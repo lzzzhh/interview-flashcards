@@ -740,4 +740,315 @@ export const statisticsCards: QACard[] = [
     sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
     favorited: false,
   },
+  // ============================================================
+  // 6. 假设检验扩展 (5 questions)
+  // ============================================================
+  {
+    id: 'stats-61',
+    category: 'statistics',
+    question: '什么是功效（Power）？影响功效的因素有哪些？',
+    answer:
+      '统计功效（Statistical Power）= 1 - β，即当备择假设 H₁ 为真时正确拒绝原假设 H₀ 的概率，本质衡量"检测到真实效应的能力"。影响功效的核心因素有四个：(1) 效应量（Effect Size）——真实差异越大功效越高，如 Cohen d = 0.8（大效应）比 d = 0.2（小效应）更容易检测，效应量由业务含义决定而非统计调整；(2) 样本量（Sample Size n）——n 越大标准误越小，检验统计量越易落入拒绝域，功效随 n 单调递增，这是实践中唯一可完全控制的参数；(3) 显著性水平 α——α 放宽（如 0.01→0.05）扩大拒绝域、提升功效，但代价是 Type I Error 率上升；(4) 数据变异性 σ——方差越小数据越集中，组间差异越容易被区分，可用 CUPED 等方法降低方差以间接提升功效。此外，检验类型也影响功效：参数检验比非参数检验功效高，单尾检验在正确方向下比双尾功效高，配对设计比独立样本功效高（消除个体间变异）。在 AB 实验中行业标准功效设定为 80%，意味着即使存在真实效应，仍有 20% 概率被漏掉。功效分析必须在实验设计阶段完成，事后功效分析（Post-hoc Power）在逻辑上存在循环论证缺陷，建议通过置信区间宽度来判断实验精度。',
+    tags: ['power', 'sample size', 'type ii error', 'effect size'],
+    subTopic: '假设检验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-62',
+    category: 'statistics',
+    question: '如何确定AB实验的样本量？基于MDE和功效的推导过程。',
+    answer:
+      'AB 实验样本量的确定基于四个关键参数的权衡：显著性水平 α（通常 0.05）、期望统计功效 1-β（通常 0.8）、最小可检测效应 MDE（用 δ 表示）、以及指标标准差 σ。对于连续指标（如人均消费金额），每组所需样本量公式为：n = 2σ²(Z_{α/2} + Z_β)² / δ²。其中 Z_{α/2} 是正态分布在 α/2 处的分位数（α=0.05 双尾时 Z=1.96），Z_β 是正态分布在 β 处的分位数（β=0.2 时 Z≈0.84）。推导逻辑：(1) 在 H₁ 为真时，组间差异的检验统计量服从非中心正态分布 N(δ/SE, 1)；(2) 拒绝域为 |Z| > Z_{α/2}，求解 P(拒绝|H₁) ≥ 1-β 即得上述公式。对于比例指标（如转化率），方差 Var = p(1-p)，样本量公式为 n = (Z_{α/2}+Z_β)²[p₁(1-p₁)+p₂(1-p₂)]/(p₁-p₂)²。实例：基线转化率 p₀=10%，期望检测 MDE=1 个百分点（p₁=11%），则 δ=0.01，n = (1.96+0.84)²×[0.1×0.9+0.11×0.89]/(0.01)² ≈ 14,700 人/组。样本量估算的最大挑战是合理设定 MDE——MDE 必须兼顾统计可行性（不能太小导致样本量过大）和业务意义（不能太大导致错过有商业价值的改善）。一般做法是回溯最小业务意义（Smallest Effect of Business Interest），结合历史数据方差估算。',
+    tags: ['sample size', 'mde', 'power analysis'],
+    subTopic: '假设检验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-63',
+    category: 'statistics',
+    question: '什么是多重比较问题（Multiple Comparisons）？Bonferroni、FDR等方法如何选？',
+    answer:
+      '多重比较问题（Multiple Comparisons Problem）指同时进行多次假设检验时，家族错误率（Family-Wise Error Rate, FWER = P(至少一次 Type I Error)）会急剧膨胀。例如单次检验 Type I 错误率为 0.05，进行 20 次独立检验时，FWER = 1-(0.95)²⁰ ≈ 64%，即即使所有原假设都成立，仍有近 2/3 概率"发现"至少一个假阳性。控制方法分为两类：(1) FWER 控制——Bonferroni 校正将每次检验的 α 调整为 α/m（m 为检验次数），简单但极端保守（尤其检验不独立时）；Holm 逐步法在 Bonferroni 基础上提升功效但仍严格；Tukey HSD 专为 ANOVA 事后两两比较设计，比 Bonferroni 功效高。(2) FDR 控制——Benjamini-Hochberg（BH）过程控制"在所有被拒绝的原假设中，假阳性的期望比例"不超过 q（通常 0.05）；步骤为将 p 值升序排列 p(1)≤...≤p(m)，找到最大 k 满足 p(k) ≤ k×q/m，拒绝前 k 个；BH-FDR 比 FWER 方法宽松得多，更适用于探索性场景。选择指南：验证性场景（一次性关键决策，如药监局审批、AB 实验核心指标）→ FWER 方法（Bonferroni/Holm），因为假阳性代价极高；探索性场景（多指标扫描找信号，如基因表达差异分析、AB 实验的辅助指标分析）→ FDR 方法（BH），容忍一定假阳性以保留统计功效。在 AB 实验中，若仅 1 个核心指标无需多重比较校正；若同时监控多个指标，核心指标可用 FWER 严格保护，辅助指标标记为探索性并用 FDR。',
+    tags: ['multiple comparisons', 'bonferroni', 'fdr', 'fwer', 'bh'],
+    subTopic: '假设检验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-64',
+    category: 'statistics',
+    question: '单尾检验 vs 双尾检验：什么时候用哪个？举例说明。',
+    answer:
+      '双尾检验的备择假设 H₁: μ≠μ₀，拒绝域均分在左右两侧各 α/2，用于检测"是否有差异（不论方向）"，是统计推断的默认和保守选择。单尾检验的备择假设为 H₁: μ>μ₀ 或 H₁: μ<μ₀，拒绝域全部集中在指定方向的一侧（全部 α），在相同显著性水平下比双尾检验有更高的统计功效（因为拒绝域更大），但代价是完全放弃检测反方向效应的能力。举例：电商 AB 测试新推荐算法预期提升点击率，理论上有明确方向预期，但实践中仍用双尾检验——因为如果新算法反而显著降低了点击率，产品团队需要知道这一信息以避免上线有害策略，双尾检验能同时检测正向和负向效应。适合单尾检验的场景：(1) 非劣效性检验（Non-Inferiority Trial），只需证明新方案不比标准方案差（如仿制药审批）；(2) 合规场景中仅需检测某一方向的超标；(3) 物理/工程领域有理论保证效应方向不可能反向。关键原则：必须在数据收集前预先声明单尾检验的方向和理由，严禁在看到数据趋势后再切换为单尾（属于 P-hacking 的典型形式）。绝大多数学术期刊和业界标准默认要求双尾检验，因为其对不确定方向的真实场景更稳健。',
+    tags: ['one-tailed', 'two-tailed', 'hypothesis testing'],
+    subTopic: '假设检验',
+    difficulty: 'easy',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-65',
+    category: 'statistics',
+    question: '什么是P-hacking？如何避免P-hacking？',
+    answer:
+      'P-hacking（P 值操纵）是指研究者通过有意或无意的灵活数据分析决策，人为将 P 值压低至显著性阈值（如 <0.05）以下的做法，显著增大了假阳性率，是"可重复性危机"（Replication Crisis）的重要推手。常见 P-hacking 手段包括：(1) Peeking——在数据收集过程中反复检查结果，一旦 P<0.05 就停止，由于 P 值在实验过程中剧烈波动，这种做法大幅提高了假阳性概率（如连续 Peeking 可将实际 α 从 0.05 放大至 0.3 以上）；(2) 选择性报告——测量了多个因变量但只报告显著的，或分析了多个子组后只呈现有显著差异的子组；(3) 灵活性分析——尝试多种数据处理方式（剔除异常值、不同协变量组合、不同模型）后选择产生显著结果的；(4) 选择性停止——看到数据达到预期后立即终止数据收集。避免方法：(1) 预注册（Pre-registration）——在数据收集前公开登记研究假设、分析方法、样本量，分析时严格按计划执行，偏差需透明报告；(2) 区分确证性分析和探索性分析——事先声明核心指标（Primary Metric）和确证性检验，其他分析标注为探索性并相应调整解读；(3) 使用序贯检验框架（Sequential Testing / Group Sequential Design）替代随意 Peeking，预先规划期中分析的时间和 α 消耗；(4) 结果全报告——公开所有测量指标和分析尝试，无论显著与否；(5) 独立复制——在独立数据集上验证已发现的效应。在 AB 实验平台中，应当锁定样本量和分析方案，避免实验者因看到结果而提前终止。',
+    tags: ['p-hacking', 'reproducibility', 'research ethics', 'preregistration'],
+    subTopic: '假设检验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+
+  // ============================================================
+  // 7. AB实验 (15 questions)
+  // ============================================================
+  {
+    id: 'stats-66',
+    category: 'statistics',
+    question: '什么是AB实验？AB实验的基本流程和核心要素是什么？',
+    answer:
+      'AB 实验（A/B Testing，也称在线对照实验 Online Controlled Experiment）是将用户通过随机分流（Randomization）分配到对照组（Control）和实验组（Treatment），只改变单一变量（策略），通过比较两组指标差异来科学评估该策略因果效应的黄金标准方法。基本流程分为六步：(1) 定义假设——明确要验证的因果关系和关键指标（如"新的商品排序算法比旧算法提升转化率 2%"）；(2) 实验设计——确定实验单位（用户/设备/会话）、样本量（基于 MDE 和功效分析）、分流比例（通常 50/50）、实验时长（通常 1-2 个业务周期）、成功标准；(3) 随机分流——通过哈希函数（如 MD5(userId+seed)）将用户确定性分配到各组，确保组间除干预外完全可比；(4) 数据收集——实验期间持续采集各组的指标数据，同时监控数据质量（如 SRM 检测）；(5) 统计分析——使用 t 检验/卡方检验或贝叶斯方法比较组间差异，计算 P 值和置信区间；(6) 决策发布——综合统计显著性、实际显著性（效应量是否达到业务阈值）和护栏指标表现决定是否全量上线。核心要素包括：随机化（消除混淆变量，是因果推断的基础）、对照（Control 提供反事实基准）、足够的样本量和实验时长（确保统计功效和结果代表性）。AB 实验的优势在于通过随机化建立了"相关≈因果"的条件，但它也有限制：不适合网络效应强的产品（如社交平台）、难以捕捉长期效应、需要足够流量支撑。',
+    tags: ['ab testing', 'experiment design', 'randomization', 'rct'],
+    subTopic: 'AB实验',
+    difficulty: 'easy',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-67',
+    category: 'statistics',
+    question: '什么是MDE（Minimum Detectable Effect）？如何在实际业务中设定MDE？',
+    answer:
+      'MDE（Minimum Detectable Effect，最小可检测效应）是在给定显著性水平 α 和统计功效 1-β 下，实验能够以较高概率检测到的最小真实差异。MDE 是样本量计算的输入参数之一——MDE 越小，所需样本量越大（与 MDE 的平方成反比）。在实际业务中设定 MDE 的步骤：(1) 回溯历史数据——计算指标的均值和标准差，了解其自然波动范围（如"转化率基线 10%，标准差约 2%"）；(2) 确定最小业务意义（Smallest Effect of Business Interest）——与产品和业务团队讨论，多大的提升才值得投入工程资源上线。例如转化率提升 0.1 个百分点可带来年收入增加 500 万，而工程实现成本仅 50 万，那么即使 0.1% 的提升也是"有业务意义的"；(3) 平衡统计可行性和业务意义——若最小业务意义对应的样本量不切实际（如需要数亿用户），则需要调整预期或选择更敏感的指标（如用 CUPED 降方差）；(4) 将业务意义转化为统计 MDE——相对 MDE = 绝对差异 / 标准差 = δ/σ（即 Cohen d），如 d=0.2 为小效应（需要很大样本量），d=0.5 为中等（常规样本量），d=0.8 为大效应（小样本即可）。实践中的经验法则：MDE 不应低于指标自然波动的 2-3%（否则样本量爆炸），也不要高于 10-15%（否则可能错过有价值的改善）。最终，MDE 应在实验设计文档中明确记录，并作为后期解读结果的参照。',
+    tags: ['mde', 'minimum detectable effect', 'sample size'],
+    subTopic: 'AB实验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-68',
+    category: 'statistics',
+    question: '什么是第一类错误（Type I Error）和第二类错误（Type II Error）？在AB实验中分别对应什么业务风险？',
+    answer:
+      '第一类错误（Type I Error, False Positive / 假阳性）是在原假设 H₀（无效应）为真时错误拒绝 H₀ 的概率，记为 α，通常设定为 0.05（5%）。第二类错误（Type II Error, False Negative / 假阴性）是在备择假设 H₁（有效应）为真时未能拒绝 H₀ 的概率，记为 β，通常设定为 0.2（统计功效 1-β = 80%）。在 AB 实验中，Type I Error 对应的业务风险是"误认为新策略有效而上线了一个实际上无效甚至有害的功能"，这会导致：(1) 浪费工程资源开发无效功能；(2) 损害关键指标（如转化率下降、用户流失增加）；(3) 降低后续实验效率（用户对频繁变化失去信任）；(4) 增加技术债务。Type II Error 对应的业务风险是"错过一个真正有效的策略"，这会导致：(1) 失去提升指标的机会成本；(2) 创新速度减慢；(3) 团队士气受挫（好的想法被数据否定）。两类错误的取舍取决于业务场景：在金融风控或医疗领域，Type I Error 的代价极高（批准无效药物会危害患者），因此倾向于设定更严格的 α（如 0.01）；在广告优化或推荐场景，Type I Error 的成本相对较低（推荐效果差可以快速回滚），而 Type II Error（错过有效策略）的机会成本更高，因此可以适当容忍较高的 α 或使用 Multi-Armed Bandit 方法以更快地发现好的策略。在样本量固定时，α 和 β 存在此消彼长的权衡——降低 α 必然增大 β，唯一同时降低两者的是增加样本量。',
+    tags: ['type i error', 'type ii error', 'business risk', 'false positive'],
+    subTopic: 'AB实验',
+    difficulty: 'easy',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-69',
+    category: 'statistics',
+    question: 'AB实验中的SRM（Sample Ratio Mismatch）是什么？如何检测和处理？',
+    answer:
+      'SRM（Sample Ratio Mismatch，样本比例不匹配）是指 AB 实验中实际分配到各组用户数比例与预期分配比例显著不一致的现象。例如预期 50/50 分流，但实际观测到对照组 48%、实验组 52%，这种偏离超出了随机误差允许的范围（通过卡方检验判断）。SRM 是 AB 实验数据质量的"金丝雀"——它几乎总能暴露出系统性问题。常见原因包括：(1) 分流代码 bug（如浏览器兼容性问题导致部分用户未正确分桶）；(2) 实验组体验问题导致用户无法进入（如白屏错误、加载失败），这些用户未被计入实验组但计入了对照组；(3) 机器人/爬虫流量被不均匀地分配到各组；(4) 数据管道差异（如对照组和实验组的数据处理延迟不同）；(5) 缓存或 CDN 导致不同组的访问模式差异。检测方法：使用卡方拟合优度检验（Chi-Square Goodness of Fit Test），H₀ 假设观测比例 = 预期比例，若 P < 0.001（更严的阈值以高灵敏度检测）则标记 SRM 告警。处理步骤：(1) 一旦检测到 SRM，立即暂停并调查根因；(2) 检查分流代码和日志，按设备/浏览器/地区等维度拆解看 SRM 是否集中在某个维度；(3) 修复后重启实验，SRM 数据不得用于统计推断（因为组间已不可比，即使 P 值显著也不可信）；(4) 记录 SRM 事件于实验报告中。谷歌和微软等公司将 SRM 检查设为实验平台自动化的第一步质量检验，是可信实验结果的前提条件。',
+    tags: ['srm', 'sample ratio mismatch', 'data quality', 'chi-square'],
+    subTopic: 'AB实验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-70',
+    category: 'statistics',
+    question: '什么是辛普森悖论（Simpson\'s Paradox）？在AB实验中如何避免？',
+    answer:
+      '辛普森悖论（Simpson\'s Paradox）是指数据在总体层面呈现的趋势，在按某个混杂变量分组后，各子组内的趋势可能与总体趋势完全相反的现象。经典案例：UC Berkeley 研究生录取数据中，总体数据显示男性录取率高于女性（性别歧视表象），但按院系分组后发现，在各院系内部女性录取率反而高于男性——真正的原因是女性更多申请了录取率低的院系，院系成为混杂变量。在 AB 实验中，Simpson\'s Paradox 可能表现为：总体指标实验组优于对照组，但按设备类型（iOS vs Android）、用户新旧、时段等维度拆分后，各子组内实验组均劣于对照组，或者反之。这通常由实验组和控制组的用户组成结构发生了变化（如实验组中 iOS 用户比例异常偏高）导致。避免方法：(1) 确保随机分流的正确性——通过 SRM 检查确认各组在协变量上平衡（如设备类型、地区、活跃度等分布应一致）；(2) 预定义细分维度分析——在实验设计阶段就确定需要拆解的关键维度，若发现总体结论与细分维度结论矛盾，优先调查分流质量；(3) 使用 CUPED 或分层随机化来预先平衡关键协变量；(4) 报告加权总体效应——如果各组子类占比不同，应使用标准化的权重计算调整后的总体效应。核心原则：当总体结论与细分分析矛盾时，不要盲目相信总体数字，先排查是否有 SRM 或实验执行偏差。',
+    tags: ['simpson paradox', 'confounding', 'segmentation'],
+    subTopic: 'AB实验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-71',
+    category: 'statistics',
+    question: '什么是网络效应/干扰效应（Network Effect/Interference）在AB实验中？如何应对？',
+    answer:
+      '网络效应/干扰效应（Network Effect / Interference）在 AB 实验中是指，处理组用户的干预可能通过社交网络、共享资源或信息传播间接影响对照组用户，从而违反 SUTVA（Stable Unit Treatment Value Assumption，个体处理值稳定假设）——即每个用户的潜在结果仅取决于自身接受的处理，不受其他用户处理的影响。典型场景：(1) 社交平台——实验组用户看到新的推荐内容后分享给对照组好友，使对照组也间接受到影响；(2) 双边市场（如打车/外卖平台）——实验组降低价格吸引更多用户打车，抢夺了对照组用户的司机供给（供给稀释效应）；(3) 广告竞价——实验组改变出价策略，影响整个竞价市场的价格环境，进而影响对照组的广告效果。网络效应导致的直接后果是：对照组的指标不再是纯净的"基准线"，实验组的效应估计（ATE）出现偏差。应对方案：(1) 集群随机化（Cluster Randomization）——以社交群组/城市/时间段为单位进行随机化，而非以用户个体为单位，确保同一集群内用户接收相同处理，但代价是有效样本量减少、统计功效降低；(2) 两阶段随机化——将用户随机分配到不同"市场"，然后在各市场内部再进行个体随机化，通过比较市场间差异估计直接效应+间接效应；(3) 网络实验分析——利用社交图数据建模 spillover 效应，如使用暴露模型（Exposure Models）将用户按"曝光程度"分层分析；(4) 反事实模拟——用模拟方法估计若无网络效应时的反事实结果。在设计阶段就要判断产品是否存在强网络效应，以决定采用哪种实验设计。',
+    tags: ['network effect', 'interference', 'sutva', 'cluster randomization'],
+    subTopic: 'AB实验',
+    difficulty: 'hard',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-72',
+    category: 'statistics',
+    question: 'AB实验中的Peeking问题是什么？为什么不能反复看结果？',
+    answer:
+      'Peeking（窥探/期中分析）是指在 AB 实验尚未达到预设样本量之前，反复查看结果并根据当前的 P 值做出停止或继续的决策。Peeking 的危险在于：P 值在实验过程中是剧烈波动的随机游走过程——即使 H₀ 为真（无效应），P 值也可能在实验早期偶然跌破 0.05，若此时停止实验并将此结果认定为显著，实际 Type I Error 率远高于名义 α=0.05。蒙特卡洛模拟表明，若每天 Peek 一次并在 P<0.05 时停止，实际 α 可能膨胀至 0.20~0.30（名义 α 的 4-6 倍）。Peeking 使实验结果不可靠的根本原因在于，它破坏了固定样本量假设检验的统计保证——传统检验假设样本量是预先固定且唯一的终止条件。正确处理方式：(1) 固定样本量+不 Peeking——预先通过功效分析确定所需样本量，在达到之前不查看结果（最严格的方案，但实践中的诱惑难以抵挡）；(2) 序贯检验（Sequential Testing）——使用序贯概率比检验（SPRT）或 alpha-spending 函数（如 O\'Brien-Fleming、Lan-DeMets 方法），在预先规划的期中分析时间点按规则"消耗"部分 α，使整体 α 仍控制在 0.05；(3) 贝叶斯序贯方法——在贝叶斯框架下使用 P(B > A | Data) 的后验概率作为终止规则，天然支持持续监控；(4) 使用 Always-Valid P-values 或 e-values 进行随时可停止的有效推断。业界最佳实践：实验平台应在实验达到最小样本量/时长前隐藏统计分析结果，或仅显示描述统计，并内置序贯检验框架以防止随意 Peeking。',
+    tags: ['peeking', 'sequential testing', 'type i error', 'early stopping'],
+    subTopic: 'AB实验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-73',
+    category: 'statistics',
+    question: 'CUPED（Controlled-experiment Using Pre-Experiment Data）是什么？如何用它降低方差？',
+    answer:
+      'CUPED（Controlled-experiment Using Pre-Experiment Data，利用实验前数据的对照实验）是一种方差缩减技术，通过将实验前的协变量信息纳入分析模型，减少指标方差从而提升实验灵敏度（以更小样本量检测到同等效应，或同等样本量检测到更小效应）。核心原理与 ANCOVA（协方差分析）相同：构建调整后的指标 Y_cuped = Y - θ(X - X̄)，其中 Y 是实验期指标，X 是同一用户实验前的相同指标（或其他高度相关的协变量），θ = Cov(Y,X)/Var(X) 是最优调整系数。方差缩减比例 = 1 - ρ²，其中 ρ 是 Y 和 X 之间的相关系数——相关系数越高缩减越大。例如实验前 GMV 与实验期 GMV 的相关系数为 0.7，则方差缩减约 49%，相当于样本量需求减半。CUPED 的关键要求：(1) X 必须在实验开始前测量（保证不受实验干预影响），否则会引入偏差（如用实验期数据做协变量会将干预效应部分也"调整掉"）；(2) X 和 Y 之间的相关性须稳定（通过历史数据验证）；(3) 调整在实验层面而非用户层面（使用对照组的总体回归系数 θ，而非各用户单独估计）。CUPED 常见变体：分层 CUPED（在随机化层内做调整）、多协变量 CUPED（使用多个实验前协变量）、非线性 CUPED（通过机器学习模型估计 X 的非线性函数）。微软和 Netflix 等公司的报告显示 CUPED 通常可将实验灵敏度提升 10-50%，极大降低实验所需样本量和时长。实践中需注意：CUPED 应用于连续指标效果好，对二分类指标（转化率）效果较有限。',
+    tags: ['cuped', 'variance reduction', 'pre-experiment data', 'ancova'],
+    subTopic: 'AB实验',
+    difficulty: 'hard',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-74',
+    category: 'statistics',
+    question: '什么是分流（Randomization）？哈希分流 vs 随机数分流各有什么优劣？',
+    answer:
+      '分流（Randomization / Traffic Splitting）是 AB 实验的核心机制，通过随机或伪随机方式将用户分配到不同实验组，确保组间在一切已知和未知因素上统计平衡，从而使组间指标差异仅归因于干预本身。两种主流实现方式：(1) 哈希分流——使用确定性哈希函数（如 MD5、SHA256、MurmurHash3）对用户标识符+实验层种子（userId + layerSeed）计算哈希值，然后对 10000（或其他模数）取模，根据余数区间映射到各组。哈希分流的优势是确定性——同一用户在同一实验层多次访问始终分到同一组（保证用户体验一致性），且无需存储状态；劣势是哈希碰撞会导致轻微不均匀（但大样本下可忽略），且不易实现不等比分流（如 20%/80%）；(2) 随机数分流——对每个用户生成随机数（或从随机数表中查找），决定其分组。随机数的优势是实现简单、天然支持任意分流比例；劣势是若没有持久化存储，同一用户在不同请求中可能分到不同组（需要数据库记录），增加系统复杂度。工程实践中哈希分流占主流：(1) 使用稳定的用户标识（UserId 或 DeviceId）；(2) 添加 Salt（实验层种子）实现分层——同一用户在不同实验层中得到不同的独立哈希值，支持正交实验（Google 的 Overlapping Experiments）；(3) 哈希值映射到 0-9999 区间后灵活分配各组的区间段。分流质量通过 SRM 检查持续监控，确保代码无 Bug 且各维度分布平衡。',
+    tags: ['randomization', 'hash', 'traffic splitting', 'deterministic'],
+    subTopic: 'AB实验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-75',
+    category: 'statistics',
+    question: '当AB实验无法达到统计显著性时，如何决策？（如：样本量不够、效应太小）',
+    answer:
+      '当 AB 实验数据收集结束后结果未达到统计显著性（P > 0.05）时，决策不能简单地"不拒绝 H₀ 就接受 H₀（无效应）"，而应结合多方面信息综合判断。分析框架：(1) 检查实验执行质量——是否存在 SRM（样本比例不匹配）、数据管道错误、实验组 bug 等技术问题导致数据不可靠；(2) 查看置信区间而非仅看 P 值——效应量的 95% 置信区间提供了更丰富的信息。例如 95% CI = [-0.5%, +2.0%] 包括 0（不显著），但上限 2.0% 表明真实效应可能高达 2%——此时"不显著"可能是因为样本量不足而非无效，应评估 2% 的业务价值决定是否继续实验；(3) MDE 比对——实际 CI 是否超过了 MDE 上限？如果 95% CI 为 [-0.1%, +0.3%] 且 MDE=1%，意味着数据已足够排除大于 MDE 的效应，可以较有信心地认为"无重要效应"；(4) 结合护栏指标——即使核心指标不显著，若护栏指标也无恶化趋势，可以降低上线风险；(5) 考虑贝叶斯后验概率——计算 P(Effect > 0 | Data) 和 P(Effect > MDE | Data)，作为频率学框架的补充。决策选项：若 CI 足够窄且排除了有业务意义的效应→可放弃该策略；若 CI 宽但效应方向有利且护栏安全→可延长实验时间或扩大样本量；若样本量已巨大但效应仍极小→该策略大概率无实际价值。核心教训：不要用 P > 0.05 简单否定一个策略，应用效应量和精度做科学判断。',
+    tags: ['decision making', 'non-significant', 'practical significance', 'confidence interval'],
+    subTopic: 'AB实验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-76',
+    category: 'statistics',
+    question: 'AB实验中如何处理多个指标（如：核心指标 vs 护栏指标）？',
+    answer:
+      'AB 实验通常同时监控多个指标，这些指标按照角色分为不同层级：(1) 核心指标（Primary/Decision Metrics, 1-2 个）——实验直接旨在改善的指标，如 GMV、转化率、点击率，实验结果是否"成功"主要由核心指标决定；(2) 护栏指标（Guardrail Metrics）——不期望实验对其产生负面影响的关键业务指标（如用户留存率、客诉率、页面加载时间），它们设立了实验的安全底线，即使核心指标显著提升，护栏指标若显著恶化也应否决实验；(3) 诊断指标（Diagnostic Metrics）——帮助理解实验机制和解释结果的辅助指标（如各页面的跳出率、搜索次数），不是决策依据。多指标处理策略：(1) 核心指标层面——因为只有 1-2 个（或使用组合指标 OEC = Overall Evaluation Criterion），一般无需多重比较校正；(2) 护栏指标层面——每个护栏指标单独检验，若统一使用 α=0.05，多个护栏指标会放大整体 Type I Error 的 FWER，建议对护栏指标组使用 Bonferroni 校正或将 α 设为更严的标准（如 0.01），同时可允许"定向宽松"——护栏指标只关注是否"显著恶化"（单尾），而非双向变化；(3) 整体决策矩阵——通常使用 Trustworthy 区域规则：核心指标显著且护栏无明显负面且 SRM 通过→上线；核心指标显著但某护栏显著恶化→暂停并调查；核心指标不显著→原则上不上线，除非有强业务理由。谷歌推荐的实验评估框架中，每实验只设 1 个 OEC（OEC 可以是多个指标的加权组合），并使用分层 FDR 控制探索性指标。',
+    tags: ['metrics', 'guardrail metrics', 'oec', 'multiple testing'],
+    subTopic: 'AB实验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-77',
+    category: 'statistics',
+    question: '什么是长期效应（Long-term Effect）？AB实验中如何评估长期效应？',
+    answer:
+      '长期效应（Long-term Effect）是指在 AB 实验的初期观察到的效应，在经过足够长时间后可能衰减、逆转或产生新效应，使得短期实验结论不能代表长期的真实因果效应。两大典型现象：(1) 新颖效应（Novelty Effect）——用户在实验初期因新界面/新功能的新鲜感而产生较高的参与度，但随着时间推移新鲜感消退，指标回归甚至低于原水平。例如新页面设计上线首周点击率提升 20%，但一个月后回落到仅提升 3%；(2) 学习效应（Learning Effect）——用户需要时间学习和适应新功能，实验初期指标可能下降（困惑期），但长期随着用户熟悉操作后指标逐步提升并超过原水平；(3) 延迟反馈效应——某些指标在短期内无法体现（如用户终身价值 LTV），需要长期跟踪。评估长期效应的方案：(1) 拉长实验周期——将标准 2-4 周的实验延长到 8-12 周（代价是流量和机会成本增加）；(2) 保留回溯队列（Holdout / Long-term Holdout）——在全量上线新策略时，保留一小部分用户（如 1-5%）持续作为对照组（长期对照），定期对比两组指标差异，检测短期实验未能捕捉的长期效应。微软和谷歌都在关键功能上线后维持 Holdout 组以持续验证长期效果；(3) 衰减建模——使用衰减函数（如指数衰减）对短期效应进行建模，外推长期稳态效应；(4) 因果推断方法——当无法做 AB 实验时（如已全量），用 DID、Synthetic Control 等方法辅助评估。核心原则：短期 AB 实验测的是"初始效应"，长期效应评估是持续的产品洞察过程。',
+    tags: ['long-term effect', 'novelty effect', 'learning effect', 'holdout'],
+    subTopic: 'AB实验',
+    difficulty: 'hard',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-78',
+    category: 'statistics',
+    question: '贝叶斯AB测试 vs 频率学AB测试：各自的优缺点和适用场景？',
+    answer:
+      '贝叶斯 AB 测试和频率学 AB 测试是两种不同的统计推断哲学，各有优劣。频率学 AB 测试：(1) 基于抽样分布理论，输出 P 值和置信区间，最终决策为"拒绝/不拒绝 H₀"的二元结论；(2) 要求固定样本量（需预先计算），实验期间不能随意 Peeking；(3) 结果解读中 P 值经常被误解（P 值 ≠ H₀ 为真的概率，也 ≠ 效应大小）。优点：客观（不依赖先验）、简单（单次二元决策清晰）、计算成本低、业界和监管认可度高。缺点：不能提前终止、不能直接回答"新策略更好的概率是多少"。贝叶斯 AB 测试：(1) 基于贝叶斯定理，输出后验概率分布（如"实验组优于对照组的概率为 97%"），结果更加直观；(2) 支持在线持续更新后验，允许在证据充分时提前终止（节省流量）；(3) 能自然整合历史数据作为先验（小流量测试更友好）；(4) 多次 Peeking 不改变统计保证（因为后验更新即贝叶斯学习过程本身）。缺点：先验选择可能带有主观性（但可用弱信息先验或非信息先验缓解）、计算成本较高（需 MCMC 或数值积分）、不一致的先验可能产生不同结论。适用场景选择：监管密集型场景（医疗审批）和结论需广泛外部认可的→频率学；内部快速迭代大量实验的互联网公司→贝叶斯（灵活性高、节省流量）；流量稀缺的小型测试→贝叶斯（先验信息弥补样本量不足）；多次序贯决策且机会成本高→贝叶斯或频率学序贯框架。实践中 Google、Microsoft、Netflix 等已广泛采用贝叶斯 AB 框架迭代海量实验。',
+    tags: ['bayesian', 'frequentist', 'ab testing', 'comparison'],
+    subTopic: 'AB实验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-79',
+    category: 'statistics',
+    question: '多臂老虎机（Multi-Armed Bandit）与AB实验的区别？什么场景用Bandit？',
+    answer:
+      '多臂老虎机（Multi-Armed Bandit, MAB）是一种自适应实验方法，来源于强化学习中的"探索-利用"（Exploration-Exploitation）权衡问题：如何在尝试多个策略（探索）与集中资源到当前最佳策略（利用）之间动态分配流量。与 AB 实验的核心区别：(1) 流量分配——AB 实验固定各组流量比例（如 50/50）且全程不变，MAB 根据实时观察到的各臂表现动态调整流量比例，表现越好的臂分到的流量越多；(2) 目标——AB 实验目标是获得可靠的统计推断结论（回答"哪个更好"），而 MAB 的目标是在实验过程中最大化总体回报（Regret Minimization，在"学习"的同时尽量减少损失）；(3) 结果——AB 实验输出 P 值/置信区间/后验概率，MAB 输出最终的最佳臂选择（但不一定给出精确的效应量化）；(4) 时长——AB 实验有预设实验时长和样本量，MAB 可无限运行持续自适应。常见 MAB 算法：Epsilon-Greedy（以 ε 概率随机探索，其余时间利用最优臂）、Thompson Sampling（根据各臂后验分布采样，以各臂为最优臂的概率进行选择）、UCB（Upper Confidence Bound，选择置信区间上限最大的臂，天然平衡探索与利用）。适用 MAB 的场景：(1) 候选策略极多且差异大（如测试 100 种广告创意），AB 实验逐个比较太低效；(2) 机会成本高（每展示一次差广告就损失潜在收入）；(3) 非平稳环境（用户偏好持续变化需持续适应）。不适用 MAB 的场景：(1) 需要严格因果结论和精确效应量化；(2) 策略改变可能有延迟效应需要足够观察期；(3) 需评估对护栏指标（如留存）的长期影响。实践中 Google Analytics 的内容优化、Netflix 的推荐缩略图选择、雅虎新闻推荐常用 MAB 方法。',
+    tags: ['multi-armed bandit', 'exploration-exploitation', 'adaptive', 'thompson sampling'],
+    subTopic: 'AB实验',
+    difficulty: 'medium',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-80',
+    category: 'statistics',
+    question: '如何设计一个分层AB实验（Layered Experiments）？谷歌的overlapping experiments怎么做？',
+    answer:
+      '分层 AB 实验（Layered Experiments）是指将用户流量同时分配到多个"实验层"中，每个实验层独立运行一套实验（对流量做正交分割），使得同一用户可以同时参与多个实验但互不干扰。核心机制：每个实验层使用不同的哈希种子（seed），确保用户在不同层之间得到独立的哈希值，从而产生独立的分组。例如 Layer 1 使用 seed=1000 做搜索算法 AB 测试，Layer 2 使用 seed=2000 做 UI 颜色 AB 测试，同一用户可能在 Layer 1 分到实验组、在 Layer 2 分到对照组，两个实验在统计上独立（因为哈希值在层间无相关性）。谷歌的 Overlapping Experiments 框架：(1) 流量视野——总流量被分为多个"域"（Domain），每个域代表一个独立的业务维度（如搜索、广告、UI），不同域之间正交；(2) 在每个域内再细分为多个"层"（Layer），每个层内运行一组互斥实验（同一层内用户只能参加一个实验），而不同层之间正交（独立哈希种子），可以同时运行；(3) 设计关键原则——层的独立性要求不同层的哈希种子确保正交（层间相关系数 ≈ 0）；流量稀释控制（每增加一个实验层，各层内分配给单个实验的流量就减少）；层间交互检测（理论上各层独立，但实践中可能发生交互，如搜索算法和 UI 颜色同时改变时的协同效应，当怀疑存在交互时需设计专门的交互层实验验证）；预留 Backfill 流量用于监测平台整体健康度。分层实验使 Google、Microsoft、Netflix 等公司能在同一时间运行数百个并发实验，极大提升实验迭代速度。',
+    tags: ['layered experiments', 'overlapping', 'google', 'orthogonalization'],
+    subTopic: 'AB实验',
+    difficulty: 'hard',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+
+  // ============================================================
+  // 8. 因果推断 (5 questions)
+  // ============================================================
+  {
+    id: 'stats-81',
+    category: 'statistics',
+    question: '相关性和因果性的根本区别是什么？为什么"相关不代表因果"？',
+    answer:
+      '相关性（Correlation）衡量两个变量之间的统计关联方向和强度（如 Pearson r = 0.8 表示强正向线性关联），而因果性（Causality）意味着一个变量的变化直接导致了另一个变量的变化（操纵 X 会引发 Y 的相应改变）。"相关不代表因果"（Correlation does not imply causation）的根本原因在于混淆变量（Confounder）的存在——第三个变量 Z 同时影响了 X 和 Y，导致 X 和 Y 表面相关但实质上没有直接因果关系。三个经典因果通道导致相关≠因果：(1) 混淆偏倚——冰淇淋销量和溺水死亡正相关，真正原因是夏季温度（Z）同时导致了两者上升；(2) 反向因果——X 和 Y 相关，但实际是 Y 导致 X，而非 X 导致 Y（如"读更多书的学生成绩更好"，可能是好成绩激发了阅读兴趣而非反之）；(3) 选择偏倚——样本选择导致虚假相关（如"在医院里，吸烟者比不吸烟者的肺癌治愈率更高"，因为吸烟者更年轻且更早被检测出）。建立因果关系的金标准是随机对照实验（RCT / AB 实验）——通过随机化消除混淆变量的影响。在无法实验时，使用观察性因果推断方法：工具变量（IV）、双重差分（DID）、断点回归（RDD）、倾向性得分匹配（PSM）等。关键区分：相关性是统计手段能自然发现的模式，因果性需要额外的实验设计或不可检验的假设（如无混淆假设）。数据科学家最常犯的错误之一就是将观测数据中显著的相关关系解读为因果关系，从而做出错误的业务决策。',
+    tags: ['causality', 'correlation', 'confounding', 'causal inference'],
+    subTopic: '因果推断',
+    difficulty: 'easy',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-82',
+    category: 'statistics',
+    question: '什么是DID（Difference-in-Differences）方法？它的核心假设和平行趋势检验是什么？',
+    answer:
+      'DID（Difference-in-Differences，双重差分法）是准实验因果推断中最常用的方法之一，通过比较处理组和对照组在处理前后变化量的差异来估计因果效应，从而消除时间趋势和其他不随时间变化的混淆因素。模型设定：Yᵢₜ = β₀ + β₁·Treatᵢ + β₂·Postₜ + β₃·(Treatᵢ × Postₜ) + εᵢₜ。其中 Treatᵢ 是处理组虚拟变量（1=处理组），Postₜ 是处理后时间虚拟变量（1=处理后），交互项系数 β₃ 即为 DID 估计量——因果效应的估计值。DID 估计量 = (处理组后 - 处理组前) - (对照组后 - 对照组前) = 消除共同时间趋势后的净效应。核心假设——平行趋势假设（Parallel Trends Assumption）：如果处理组没有接受干预，其指标的变化趋势应该与对照组相同（即处理组和对照组在处理前有相同的趋势）。检验平行趋势的方法：(1) 视觉诊断——绘制两组在多个处理前时间点的指标趋势图，检查两条线是否大致平行；(2) 事件研究法（Event Study）——在处理前多个时点设置虚拟变量与 Treat 的交互项，检验这些系数是否显著不为 0，若均不显著则支持平行趋势；(3) Placebo 检验——虚构一个处理发生的时间点（在实际处理前），用 DID 方法不应得到显著效应。DID 的局限：平行趋势不可检验"处理后"部分（只是假设其持续成立）、对时间序列长度有要求（需要足够的处理前数据点做趋势检验）、若存在随时间变化的混淆变量（与处理时点相关），DID 估计仍可能有偏。扩展方法包括三重差分（DDD）和合成控制法（Synthetic Control）以增强因果识别的可信度。',
+    tags: ['did', 'difference-in-differences', 'parallel trends', 'quasi-experiment'],
+    subTopic: '因果推断',
+    difficulty: 'hard',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-83',
+    category: 'statistics',
+    question: '什么是工具变量（Instrumental Variable）？在什么场景下使用？',
+    answer:
+      '工具变量（Instrumental Variable, IV）是解决回归分析中内生性（Endogeneity）问题的经典方法。当自变量 X 与误差项 ε 存在相关性（由遗漏变量、测量误差或反向因果导致）时，OLS 估计有偏且不一致，IV 通过引入一个"工具"来识别因果效应。有效工具变量 Z 需满足两个核心条件：(1) 相关性（Relevance）——Z 与内生变量 X 显著相关（Cov(Z,X) ≠ 0，即第一阶段回归中 Z 是 X 的强预测变量）；(2) 外生性/排他性（Exogeneity / Exclusion Restriction）——Z 仅通过 X 影响 Y，与误差项不相关（Cov(Z,ε) = 0），即 Z 不能通过 X 之外的任何路径影响 Y。IV 估计通常通过两阶段最小二乘法（2SLS）实现：第一阶段——用 Z（及其他外生变量）回归 X，得到 X 的预测值 X̂；第二阶段——用 Y 对 X̂ 回归，系数即为因果效应的 IV 估计。弱工具变量问题（Weak IV）——当 Z 与 X 仅弱相关（第一阶段 F 统计量 < 10），IV 估计将极不稳定且有偏（向 OLS 偏倚方向偏移），检测规则是 Stock-Yogo 检验。经典 IV 案例：(1) 劳动经济学——用"出生季度"作为教育年限的工具变量（Angrist & Krueger, 1991），因为出生季度影响义务教育结束年龄但与先天能力无关，从而识别教育对收入的因果效应；(2) 经济学——用"降雨量"作为农产品价格的工具变量。现实中寻找合格 IV 是极大的挑战——外生性条件不可直接检验，需要经济学理论和领域知识严密论证。',
+    tags: ['instrumental variable', 'iv', 'endogeneity', '2sls'],
+    subTopic: '因果推断',
+    difficulty: 'hard',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-84',
+    category: 'statistics',
+    question: '什么是RDD（Regression Discontinuity Design）？适合什么场景？',
+    answer:
+      'RDD（Regression Discontinuity Design，断点回归设计）是一种准实验因果推断方法，适用于存在一个连续运行变量（Running Variable / Forcing Variable）和一个人为设定的阈值（Cutoff），当运行变量超过阈值时个体才接受处理的情境。核心思想：在阈值附近极小的邻域内，刚过阈值和刚未过阈值的个体（在运行变量上几乎相同）可视为"局部随机化"——处理状态近似随机分配，从而通过比较阈值两侧个体的结果差异来识别因果效应。两种类型：(1) 精确 RDD（Sharp RDD）——运行变量超过阈值后处理概率从 0 跃升到 1（确定性的处理分配）；(2) 模糊 RDD（Fuzzy RDD）——超过阈值后处理概率显著增加但不为 1，此时需用 IV 方法（将阈值作为工具变量）。RDD 估计通过局部多项式回归实现：在阈值两侧分别拟合低阶多项式（通常线性或二次），配合局部带宽（Bandwidth）限制分析窗口在阈值附近。关键挑战是带宽选择：带宽太大引入偏倚（远离阈值的个体可比性差），带宽太小方差大（样本少）；常用 IK（Imbens-Kalyanaraman）或 CCT（Calonico-Cattaneo-Titiunik）数据驱动带宽选择法。适合 RDD 的场景：(1) 教育——录取分数线两侧的学生（如大学录取按排名，分数线附近学生能力相似，比较就学率和后续成就差异识别教育的因果效应）；(2) 政策评估——如"年满 65 岁可获 Medicare 保险"，比较刚满和刚未满 65 岁者的健康指标；(3) 推荐系统——是否展示某推荐位依赖于分数是否超过某阈值（如质量分 > 0.7 才展示）。RDD 的主要局限：只能识别阈值附近的局部平均处理效应（LATE），不能推广到远离阈值的个体人群。',
+    tags: ['rdd', 'regression discontinuity', 'quasi-experiment', 'cutoff'],
+    subTopic: '因果推断',
+    difficulty: 'hard',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-85',
+    category: 'statistics',
+    question: '倾向性得分匹配（Propensity Score Matching）的原理、步骤和局限性？',
+    answer:
+      '倾向性得分匹配（Propensity Score Matching, PSM）是观测性研究中用于减少选择偏倚、模拟随机对照实验的因果推断方法。核心原理：倾向性得分（Propensity Score）e(X) = P(T=1|X)，即给定协变量 X 下个体接受处理的概率。Rosenbaum & Rubin (1983) 证明：如果"条件独立性假设"（CIA / Unconfoundedness）成立（即控制了 X 后，处理分配与潜在结果独立），那么控制一维的 e(X) 等价于控制全部高维的 X，极大地简化了匹配问题。PSM 标准步骤：(1) 估计倾向性得分——使用逻辑回归（或其他分类模型）将处理变量 T 对可观测协变量 X 回归，计算每个个体的倾向性得分 ê(X)；(2) 匹配——为每个处理组个体在对照组中找一个 ê 最接近的个体，常用方法包括最近邻匹配、卡尺匹配（设定最大距离阈值）、核匹配（加权使用所有对照组个体）；(3) 平衡性检验——匹配后检查处理组和对照组在各协变量上的标准化均值差异（SMD），通常要求 SMD < 0.1；(4) 因果效应估计——计算匹配后两组结果均值的差异（ATT = 处理组的平均处理效应）。PSM 的局限和注意事项：(1) 仅控制可观测的混淆变量——CIA 假设不可检验，若存在未观测的混淆变量（如动机、天赋），PSM 估计仍可能有偏；(2) 共同支撑域（Common Support）——如果处理组和对照组的倾向性得分分布重叠很少，匹配质量差且需谨慎外推；(3) 匹配后的标准误差需要调整（因匹配引入依赖），通常用 Bootstrap 或 Abadie-Imbens 标准误；(4) PSM 不能替代随机实验——PSM 只能在可观测变量上平衡，无法像随机化那样在未知变量上也取得平衡。替代或增强方法包括逆概率加权（IPTW）、双重稳健估计（DR Estimator）、熵平衡等。',
+    tags: ['propensity score matching', 'psm', 'observational study', 'selection bias'],
+    subTopic: '因果推断',
+    difficulty: 'hard',
+    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    favorited: false,
+  },
 ];
