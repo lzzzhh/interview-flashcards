@@ -43,8 +43,8 @@ export default function HomePage({ onEnterStudy }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-      <div className="max-w-xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center">
+      <div className="max-w-xl w-full px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">

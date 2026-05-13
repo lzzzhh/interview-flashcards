@@ -36,7 +36,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
   if (state.studyMode === 'choose') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm mx-auto space-y-4">
+        <div className="w-full max-w-sm space-y-4">
           <button onClick={onBack} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-6">
             <ArrowLeft className="w-4 h-4" /> 返回首页
           </button>
