@@ -2,10 +2,12 @@
 // src/components/StatsDashboard.tsx — 学习统计面板（含艾宾浩斯曲线）
 // ============================================================
 
-import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { useProgress } from '../hooks/useProgress';
 import { DIFFICULTY_LABEL } from '../constants';
+import { exportProgress, importProgress } from '../utils/backup';
 
 /**
  * 艾宾浩斯遗忘曲线数据
@@ -214,8 +216,69 @@ export default function StatsDashboard() {
               })}
             </div>
           </div>
+          {/* Import / Export */}
+          <ImportExport />
         </div>
       </div>
+    </div>
+  );
+}
+
+function ImportExport() {
+  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const result = await importProgress(file);
+    setMsg({ type: result.success ? 'success' : 'error', text: result.message });
+    // Reset input so same file can be re-imported
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  return (
+    <div className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        备份与同步
+      </h3>
+      <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+        进度数据存储在浏览器本地。导出 JSON 文件可备份到电脑/手机，或发送到其他设备导入恢复。
+      </p>
+
+      <div className="flex gap-2">
+        <button
+          onClick={exportProgress}
+          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          导出备份
+        </button>
+
+        <label className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer">
+          <Upload className="w-4 h-4" />
+          导入恢复
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".json"
+            onChange={handleImport}
+            className="hidden"
+          />
+        </label>
+      </div>
+
+      {msg && (
+        <div
+          className={`text-xs p-2 rounded-lg ${
+            msg.type === 'success'
+              ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+              : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+          }`}
+        >
+          {msg.text}
+        </div>
+      )}
     </div>
   );
 }
