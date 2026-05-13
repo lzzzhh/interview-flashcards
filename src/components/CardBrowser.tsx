@@ -110,7 +110,7 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
       {/* Header */}
       <div className="flex items-center gap-2 p-3 border-b border-gray-200 dark:border-gray-700">
         <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5 dark:text-gray-300" />
         </button>
         <h2 className="text-lg font-bold flex-1 dark:text-gray-100">卡片管理</h2>
         <button
