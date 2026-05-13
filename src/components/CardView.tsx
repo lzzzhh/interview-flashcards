@@ -221,7 +221,7 @@ function QAView({ card }: { card: QACard }) {
       <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 pb-3 border-b border-gray-100 dark:border-gray-700">
         <ReviewMeta sm2={card.sm2} />
 
-        <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed mt-2 px-1">
+        <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed mt-2 px-1 text-justify">
           <MathText text={card.question} />
         </div>
 
@@ -275,7 +275,7 @@ function QAView({ card }: { card: QACard }) {
             showAnswer ? 'max-h-[2000px] opacity-100 mt-3' : 'max-h-0 opacity-0'
           }`}
         >
-          <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 px-3 sm:px-4">
+          <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 px-3 sm:px-4 text-justify">
             <MathText text={card.answer} />
           </div>
         </div>
