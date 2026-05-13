@@ -67,6 +67,10 @@ export default function MathText({ text }: MathTextProps) {
  * - 已经是 $...$ 或 $$...$$ 的 → 保持用户标记
  */
 function preprocess(text: string): string {
+  // 如果文本已经包含 $...$ 数学标记，信任用户的格式，不做预处理
+  const hasDollarMath = /\$[^$\n]+\$/.test(text) || /\$\$/.test(text);
+  if (hasDollarMath) return text;
+
   const lines = text.split('\n');
   const result: string[] = [];
   let inFence = false;
