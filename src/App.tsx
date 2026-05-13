@@ -36,12 +36,16 @@ function StudyPage({ onBack }: { onBack: () => void }) {
   if (state.studyMode === 'choose') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-        <div className="max-w-xl mx-auto px-3 sm:px-4 py-3">
-          <button onClick={onBack} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm transition-colors mb-6">
-            <ArrowLeft className="w-4 h-4" /> 返回
-          </button>
+        <div className="max-w-xl mx-auto px-3 sm:px-4 py-3 space-y-3">
+          {/* Top bar — matching study page layout */}
+          <div className="flex items-center justify-between">
+            <button onClick={onBack} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm transition-colors">
+              <ArrowLeft className="w-4 h-4" /> 返回
+            </button>
+            <DarkModeToggle />
+          </div>
 
-          <div className="flex flex-col items-center justify-center py-8">
+          <div className="flex flex-col items-center justify-center py-16">
             <h2 className="text-xl font-bold text-center text-gray-900 dark:text-gray-100 mb-6">开始学习</h2>
 
             <div className="w-full max-w-xs space-y-4">
