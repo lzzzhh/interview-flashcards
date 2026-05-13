@@ -171,11 +171,16 @@ function AppInner() {
     setStudyCategory(category);
   };
 
-  if (studyCategory) {
-    return <StudyPage onBack={() => setStudyCategory(null)} />;
-  }
-
-  return <HomePage onEnterStudy={handleEnterStudy} />;
+  return (
+    <div className="relative min-h-screen overflow-hidden">
+      <div className={`transition-all duration-400 ease-in-out ${studyCategory ? '-translate-x-full opacity-0 absolute inset-0' : 'translate-x-0 opacity-100'}`}>
+        <HomePage onEnterStudy={handleEnterStudy} />
+      </div>
+      <div className={`transition-all duration-400 ease-in-out ${studyCategory ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 absolute inset-0'}`}>
+        {studyCategory && <StudyPage onBack={() => setStudyCategory(null)} />}
+      </div>
+    </div>
+  );
 }
 
 export default function App() {

@@ -64,6 +64,11 @@ body {
   transform: rotateX(180deg);
 }
 
+/* Page transition */
+.duration-400 {
+  transition-duration: 0.4s;
+}
+
 .math-text {
   color: inherit;
   font-size: 0.95rem;
