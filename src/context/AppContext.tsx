@@ -163,6 +163,25 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
     }
 
+    case 'TOGGLE_REVIEW_MODE': {
+      const next = !state.reviewMode;
+      if (next) {
+        // Entering review mode — reset to due cards only
+        const due = state.cards.filter((c) => c.sm2.nextReview <= Date.now());
+        return { ...state, reviewMode: true, cards: due, currentIndex: 0 };
+      } else {
+        // Exiting review mode — reload all cards
+        const rawCards = CARD_DATA[state.category];
+        const progress = loadProgress(state.category);
+        return {
+          ...state,
+          reviewMode: false,
+          cards: mergeProgress(rawCards, progress),
+          currentIndex: 0,
+        };
+      }
+    }
+
     default:
       return state;
   }
@@ -247,6 +266,7 @@ function createInitialState(): AppState {
     isDark: settings.isDark ?? false,
     showStats: false,
     shuffled: false,
+    reviewMode: false,
   };
 }
 
@@ -258,6 +278,8 @@ interface AppContextValue {
   currentCard: FlashCard | null;
   masteredIds: string[];
   favoritedIds: string[];
+  dueCountByCategory: Record<Category, number>;
+  totalDue: number;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -299,6 +321,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const masteredIds = useMemo(() => getMasteredIds(state.cards), [state.cards]);
   const favoritedIds = useMemo(() => getFavoritedIds(state.cards), [state.cards]);
 
+  // Due counts by category — compute from ALL card data (not just loaded)
+  const dueCountByCategory = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const [cat, allCards] of Object.entries(CARD_DATA) as [Category, FlashCard[]][]) {
+      const progress = loadProgress(cat);
+      const merged = allCards.map((c) => ({
+        ...c,
+        sm2: progress.sm2[c.id] ?? c.sm2,
+      }));
+      counts[cat] = merged.filter((c) => c.sm2.nextReview <= Date.now()).length;
+    }
+    return counts as Record<Category, number>;
+  }, [state.cards, state.category]); // re-evaluate when cards change
+
+  const totalDue = useMemo(
+    () => Object.values(dueCountByCategory).reduce((a, b) => a + b, 0),
+    [dueCountByCategory],
+  );
+
   const value: AppContextValue = {
     state,
     dispatch,
@@ -306,6 +347,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     currentCard,
     masteredIds,
     favoritedIds,
+    dueCountByCategory,
+    totalDue,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

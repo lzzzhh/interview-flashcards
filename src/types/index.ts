@@ -57,6 +57,7 @@ export interface AppState {
   isDark: boolean;
   showStats: boolean;
   shuffled: boolean;
+  reviewMode: boolean;
 }
 
 export type AppAction =
@@ -76,7 +77,8 @@ export type AppAction =
   | { type: 'TOGGLE_DARK' }
   | { type: 'TOGGLE_STATS' }
   | { type: 'SHUFFLE' }
-  | { type: 'RESET_ORDER' };
+  | { type: 'RESET_ORDER' }
+  | { type: 'TOGGLE_REVIEW_MODE' };
 
 // ============================================================
 // localStorage 持久化相关类型

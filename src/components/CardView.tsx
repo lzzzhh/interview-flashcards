@@ -1,9 +1,9 @@
 // ============================================================
-// src/components/CardView.tsx — 核心卡片组件
+// src/components/CardView.tsx — 核心卡片组件（含 Anki 复习状态）
 // ============================================================
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Repeat } from 'lucide-react';
 import type { FlashCard, LeetCodeCard, QACard } from '../types';
 import { DIFFICULTY_LABEL, DIFFICULTY_COLOR } from '../constants';
 
@@ -17,6 +17,64 @@ function isLeetCode(card: FlashCard): card is LeetCodeCard {
   return card.category === 'leetcode';
 }
 
+/** 格式化复习间隔为可读字符串 */
+function formatInterval(intervalDays: number): string {
+  if (intervalDays === 0) return '新卡片';
+  if (intervalDays === 1) return '1天';
+  if (intervalDays < 7) return `${intervalDays}天`;
+  if (intervalDays < 30) return `${Math.round(intervalDays / 7)}周`;
+  return `${Math.round(intervalDays / 30)}月`;
+}
+
+/** 艾宾浩斯阶段描述 */
+function getReviewStage(sm2: { repetitions: number; easeFactor: number; interval: number }): {
+  label: string;
+  color: string;
+  stage: number;
+} {
+  const { repetitions, interval } = sm2;
+  if (repetitions === 0) return { label: '新学', color: 'text-blue-500', stage: 0 };
+  if (repetitions === 1) return { label: '短期', color: 'text-orange-500', stage: 1 };
+  if (repetitions === 2) return { label: '中期', color: 'text-yellow-500', stage: 2 };
+  if (interval >= 30) return { label: '长期', color: 'text-green-500', stage: 4 };
+  return { label: '巩固', color: 'text-purple-500', stage: 3 };
+}
+
+/** 到期状态 */
+function getDueStatus(nextReview: number): { isDue: boolean; overdueDays: number } {
+  const now = Date.now();
+  const diff = now - nextReview;
+  return {
+    isDue: diff >= 0,
+    overdueDays: diff > 0 ? Math.ceil(diff / 86400000) : 0,
+  };
+}
+
+// ---- Review Meta bar (shows interval + stage) ----
+function ReviewMeta({ sm2 }: { sm2: { repetitions: number; easeFactor: number; interval: number; nextReview: number } }) {
+  const stage = getReviewStage(sm2);
+  const due = getDueStatus(sm2.nextReview);
+
+  return (
+    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700 pb-2 mb-2">
+      <span className="flex items-center gap-1">
+        <Repeat className="w-3 h-3" />
+        重复 {sm2.repetitions} 次
+      </span>
+      <span className="flex items-center gap-1">
+        <Clock className="w-3 h-3" />
+        间隔 {formatInterval(sm2.interval)}
+      </span>
+      <span className={`font-medium ${stage.color}`}>{stage.label}</span>
+      {due.isDue && (
+        <span className="ml-auto px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 font-medium">
+          {due.overdueDays > 0 ? `逾期 ${due.overdueDays} 天` : '到期'}
+        </span>
+      )}
+    </div>
+  );
+}
+
 // ---- LeetCode Card ----
 function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; showApproach: boolean; showCode: boolean }) {
   const [localApproach, setLocalApproach] = useState(false);
@@ -27,6 +85,9 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
 
   return (
     <div className="space-y-4 text-left">
+      {/* Review Meta */}
+      <ReviewMeta sm2={card.sm2} />
+
       {/* Header: Number + Title + Difficulty */}
       <div className="flex items-start gap-3">
         <span className="text-lg font-bold text-primary whitespace-nowrap">
@@ -119,6 +180,9 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
 function QAView({ card }: { card: QACard }) {
   return (
     <div className="space-y-4 text-left">
+      {/* Review Meta */}
+      <ReviewMeta sm2={card.sm2} />
+
       {/* Question / Term */}
       <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed">
         {card.question}
