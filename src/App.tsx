@@ -7,9 +7,6 @@ import { ArrowLeft, FlaskConical, X } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
 import HomePage from './components/HomePage';
-import CategoryTabs from './components/CategoryTabs';
-import SearchBar from './components/SearchBar';
-import FilterBar from './components/FilterBar';
 import CardView from './components/CardView';
 import CardActions from './components/CardActions';
 import ProgressBar from './components/ProgressBar';
@@ -89,16 +86,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
           </div>
         )}
 
-        {/* Tabs + Search */}
-        {!state.reviewMode && (
-          <>
-            <CategoryTabs />
-            <div className="flex gap-2">
-              <SearchBar />
-              <FilterBar />
-            </div>
-          </>
-        )}
+        {/* Tabs hidden — user chose module from home page */}
 
         {/* Card */}
         {currentCard ? (
