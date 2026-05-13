@@ -105,6 +105,22 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportJSON = () => {
+    const data = filtered.map((c) => ({
+      question: c.category === 'leetcode' ? c.titleCn : c.question,
+      answer: c.category === 'leetcode' ? c.approach : c.answer,
+      tags: c.tags || [],
+      subTopic: (c as any).subTopic,
+    }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `deck-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="fixed inset-0 z-40 bg-white dark:bg-gray-900 flex flex-col">
       {/* Header */}
@@ -115,10 +131,17 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
         <h2 className="text-lg font-bold flex-1 dark:text-gray-100">卡片管理</h2>
         <button
           onClick={handleExportCSV}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm"
+          className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs"
         >
-          <Download className="w-4 h-4" />
-          <span className="hidden sm:inline">导出</span>
+          <Download className="w-3.5 h-3.5" />
+          CSV
+        </button>
+        <button
+          onClick={handleExportJSON}
+          className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs"
+        >
+          <Download className="w-3.5 h-3.5" />
+          JSON
         </button>
         <label className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm cursor-pointer">
           <Upload className="w-4 h-4" />
