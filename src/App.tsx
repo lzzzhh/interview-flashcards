@@ -2,8 +2,8 @@
 // src/App.tsx — 适配 cardsById + visibleCardIds
 // ============================================================
 
-import { useRef, useCallback } from 'react';
-import { BarChart3, FlaskConical, AlertCircle, X } from 'lucide-react';
+import { useRef, useCallback, useState } from 'react';
+import { BarChart3, FlaskConical, AlertCircle, X, Pencil } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
 import CategoryTabs from './components/CategoryTabs';
@@ -15,16 +15,52 @@ import ProgressBar from './components/ProgressBar';
 import DarkModeToggle from './components/DarkModeToggle';
 import EmptyState from './components/EmptyState';
 import StatsDashboard from './components/StatsDashboard';
+import CardBrowser from './components/CardBrowser';
+import CardEditor from './components/CardEditor';
+import type { FlashCard } from './types';
 
 function AppInner() {
   const { state, dispatch, visibleCards, currentCard, masteredIds, totalDue } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [showBrowser, setShowBrowser] = useState(false);
+  const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
 
   const getCurrentCardId = useCallback(() => currentCard?.id ?? null, [currentCard]);
 
   useKeyboard({ dispatch, searchInputRef, getCurrentCardId });
 
+  const handleSaveCard = (_card: FlashCard) => {
+    dispatch({ type: 'SET_CATEGORY', payload: state.category });
+    setEditingCard(null);
+  };
+
   const cardCount = visibleCards.length;
+
+  // 管理模式下显示卡片浏览器
+  if (showBrowser) {
+    return (
+      <AppProvider>
+        <CardBrowser
+          onEdit={(card) => {
+            if (!card.id) {
+              // 新建
+              setEditingCard(null);
+            } else {
+              setEditingCard(card);
+            }
+          }}
+          onClose={() => setShowBrowser(false)}
+        />
+        {editingCard !== null && (
+          <CardEditor
+            card={editingCard}
+            onSave={handleSaveCard}
+            onClose={() => setEditingCard(null)}
+          />
+        )}
+      </AppProvider>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
@@ -42,6 +78,13 @@ function AppInner() {
             )}
           </div>
           <div className="flex items-center gap-1">
+            <button
+              onClick={() => setShowBrowser(true)}
+              className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              title="卡片管理"
+            >
+              <Pencil className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            </button>
             <button
               onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
               className={`relative p-2 rounded-lg transition-colors ${
