@@ -10,6 +10,10 @@
 </p>
 
 <p align="center">
+  <img src="icon.png" width="128" alt="面经闪卡图标" />
+</p>
+
+<p align="center">
   Active Recall + SM-2 间隔重复驱动的面试复习桌面应用。<br>
   高质量卡片覆盖算法 · 统计学 · 机器学习 · 大模型 · 行业黑话 · 职场话术六大方向。<br>
   数据本地存储，Tauri 原生桌面体感，跨平台（macOS / Windows / Linux）。
