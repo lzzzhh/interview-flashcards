@@ -421,14 +421,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const totalDue = useMemo(() => Object.values(dueCountByCategory).reduce((a, b) => a + b, 0), [dueCountByCategory]);
 
-  // 新卡片总数
+  // 新卡片总数（从 localStorage 读取真实状态）
   const totalNew = useMemo(() => {
     let count = 0;
-    for (const cat of Object.values(CARD_DATA) as FlashCard[][]) {
-      count += cat.filter((c) => c.sm2.state === 'new').length;
+    for (const [cat, allCards] of Object.entries(CARD_DATA) as [Category, FlashCard[]][]) {
+      const progress = loadProgress(cat);
+      count += allCards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return !sm2 || sm2.state === 'new';
+      }).length;
     }
     return count;
-  }, []);
+  }, [state.cardsById]);
 
   const value: AppContextValue = {
     state,

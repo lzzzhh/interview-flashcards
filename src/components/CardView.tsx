@@ -117,7 +117,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
         </span>
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            {card.title}
+            <MathText text={card.title} />
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {card.titleCn}
@@ -214,7 +214,7 @@ function QAView({ card }: { card: QACard }) {
 
       {/* Question / Term */}
       <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed">
-        {card.question}
+        <MathText text={card.question} />
       </div>
 
       {/* Tags if any */}
