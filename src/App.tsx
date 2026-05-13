@@ -1,11 +1,12 @@
 // ============================================================
-// src/App.tsx — 适配 cardsById + visibleCardIds
+// src/App.tsx — 首页 + 沉浸学习模式
 // ============================================================
 
 import { useRef, useCallback, useState } from 'react';
-import { BarChart3, FlaskConical, AlertCircle, X, Pencil } from 'lucide-react';
+import { ArrowLeft, FlaskConical, X } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
+import HomePage from './components/HomePage';
 import CategoryTabs from './components/CategoryTabs';
 import SearchBar from './components/SearchBar';
 import FilterBar from './components/FilterBar';
@@ -14,125 +15,64 @@ import CardActions from './components/CardActions';
 import ProgressBar from './components/ProgressBar';
 import DarkModeToggle from './components/DarkModeToggle';
 import EmptyState from './components/EmptyState';
-import StatsDashboard from './components/StatsDashboard';
 import CardBrowser from './components/CardBrowser';
 import CardEditor from './components/CardEditor';
 import type { FlashCard } from './types';
 
-function AppInner() {
+function StudyPage({ onBack }: { onBack: () => void }) {
   const { state, dispatch, visibleCards, currentCard, masteredIds, totalDue, totalNew } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
 
   const getCurrentCardId = useCallback(() => currentCard?.id ?? null, [currentCard]);
-
   useKeyboard({ dispatch, searchInputRef, getCurrentCardId });
-
-  const handleSaveCard = (card: FlashCard) => {
-    if (state.cardsById[card.id]) {
-      dispatch({ type: 'UPDATE_CARD', payload: card });
-    } else {
-      dispatch({ type: 'ADD_CARD', payload: card });
-    }
-    setEditingCard(null);
-  };
 
   const cardCount = visibleCards.length;
 
-  // 管理模式下显示卡片浏览器
-  if (showBrowser) {
-    return (
-      <AppProvider>
-        <CardBrowser
-          onEdit={(card) => {
-            if (!card.id) {
-              // 新建
-              setEditingCard(null);
-            } else {
-              setEditingCard(card);
-            }
-          }}
-          onClose={() => setShowBrowser(false)}
-        />
-        {editingCard !== null && (
-          <CardEditor
-            card={editingCard}
-            onSave={handleSaveCard}
-            onClose={() => setEditingCard(null)}
-          />
-        )}
-      </AppProvider>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-      <div className="max-w-xl mx-auto px-3 sm:px-4 py-3 sm:py-8 space-y-3 sm:space-y-4">
-        {/* Header */}
+      <div className="max-w-xl mx-auto px-3 sm:px-4 py-3 space-y-3">
+
+        {/* Top bar */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              📚 面经闪卡
-            </h1>
-            {state.reviewMode && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-orange-500 text-white animate-fadeIn">
-                复习中
-              </span>
-            )}
-          </div>
+          <button onClick={onBack} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            返回
+          </button>
+
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => setShowBrowser(true)}
-              className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              title="卡片管理"
-            >
-              <Pencil className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            {state.reviewMode && (
+              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-orange-500 text-white">复习中</span>
+            )}
+            <button onClick={() => setShowBrowser(true)} className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" title="卡片管理">
+              <X className="w-4 h-4 rotate-45 text-gray-500" />
             </button>
             <button
               onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
-              className={`relative p-2 rounded-lg transition-colors ${
-                state.reviewMode
-                  ? 'bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400'
-                  : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
+              className={`relative p-1.5 rounded-lg transition-colors ${
+                state.reviewMode ? 'bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400' : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500'
               }`}
-              title={state.reviewMode ? '退出复习模式' : '复习到期卡片'}
             >
-              <FlaskConical className="w-5 h-5" />
+              <FlaskConical className="w-4 h-4" />
               {totalDue > 0 && !state.reviewMode && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-orange-500 text-white text-[9px] font-bold flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-orange-500 text-white text-[8px] font-bold flex items-center justify-center">
                   {totalDue > 9 ? '!' : totalDue}
                 </span>
               )}
-            </button>
-            <button
-              onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-              className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              title="学习统计"
-            >
-              <BarChart3 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
             <DarkModeToggle />
           </div>
         </div>
 
-        {/* Review banner — show new + review counts separately */}
+        {/* Review banner */}
         {!state.reviewMode && (totalDue > 0 || totalNew > 0) && (
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
-            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 text-sm hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors"
-          >
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-orange-500" />
-            <span className="flex-1 text-left text-gray-700 dark:text-gray-300">
-              {totalDue > 0 ? (
-                <>复习 <strong className="text-orange-600">{totalDue}</strong> 张</>
-              ) : null}
-              {totalDue > 0 && totalNew > 0 && ' · '}
-              {totalNew > 0 ? (
-                <>新学 <strong className="text-blue-600">{Math.min(totalNew, state.dailyNewLimit)}</strong>/<span className="text-gray-400">{totalNew}</span> 张</>
-              ) : null}
-            </span>
-            <span className="text-xs font-medium text-gray-500">开始 →</span>
+          <button onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 text-sm hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors">
+            {totalDue > 0 && <span className="text-xs text-gray-600 dark:text-gray-300">复习 <strong className="text-orange-600">{totalDue}</strong></span>}
+            {totalDue > 0 && totalNew > 0 && <span className="text-gray-300">·</span>}
+            {totalNew > 0 && <span className="text-xs text-gray-600 dark:text-gray-300">新学 <strong className="text-blue-600">{Math.min(totalNew, state.dailyNewLimit)}</strong></span>}
+            <span className="text-xs text-gray-400 ml-auto">开始 →</span>
           </button>
         )}
 
@@ -140,66 +80,68 @@ function AppInner() {
         {state.reviewMode && (
           <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/30 border-b border-orange-200 dark:border-orange-800 flex items-center gap-2">
             <span className="text-xs text-orange-600 dark:text-orange-400 flex-1">
-              🔬 复习 {totalDue} 张 · 新学 {Math.min(totalNew, state.dailyNewLimit)} 张 · 第 {state.currentVisibleIndex + 1}/{cardCount} 张
+              🔬 复习 {totalDue} 张 · 新学 {Math.min(totalNew, state.dailyNewLimit)} 张 · {state.currentVisibleIndex + 1}/{cardCount}
             </span>
-            <button
-              onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <X className="w-4 h-4" />
-              退出复习
+            <button onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-700 text-xs font-medium">
+              <X className="w-3 h-3" /> 退出
             </button>
           </div>
         )}
 
-        {/* Tabs (hidden in review mode) */}
-        {!state.reviewMode && <CategoryTabs />}
-
-        {/* Search + Filter */}
+        {/* Tabs + Search */}
         {!state.reviewMode && (
-          <div className="flex gap-2">
-            <SearchBar />
-            <FilterBar />
-          </div>
+          <>
+            <CategoryTabs />
+            <div className="flex gap-2">
+              <SearchBar />
+              <FilterBar />
+            </div>
+          </>
         )}
 
-        {/* Card View */}
+        {/* Card */}
         {currentCard ? (
           <div className="space-y-4" key={currentCard.id}>
-            <CardView
-              card={currentCard}
-              showApproach={state.showApproach}
-              showCode={state.showCode}
-            />
+            <CardView card={currentCard} showApproach={state.showApproach} showCode={state.showCode} />
             <CardActions />
           </div>
         ) : (
-          <EmptyState
-            message={
-              state.reviewMode
-                ? '🎉 没有到期卡片！所有卡片都在按计划复习中。'
-                : state.searchQuery
-                  ? `未找到与「${state.searchQuery}」相关的卡片`
-                  : undefined
-            }
-          />
+          <EmptyState message={state.reviewMode ? '🎉 没有到期卡片！' : state.searchQuery ? `未找到「${state.searchQuery}」` : undefined} />
         )}
 
-        {/* Progress */}
         {cardCount > 0 && (
           <div className="pt-2 pb-8">
-            <ProgressBar
-              current={Math.min(state.currentVisibleIndex, cardCount - 1)}
-              total={cardCount}
-              mastered={masteredIds.length}
-            />
+            <ProgressBar current={Math.min(state.currentVisibleIndex, cardCount - 1)} total={cardCount} mastered={masteredIds.length} />
           </div>
         )}
       </div>
 
-      <StatsDashboard />
+      {/* Browser */}
+      {showBrowser && (
+        <CardBrowser onEdit={(card) => { if (!card.id) setEditingCard(null); else setEditingCard(card); }} onClose={() => setShowBrowser(false)} />
+      )}
+      {editingCard !== null && (
+        <CardEditor card={editingCard} onSave={() => { setEditingCard(null); dispatch({ type: 'SET_CATEGORY', payload: state.category }); }} onClose={() => setEditingCard(null)} />
+      )}
     </div>
   );
+}
+
+function AppInner() {
+  const [studyCategory, setStudyCategory] = useState<string | null>(null);
+  const { dispatch } = useAppContext();
+
+  const handleEnterStudy = (category: string) => {
+    dispatch({ type: 'SET_CATEGORY', payload: category as any });
+    setStudyCategory(category);
+  };
+
+  if (studyCategory) {
+    return <StudyPage onBack={() => setStudyCategory(null)} />;
+  }
+
+  return <HomePage onEnterStudy={handleEnterStudy} />;
 }
 
 export default function App() {
