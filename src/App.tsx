@@ -2,7 +2,7 @@
 // src/App.tsx — 首页 + 沉浸学习模式
 // ============================================================
 
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, useMemo } from 'react';
 import { ArrowLeft, FlaskConical, X } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
@@ -27,6 +27,11 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
   const cardCount = visibleCards.length;
 
+  // Count new cards in current module
+  const moduleNewCount = useMemo(() => {
+    return Object.values(state.cardsById).filter((c) => !c.sm2.state || c.sm2.state === 'new').length;
+  }, [state.cardsById]);
+
   // Choice screen
   if (state.studyMode === 'choose') {
     return (
@@ -39,21 +44,21 @@ function StudyPage({ onBack }: { onBack: () => void }) {
           <h2 className="text-xl font-bold text-center text-gray-900 dark:text-gray-100">开始学习</h2>
 
           <button
+            onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'new' })}
+            className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+          >
+            <span className="text-3xl">🆕</span>
+            <span className="text-base font-bold text-blue-700 dark:text-blue-300">学习新卡</span>
+            <span className="text-xs text-blue-500">今日上限 {state.dailyNewLimit} 张 · 剩余 {moduleNewCount} 张</span>
+          </button>
+
+          <button
             onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'review' })}
             className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors"
           >
             <span className="text-3xl">🔄</span>
             <span className="text-base font-bold text-orange-700 dark:text-orange-300">开始复习</span>
             <span className="text-xs text-orange-500">{totalDue} 张卡片到期</span>
-          </button>
-
-          <button
-            onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'new' })}
-            className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-          >
-            <span className="text-3xl">🆕</span>
-            <span className="text-base font-bold text-blue-700 dark:text-blue-300">学习新卡</span>
-            <span className="text-xs text-blue-500">今日上限 {state.dailyNewLimit} 张 · 剩余 {totalNew} 张</span>
           </button>
 
           <button onClick={() => setShowBrowser(true)}
