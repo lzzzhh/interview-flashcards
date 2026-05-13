@@ -2206,4 +2206,152 @@ export const statisticsCards: QACard[] = [
     sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
+
+  // ============================================================
+  // 22. SQL与数据分析 (12 questions)
+  // ============================================================
+  {
+    id: 'stats-178',
+    category: 'statistics',
+    question: 'SQL 中 JOIN 的几种类型（INNER/LEFT/RIGHT/FULL/CROSS）的区别和使用场景？',
+    answer:
+      'INNER JOIN（内连接）：只返回两个表中匹配的行。ON 条件为真的行才会出现在结果集中，不匹配的行被丢弃。使用场景：需要两个表都有对应数据的情况，如"查询所有有订单的用户"。LEFT JOIN（左外连接）：返回左表的所有行，即使右表中没有匹配。若右表无匹配，对应列填充 NULL。这是最常用的外连接，场景如"查询所有用户及其订单（包括没有订单的用户）"，左表是主表，右表是补充信息。RIGHT JOIN（右外连接）：与 LEFT JOIN 对称，返回右表所有行。场景与 LEFT JOIN 类似，但实际开发中较少单独使用，因为通过调换表顺序用 LEFT JOIN 即可实现同等效果。FULL OUTER JOIN（全外连接）：返回两表所有行，无匹配则填充 NULL，相当于 LEFT JOIN 和 RIGHT JOIN 的结果做 UNION。场景如"合并两份用户名单，找出哪些是独属于某一方"，MySQL 原生不支持 FULL JOIN，常用 LEFT JOIN UNION RIGHT JOIN 模拟。CROSS JOIN（交叉连接/笛卡尔积）：返回两表的笛卡尔积，即左表每行与右表每行组合，结果行数 = 左表行数 × 右表行数。通常需要配合 WHERE 条件使用，否则会产生爆炸级数据量。场景如"生成所有可能的组合（尺寸×颜色）"。实际面试中，LEFT JOIN 和 INNER JOIN 的区分最常考：关键在于理解"主表驱动"的思想——用 LEFT JOIN 时左表是分析主维度，INNER JOIN 则等价于取交集。还需要警惕多表 JOIN 时 INNER JOIN 会逐步过滤掉数据，导致最终行数可能意外减少。',
+    tags: ['join', 'inner join', 'left join', 'outer join', 'cross join'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'easy',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-179',
+    category: 'statistics',
+    question: '什么是窗口函数（Window Function）？ROW_NUMBER、RANK、DENSE_RANK 的区别？',
+    answer:
+      '窗口函数（又名分析函数/OLAP 函数）在 SQL 中用于在保留原始行粒度的前提下进行分组内的排序、聚合和偏移计算。与 GROUP BY 不同，窗口函数不会折叠行——它通过 OVER() 子句定义一个"窗口"（一组行的集合），函数在这个窗口内对每一行计算标量值并附加到该行。语法结构：FUNCTION() OVER (PARTITION BY col ORDER BY col ROWS/RANGE BETWEEN ...)。PARTITION BY 定义分组（类似 GROUP BY 但不折叠），ORDER BY 定义窗口内排序，ROWS/RANGE 定义窗口范围。ROW_NUMBER()：为分区内每一行分配唯一连续序号（1, 2, 3, 4, ...），即使两行 ORDER BY 值相同，编号也不重复，序号严格递增且不跳跃。RANK()：为分区内行分配排名，当两行 ORDER BY 值相同时获得相同排名（并列），下一个不同值的排名会"跳过"被并列占用的位数。例如分数 [100, 95, 95, 90]，RANK 返回 [1, 2, 2, 4]。DENSE_RANK()：与 RANK 类似，相同值并列排名，但下一个不同值排名不跳过，连续递增。例如 [100, 95, 95, 90]，DENSE_RANK 返回 [1, 2, 2, 3]。选择场景：ROW_NUMBER 用于"取每组 TOP N 且不允许并列"，如"每个用户最近的 1 笔订单"；RANK 用于需要标准排名的场景（显示并列后维持总排名位次），如"奥林匹克排名"；DENSE_RANK 用于"取每组 TOP N 且允许并列但排名连续"，如"公司内各员工薪资等级"。窗口函数在日常数据分析中极为常用，如计算移动平均（MOVING AVG）、累计和（RUNNING SUM）、同比环比（LAG/LEAD）等都需要窗口函数来实现。',
+    tags: ['window function', 'row_number', 'rank', 'dense_rank', 'over'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-180',
+    category: 'statistics',
+    question: 'SQL 中如何优化慢查询？从索引、SQL 语句、表结构三个层面回答。',
+    answer:
+      '优化慢查询需要多维度诊断和系统化优化。索引层面：(1) 为 WHERE、JOIN、ORDER BY、GROUP BY 中频繁使用的列添加索引，利用最左前缀原则设计联合索引（如 WHERE a AND b → 索引 (a, b)）；(2) 使用覆盖索引（Covering Index）让索引包含查询所需全部列，避免回表（索引中已有的数据无需再到聚簇索引查，减少磁盘 IO）；(3) 避免在索引列上使用函数或运算（如 WHERE DATE(create_time)=\'2024-01-01\' 会导致索引失效，应改为范围查询）；(4) 避免负向查询（NOT IN、!=、NOT EXISTS 通常不走索引）和 LIKE \'%keyword\'（前导模糊不走索引，后置模糊 LIKE \'keyword%\' 可走）；(5) 定期分析和重建索引（分析索引碎片和统计信息）。SQL 语句层面：(1) 用 EXPLAIN 查看执行计划，关注 type 列（最好为 const/eq_ref/ref，避免 ALL 全表扫描）、rows 列、Extra 列（Using filesort/Using temporary 是红色警报）；(2) 避免 SELECT *，只取需要的列，减少数据传输和允许覆盖索引；(3) 多表 JOIN 时小表驱动大表（小表作为驱动表），确保 JOIN 列有索引；(4) 将子查询改写为 JOIN（MySQL 优化器处理子查询较弱），尤其是 IN (SELECT ...) 常导致低效；(5) 大量数据分页时用"延迟关联"或游标分页代替 LIMIT 大偏移（LIMIT 100000, 10 会扫描 100010 行后丢弃前 100000 行）。表结构层面：(1) 合理选择字段类型——使用最小存储空间的数据类型（如 INT 不用 BIGINT 存状态码）；(2) 垂直分表——将高频访问的小列和低频访问的大列（如 TEXT/BLOB）分开，减少 IO；(3) 水平分表——当单表超过数百万行时按时间/哈希维度分区或分表；(4) 适当冗余字段避免复杂的 JOIN（如订单表冗余存储用户名避免每次关联用户表）；(5) 选择合适存储引擎（InnoDB 支持事务和行锁，MyISAM 查询快但不支持事务）。优化流程是：慢查询日志 → EXPLAIN 分析 → 优先级排序（高频率+大开销的先优化）→ 加索引/改写 SQL → 验证 EXPLAIN 改善情况。',
+    tags: ['sql optimization', 'index', 'explain', 'slow query', 'covering index'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-181',
+    category: 'statistics',
+    question: '什么是事务的 ACID 特性？每个特性分别是什么意思？',
+    answer:
+      'ACID 是数据库事务正确执行的四个基本保证，确保数据在并发和故障场景下的可靠性和一致性。A（Atomicity 原子性）：事务中的所有操作要么全部成功执行，要么全部失败回滚，不允许部分执行。通过 Undo Log 实现——事务执行前将旧值写入 Undo Log，若事务回滚则利用 Undo 日志恢复原始状态。例如转账操作：A 扣款和 B 加款是原子整体，不能出现 A 扣了但 B 没加的情况。C（Consistency 一致性）：事务执行前后，数据库必须从一个一致状态转换到另一个一致状态，所有完整性约束（主键、外键、UNIQUE、CHECK、触发器等约束）必须保持满足。一致性是 ACID 中唯一由用户/应用层面保证的特性（原子性、隔离性、持久性是数据库层面的保证）。例如转账后总金额不变，这是业务一致性约束。I（Isolation 隔离性）：并发执行的多个事务之间相互隔离，一个事务的执行不应被其他事务干扰。数据库通过锁（行锁、间隙锁）和 MVCC（多版本并发控制）实现不同隔离级别。隔离级别从低到高：读未提交（Read Uncommitted）→ 可能脏读；读已提交（Read Committed）→ Oracle 默认，可能不可重复读；可重复读（Repeatable Read）→ MySQL InnoDB 默认，通过 MVCC 快照读 + 临键锁（Next-Key Lock）解决了幻读问题；串行化（Serializable）→ 事务完全串行执行，性能最差。理解隔离性要掌握脏读、不可重复读、幻读的原理和区别。D（Durability 持久性）：事务一旦提交成功，其修改永久保存，即使数据库随后崩溃也不会丢失。通过 Redo Log（重做日志）实现——事务提交前先将修改写入 Redo Log（顺序写，性能高），即使崩溃后也可用 Redo Log 恢复已提交的数据。Redo Log 配合 Binlog 的两阶段提交（2PC）进一步保证了分布式或主备场景下的一致性。',
+    tags: ['acid', 'transaction', 'atomicity', 'isolation', 'durability'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-182',
+    category: 'statistics',
+    question: 'SQL 中 UNION 和 UNION ALL 的区别？什么时候用哪个？',
+    answer:
+      'UNION 和 UNION ALL 都是将多个 SELECT 查询的结果合并为一个结果集（纵向合并/行追加）。核心区别：UNION 在合并后自动去重（删除重复行），而 UNION ALL 保留所有行，不做去重操作。UNION 的去重逻辑类似于 UNION ALL + DISTINCT，需要额外排序和比较，因此 UNION 比 UNION ALL 慢得多（额外 O(n·logn) 排序开销）。两者对结果集的要求相同：每个 SELECT 的列数、列顺序和数据类型必须兼容（相同或可隐式转换），列名以第一个 SELECT 的列名为准。使用场景选择：当需要去重时用 UNION——例如"合并两个部门的人员名单，同一个人不能重复出现"；当确定不会有重复或需要保留所有行时用 UNION ALL——例如"合并从多个分表查询的日志数据"，每条日志都是独立的事件不应该被去重。在数据分析的 ETL 中，几乎永远应该用 UNION ALL：因为事实表数据天然不应该去重，使用 UNION 会浪费大量计算资源甚至意外删减数据（如果明细中确有相同的两行合法数据）。面试中还可以扩展讨论：UNION 去重基于所有列的组合来判断行是否重复，不是基于单一主键。此外，INTERSECT（交集）和 EXCEPT/MINUS（差集）也属于集合操作，但在不同数据库中的支持和语法有差异。',
+    tags: ['union', 'union all', 'dedup', 'set operation'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'easy',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-183',
+    category: 'statistics',
+    question: '什么是索引？B+树索引和哈希索引的区别？什么情况下索引会失效？',
+    answer:
+      '索引是数据库中用于加速数据检索的数据结构（类似书的目录），通过减少扫描的数据页数量来提升查询效率，但代价是额外写入开销（每次 INSERT/UPDATE/DELETE 需维护索引）和存储空间。B+树索引：MySQL InnoDB 的默认索引结构，所有数据记录存储在叶节点（聚簇索引的叶节点直接存储整行数据，非聚簇索引叶节点存储主键值）。特点：所有叶节点按从小到大排序并以双向链表相连，因此支持范围查询（BETWEEN、>、<）和全覆盖扫描，查询效率稳定在 O(log n)。B+树通过非叶节点只存键值+子节点指针将更多索引项存入单个页（高扇出性），减少 IO 次数。哈希索引：基于哈希表实现，对索引列计算哈希值后映射到桶（Bucket），等值查询 O(1) 非常快。但哈希索引不支持范围查询（因为哈希值无序），不支持排序（ORDER BY 无法利用哈希索引），不支持部分索引匹配（最左前缀），存在哈希碰撞时的链式查找退化。MySQL 中 Memory 引擎支持哈希索引，InnoDB 通过自适应哈希索引（Adaptive Hash Index）对热点页自动创建哈希索引加速。索引失效的常见情况：(1) 在索引列上使用函数或计算（WHERE YEAR(date_col)=2024 → 索引失效）；(2) 前导模糊查询（LIKE \'%abc\' → 失效，LIKE \'abc%\' → 有效）；(3) 使用负向条件（NOT IN、!=、<>、NOT EXISTS 通常不走索引）；(4) 联合索引不满足最左前缀原则（如索引 (a,b)，WHERE b=1 不走索引）；(5) 隐式类型转换（如 WHERE varchar_col = 123 → 字符串被转为数字导致索引失效）；(6) 查询优化器认为全表扫描比索引更高效（如表很小或返回行数比例太高）。判断索引是否失效的最可靠方法是 EXPLAIN 查看执行计划。',
+    tags: ['index', 'b+ tree', 'hash index', 'index failure', 'clustered index'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-184',
+    category: 'statistics',
+    question: '数据分析中如何处理缺失值？删除、填充、插值各有什么适用场景？',
+    answer:
+      '缺失值处理是数据分析预处理中最常见也最重要的步骤之一，策略选择取决于缺失机制和业务目标。缺失机制分三类：MCAR（完全随机缺失）——缺失与任何变量无关，删除行不会引入偏差；MAR（随机缺失）——缺失与其他观测变量有关，需要建模处理；MNAR（非随机缺失）——缺失与缺失值本身有关（如高收入者不愿报告收入），处理最复杂。删除法：(1) 列表删除（Listwise/Complete Case Analysis）——删除任何含有缺失值的行。适用于缺失比例极低（<5%）且 MCAR 的情况。优点：简单；缺点：损失数据量和统计功效，非 MCAR 下引入偏差。(2) 成对删除（Pairwise Deletion）——在计算协方差等统计量时，仅使用两列都非空的样本对，样本量随分析变化。优点：保留更多数据；缺点：不同分析样本量不一致，协方差矩阵可能非正定，导致后续回归等分析失败。(3) 列删除——某列缺失比例过高（>50-70%）时直接删除整个变量。填充法（Imputation）：(1) 均值/中位数/众数填充——简单快速，但会低估方差和协方差（使数据"过于平滑"），破坏变量间关系和分布形态。适用于缺失较少、对精度要求不高的场景。(2) 前向/后向填充——用上一个/下一个有效值填充，适用于时间序列数据（如股票价格、传感器数据），假设值不会突变。(3) 模型预测填充——用回归、KNN、随机森林、MICE（多重插补）等方法基于其他变量预测缺失值。MICE 是当前最理论上完善的填充方法：对每个含缺失的变量建立回归模型，用其他变量预测缺失值，迭代多次并生成多套完整数据，分析结果时使用 Rubin 规则合并方差和置信区间。(4) 标记缺失法——新增一个二分类指示变量标记"该值是否由缺失填充而来"，允许模型学习缺失本身的模式。插值法（Interpolation）：用于有序数据（尤其是时间序列和空间数据），假设相邻数据之间存在平滑关系。线性插值（两已知点间直线填充）最常用；样条插值和多项式插值更平滑但可能过拟合。适用场景：传感器数据的中断、影像缺失像素。选择策略的核心原则：要理解缺失的"原因"而非盲目套用方法——缺失本身可能是重要的信号（如"用户未填写收入"反映了隐私关注度），此时标记法优于填充法。同时，无论选择何种方法，都需要做敏感性分析——比较"删除法/均值填充/多重插补"等不同方案下的分析结论是否一致。',
+    tags: ['missing value', 'imputation', 'interpolation', 'mice', 'data cleaning'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-185',
+    category: 'statistics',
+    question: '什么是数据仓库的星型模型和雪花模型？各有什么优缺点？',
+    answer:
+      '星型模型和雪花模型是数据仓库中维度建模（Dimensional Modeling）的两种经典模式，用于组织事实表和维度表的关系，服务于 OLAP 分析查询。星型模型：中心是一张事实表（存储度量值和外键），周围直接连接一组维度表（去规范化/扁平化），维度表之间不互相连接。形似星星，维度表只有一层。例如，销售事实表含有订单金额、数量等度量值，外键连接商品维度、时间维度、门店维度、客户维度等。维度表是宽平的——所有属性都在一张表内（如商品维度表包含商品名、品牌、品类、子品类等所有属性），存在冗余但查询简洁。雪花模型：星型模型的规范化延伸，维度表被进一步拆分为多层子维度，形成像雪花的分支结构。例如商品维度拆分为商品表 → 品牌表 → 品类表，减小冗余但增加 JOIN 复杂度。优缺点对比：星型模型优点——查询简单（JOIN 层级少，通常只需事实表 + 少数维度表），查询性能高（对决策支持系统最友好），易于理解和使用（业务用户可直接写查询而不需理解复杂的表关系）。缺点是存储空间较大（维度数据冗余），维度更新可能涉及大量行修改（如品牌改名需更新商品维度所有行）。雪花模型优点——减少数据冗余（规范化存储），存储空间更小，维度数据更新一致性好（修改一处即可），适合维度数据量大且频繁变动的场景。缺点：查询复杂（需要多层 JOIN），查询性能较差（更多 JOIN 操作），业务理解门槛较高。在工程实践中，大多数数据仓库采用星型模型或"混合模式"——核心大维度（如时间、地区）使用星型，频繁变动的维度考虑适度雪花化。面试中还应提及宽表设计：在 Hadoop/Hive 等大数据场景中，有时会将事实表和维度表提前 JOIN 成一张大宽表以加速查询，这是星型模型思想的极端延伸。',
+    tags: ['star schema', 'snowflake schema', 'dimensional modeling', 'data warehouse', 'olap'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-186',
+    category: 'statistics',
+    question: 'GROUP BY 和 PARTITION BY 的区别是什么？各自的典型使用场景？',
+    answer:
+      'GROUP BY 是聚合操作，将多行按分组键折叠为一行（每组一个输出行），用于计算汇总统计量（SUM、COUNT、AVG、MAX、MIN）。PARTITION BY 是窗口函数的子句，用于定义行分组的"窗口"但不折叠行数——原始每一行都保留，窗口函数的结果作为新列附加。这是两者最本质的区别：GROUP BY 减少行数（N→M），PARTITION BY 保持行数（N→N）。典型 GROUP BY 场景："计算每个部门的平均工资"——结果只有部门数行，每行一个部门一条汇总。典型 PARTITION BY 场景："保留每个员工的工资，同时显示该员工在其部门中的工资排名和部门平均工资"——结果仍是每个员工一行，额外附加部门维度的统计信息（RANK、AVG）。SQL 示例对比：GROUP BY → SELECT dept, AVG(salary) FROM emp GROUP BY dept; 返回每个部门一行。PARTITION BY → SELECT name, dept, salary, AVG(salary) OVER (PARTITION BY dept) AS dept_avg FROM emp; 返回每个员工一行，包含个人薪水和部门均值。在面试和工作中，一个常见需求是"取每组 TOP N"，这时必须用窗口函数（ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...)）而不能用 GROUP BY。另一个关键区别：GROUP BY 后 SELECT 中只能出现分组键和聚合函数，而窗口函数结果可以直接参与后续 WHERE/HAVING 条件（通过子查询/CTE 包装）。另外 HAVING 配合 GROUP BY 过滤聚合后的组，而窗口函数的结果要过滤需通过子查询或 CTE（因为窗口函数在 SELECT 之后才计算，不能直接放在 WHERE 中）。',
+    tags: ['group by', 'partition by', 'window function', 'aggregation'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'easy',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-187',
+    category: 'statistics',
+    question: '什么是数据倾斜？在 Spark/Hive 中如何解决数据倾斜问题？',
+    answer:
+      '数据倾斜（Data Skew）是指在分布式计算中，数据在各个分区之间的分布严重不均匀，导致某些 Task 处理的数据量远大于其他 Task（可能 100 倍甚至 1000 倍的差异），形成"长尾任务"——大部分 Task 很快完成，但极少数 Task 运行很久甚至 OOM（内存溢出），整体作业被拖慢。产生原因通常是分片键（Shuffle Key）的值分布极度不均衡——某些 key 对应的数据量巨大（如热门商品、头部的用户 ID），在 Shuffle 操作（JOIN、GROUP BY、DISTINCT 等）中这些 key 被哈希到同一个分区。Spark/Hive 中的解决方案分场景讨论——GROUP BY 倾斜：(1) 两阶段聚合（Spark 中常用——给 key 加随机前缀打散：第一阶段 key 加随机数 0~n-1 聚合部分结果，第二阶段去掉随机前缀做最终聚合）——将一个大 key 的聚合分拆成 n 个小任务并行。(2) 使用 Hive 参数 set hive.groupby.skewindata=true 开启倾斜优化（查询计划变为两个 MR Job，第一阶段随机分发做预聚合，第二阶段按 key 分发做最终聚合）。JOIN 倾斜：(1) Map Join（Broadcast Join / Map-side Join）——把小表完整加载到每个 Executor 内存中，在 Map 端完成 JOIN 避免 Shuffle。适用条件是小表数据量 < broadcast 阈值（Spark 默认 10MB，可通过 spark.sql.autoBroadcastJoinThreshold 调大）。这是解决 Join 倾斜最有效的方式——完全消除了 Shuffle。(2) 倾斜 key 拆分——对大 key 对应的大表数据加随机前缀 0~n-1，对小表数据复制 n 份并同样加前缀，做 JOIN 后去掉前缀。本质是将"一个巨大分区的 JOIN"分散为"n 个中等分区的并行 JOIN"。(3) 过滤掉倾斜 key——如果倾斜的 key 是无效数据（如 NULL 值），可以直接提前过滤或单独处理。NULL 值倾斜的解决方案：将 NULL 值随机化（如 NULL + rand(0,n-1)）或单独处理。(4) 动态分桶——使用 Bucket Join 或 Sort Merge Join 时确保两表按相同 key 分桶，在桶内 JOIN 而非全量 Shuffle。通用方案：(1) 调节 Shuffle 分区数——增加 spark.sql.shuffle.partitions 或 reduce 数量以拆分热点；(2) 开启 Spark 的 Adaptive Query Execution (AQE) ——从 Spark 3.0 起支持动态检测数据倾斜并自动优化，数据倾斜的分区被自动分裂和 re-distribute，极大减轻人工调优负担。诊断倾斜的线索：Spark UI 中 Stage 的 Task 运行时间分布严重不均（某些 Task 比中位数慢 5-10 倍）或 Shuffle Read Size 极度不均。',
+    tags: ['data skew', 'spark', 'hive', 'shuffle', 'join optimization'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'hard',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-188',
+    category: 'statistics',
+    question: 'HAVING 和 WHERE 的区别是什么？什么时候必须用 HAVING？',
+    answer:
+      'WHERE 和 HAVING 都是 SQL 中的过滤条件，但作用于查询的不同阶段。WHERE 在数据分组前过滤原始行（在 GROUP BY 之前执行），筛选哪些行参与后续聚合。HAVING 在数据分组后过滤汇总结果（在 GROUP BY 之后执行），筛选哪些分组保留在最终结果中。关键区别：(1) 执行顺序不同——SQL 逻辑执行顺序为 FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY，WHERE 在前 HAVING 在后；(2) 作用对象不同——WHERE 作用于原始行数据，HAVING 作用于聚合后的组；(3) 可使用的表达式不同——WHERE 不能使用聚合函数（如 SUM、COUNT、AVG），因为这些在 GROUP BY 之后才计算；HAVING 可以使用聚合函数，这是其核心存在理由。必须使用 HAVING 的场景：当过滤条件依赖聚合结果时。例如"查询订单总数超过 10 单的用户"——SELECT user_id, COUNT(*) AS order_cnt FROM orders GROUP BY user_id HAVING COUNT(*) > 10。这里的 COUNT(*) 是聚合值，WHERE 无法使用，必须用 HAVING。反之，如果条件不依赖聚合值（如"只查 2024 年的订单总数"），则应优先在 WHERE 中过滤（WHERE year=2024），这样可以减少进入聚合的数据量，提升性能。另一个区别是 WHERE 可以使用索引（配合最左前缀），而 HAVING 通常无法利用索引。实践中应遵循"先 WHERE 后 HAVING"原则——能在 WHERE 中过滤的先过滤（减少聚合数据量），只能在聚合后过滤的才用 HAVING。面试中还可能引申到 QUALIFY（某些数据库如 Snowflake、BigQuery 支持）——直接对窗口函数结果过滤，避免了传统子查询/CTE 的嵌套写法。',
+    tags: ['having', 'where', 'filter', 'aggregation', 'sql execution order'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'easy',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-189',
+    category: 'statistics',
+    question: 'EXPLAIN 执行计划怎么看？如何通过执行计划判断 SQL 是否高效？',
+    answer:
+      'EXPLAIN 是分析 SQL 执行计划的核心工具，在 SQL 前加 EXPLAIN 关键字即可查看优化器选择的执行路径。MySQL EXPLAIN 输出关键列解读：(1) id——SELECT 序号，表示执行顺序或嵌套关系，id 值越大优先级越高越先执行，相同 id 从上到下执行；(2) select_type——查询类型：SIMPLE（简单查询）、PRIMARY（最外层查询）、SUBQUERY/DERIVED（子查询/派生表）、UNION（UNION 的后一个查询）。DERIVED 通常性能较差，应关注能否优化掉；(3) type——访问类型，从好到差排序：system > const > eq_ref > ref > range > index > ALL。const 表示主键或唯一索引等值查询（最优）；eq_ref 表示联表查询中使用主键/唯一索引匹配，每行只匹配一行；ref 表示非唯一索引等值匹配；range 表示索引范围扫描（BETWEEN、>、<、IN）；index 表示全索引扫描（扫描整个索引树，比全表快但未必高效）；ALL 即全表扫描（最差）。通常要求至少达到 range 级别，OLTP 场景力求 const/eq_ref/ref。如果看到 ALL，是最需要优化的信号；(4) possible_keys——可能用到的索引；key——实际使用的索引；key_len——使用的索引字节长度（越短越好）；(5) rows——优化器估计需要检查的行数，这个数字越小越好，是判断查询代价的快速指标；(6) Extra——额外信息，最重要列：Using index（覆盖索引，不查表，好）；Using where（使用 WHERE 过滤，正常）；Using index condition（索引条件下推 ICP，好）；Using temporary（需要临时表，性能告警，常见于 GROUP BY 和 DISTINCT）；Using filesort（需要额外排序，告警，考虑加索引消除）。判断 SQL 是否高效的核心检查点：type 是否为 ALL（全表扫描）→ 加索引；Extra 是否包含 Using filesort 或 Using temporary → 优化 ORDER BY/GROUP BY 使其利用索引有序性；key 是否为 NULL（未用任何索引）→ 检查 WHERE 条件是否索引友好；rows 是否过大 → 索引过滤效果不够或数据量本身体量巨大需考虑分区/分页；extra 是否含 Using join buffer → JOIN 列缺索引。Hive/Spark 的 EXPLAIN 看 Job 数量和 Stage 拓扑，目标是最小化 Shuffle 操作（Exchange 节点）。Spark UI 中查看 DAG 图和各 Stage 的输入数据量，重点关注 Shuffle Read 的数据量。',
+    tags: ['explain', 'execution plan', 'query optimization', 'type', 'extra'],
+    subTopic: 'SQL与数据分析',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
 ];
