@@ -104,7 +104,7 @@ function ReviewDistribution({ cards }: { cards: { sm2: { interval: number; repet
 }
 
 export default function StatsDashboard() {
-  const { state, dispatch, totalDue } = useAppContext();
+  const { state, dispatch, totalDue, totalNew } = useAppContext();
   const cards = Object.values(state.cardsById);
 
   const stats = useMemo(() => {
@@ -170,10 +170,17 @@ export default function StatsDashboard() {
             />
             <StatBox
               icon={<Clock className="w-4 h-4" />}
-              label="今日到期"
+              label="到期复习"
               value={totalDue}
               color="text-orange-600 dark:text-orange-400"
               bg="bg-orange-50 dark:bg-orange-900/30"
+            />
+            <StatBox
+              icon={<BookOpen className="w-4 h-4" />}
+              label="今日可学新卡"
+              value={Math.min(totalNew, state.dailyNewLimit)}
+              color="text-blue-600 dark:text-blue-400"
+              bg="bg-blue-50 dark:bg-blue-900/30"
             />
             <StatBox
               icon={<Zap className="w-4 h-4" />}
@@ -218,6 +225,22 @@ export default function StatsDashboard() {
 
           {/* Ebbinghaus Curve */}
           <EbbinghausCurve />
+
+          {/* Review queue summary */}
+          <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-3">
+            <div className="flex justify-between">
+              <span>到期复习</span>
+              <span className="font-medium text-orange-600">{totalDue} 张</span>
+            </div>
+            <div className="flex justify-between">
+              <span>今日新学（上限 {state.dailyNewLimit}）</span>
+              <span className="font-medium text-blue-600">{Math.min(totalNew, state.dailyNewLimit)} / {totalNew} 张</span>
+            </div>
+            <div className="flex justify-between pt-1 border-t border-gray-200 dark:border-gray-600">
+              <span>今日总计</span>
+              <span className="font-bold">{totalDue + Math.min(totalNew, state.dailyNewLimit)} 张</span>
+            </div>
+          </div>
 
           {/* Average rating + difficult */}
           <div className="space-y-2">
