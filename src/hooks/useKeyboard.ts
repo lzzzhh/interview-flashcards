@@ -50,7 +50,8 @@ export function useKeyboard({ dispatch, searchInputRef, getCurrentCardId }: Keyb
       // M to toggle mastered
       if (!isInput && (e.key === 'm' || e.key === 'M')) {
         e.preventDefault();
-        dispatch({ type: 'TOGGLE_MASTERED' });
+        const id = getCurrentCardId?.();
+        if (id) dispatch({ type: 'TOGGLE_MASTERED', payload: id });
         return;
       }
 
@@ -72,7 +73,8 @@ export function useKeyboard({ dispatch, searchInputRef, getCurrentCardId }: Keyb
       // 1-5 for SM-2 rating
       if (!isInput && ['1', '2', '3', '4', '5'].includes(e.key)) {
         e.preventDefault();
-        dispatch({ type: 'RATE_CARD', payload: parseInt(e.key) as 1 | 2 | 3 | 4 | 5 });
+        const id = getCurrentCardId?.();
+        if (id) dispatch({ type: 'RATE_CARD', payload: { cardId: id, rating: parseInt(e.key) } });
         return;
       }
 

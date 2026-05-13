@@ -1,5 +1,5 @@
 // ============================================================
-// src/App.tsx — 主组装组件（含复习模式流程）
+// src/App.tsx — 适配 cardsById + visibleCardIds
 // ============================================================
 
 import { useRef, useCallback } from 'react';
@@ -17,12 +17,14 @@ import EmptyState from './components/EmptyState';
 import StatsDashboard from './components/StatsDashboard';
 
 function AppInner() {
-  const { state, dispatch, filteredCards, currentCard, masteredIds, totalDue } = useAppContext();
+  const { state, dispatch, visibleCards, currentCard, masteredIds, totalDue } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const getCurrentCardId = useCallback(() => currentCard?.id ?? null, [currentCard]);
 
   useKeyboard({ dispatch, searchInputRef, getCurrentCardId });
+
+  const cardCount = visibleCards.length;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
@@ -40,7 +42,6 @@ function AppInner() {
             )}
           </div>
           <div className="flex items-center gap-1">
-            {/* Review Mode Toggle */}
             <button
               onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
               className={`relative p-2 rounded-lg transition-colors ${
@@ -82,11 +83,11 @@ function AppInner() {
           </button>
         )}
 
-        {/* Review mode bar — clear exit button */}
+        {/* Review mode bar */}
         {state.reviewMode && (
           <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/30 border-b border-orange-200 dark:border-orange-800 flex items-center gap-2">
             <span className="text-xs text-orange-600 dark:text-orange-400 flex-1">
-              🔬 复习中 · {filteredCards.length} 张到期 · 第 {state.currentIndex + 1}/{filteredCards.length} 张
+              🔬 复习中 · {cardCount} 张到期 · 第 {state.currentVisibleIndex + 1}/{cardCount} 张
             </span>
             <button
               onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
@@ -101,7 +102,7 @@ function AppInner() {
         {/* Tabs (hidden in review mode) */}
         {!state.reviewMode && <CategoryTabs />}
 
-        {/* Search + Filter (hidden in review mode) */}
+        {/* Search + Filter */}
         {!state.reviewMode && (
           <div className="flex gap-2">
             <SearchBar />
@@ -110,7 +111,7 @@ function AppInner() {
         )}
 
         {/* Card View */}
-        {filteredCards.length > 0 && currentCard ? (
+        {currentCard ? (
           <div className="space-y-4" key={currentCard.id}>
             <CardView
               card={currentCard}
@@ -132,18 +133,17 @@ function AppInner() {
         )}
 
         {/* Progress */}
-        {filteredCards.length > 0 && (
+        {cardCount > 0 && (
           <div className="pt-2 pb-8">
             <ProgressBar
-              current={Math.min(state.currentIndex, filteredCards.length - 1)}
-              total={filteredCards.length}
+              current={Math.min(state.currentVisibleIndex, cardCount - 1)}
+              total={cardCount}
               mastered={masteredIds.length}
             />
           </div>
         )}
       </div>
 
-      {/* Stats Dashboard (overlay) */}
       <StatsDashboard />
     </div>
   );

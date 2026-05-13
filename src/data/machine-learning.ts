@@ -1,6 +1,6 @@
-import type { QACard } from '../types';
+import type { QACard, SM2Record, CardState } from '../types';
 
-const SM2 = { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() };
+const SM2: SM2Record = { state: 'new' as CardState, easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() };
 
 export const machineLearningCards: QACard[] = [
   // ============================================================

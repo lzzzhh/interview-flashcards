@@ -4,13 +4,33 @@
 
 export type Category = 'leetcode' | 'statistics' | 'machine-learning' | 'llm' | 'jargon' | 'workplace';
 export type Difficulty = 'easy' | 'medium' | 'hard';
+export type CardState = 'new' | 'learning' | 'review' | 'relearning';
 
-/** SM-2 复习状态 */
+/** SM-2 复习状态（增强版） */
 export interface SM2Record {
-  easeFactor: number;     // 初始 2.5
-  interval: number;       // 复习间隔（天）
-  repetitions: number;    // 连续答对次数
-  nextReview: number;     // 下次复习时间戳 (ms)
+  state: CardState;         // new / learning / review / relearning
+  easeFactor: number;       // 初始 2.5
+  interval: number;         // 复习间隔（天）
+  repetitions: number;      // 总复习次数
+  lapses: number;           // 遗忘次数
+  nextReview: number;       // 下次复习时间戳 (ms)
+  lastReviewedAt?: number;  // 上次复习时间戳
+}
+
+/** ReviewLog — 每次复习的完整记录 */
+export interface ReviewLog {
+  id: string;
+  cardId: string;
+  reviewedAt: number;
+  rating: number;
+  stateBefore: CardState;
+  stateAfter: CardState;
+  intervalBefore: number;
+  intervalAfter: number;
+  easeBefore: number;
+  easeAfter: number;
+  elapsedDays: number;
+  scheduledDays: number;
 }
 
 /** 力扣 Hot 100 卡片 */
@@ -45,47 +65,61 @@ export interface QACard {
 
 export type FlashCard = LeetCodeCard | QACard;
 
+// ============================================================
+// State — 核心改进：cardsById 永远保存完整数据
+// ============================================================
 export interface AppState {
   category: Category;
-  cards: FlashCard[];
-  currentIndex: number;
+
+  /** 完整卡片数据源（不可被筛选/review/shuffle 覆盖） */
+  cardsById: Record<string, FlashCard>;
+
+  /** 当前可见卡片 ID 列表（过滤/搜索/复习/随机只影响此列表） */
+  visibleCardIds: string[];
+
+  /** 当前在 visibleCardIds 中的下标 */
+  currentVisibleIndex: number;
+
   showApproach: boolean;
   showCode: boolean;
+  qaAnswerVisible: boolean;
+
   filterDifficulty: Difficulty | 'all';
   filterSubTopic: string | 'all';
   searchQuery: string;
+
   isDark: boolean;
   showStats: boolean;
   shuffled: boolean;
   reviewMode: boolean;
-  qaAnswerVisible: boolean;
 }
 
+// ============================================================
+// Actions
+// ============================================================
 export type AppAction =
   | { type: 'SET_CATEGORY'; payload: Category }
-  | { type: 'SET_CARDS'; payload: FlashCard[] }
   | { type: 'GO_TO'; payload: number }
   | { type: 'NEXT' }
   | { type: 'PREV' }
   | { type: 'TOGGLE_APPROACH' }
   | { type: 'TOGGLE_CODE' }
-  | { type: 'TOGGLE_MASTERED' }
+  | { type: 'TOGGLE_QA_ANSWER' }
+  | { type: 'TOGGLE_MASTERED'; payload: string }
   | { type: 'TOGGLE_FAVORITE'; payload: string }
-  | { type: 'RATE_CARD'; payload: 0 | 1 | 2 | 3 | 4 | 5 }
+  | { type: 'RATE_CARD'; payload: { cardId: string; rating: number } }
   | { type: 'SET_FILTER_DIFFICULTY'; payload: Difficulty | 'all' }
   | { type: 'SET_FILTER_SUBTOPIC'; payload: string | 'all' }
   | { type: 'SET_SEARCH'; payload: string }
   | { type: 'TOGGLE_DARK' }
   | { type: 'TOGGLE_STATS' }
-  | { type: 'SHUFFLE' }
-  | { type: 'RESET_ORDER' }
   | { type: 'TOGGLE_REVIEW_MODE' }
-  | { type: 'TOGGLE_QA_ANSWER' };
+  | { type: 'SHUFFLE' }
+  | { type: 'RESET_ORDER' };
 
 // ============================================================
-// localStorage 持久化相关类型
+// localStorage 持久化（兼容旧格式）
 // ============================================================
-
 export const STORAGE_KEYS = {
   LEETCODE_PROGRESS: 'fc-leetcode-progress',
   STATISTICS_PROGRESS: 'fc-stats-progress',
@@ -109,11 +143,22 @@ export interface StoredSettings {
 }
 
 export interface DayRecord {
-  date: string;        // '2026-05-12'
+  date: string;
   cardsReviewed: number;
   cardsMastered: number;
 }
 
 export interface StoredStats {
   sessions: DayRecord[];
+}
+
+// ============================================================
+// 新数据格式（Tauri 文件存储）
+// ============================================================
+export interface AppDataV1 {
+  schemaVersion: 1;
+  progress: Record<string, StoredProgress>;
+  reviewLogs: Record<string, ReviewLog[]>;
+  settings: StoredSettings;
+  stats: StoredStats;
 }

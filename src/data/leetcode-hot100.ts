@@ -2,15 +2,17 @@
 // LeetCode Hot 100 闪卡数据（100 题）
 // ============================================================
 
-import type { LeetCodeCard } from '../types';
+import type { LeetCodeCard, SM2Record, CardState } from '../types';
 
-const now = Date.now();
-const defaultSM2 = {
+const defaultSM2: SM2Record = {
+  state: 'new' as CardState,
   easeFactor: 2.5,
   interval: 0,
   repetitions: 0,
-  nextReview: now,
+  lapses: 0,
+  nextReview: Date.now(),
 };
+
 const fav = false;
 
 // ============================================================

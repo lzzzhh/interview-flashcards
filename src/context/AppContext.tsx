@@ -1,5 +1,7 @@
 // ============================================================
-// src/context/AppContext.tsx — 全局状态管理
+// src/context/AppContext.tsx — 重构版
+// cardsById 永远保存完整数据，visibleCardIds 只存筛选结果
+// 所有卡片操作通过 cardId，不用 index
 // ============================================================
 
 import {
@@ -25,10 +27,9 @@ import { machineLearningCards } from '../data/machine-learning';
 import { llmCards } from '../data/llm';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
-import { sm2, createDefaultSM2 } from '../utils/sm2';
-import { loadProgress, loadSettings, saveSettings } from '../utils/storage';
+import { scheduleReview, createDefaultSM2 } from '../utils/sm2';
+import { loadProgress, saveSettings } from '../utils/storage';
 import { saveAppData } from '../utils/nativeStorage';
-import type { AppData } from '../utils/nativeStorage';
 import { shuffle } from '../utils/shuffle';
 
 // ---- 数据源映射 ----
@@ -41,196 +42,65 @@ const CARD_DATA: Record<Category, FlashCard[]> = {
   workplace: workplaceCards as FlashCard[],
 };
 
-// ---- 合并 progress 到卡片 ----
-function mergeProgress(cards: FlashCard[], progress: StoredProgress): FlashCard[] {
-  return cards.map((card) => ({
-    ...card,
-    sm2: progress.sm2[card.id] ?? card.sm2,
-    favorited: progress.favorited.includes(card.id),
-  }));
-}
+const progressKeyMap: Record<Category, string> = {
+  leetcode: 'fc-leetcode-progress',
+  statistics: 'fc-stats-progress',
+  'machine-learning': 'fc-ml-progress',
+  llm: 'fc-llm-progress',
+  jargon: 'fc-jargon-progress',
+  workplace: 'fc-workplace-progress',
+};
 
-// ---- Reducer ----
-function appReducer(state: AppState, action: AppAction): AppState {
-  switch (action.type) {
-    case 'SET_CATEGORY': {
-      const rawCards = CARD_DATA[action.payload];
-      const progress = loadProgress(action.payload);
-      const cards = mergeProgress(rawCards, progress);
-      return {
-        ...state,
-        category: action.payload,
-        cards,
-        currentIndex: 0,
-        showApproach: false,
-        showCode: false,
-        qaAnswerVisible: false,
-        filterDifficulty: 'all',
-        filterSubTopic: 'all',
-        searchQuery: '',
-        shuffled: false,
-      };
-    }
-
-    case 'SET_CARDS':
-      return { ...state, cards: action.payload, currentIndex: 0 };
-
-    case 'GO_TO':
-      return {
-        ...state,
-        currentIndex: Math.max(0, Math.min(action.payload, state.cards.length - 1)),
-      };
-
-    case 'NEXT':
-      return {
-        ...state,
-        currentIndex: Math.min(state.currentIndex + 1, state.cards.length - 1),
-        qaAnswerVisible: false,
-        showApproach: false,
-        showCode: false,
-      };
-
-    case 'PREV':
-      return {
-        ...state,
-        currentIndex: Math.max(state.currentIndex - 1, 0),
-        qaAnswerVisible: false,
-        showApproach: false,
-        showCode: false,
-      };
-
-    case 'TOGGLE_APPROACH':
-      return { ...state, showApproach: !state.showApproach };
-
-    case 'TOGGLE_CODE':
-      return { ...state, showCode: !state.showCode };
-
-    case 'TOGGLE_MASTERED': {
-      const idx = state.currentIndex;
-      if (idx >= state.cards.length) return state;
-      const card = state.cards[idx];
-      const isNowMastered = card.sm2.repetitions === 0;
-      const newSm2: SM2Record = isNowMastered
-        ? { ...card.sm2, repetitions: 3, nextReview: Date.now() + 6 * 86400000 }
-        : createDefaultSM2();
-      const newCards = state.cards.map((c, i) =>
-        i === idx ? { ...c, sm2: newSm2 } : c,
-      );
-      return { ...state, cards: newCards };
-    }
-
-    case 'TOGGLE_FAVORITE': {
-      const newCards = state.cards.map((c) =>
-        c.id === action.payload ? { ...c, favorited: !c.favorited } : c,
-      );
-      return { ...state, cards: newCards };
-    }
-
-    case 'RATE_CARD': {
-      const idx = state.currentIndex;
-      if (idx >= state.cards.length) return state;
-      const card = state.cards[idx];
-      const newSm2 = sm2(card.sm2, action.payload);
-      const newCards = state.cards.map((c, i) =>
-        i === idx ? { ...c, sm2: newSm2 } : c,
-      );
-      return { ...state, cards: newCards };
-    }
-
-    case 'SET_FILTER_DIFFICULTY':
-      return { ...state, filterDifficulty: action.payload };
-
-    case 'SET_FILTER_SUBTOPIC':
-      return { ...state, filterSubTopic: action.payload };
-
-    case 'SET_SEARCH':
-      return { ...state, searchQuery: action.payload };
-
-    case 'TOGGLE_DARK': {
-      const next = !state.isDark;
-      saveSettings({ isDark: next, lastCategory: state.category });
-      return { ...state, isDark: next };
-    }
-
-    case 'TOGGLE_STATS':
-      return { ...state, showStats: !state.showStats };
-
-    case 'SHUFFLE': {
-      const filtered = applyFilters(state.cards, state);
-      const shuffled = shuffle(filtered);
-      return { ...state, cards: shuffled, currentIndex: 0, shuffled: true };
-    }
-
-    case 'RESET_ORDER': {
-      const rawCards = CARD_DATA[state.category];
-      const progress = loadProgress(state.category);
-      return {
-        ...state,
-        cards: mergeProgress(rawCards, progress),
-        currentIndex: 0,
-        shuffled: false,
-      };
-    }
-
-    case 'TOGGLE_REVIEW_MODE': {
-      const next = !state.reviewMode;
-      if (next) {
-        const due = state.cards.filter((c) => c.sm2.nextReview <= Date.now());
-        return { ...state, reviewMode: true, cards: due, currentIndex: 0 };
-      } else {
-        const rawCards = CARD_DATA[state.category];
-        const progress = loadProgress(state.category);
-        return {
-          ...state,
-          reviewMode: false,
-          cards: mergeProgress(rawCards, progress),
-          currentIndex: 0,
-        };
-      }
-    }
-
-    case 'TOGGLE_QA_ANSWER':
-      return { ...state, qaAnswerVisible: !state.qaAnswerVisible };
-
-    default:
-      return state;
+// ---- 合并 progress → cardsById ----
+function buildCardsById(category: Category): Record<string, FlashCard> {
+  const rawCards = CARD_DATA[category];
+  const progress = loadProgress(category);
+  const result: Record<string, FlashCard> = {};
+  for (const card of rawCards) {
+    const sm2 = progress.sm2[card.id]
+      ? { ...card.sm2, ...progress.sm2[card.id] } // merge stored state
+      : card.sm2;
+    result[card.id] = { ...card, sm2, favorited: progress.favorited.includes(card.id) };
   }
+  return result;
 }
 
-// ---- 筛选 helpers ----
-export function getMasteredIds(cards: FlashCard[]): string[] {
-  return cards
-    .filter((c) => c.sm2.repetitions > 0)
-    .map((c) => c.id);
+function isLeetCodeCard(card: FlashCard): card is LeetCodeCard {
+  return card.category === 'leetcode';
 }
 
-export function getFavoritedIds(cards: FlashCard[]): string[] {
-  return cards.filter((c) => c.favorited).map((c) => c.id);
-}
+// ---- 筛选 visibleCardIds ----
+function computeVisibleIds(state: AppState): string[] {
+  let ids = Object.keys(state.cardsById);
 
-export function applyFilters(cards: FlashCard[], state: AppState): FlashCard[] {
-  let filtered = [...cards];
+  // 复习模式：只看到期卡片
+  if (state.reviewMode) {
+    ids = ids.filter((id) => state.cardsById[id].sm2.nextReview <= Date.now());
+  }
 
-  // filter by difficulty
+  // 难度
   if (state.filterDifficulty !== 'all') {
-    filtered = filtered.filter((c) => {
+    ids = ids.filter((id) => {
+      const c = state.cardsById[id];
       const d = isLeetCodeCard(c) ? c.difficulty : c.difficulty ?? 'medium';
       return d === state.filterDifficulty;
     });
   }
 
-  // filter by subtopic
+  // 子主题
   if (state.filterSubTopic !== 'all') {
-    filtered = filtered.filter((c) => {
+    ids = ids.filter((id) => {
+      const c = state.cardsById[id];
       if (isLeetCodeCard(c)) return c.tags.includes(state.filterSubTopic);
-      return c.subTopic === state.filterSubTopic;
+      return 'subTopic' in c && c.subTopic === state.filterSubTopic;
     });
   }
 
-  // search
+  // 搜索
   if (state.searchQuery.trim()) {
     const q = state.searchQuery.toLowerCase();
-    filtered = filtered.filter((c) => {
+    ids = ids.filter((id) => {
+      const c = state.cardsById[id];
       if (isLeetCodeCard(c)) {
         return (
           c.title.toLowerCase().includes(q) ||
@@ -244,32 +114,183 @@ export function applyFilters(cards: FlashCard[], state: AppState): FlashCard[] {
         c.question.includes(q) ||
         c.answer.includes(q) ||
         (c.tags ?? []).some((t) => t.includes(q)) ||
-        (c.subTopic ?? '').includes(q)
+        ((c as any).subTopic ?? '').includes(q)
       );
     });
   }
 
-  return filtered;
+  // 随机
+  if (state.shuffled) {
+    ids = shuffle(ids);
+  }
+
+  return ids;
 }
 
-function isLeetCodeCard(card: FlashCard): card is LeetCodeCard {
-  return card.category === 'leetcode';
+// ---- Reducer ----
+function appReducer(state: AppState, action: AppAction): AppState {
+  switch (action.type) {
+    case 'SET_CATEGORY': {
+      const nextState = {
+        ...state,
+        category: action.payload,
+        cardsById: buildCardsById(action.payload),
+        showApproach: false,
+        showCode: false,
+        qaAnswerVisible: false,
+        filterDifficulty: 'all' as const,
+        filterSubTopic: 'all' as const,
+        searchQuery: '',
+        shuffled: false,
+        reviewMode: false,
+      };
+      return { ...nextState, visibleCardIds: computeVisibleIds(nextState), currentVisibleIndex: 0 };
+    }
+
+    case 'GO_TO':
+      return {
+        ...state,
+        currentVisibleIndex: Math.max(0, Math.min(action.payload, state.visibleCardIds.length - 1)),
+      };
+
+    case 'NEXT':
+      return {
+        ...state,
+        currentVisibleIndex: Math.min(state.currentVisibleIndex + 1, state.visibleCardIds.length - 1),
+        qaAnswerVisible: false,
+        showApproach: false,
+        showCode: false,
+      };
+
+    case 'PREV':
+      return {
+        ...state,
+        currentVisibleIndex: Math.max(state.currentVisibleIndex - 1, 0),
+        qaAnswerVisible: false,
+        showApproach: false,
+        showCode: false,
+      };
+
+    case 'TOGGLE_APPROACH':
+      return { ...state, showApproach: !state.showApproach };
+
+    case 'TOGGLE_CODE':
+      return { ...state, showCode: !state.showCode };
+
+    case 'TOGGLE_QA_ANSWER':
+      return { ...state, qaAnswerVisible: !state.qaAnswerVisible };
+
+    case 'TOGGLE_MASTERED': {
+      const card = state.cardsById[action.payload];
+      if (!card) return state;
+      const newSm2: SM2Record = card.sm2.state === 'new'
+        ? { ...card.sm2, state: 'learning' as const, interval: 6, repetitions: 3, nextReview: Date.now() + 6 * 86400000 }
+        : createDefaultSM2();
+      return {
+        ...state,
+        cardsById: { ...state.cardsById, [action.payload]: { ...card, sm2: newSm2 } },
+      };
+    }
+
+    case 'TOGGLE_FAVORITE': {
+      const card = state.cardsById[action.payload];
+      if (!card) return state;
+      return {
+        ...state,
+        cardsById: {
+          ...state.cardsById,
+          [action.payload]: { ...card, favorited: !card.favorited },
+        },
+      };
+    }
+
+    case 'RATE_CARD': {
+      const { cardId, rating } = action.payload;
+      const card = state.cardsById[cardId];
+      if (!card) return state;
+      const result = scheduleReview(cardId, card.sm2, rating);
+      return {
+        ...state,
+        cardsById: {
+          ...state.cardsById,
+          [cardId]: { ...card, sm2: result.sm2 },
+        },
+        qaAnswerVisible: false,
+      };
+    }
+
+    case 'SET_FILTER_DIFFICULTY': {
+      const next = { ...state, filterDifficulty: action.payload };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
+    case 'SET_FILTER_SUBTOPIC': {
+      const next = { ...state, filterSubTopic: action.payload };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
+    case 'SET_SEARCH': {
+      const next = { ...state, searchQuery: action.payload };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
+    case 'TOGGLE_DARK': {
+      const next = !state.isDark;
+      saveSettings({ isDark: next, lastCategory: state.category });
+      return { ...state, isDark: next };
+    }
+
+    case 'TOGGLE_STATS':
+      return { ...state, showStats: !state.showStats };
+
+    case 'TOGGLE_REVIEW_MODE': {
+      const nextReview = !state.reviewMode;
+      const next = { ...state, reviewMode: nextReview };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
+    case 'SHUFFLE': {
+      const next = { ...state, shuffled: true };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
+    case 'RESET_ORDER': {
+      const next = { ...state, shuffled: false };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
+    default:
+      return state;
+  }
+}
+
+// ---- Helpers ----
+export function getMasteredIds(cardsById: Record<string, FlashCard>): string[] {
+  return Object.values(cardsById)
+    .filter((c) => c.sm2.state !== 'new')
+    .map((c) => c.id);
+}
+
+export function getFavoritedIds(cardsById: Record<string, FlashCard>): string[] {
+  return Object.values(cardsById).filter((c) => c.favorited).map((c) => c.id);
 }
 
 // ---- Initial State ----
 function createInitialState(): AppState {
-  const settings = loadSettings();
+  const settings = (() => {
+    try { return JSON.parse(localStorage.getItem('fc-settings') || '{}'); }
+    catch { return {}; }
+  })();
   const category = settings.lastCategory ?? 'leetcode';
-  const rawCards = CARD_DATA[category];
-  const progress = loadProgress(category);
-  const cards = mergeProgress(rawCards, progress);
 
   return {
     category,
-    cards,
-    currentIndex: 0,
+    cardsById: buildCardsById(category),
+    visibleCardIds: [],
+    currentVisibleIndex: 0,
     showApproach: false,
     showCode: false,
+    qaAnswerVisible: false,
     filterDifficulty: 'all',
     filterSubTopic: 'all',
     searchQuery: '',
@@ -277,7 +298,6 @@ function createInitialState(): AppState {
     showStats: false,
     shuffled: false,
     reviewMode: false,
-    qaAnswerVisible: false,
   };
 }
 
@@ -285,8 +305,8 @@ function createInitialState(): AppState {
 interface AppContextValue {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
-  filteredCards: FlashCard[];
   currentCard: FlashCard | null;
+  visibleCards: FlashCard[];
   masteredIds: string[];
   favoritedIds: string[];
   dueCountByCategory: Record<Category, number>;
@@ -298,114 +318,72 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, undefined, createInitialState);
 
-  const progressKeyMap: Record<Category, string> = {
-    leetcode: 'fc-leetcode-progress',
-    statistics: 'fc-stats-progress',
-    'machine-learning': 'fc-ml-progress',
-    llm: 'fc-llm-progress',
-    jargon: 'fc-jargon-progress',
-    workplace: 'fc-workplace-progress',
-  };
-
-  // 统一持久化：Tauri 原生文件 > localStorage
+  // 初始化时触发可见卡片计算
   useEffect(() => {
-    // 读取本地数据构建完整 AppData
-    const local = {
-      progress: {} as Record<string, StoredProgress>,
-      settings: { isDark: state.isDark, lastCategory: state.category },
-      stats: { sessions: [] },
-    } as AppData;
-
-    // 从 localStorage 加载其他分类的进度
-    const allKeys = [
-      'fc-leetcode-progress', 'fc-stats-progress', 'fc-ml-progress',
-      'fc-llm-progress', 'fc-jargon-progress', 'fc-workplace-progress',
-    ];
-    for (const key of allKeys) {
-      try {
-        local.progress[key] = JSON.parse(localStorage.getItem(key) || '{"sm2":{},"mastered":[],"favorited":[]}');
-      } catch {
-        local.progress[key] = { sm2: {}, mastered: [], favorited: [] };
-      }
-    }
-
-    // 更新当前分类的进度
-    const progressKey = progressKeyMap[state.category];
-    const progress: StoredProgress = {
-      sm2: {},
-      mastered: getMasteredIds(state.cards),
-      favorited: getFavoritedIds(state.cards),
-    };
-    for (const card of state.cards) {
-      progress.sm2[card.id] = card.sm2;
-    }
-    local.progress[progressKey] = progress;
-
-    // 同步设置
-    try {
-      const s = JSON.parse(localStorage.getItem('fc-settings') || '{}');
-      Object.assign(local.settings, s);
-    } catch {}
-    try {
-      const s = JSON.parse(localStorage.getItem('fc-stats') || '{}');
-      Object.assign(local.stats, s);
-    } catch {}
-    local.settings.isDark = state.isDark;
-    local.settings.lastCategory = state.category;
-
-    // 先写 localStorage 保证即时可用
-    localStorage.setItem(progressKey, JSON.stringify(progress));
-    localStorage.setItem('fc-settings', JSON.stringify(local.settings));
-
-    // 再异步写原生文件（Tauri）
-    saveAppData(local);
-  }, [state.cards, state.category, state.isDark]);
+    // Dispatch a no-op filter change to trigger visibleCardIds computation
+    dispatch({ type: 'SET_FILTER_DIFFICULTY', payload: 'all' });
+  }, []);
 
   // persist dark mode class on <html>
   useEffect(() => {
     document.documentElement.classList.toggle('dark', state.isDark);
   }, [state.isDark]);
 
-  // persist settings (redundant with above but kept for clarity)
+  // 持久化
   useEffect(() => {
-    saveSettings({ isDark: state.isDark, lastCategory: state.category });
-  }, [state.isDark, state.category]);
+    const progress: StoredProgress = {
+      sm2: {},
+      mastered: getMasteredIds(state.cardsById),
+      favorited: getFavoritedIds(state.cardsById),
+    };
+    for (const card of Object.values(state.cardsById)) {
+      progress.sm2[card.id] = card.sm2;
+    }
+    saveProgressToLS(state.category, progress);
 
-  const filteredCards = useMemo(
-    () => applyFilters(state.cards, state),
-    [state.cards, state.filterDifficulty, state.filterSubTopic, state.searchQuery],
+    // Tauri 文件存储
+    const allData = loadAllProgress();
+    saveAppData({
+      schemaVersion: 1,
+      progress: allData,
+      reviewLogs: {},
+      settings: { isDark: state.isDark, lastCategory: state.category },
+      stats: { sessions: [] },
+    } as any);
+  }, [state.cardsById, state.category, state.isDark]);
+
+  const currentCard = state.visibleCardIds.length > 0
+    ? state.cardsById[state.visibleCardIds[state.currentVisibleIndex]] ?? null
+    : null;
+
+  const visibleCards = useMemo(
+    () => state.visibleCardIds.map((id) => state.cardsById[id]).filter(Boolean) as FlashCard[],
+    [state.visibleCardIds, state.cardsById],
   );
 
-  const currentCard =
-    filteredCards.length > 0 ? filteredCards[Math.min(state.currentIndex, filteredCards.length - 1)] : null;
+  const masteredIds = useMemo(() => getMasteredIds(state.cardsById), [state.cardsById]);
+  const favoritedIds = useMemo(() => getFavoritedIds(state.cardsById), [state.cardsById]);
 
-  const masteredIds = useMemo(() => getMasteredIds(state.cards), [state.cards]);
-  const favoritedIds = useMemo(() => getFavoritedIds(state.cards), [state.cards]);
-
-  // Due counts by category — compute from ALL card data (not just loaded)
+  // Due counts
   const dueCountByCategory = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const [cat, allCards] of Object.entries(CARD_DATA) as [Category, FlashCard[]][]) {
       const progress = loadProgress(cat);
-      const merged = allCards.map((c) => ({
-        ...c,
-        sm2: progress.sm2[c.id] ?? c.sm2,
-      }));
-      counts[cat] = merged.filter((c) => c.sm2.nextReview <= Date.now()).length;
+      counts[cat] = allCards.filter((c) => {
+        const sm2 = progress.sm2[c.id] ?? c.sm2;
+        return sm2.nextReview <= Date.now();
+      }).length;
     }
     return counts as Record<Category, number>;
-  }, [state.cards, state.category]); // re-evaluate when cards change
+  }, [state.cardsById]);
 
-  const totalDue = useMemo(
-    () => Object.values(dueCountByCategory).reduce((a, b) => a + b, 0),
-    [dueCountByCategory],
-  );
+  const totalDue = useMemo(() => Object.values(dueCountByCategory).reduce((a, b) => a + b, 0), [dueCountByCategory]);
 
   const value: AppContextValue = {
     state,
     dispatch,
-    filteredCards,
     currentCard,
+    visibleCards,
     masteredIds,
     favoritedIds,
     dueCountByCategory,
@@ -419,4 +397,23 @@ export function useAppContext(): AppContextValue {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error('useAppContext must be used within AppProvider');
   return ctx;
+}
+
+// ---- helpers ----
+function saveProgressToLS(category: Category, progress: StoredProgress) {
+  try {
+    localStorage.setItem(progressKeyMap[category], JSON.stringify(progress));
+  } catch {}
+}
+
+function loadAllProgress(): Record<string, StoredProgress> {
+  const result: Record<string, StoredProgress> = {};
+  for (const key of Object.values(progressKeyMap)) {
+    try {
+      result[key] = JSON.parse(localStorage.getItem(key) || '{"sm2":{},"mastered":[],"favorited":[]}');
+    } catch {
+      result[key] = { sm2: {}, mastered: [], favorited: [] };
+    }
+  }
+  return result;
 }

@@ -9,7 +9,7 @@ export const llmCards: QACard[] = [
     tags: ['Self-Attention', 'QKV', '公式推导', '核心机制'],
     subTopic: 'Transformer',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -20,7 +20,7 @@ export const llmCards: QACard[] = [
     tags: ['Scaled Attention', '√d_k', '方差控制', '梯度消失'],
     subTopic: 'Transformer',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -31,7 +31,7 @@ export const llmCards: QACard[] = [
     tags: ['Multi-Head Attention', '子空间', '语义多样性'],
     subTopic: 'Transformer',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -42,7 +42,7 @@ export const llmCards: QACard[] = [
     tags: ['Positional Encoding', 'Sinusoidal', 'RoPE', '位置编码'],
     subTopic: 'Transformer',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -53,7 +53,7 @@ export const llmCards: QACard[] = [
     tags: ['Residual Connection', '残差连接', '梯度回传', '深层网络'],
     subTopic: 'Transformer',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -64,7 +64,7 @@ export const llmCards: QACard[] = [
     tags: ['LayerNorm', 'BatchNorm', '归一化', 'RMSNorm'],
     subTopic: 'Transformer',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -75,7 +75,7 @@ export const llmCards: QACard[] = [
     tags: ['并行化', 'RNN vs Transformer', 'GPU计算', '训练效率'],
     subTopic: 'Transformer',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -86,7 +86,7 @@ export const llmCards: QACard[] = [
     tags: ['Encoder', 'Decoder', '架构对比', 'Encoder-only', 'Decoder-only'],
     subTopic: 'Transformer',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -97,7 +97,7 @@ export const llmCards: QACard[] = [
     tags: ['Self-Attention', 'Cross-Attention', 'Causal Attention', 'Mask'],
     subTopic: 'Transformer',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -108,7 +108,7 @@ export const llmCards: QACard[] = [
     tags: ['GPT', 'BERT', '架构对比', '生成 vs 理解'],
     subTopic: 'Transformer',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -124,7 +124,7 @@ export const llmCards: QACard[] = [
     tags: ['Pretraining', 'Finetuning', '预训练', '对齐', 'SFT'],
     subTopic: '训练微调',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -135,7 +135,7 @@ export const llmCards: QACard[] = [
     tags: ['LoRA', 'PEFT', '低秩分解', '参数高效微调'],
     subTopic: '训练微调',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -146,7 +146,7 @@ export const llmCards: QACard[] = [
     tags: ['Instruction Tuning', '指令微调', 'SFT', 'FLAN', 'Alpaca'],
     subTopic: '训练微调',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -157,7 +157,7 @@ export const llmCards: QACard[] = [
     tags: ['RLHF', 'Reward Model', 'PPO', '对齐', 'InstructGPT'],
     subTopic: '训练微调',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -168,7 +168,7 @@ export const llmCards: QACard[] = [
     tags: ['PPO', 'DPO', '偏好对齐', 'RLHF替代'],
     subTopic: '训练微调',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -179,7 +179,7 @@ export const llmCards: QACard[] = [
     tags: ['Prompt Tuning', 'P-Tuning', 'Prefix Tuning', 'Soft Prompt', 'PEFT'],
     subTopic: '训练微调',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -190,7 +190,7 @@ export const llmCards: QACard[] = [
     tags: ['Full Finetuning', 'PEFT', 'LoRA', '微调策略'],
     subTopic: '训练微调',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -201,7 +201,7 @@ export const llmCards: QACard[] = [
     tags: ['Catastrophic Forgetting', '灾难性遗忘', '知识保留', 'KL正则化'],
     subTopic: '训练微调',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -212,7 +212,7 @@ export const llmCards: QACard[] = [
     tags: ['数据质量', '微调数据', '数据筛选', 'LIMA'],
     subTopic: '训练微调',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -223,7 +223,7 @@ export const llmCards: QACard[] = [
     tags: ['SFT', '监督微调', 'RLHF基础', '指令遵循'],
     subTopic: '训练微调',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -239,7 +239,7 @@ export const llmCards: QACard[] = [
     tags: ['KV Cache', '推理优化', '显存管理', '自回归'],
     subTopic: '推理部署',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -250,7 +250,7 @@ export const llmCards: QACard[] = [
     tags: ['Beam Search', 'Greedy Decoding', '解码策略', '采样方法'],
     subTopic: '推理部署',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -261,7 +261,7 @@ export const llmCards: QACard[] = [
     tags: ['Temperature', '采样', '随机性控制', '解码参数'],
     subTopic: '推理部署',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -272,7 +272,7 @@ export const llmCards: QACard[] = [
     tags: ['Quantization', '量化', 'GPTQ', 'AWQ', 'INT4'],
     subTopic: '推理部署',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -283,7 +283,7 @@ export const llmCards: QACard[] = [
     tags: ['Speculative Decoding', '推测解码', 'Draft Model', '推理加速'],
     subTopic: '推理部署',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -294,7 +294,7 @@ export const llmCards: QACard[] = [
     tags: ['vLLM', 'PagedAttention', 'KV Cache管理', '内存优化'],
     subTopic: '推理部署',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -310,7 +310,7 @@ export const llmCards: QACard[] = [
     tags: ['ReAct', 'Agent框架', '推理+行动', 'Tool-Use'],
     subTopic: 'Agent',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -321,7 +321,7 @@ export const llmCards: QACard[] = [
     tags: ['Function Calling', 'Tool-Use', '结构化输出', 'API调用'],
     subTopic: 'Agent',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -332,7 +332,7 @@ export const llmCards: QACard[] = [
     tags: ['Tool-Use', '工具调用', 'Agent设计', 'MCP'],
     subTopic: 'Agent',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -343,7 +343,7 @@ export const llmCards: QACard[] = [
     tags: ['Multi-Agent', '协作', 'AutoGPT', 'MetaGPT', 'AutoGen'],
     subTopic: 'Agent',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -354,7 +354,7 @@ export const llmCards: QACard[] = [
     tags: ['AutoGPT', 'MetaGPT', 'Agent架构', '框架对比'],
     subTopic: 'Agent',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -365,7 +365,7 @@ export const llmCards: QACard[] = [
     tags: ['Planning', '任务分解', 'Agent规划', 'Tree-of-Thought'],
     subTopic: 'Agent',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -381,7 +381,7 @@ export const llmCards: QACard[] = [
     tags: ['RAG', '检索增强生成', '文档切分', '向量检索'],
     subTopic: 'RAG',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -392,7 +392,7 @@ export const llmCards: QACard[] = [
     tags: ['Chunk策略', '文档切分', '语义切分', 'Parent-Child'],
     subTopic: 'RAG',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -403,7 +403,7 @@ export const llmCards: QACard[] = [
     tags: ['Embedding Model', '向量模型', 'MTEB', '检索评估'],
     subTopic: 'RAG',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -414,7 +414,7 @@ export const llmCards: QACard[] = [
     tags: ['Reranking', '重排序', 'Cross-Encoder', '检索精度'],
     subTopic: 'RAG',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -425,7 +425,7 @@ export const llmCards: QACard[] = [
     tags: ['Hybrid Search', '混合检索', 'BM25', 'RRF', '稀疏+稠密'],
     subTopic: 'RAG',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -441,7 +441,7 @@ export const llmCards: QACard[] = [
     tags: ['Hallucination', '幻觉', '检测', '缓解', 'RAGAS'],
     subTopic: '评估安全',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -452,7 +452,7 @@ export const llmCards: QACard[] = [
     tags: ['Jailbreak', '越狱攻击', '安全对齐', '防御策略'],
     subTopic: '评估安全',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -463,7 +463,7 @@ export const llmCards: QACard[] = [
     tags: ['Benchmark', 'MMLU', 'GSM8K', 'HumanEval', '评测基准'],
     subTopic: '评估安全',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -474,7 +474,7 @@ export const llmCards: QACard[] = [
     tags: ['RLHF', 'Safety Alignment', 'Constitutional AI', '安全对齐'],
     subTopic: '评估安全',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -485,7 +485,7 @@ export const llmCards: QACard[] = [
     tags: ['Red Teaming', '红队测试', '安全评估', '漏洞发现'],
     subTopic: '评估安全',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -496,7 +496,7 @@ export const llmCards: QACard[] = [
     tags: ['Constitutional AI', '宪法AI', 'RLAIF', '安全训练'],
     subTopic: '评估安全',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 ];

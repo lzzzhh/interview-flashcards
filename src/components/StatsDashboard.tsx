@@ -96,7 +96,7 @@ function ReviewDistribution({ cards }: { cards: { sm2: { interval: number; repet
 
 export default function StatsDashboard() {
   const { state, dispatch, totalDue } = useAppContext();
-  const { cards } = state;
+  const cards = Object.values(state.cardsById);
   const stats = useProgress(cards);
 
   if (!state.showStats) return null;

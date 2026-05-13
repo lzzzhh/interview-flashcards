@@ -13,7 +13,7 @@ export const statisticsCards: QACard[] = [
     tags: ['central tendency', 'descriptive'],
     subTopic: '描述统计',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -25,7 +25,7 @@ export const statisticsCards: QACard[] = [
     tags: ['variance', 'stddev', 'bessel correction'],
     subTopic: '描述统计',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -37,7 +37,7 @@ export const statisticsCards: QACard[] = [
     tags: ['boxplot', 'outlier', 'IQR'],
     subTopic: '描述统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -49,7 +49,7 @@ export const statisticsCards: QACard[] = [
     tags: ['percentile', 'quantile', 'median'],
     subTopic: '描述统计',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -61,7 +61,7 @@ export const statisticsCards: QACard[] = [
     tags: ['skewness', 'kurtosis', 'distribution shape'],
     subTopic: '描述统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -73,7 +73,7 @@ export const statisticsCards: QACard[] = [
     tags: ['correlation', 'causation', 'confounder'],
     subTopic: '描述统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -85,7 +85,7 @@ export const statisticsCards: QACard[] = [
     tags: ['standard error', 'sampling distribution', 'CLT'],
     subTopic: '描述统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -97,7 +97,7 @@ export const statisticsCards: QACard[] = [
     tags: ['confidence interval', 'frequentist', 'estimation'],
     subTopic: '描述统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -113,7 +113,7 @@ export const statisticsCards: QACard[] = [
     tags: ['conditional probability', 'bayes theorem', 'prior', 'likelihood'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -125,7 +125,7 @@ export const statisticsCards: QACard[] = [
     tags: ['LLN', 'CLT', 'convergence'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -137,7 +137,7 @@ export const statisticsCards: QACard[] = [
     tags: ['normal distribution', 'gaussian', '68-95-99.7'],
     subTopic: '概率论',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -149,7 +149,7 @@ export const statisticsCards: QACard[] = [
     tags: ['bernoulli', 'binomial', 'discrete distribution'],
     subTopic: '概率论',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -161,7 +161,7 @@ export const statisticsCards: QACard[] = [
     tags: ['poisson', 'exponential', 'rare events'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -173,7 +173,7 @@ export const statisticsCards: QACard[] = [
     tags: ['exponential', 'memoryless', 'waiting time'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -185,7 +185,7 @@ export const statisticsCards: QACard[] = [
     tags: ['law of total probability', 'partition', 'marginal'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -197,7 +197,7 @@ export const statisticsCards: QACard[] = [
     tags: ['expectation', 'variance', 'linearity'],
     subTopic: '概率论',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -209,7 +209,7 @@ export const statisticsCards: QACard[] = [
     tags: ['covariance', 'correlation', 'pearson', 'spearman'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -221,7 +221,7 @@ export const statisticsCards: QACard[] = [
     tags: ['MGF', 'moment', 'characteristic function'],
     subTopic: '概率论',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -233,7 +233,7 @@ export const statisticsCards: QACard[] = [
     tags: ['chebyshev', 'inequality', 'bound'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -245,7 +245,7 @@ export const statisticsCards: QACard[] = [
     tags: ['markov chain', 'stationary distribution', 'transition matrix'],
     subTopic: '概率论',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -257,7 +257,7 @@ export const statisticsCards: QACard[] = [
     tags: ['monty hall', 'conditional probability', 'paradox'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -269,7 +269,7 @@ export const statisticsCards: QACard[] = [
     tags: ['birthday paradox', 'collision', 'combinatorics'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -281,7 +281,7 @@ export const statisticsCards: QACard[] = [
     tags: ['joint distribution', 'marginal', 'conditional'],
     subTopic: '概率论',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -297,7 +297,7 @@ export const statisticsCards: QACard[] = [
     tags: ['p-value', 'hypothesis testing', 'misinterpretation'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -309,7 +309,7 @@ export const statisticsCards: QACard[] = [
     tags: ['type I error', 'type II error', 'power', 'alpha', 'beta'],
     subTopic: '假设检验',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -321,7 +321,7 @@ export const statisticsCards: QACard[] = [
     tags: ['t-test', 'z-test', 'student t', 'normal'],
     subTopic: '假设检验',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -333,7 +333,7 @@ export const statisticsCards: QACard[] = [
     tags: ['chi-square', 'contingency table', 'goodness of fit'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -345,7 +345,7 @@ export const statisticsCards: QACard[] = [
     tags: ['test selection', 'parametric', 'non-parametric'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -357,7 +357,7 @@ export const statisticsCards: QACard[] = [
     tags: ['confidence interval', 'hypothesis testing', 'duality'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -369,7 +369,7 @@ export const statisticsCards: QACard[] = [
     tags: ['one-tailed', 'two-tailed', 'directionality'],
     subTopic: '假设检验',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -381,7 +381,7 @@ export const statisticsCards: QACard[] = [
     tags: ['power analysis', 'sample size', 'cohen d', 'effect size'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -393,7 +393,7 @@ export const statisticsCards: QACard[] = [
     tags: ['ANOVA', 'F-test', 'variance decomposition'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -405,7 +405,7 @@ export const statisticsCards: QACard[] = [
     tags: ['multiple comparison', 'bonferroni', 'FWER', 'FDR'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -417,7 +417,7 @@ export const statisticsCards: QACard[] = [
     tags: ['F-test', 'variance ratio', 'model comparison'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -429,7 +429,7 @@ export const statisticsCards: QACard[] = [
     tags: ['mann-whitney', 'wilcoxon', 'non-parametric'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -441,7 +441,7 @@ export const statisticsCards: QACard[] = [
     tags: ['KS test', 'Kolmogorov-Smirnov', 'ECDF', 'goodness of fit'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -453,7 +453,7 @@ export const statisticsCards: QACard[] = [
     tags: ['bootstrap', 'resampling', 'empirical distribution'],
     subTopic: '假设检验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -465,7 +465,7 @@ export const statisticsCards: QACard[] = [
     tags: ['permutation test', 'randomization', 'exact test'],
     subTopic: '假设检验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -481,7 +481,7 @@ export const statisticsCards: QACard[] = [
     tags: ['prior', 'posterior', 'likelihood', 'bayesian update'],
     subTopic: '贝叶斯统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -493,7 +493,7 @@ export const statisticsCards: QACard[] = [
     tags: ['conjugate prior', 'beta-binomial', 'normal-normal'],
     subTopic: '贝叶斯统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -505,7 +505,7 @@ export const statisticsCards: QACard[] = [
     tags: ['bayesian', 'frequentist', 'philosophy', 'comparison'],
     subTopic: '贝叶斯统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -517,7 +517,7 @@ export const statisticsCards: QACard[] = [
     tags: ['bayesian AB testing', 'beta-binomial', 'sequential'],
     subTopic: '贝叶斯统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -529,7 +529,7 @@ export const statisticsCards: QACard[] = [
     tags: ['MCMC', 'sampling', 'posterior approximation'],
     subTopic: '贝叶斯统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -541,7 +541,7 @@ export const statisticsCards: QACard[] = [
     tags: ['metropolis-hastings', 'MCMC', 'acceptance probability'],
     subTopic: '贝叶斯统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -553,7 +553,7 @@ export const statisticsCards: QACard[] = [
     tags: ['gibbs sampling', 'conditional distribution', 'MCMC'],
     subTopic: '贝叶斯统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -565,7 +565,7 @@ export const statisticsCards: QACard[] = [
     tags: ['credible interval', 'HPDI', 'posterior'],
     subTopic: '贝叶斯统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -577,7 +577,7 @@ export const statisticsCards: QACard[] = [
     tags: ['bayesian linear regression', 'regularization', 'posterior predictive'],
     subTopic: '贝叶斯统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -589,7 +589,7 @@ export const statisticsCards: QACard[] = [
     tags: ['hierarchical model', 'partial pooling', 'mixed effects'],
     subTopic: '贝叶斯统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -605,7 +605,7 @@ export const statisticsCards: QACard[] = [
     tags: ['linear regression', 'assumptions', 'Gauss-Markov'],
     subTopic: '回归分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -617,7 +617,7 @@ export const statisticsCards: QACard[] = [
     tags: ['R-squared', 'adjusted R-squared', 'overfitting'],
     subTopic: '回归分析',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -629,7 +629,7 @@ export const statisticsCards: QACard[] = [
     tags: ['multicollinearity', 'VIF', 'variance inflation'],
     subTopic: '回归分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -641,7 +641,7 @@ export const statisticsCards: QACard[] = [
     tags: ['heteroscedasticity', 'breusch-pagan', 'robust standard errors'],
     subTopic: '回归分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -653,7 +653,7 @@ export const statisticsCards: QACard[] = [
     tags: ['ridge', 'lasso', 'L1', 'L2', 'regularization'],
     subTopic: '回归分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -665,7 +665,7 @@ export const statisticsCards: QACard[] = [
     tags: ['logistic regression', 'sigmoid', 'odds ratio', 'cross entropy'],
     subTopic: '回归分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -677,7 +677,7 @@ export const statisticsCards: QACard[] = [
     tags: ['polynomial regression', 'nonlinear', 'overfitting'],
     subTopic: '回归分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -689,7 +689,7 @@ export const statisticsCards: QACard[] = [
     tags: ['interaction', 'effect modification', 'centering'],
     subTopic: '回归分析',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -701,7 +701,7 @@ export const statisticsCards: QACard[] = [
     tags: ['stepwise regression', 'model selection', 'p-hacking'],
     subTopic: '回归分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -713,7 +713,7 @@ export const statisticsCards: QACard[] = [
     tags: ['L1', 'L2', 'regularization', 'lasso', 'ridge'],
     subTopic: '回归分析',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -725,7 +725,7 @@ export const statisticsCards: QACard[] = [
     tags: ['AIC', 'BIC', 'model selection', 'information criterion'],
     subTopic: '回归分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -737,7 +737,7 @@ export const statisticsCards: QACard[] = [
     tags: ['residual', 'diagnostic plot', 'QQ plot', 'cook distance'],
     subTopic: '回归分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   // ============================================================
@@ -752,7 +752,7 @@ export const statisticsCards: QACard[] = [
     tags: ['power', 'sample size', 'type ii error', 'effect size'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -764,7 +764,7 @@ export const statisticsCards: QACard[] = [
     tags: ['sample size', 'mde', 'power analysis'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -776,7 +776,7 @@ export const statisticsCards: QACard[] = [
     tags: ['multiple comparisons', 'bonferroni', 'fdr', 'fwer', 'bh'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -788,7 +788,7 @@ export const statisticsCards: QACard[] = [
     tags: ['one-tailed', 'two-tailed', 'hypothesis testing'],
     subTopic: '假设检验',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -800,7 +800,7 @@ export const statisticsCards: QACard[] = [
     tags: ['p-hacking', 'reproducibility', 'research ethics', 'preregistration'],
     subTopic: '假设检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -816,7 +816,7 @@ export const statisticsCards: QACard[] = [
     tags: ['ab testing', 'experiment design', 'randomization', 'rct'],
     subTopic: 'AB实验',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -828,7 +828,7 @@ export const statisticsCards: QACard[] = [
     tags: ['mde', 'minimum detectable effect', 'sample size'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -840,7 +840,7 @@ export const statisticsCards: QACard[] = [
     tags: ['type i error', 'type ii error', 'business risk', 'false positive'],
     subTopic: 'AB实验',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -852,7 +852,7 @@ export const statisticsCards: QACard[] = [
     tags: ['srm', 'sample ratio mismatch', 'data quality', 'chi-square'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -864,7 +864,7 @@ export const statisticsCards: QACard[] = [
     tags: ['simpson paradox', 'confounding', 'segmentation'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -876,7 +876,7 @@ export const statisticsCards: QACard[] = [
     tags: ['network effect', 'interference', 'sutva', 'cluster randomization'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -888,7 +888,7 @@ export const statisticsCards: QACard[] = [
     tags: ['peeking', 'sequential testing', 'type i error', 'early stopping'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -900,7 +900,7 @@ export const statisticsCards: QACard[] = [
     tags: ['cuped', 'variance reduction', 'pre-experiment data', 'ancova'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -912,7 +912,7 @@ export const statisticsCards: QACard[] = [
     tags: ['randomization', 'hash', 'traffic splitting', 'deterministic'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -924,7 +924,7 @@ export const statisticsCards: QACard[] = [
     tags: ['decision making', 'non-significant', 'practical significance', 'confidence interval'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -936,7 +936,7 @@ export const statisticsCards: QACard[] = [
     tags: ['metrics', 'guardrail metrics', 'oec', 'multiple testing'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -948,7 +948,7 @@ export const statisticsCards: QACard[] = [
     tags: ['long-term effect', 'novelty effect', 'learning effect', 'holdout'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -960,7 +960,7 @@ export const statisticsCards: QACard[] = [
     tags: ['bayesian', 'frequentist', 'ab testing', 'comparison'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -972,7 +972,7 @@ export const statisticsCards: QACard[] = [
     tags: ['multi-armed bandit', 'exploration-exploitation', 'adaptive', 'thompson sampling'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -984,7 +984,7 @@ export const statisticsCards: QACard[] = [
     tags: ['layered experiments', 'overlapping', 'google', 'orthogonalization'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1000,7 +1000,7 @@ export const statisticsCards: QACard[] = [
     tags: ['causality', 'correlation', 'confounding', 'causal inference'],
     subTopic: '因果推断',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1012,7 +1012,7 @@ export const statisticsCards: QACard[] = [
     tags: ['did', 'difference-in-differences', 'parallel trends', 'quasi-experiment'],
     subTopic: '因果推断',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1024,7 +1024,7 @@ export const statisticsCards: QACard[] = [
     tags: ['instrumental variable', 'iv', 'endogeneity', '2sls'],
     subTopic: '因果推断',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1036,7 +1036,7 @@ export const statisticsCards: QACard[] = [
     tags: ['rdd', 'regression discontinuity', 'quasi-experiment', 'cutoff'],
     subTopic: '因果推断',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1048,7 +1048,7 @@ export const statisticsCards: QACard[] = [
     tags: ['propensity score matching', 'psm', 'observational study', 'selection bias'],
     subTopic: '因果推断',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1064,7 +1064,7 @@ export const statisticsCards: QACard[] = [
     tags: ['stationarity', 'unit root', 'spurious regression', 'adf'],
     subTopic: '时间序列分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1076,7 +1076,7 @@ export const statisticsCards: QACard[] = [
     tags: ['adf', 'unit root', 'dickey-fuller', 'stationarity test'],
     subTopic: '时间序列分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1088,7 +1088,7 @@ export const statisticsCards: QACard[] = [
     tags: ['arima', 'box-jenkins', 'autoregressive', 'moving average'],
     subTopic: '时间序列分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1100,7 +1100,7 @@ export const statisticsCards: QACard[] = [
     tags: ['acf', 'pacf', 'box-jenkins', 'model identification'],
     subTopic: '时间序列分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1112,7 +1112,7 @@ export const statisticsCards: QACard[] = [
     tags: ['seasonal decomposition', 'stl', 'additive', 'multiplicative'],
     subTopic: '时间序列分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1124,7 +1124,7 @@ export const statisticsCards: QACard[] = [
     tags: ['prophet', 'arima', 'gam', 'business forecasting'],
     subTopic: '时间序列分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1136,7 +1136,7 @@ export const statisticsCards: QACard[] = [
     tags: ['missing values', 'imputation', 'interpolation', 'forward fill'],
     subTopic: '时间序列分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1148,7 +1148,7 @@ export const statisticsCards: QACard[] = [
     tags: ['granger causality', 'predictive causality', 'time series'],
     subTopic: '时间序列分析',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1164,7 +1164,7 @@ export const statisticsCards: QACard[] = [
     tags: ['survival analysis', 'censoring', 'time-to-event', 'hazard'],
     subTopic: '生存分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1176,7 +1176,7 @@ export const statisticsCards: QACard[] = [
     tags: ['kaplan-meier', 'log-rank', 'survival function', 'non-parametric'],
     subTopic: '生存分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1188,7 +1188,7 @@ export const statisticsCards: QACard[] = [
     tags: ['cox proportional hazards', 'hazard ratio', 'semi-parametric', 'ph assumption'],
     subTopic: '生存分析',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1200,7 +1200,7 @@ export const statisticsCards: QACard[] = [
     tags: ['churn prediction', 'retention', 'predictive maintenance', 'ltv'],
     subTopic: '生存分析',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1212,7 +1212,7 @@ export const statisticsCards: QACard[] = [
     tags: ['time-varying covariates', 'cox model', 'counting process', 'exogeneity'],
     subTopic: '生存分析',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1228,7 +1228,7 @@ export const statisticsCards: QACard[] = [
     tags: ['sampling', 'stratified', 'cluster', 'systematic', 'srs'],
     subTopic: '抽样方法',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1240,7 +1240,7 @@ export const statisticsCards: QACard[] = [
     tags: ['importance sampling', 'monte carlo', 'variance reduction', 'off-policy'],
     subTopic: '抽样方法',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1252,7 +1252,7 @@ export const statisticsCards: QACard[] = [
     tags: ['bootstrap', 'resampling', 'efron', 'empirical distribution'],
     subTopic: '抽样方法',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1264,7 +1264,7 @@ export const statisticsCards: QACard[] = [
     tags: ['sampling bias', 'survivorship bias', 'selection bias', 'randomization'],
     subTopic: '抽样方法',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1276,7 +1276,7 @@ export const statisticsCards: QACard[] = [
     tags: ['rejection sampling', 'mcmc', 'sampling methods', 'curse of dimensionality'],
     subTopic: '抽样方法',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1292,7 +1292,7 @@ export const statisticsCards: QACard[] = [
     tags: ['parametric', 'non-parametric', 'distribution-free', 'robust'],
     subTopic: '非参数检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1304,7 +1304,7 @@ export const statisticsCards: QACard[] = [
     tags: ['mann-whitney', 'wilcoxon', 'rank sum', 't-test comparison'],
     subTopic: '非参数检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1316,7 +1316,7 @@ export const statisticsCards: QACard[] = [
     tags: ['kruskal-wallis', 'anova', 'non-parametric', 'rank'],
     subTopic: '非参数检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1328,7 +1328,7 @@ export const statisticsCards: QACard[] = [
     tags: ['wilcoxon signed-rank', 'paired t-test', 'non-parametric', 'matched pairs'],
     subTopic: '非参数检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1340,7 +1340,7 @@ export const statisticsCards: QACard[] = [
     tags: ['kolmogorov-smirnov', 'ks test', 'ecdf', 'distribution comparison'],
     subTopic: '非参数检验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1356,7 +1356,7 @@ export const statisticsCards: QACard[] = [
     tags: ['mcmc', 'metropolis-hastings', 'stationary distribution', 'acceptance rate'],
     subTopic: '贝叶斯统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1368,7 +1368,7 @@ export const statisticsCards: QACard[] = [
     tags: ['gibbs sampling', 'mcmc', 'full conditional', 'metropolis-hastings'],
     subTopic: '贝叶斯统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1380,7 +1380,7 @@ export const statisticsCards: QACard[] = [
     tags: ['posterior predictive', 'ppd', 'bayesian prediction', 'posterior predictive check'],
     subTopic: '贝叶斯统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1396,7 +1396,7 @@ export const statisticsCards: QACard[] = [
     tags: ['characteristic function', 'mgf', 'moment', 'fourier transform'],
     subTopic: '概率论',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1408,7 +1408,7 @@ export const statisticsCards: QACard[] = [
     tags: ['jensen inequality', 'em algorithm', 'variational inference', 'elbo'],
     subTopic: '概率论',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1420,7 +1420,7 @@ export const statisticsCards: QACard[] = [
     tags: ['multivariate normal', 'conditional distribution', 'marginal', 'gaussian process'],
     subTopic: '概率论',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1432,7 +1432,7 @@ export const statisticsCards: QACard[] = [
     tags: ['mutual information', 'correlation', 'entropy', 'non-linear dependency'],
     subTopic: '概率论',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1448,7 +1448,7 @@ export const statisticsCards: QACard[] = [
     tags: ['delta method', 'ratio metrics', 'variance estimation', 'ctr'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1460,7 +1460,7 @@ export const statisticsCards: QACard[] = [
     tags: ['variance reduction', 'cuped', 'stratification', 'regression adjustment'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1472,7 +1472,7 @@ export const statisticsCards: QACard[] = [
     tags: ['stratification', 'post-stratification', 'power', 'experiment design'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1484,7 +1484,7 @@ export const statisticsCards: QACard[] = [
     tags: ['sequential testing', 'group sequential', 'alpha spending', 'early stopping'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1496,7 +1496,7 @@ export const statisticsCards: QACard[] = [
     tags: ['alpha spending', 'obrien-fleming', 'pocock', 'sequential', 'group sequential'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1508,7 +1508,7 @@ export const statisticsCards: QACard[] = [
     tags: ['hte', 'heterogeneous treatment effects', 'causal forest', 'subgroup analysis'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1520,7 +1520,7 @@ export const statisticsCards: QACard[] = [
     tags: ['counterfactual', 'synthetic control', 'causal inference', 'geo experiment'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1532,7 +1532,7 @@ export const statisticsCards: QACard[] = [
     tags: ['switchback', 'time-split', 'experiment design', 'network effect'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1544,7 +1544,7 @@ export const statisticsCards: QACard[] = [
     tags: ['interleaving', 'search ranking', 'recommendation', 'online evaluation'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1556,7 +1556,7 @@ export const statisticsCards: QACard[] = [
     tags: ['novelty effect', 'primacy effect', 'experiment duration', 'crossover design'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1568,7 +1568,7 @@ export const statisticsCards: QACard[] = [
     tags: ['outlier', 'winsorization', 'capping', 'robust statistics'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1580,7 +1580,7 @@ export const statisticsCards: QACard[] = [
     tags: ['aa test', 'data quality', 'srm', 'experiment infrastructure'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1592,7 +1592,7 @@ export const statisticsCards: QACard[] = [
     tags: ['two-sided market', 'marketplace', 'network effect', 'geo experiment'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1604,7 +1604,7 @@ export const statisticsCards: QACard[] = [
     tags: ['triggered analysis', 'itt', 'tot', 'cace', 'dilution'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1616,7 +1616,7 @@ export const statisticsCards: QACard[] = [
     tags: ['multiple metrics', 'guardrail metrics', 'oec', 'primary metric', 'fwer'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1628,7 +1628,7 @@ export const statisticsCards: QACard[] = [
     tags: ['dilution effect', 'itt', 'triggered analysis', 'exposure rate'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1640,7 +1640,7 @@ export const statisticsCards: QACard[] = [
     tags: ['holdout', 'long-term effect', 'retention group', 'longitudinal'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1652,7 +1652,7 @@ export const statisticsCards: QACard[] = [
     tags: ['ramp-up', 'canary', 'gradual rollout', 'risk management'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1664,7 +1664,7 @@ export const statisticsCards: QACard[] = [
     tags: ['practical significance', 'statistical significance', 'mde', 'decision making'],
     subTopic: 'AB实验',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1676,7 +1676,7 @@ export const statisticsCards: QACard[] = [
     tags: ['winner curse', 'selection bias', 'shrinkage', 'replication'],
     subTopic: 'AB实验',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1692,7 +1692,7 @@ export const statisticsCards: QACard[] = [
     tags: ['do-calculus', 'scm', 'pearl', 'causal hierarchy', 'dag'],
     subTopic: '因果推断',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1704,7 +1704,7 @@ export const statisticsCards: QACard[] = [
     tags: ['uplift modeling', 'ite', 'causal ml', 'personalization'],
     subTopic: '因果推断',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1716,7 +1716,7 @@ export const statisticsCards: QACard[] = [
     tags: ['rdd', 'sharp rdd', 'fuzzy rdd', 'iv', 'late'],
     subTopic: '因果推断',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1728,7 +1728,7 @@ export const statisticsCards: QACard[] = [
     tags: ['mediation analysis', 'direct effect', 'indirect effect', 'causal mechanism'],
     subTopic: '因果推断',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1740,7 +1740,7 @@ export const statisticsCards: QACard[] = [
     tags: ['instrumental variable', 'relevance', 'exogeneity', 'weak iv', 'overidentification'],
     subTopic: '因果推断',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1756,7 +1756,7 @@ export const statisticsCards: QACard[] = [
     tags: ['factorial design', '2^k', 'interaction', 'main effect', 'fractional factorial'],
     subTopic: '实验设计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1768,7 +1768,7 @@ export const statisticsCards: QACard[] = [
     tags: ['randomized block', 'blocking', 'experiment design', 'precision'],
     subTopic: '实验设计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1780,7 +1780,7 @@ export const statisticsCards: QACard[] = [
     tags: ['latin square', 'blocking', 'row column', 'experiment design'],
     subTopic: '实验设计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1792,7 +1792,7 @@ export const statisticsCards: QACard[] = [
     tags: ['response surface', 'RSM', 'optimization', 'CCD', 'steepest ascent'],
     subTopic: '实验设计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1804,7 +1804,7 @@ export const statisticsCards: QACard[] = [
     tags: ['quasi-experiment', 'DiD', 'natural experiment', 'causal inference'],
     subTopic: '实验设计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1816,7 +1816,7 @@ export const statisticsCards: QACard[] = [
     tags: ['ANCOVA', 'covariate adjustment', 'precision', 'experiment'],
     subTopic: '实验设计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1828,7 +1828,7 @@ export const statisticsCards: QACard[] = [
     tags: ['randomization test', 'permutation test', 'exchangeability', 'non-parametric'],
     subTopic: '实验设计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1840,7 +1840,7 @@ export const statisticsCards: QACard[] = [
     tags: ['neyman allocation', 'optimal allocation', 'stratified sampling', 'sample efficiency'],
     subTopic: '实验设计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1856,7 +1856,7 @@ export const statisticsCards: QACard[] = [
     tags: ['big data', 'large sample', 'significance', 'effect size', 'dimension curse'],
     subTopic: '大数据统计',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1868,7 +1868,7 @@ export const statisticsCards: QACard[] = [
     tags: ['streaming', 'online algorithm', 'welford', 't-digest', 'quantile'],
     subTopic: '大数据统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1880,7 +1880,7 @@ export const statisticsCards: QACard[] = [
     tags: ['bloom filter', 'count-min sketch', 'hyperloglog', 'probabilistic data structure'],
     subTopic: '大数据统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1892,7 +1892,7 @@ export const statisticsCards: QACard[] = [
     tags: ['minhash', 'simhash', 'LSH', 'correlation', 'similarity'],
     subTopic: '大数据统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1904,7 +1904,7 @@ export const statisticsCards: QACard[] = [
     tags: ['FDR', 'benjamini-hochberg', 'q-value', 'multiple testing', 'storey'],
     subTopic: '大数据统计',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1920,7 +1920,7 @@ export const statisticsCards: QACard[] = [
     tags: ['expected value', 'decision theory', 'uncertainty', 'expected utility'],
     subTopic: '决策科学',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1932,7 +1932,7 @@ export const statisticsCards: QACard[] = [
     tags: ['multi-armed bandit', 'explore-exploit', 'epsilon-greedy', 'ucb', 'thompson sampling'],
     subTopic: '决策科学',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1944,7 +1944,7 @@ export const statisticsCards: QACard[] = [
     tags: ['loss function', 'asymmetric cost', 'decision threshold', 'misclassification cost'],
     subTopic: '决策科学',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1956,7 +1956,7 @@ export const statisticsCards: QACard[] = [
     tags: ['sensitivity analysis', 'sobol', 'uncertainty', 'robustness', 'scenario analysis'],
     subTopic: '决策科学',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 
@@ -1972,7 +1972,7 @@ export const statisticsCards: QACard[] = [
     tags: ['AB test', 'causality', 'business case', 'risk'],
     subTopic: '面试场景题',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1984,7 +1984,7 @@ export const statisticsCards: QACard[] = [
     tags: ['subgroup analysis', 'data dredging', 'p-hacking', 'exploratory'],
     subTopic: '面试场景题',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -1996,7 +1996,7 @@ export const statisticsCards: QACard[] = [
     tags: ['AB test', 'novelty effect', 'time decay', 'selection bias'],
     subTopic: '面试场景题',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -2008,7 +2008,7 @@ export const statisticsCards: QACard[] = [
     tags: ['AB test', 'power', 'CUPED', 'small sample', 'traffic-limited'],
     subTopic: '面试场景题',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
@@ -2020,7 +2020,7 @@ export const statisticsCards: QACard[] = [
     tags: ['p-value', 'significance', 'dichotomization', 'ASA statement'],
     subTopic: '面试场景题',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: Date.now() },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
 ];

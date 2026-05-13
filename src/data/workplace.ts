@@ -30,7 +30,7 @@ export const workplaceCards: QACard[] = [
     tags: ['向上沟通', '时间管理', '需求评估'],
     subTopic: '向上沟通',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -58,7 +58,7 @@ export const workplaceCards: QACard[] = [
     tags: ['向上沟通', '个人成长', '风险管理'],
     subTopic: '向上沟通',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -89,7 +89,7 @@ export const workplaceCards: QACard[] = [
     tags: ['向上沟通', '项目管理', '风险管理'],
     subTopic: '向上沟通',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -116,7 +116,7 @@ export const workplaceCards: QACard[] = [
     tags: ['需求管理', '跨部门协作', '沟通技巧'],
     subTopic: '向上沟通',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -144,7 +144,7 @@ export const workplaceCards: QACard[] = [
     tags: ['向上沟通', '资源管理', '项目管理'],
     subTopic: '向上沟通',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -174,7 +174,7 @@ export const workplaceCards: QACard[] = [
     tags: ['沟通技巧', '专业形象', '面试技巧'],
     subTopic: '向上沟通',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -206,7 +206,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['汇报技巧', '面试技巧', '述职'],
     subTopic: '向上沟通',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -243,7 +243,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['汇报技巧', '向上管理', '时间管理'],
     subTopic: '向上沟通',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -286,7 +286,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['汇报技巧', '述职', '职业发展'],
     subTopic: '向上沟通',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -317,7 +317,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['职业发展', '向上沟通', '薪资谈判'],
     subTopic: '面试技巧',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -349,7 +349,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['面试技巧', '自我认知'],
     subTopic: '面试技巧',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -380,7 +380,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['面试技巧', '职业发展'],
     subTopic: '面试技巧',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -412,7 +412,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['面试技巧', '职业发展'],
     subTopic: '面试技巧',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -453,7 +453,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['向上管理', '沟通技巧', '职业发展'],
     subTopic: '向上沟通',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -490,7 +490,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['跨部门协作', '沟通技巧', '项目管理'],
     subTopic: '跨部门协作',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -531,7 +531,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['会议技巧', '沟通技巧', '专业形象'],
     subTopic: '跨部门协作',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -573,7 +573,7 @@ R: 首页 LCP 从 4.2s 降到 1.6s，跳出率下降至 28%，促销期间 GMV �
     tags: ['会议技巧', '时间管理', '项目管理'],
     subTopic: '项目管理',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -609,7 +609,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['反馈技巧', '团队协作', '沟通技巧'],
     subTopic: '跨部门协作',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -644,7 +644,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['职场政治', '向上管理', '自我保护'],
     subTopic: '跨部门协作',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -681,7 +681,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['沟通技巧', '边界管理', '时间管理'],
     subTopic: '跨部门协作',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -721,7 +721,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['职业发展', '团队融入', '新人指南'],
     subTopic: '项目管理',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -766,7 +766,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['向上管理', '职业发展', '沟通技巧'],
     subTopic: '向上沟通',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -811,7 +811,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['项目管理', '推动力', '影响力'],
     subTopic: '项目管理',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -851,7 +851,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['向上管理', '沟通技巧', '冲突管理'],
     subTopic: '向上沟通',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -899,7 +899,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['书面沟通', '专业形象', '沟通技巧'],
     subTopic: '向上沟通',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -941,7 +941,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['演讲技巧', '专业形象', '技术分享'],
     subTopic: '向上沟通',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -976,7 +976,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['面试技巧', '自我介绍', '表达力'],
     subTopic: '面试技巧',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1018,7 +1018,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['面试技巧', '职业空窗期', '简历技巧'],
     subTopic: '面试技巧',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1061,7 +1061,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['薪资谈判', '面试技巧', '职业发展'],
     subTopic: '面试技巧',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1096,7 +1096,7 @@ I - Impact（影响）：这个行为带来了什么后果
     tags: ['面试技巧', 'offer谈判', '职业发展'],
     subTopic: '面试技巧',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1142,7 +1142,7 @@ Step 5：离职当天
     tags: ['职业发展', '离职', '专业形象'],
     subTopic: '面试技巧',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1181,7 +1181,7 @@ Step 5：离职当天
     tags: ['职业发展', '新人指南', '试用期'],
     subTopic: '项目管理',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1226,7 +1226,7 @@ Step 5：离职当天
     tags: ['远程办公', '向上管理', '自我展示'],
     subTopic: '向上沟通',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1267,7 +1267,7 @@ Step 5：离职当天
     tags: ['时间管理', '效率', '项目管理'],
     subTopic: '项目管理',
     difficulty: 'easy',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1306,7 +1306,7 @@ Step 5：离职当天
     tags: ['技术评审', '沟通技巧', '情绪管理'],
     subTopic: '项目管理',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1346,7 +1346,7 @@ Step 5：离职当天
     tags: ['职业发展', '向上管理', '项目争取'],
     subTopic: '向上沟通',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1384,7 +1384,7 @@ Step 5：离职当天
     tags: ['边界管理', '向上沟通', 'WLB'],
     subTopic: '向上沟通',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1423,7 +1423,7 @@ Step 5：离职当天
     tags: ['职场政治', '自我保护', '向上管理'],
     subTopic: '向上沟通',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1463,7 +1463,7 @@ Step 5：离职当天
     tags: ['情绪管理', '冲突管理', '团队协作'],
     subTopic: '跨部门协作',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1504,7 +1504,7 @@ Step 5：离职当天
     tags: ['职业发展', '向上管理', '晋升'],
     subTopic: '向上沟通',
     difficulty: 'hard',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1548,7 +1548,7 @@ Step 5：离职当天
     tags: ['代码评审', '技术成长', '情绪管理'],
     subTopic: '项目管理',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 
@@ -1604,7 +1604,7 @@ Step 5：离职当天
     tags: ['技术分享', '影响力', '职业发展'],
     subTopic: '项目管理',
     difficulty: 'medium',
-    sm2: { easeFactor: 2.5, interval: 0, repetitions: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
 ];
