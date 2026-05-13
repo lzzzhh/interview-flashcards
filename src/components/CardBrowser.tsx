@@ -3,9 +3,9 @@
 // ============================================================
 
 import { useState, useMemo } from 'react';
-import { Search, Trash2, Edit3, X, Plus, Download } from 'lucide-react';
+import { Search, Trash2, Edit3, X, Plus, Download, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import type { FlashCard } from '../types';
+import type { FlashCard, QACard } from '../types';
 
 interface Props {
   onEdit: (card: FlashCard) => void;
@@ -31,12 +31,57 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
   }, [allCards, search]);
 
   const handleDelete = (id: string) => {
-    const newCards = { ...state.cardsById };
-    delete newCards[id];
-    // Also remove from localStorage
-    dispatch({ type: 'SET_CATEGORY', payload: state.category }); // trigger reload
+    dispatch({ type: 'DELETE_CARD', payload: id });
     setConfirmDelete(null);
   };
+
+  const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      const lines = text.split('\n').filter(Boolean);
+      if (lines.length < 2) return;
+      for (let i = 1; i < lines.length; i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (cols.length < 6) continue;
+        const [id, type, question, answer, tagsStr, subTopic, difficulty] = cols;
+        const card: QACard = {
+          id: id || `import-${Date.now()}-${i}`,
+          category: (type || state.category) as QACard['category'],
+          question: question || '',
+          answer: answer || '',
+          tags: (tagsStr || '').split(';').map((t: string) => t.trim()).filter(Boolean),
+          subTopic: subTopic || undefined,
+          difficulty: (difficulty || 'medium') as any,
+          sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+          favorited: false,
+        };
+        dispatch({ type: 'ADD_CARD', payload: card });
+      }
+    };
+    reader.readAsText(file);
+    if (e.target) e.target.value = '';
+  };
+
+  function parseCSVLine(line: string): string[] {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    for (const ch of line) {
+      if (ch === '"') {
+        inQuotes = !inQuotes;
+      } else if (ch === ',' && !inQuotes) {
+        result.push(current);
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+    result.push(current);
+    return result;
+  }
 
   const handleExportCSV = () => {
     const headers = 'id,type,question,answer,tags,subTopic,difficulty';
@@ -74,8 +119,13 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
           title="导出 CSV"
         >
           <Download className="w-4 h-4" />
-          <span className="hidden sm:inline">导出CSV</span>
+          <span className="hidden sm:inline">导出</span>
         </button>
+        <label className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm cursor-pointer">
+          <Upload className="w-4 h-4" />
+          <span className="hidden sm:inline">导入</span>
+          <input type="file" accept=".csv" onChange={handleImportCSV} className="hidden" />
+        </label>
         <button
           onClick={() => onEdit({} as FlashCard)}
           className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white text-sm"

@@ -115,7 +115,10 @@ export type AppAction =
   | { type: 'TOGGLE_STATS' }
   | { type: 'TOGGLE_REVIEW_MODE' }
   | { type: 'SHUFFLE' }
-  | { type: 'RESET_ORDER' };
+  | { type: 'RESET_ORDER' }
+  | { type: 'ADD_CARD'; payload: FlashCard }
+  | { type: 'UPDATE_CARD'; payload: FlashCard }
+  | { type: 'DELETE_CARD'; payload: string };
 
 // ============================================================
 // localStorage 持久化（兼容旧格式）

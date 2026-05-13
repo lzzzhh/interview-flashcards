@@ -29,8 +29,12 @@ function AppInner() {
 
   useKeyboard({ dispatch, searchInputRef, getCurrentCardId });
 
-  const handleSaveCard = (_card: FlashCard) => {
-    dispatch({ type: 'SET_CATEGORY', payload: state.category });
+  const handleSaveCard = (card: FlashCard) => {
+    if (state.cardsById[card.id]) {
+      dispatch({ type: 'UPDATE_CARD', payload: card });
+    } else {
+      dispatch({ type: 'ADD_CARD', payload: card });
+    }
     setEditingCard(null);
   };
 

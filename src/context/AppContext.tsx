@@ -262,6 +262,31 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
     }
 
+    case 'ADD_CARD': {
+      const card = action.payload;
+      return {
+        ...state,
+        cardsById: { ...state.cardsById, [card.id]: card },
+      };
+    }
+
+    case 'UPDATE_CARD': {
+      const card = action.payload;
+      return {
+        ...state,
+        cardsById: { ...state.cardsById, [card.id]: card },
+      };
+    }
+
+    case 'DELETE_CARD': {
+      const newCards = { ...state.cardsById };
+      delete newCards[action.payload];
+      return {
+        ...state,
+        cardsById: newCards,
+      };
+    }
+
     default:
       return state;
   }
