@@ -16,150 +16,199 @@ export default function MathText({ text }: MathTextProps) {
   const content = useMemo(() => preprocess(text), [text]);
 
   return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex]}
-      components={{
-        // 代码块样式适配暗色模式
-        pre: ({ children }) => (
-          <pre className="bg-gray-100 dark:bg-[#1e1e2e] text-gray-800 dark:text-[#4ade80] rounded-lg p-4 overflow-x-auto text-sm font-mono leading-relaxed my-3">
-            {children}
-          </pre>
-        ),
-        code: ({ children, className }) => {
-          const isInline = !className;
-          if (isInline) {
-            return (
-              <code className="bg-gray-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 px-1 py-0.5 rounded text-sm font-mono">
-                {children}
-              </code>
-            );
-          }
-          return <code className={className}>{children}</code>;
-        },
-        // 段落间距
-        p: ({ children }) => <p className="my-2 leading-relaxed">{children}</p>,
-        // 表格
-        table: ({ children }) => (
-          <div className="overflow-x-auto my-3">
-            <table className="min-w-full border-collapse border border-gray-200 dark:border-gray-700 text-sm">
+    <div className="math-text">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[[rehypeKatex, { strict: 'ignore' }]]}
+        components={{
+          pre: ({ children }) => (
+            <pre className="rounded-lg bg-gray-100 p-4 text-sm leading-relaxed text-gray-800 dark:bg-[#1e1e2e] dark:text-[#4ade80]">
               {children}
-            </table>
-          </div>
-        ),
-        th: ({ children }) => (
-          <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 bg-gray-50 dark:bg-gray-800 font-medium text-left">
-            {children}
-          </th>
-        ),
-        td: ({ children }) => (
-          <td className="border border-gray-200 dark:border-gray-700 px-3 py-2">
-            {children}
-          </td>
-        ),
-        // 列表
-        ul: ({ children }) => <ul className="list-disc list-inside my-2 space-y-1">{children}</ul>,
-        ol: ({ children }) => <ol className="list-decimal list-inside my-2 space-y-1">{children}</ol>,
-        li: ({ children }) => <li className="text-sm">{children}</li>,
-        // 加粗
-        strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-        // 分割线
-        hr: () => <hr className="my-4 border-gray-200 dark:border-gray-700" />,
-        // 标题
-        h3: ({ children }) => <h3 className="text-base font-bold mt-4 mb-2">{children}</h3>,
-        h4: ({ children }) => <h4 className="text-sm font-semibold mt-3 mb-1">{children}</h4>,
-      }}
-    >
-      {content}
-    </ReactMarkdown>
+            </pre>
+          ),
+          code: ({ children, className }) => {
+            const isInline = !className;
+            if (isInline) {
+              return (
+                <code className="rounded bg-gray-100 px-1 py-0.5 font-mono text-[0.92em] text-pink-600 dark:bg-gray-800 dark:text-pink-400">
+                  {children}
+                </code>
+              );
+            }
+            return <code className={className}>{children}</code>;
+          },
+          p: ({ children }) => <p>{children}</p>,
+          table: ({ children }) => (
+            <div className="math-table-wrap">
+              <table>{children}</table>
+            </div>
+          ),
+          th: ({ children }) => <th>{children}</th>,
+          td: ({ children }) => <td>{children}</td>,
+          ul: ({ children }) => <ul>{children}</ul>,
+          ol: ({ children }) => <ol>{children}</ol>,
+          li: ({ children }) => <li>{children}</li>,
+          strong: ({ children }) => <strong>{children}</strong>,
+          hr: () => <hr />,
+          h3: ({ children }) => <h3>{children}</h3>,
+          h4: ({ children }) => <h4>{children}</h4>,
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 }
 
 /**
- * 预处理文本：中文和公式分离
- * - 检测混合行，抽出数学公式独占一行（$$ 包裹）
+ * 预处理文本：只处理明显公式，避免把普通文字误识别成数学。
+ * - 混合行里的明显短公式保留为行内公式
  * - 纯公式行 → $$...$$
- * - 纯中文/英文行 → 保持原样
- * - 已经是 $...$ 或 $$...$$ 的 → 保持
+ * - 已经是 $...$ 或 $$...$$ 的 → 保持用户标记
  */
 function preprocess(text: string): string {
-  if (/\$\$/.test(text)) return text; // 已手动标记，信任用户
-
   const lines = text.split('\n');
   const result: string[] = [];
+  let inFence = false;
+  let inDisplayMath = false;
 
   for (const line of lines) {
     const trimmed = line.trim();
+    if (/^```/.test(trimmed)) {
+      inFence = !inFence;
+      result.push(line);
+      continue;
+    }
+    if (trimmed.startsWith('$$')) {
+      inDisplayMath = !inDisplayMath;
+      result.push(line);
+      continue;
+    }
+    if (inFence || inDisplayMath) {
+      result.push(line);
+      continue;
+    }
     if (!trimmed) {
       result.push('');
       continue;
     }
 
-    // 纯公式行 → $$ 包裹
     if (isPureFormulaLine(trimmed)) {
       if (trimmed.startsWith('$') && trimmed.endsWith('$')) {
         result.push(line);
       } else {
-        result.push(`$$\n${trimmed}\n$$`);
+        result.push(`$$\n${toKatexFriendly(trimmed)}\n$$`);
       }
       continue;
     }
 
-    // 混合行：中文 + 公式 → 拆分
-    result.push(...separateMathFromChinese(trimmed));
+    result.push(wrapInlineMath(line));
   }
 
   return result.join('\n\n');
 }
 
-/** 将混合行拆分为中文段落和公式行 */
-function separateMathFromChinese(line: string): string[] {
-  const parts: string[] = [];
-  let remaining = line;
-
-  // 寻找公式片段并拆分
-  while (remaining.length > 0) {
-    const match = findNextMathSegment(remaining);
-    if (!match) {
-      // 剩余全是中文/普通文本
-      const rest = remaining.trim();
-      if (rest) parts.push(rest);
-      break;
-    }
-
-    // 公式前面的中文
-    const before = remaining.slice(0, match.start).trim();
-    if (before) parts.push(before);
-
-    // 公式自身 → 单独一行
-    const formula = match.text.trim();
-    if (formula.startsWith('$') && formula.endsWith('$')) {
-      parts.push(formula);
-    } else {
-      parts.push(`$$\n${formula}\n$$`);
-    }
-
-    // 继续处理剩余部分
-    remaining = remaining.slice(match.end);
-  }
-
-  return parts;
+function wrapInlineMath(line: string): string {
+  const protectedLine = line
+    .replace(/`([^`]+)`/g, (_, code: string) => `\uE000${code}\uE001`)
+    .replace(/(^|[^\\])\$([^$\n]+)\$/g, (_, prefix: string, math: string) => {
+      return `${prefix}\uE004${math}\uE005`;
+    });
+  const converted = protectInlineFormulaSegments(protectedLine);
+  return converted
+    .replace(/\uE004([^]+?)\uE005/g, '$$$1$$')
+    .replace(/\uE000([^]+?)\uE001/g, '`$1`');
 }
 
-/** 在文本中找到下一个数学公式片段 */
-function findNextMathSegment(text: string): { start: number; end: number; text: string } | null {
-  // 策略：找到不含中文的连续片段，检查是否有数学特征
-  // 匹配"非中文 + 非中文标点"的连续片段（至少 3 个字符）
-  const nonChineseBlock = /[^\u4e00-\u9fff\u3000-\u303f\uff00-\uffef。，；：！？、\n]{3,}/g;
-  let m: RegExpExecArray | null;
-  while ((m = nonChineseBlock.exec(text)) !== null) {
-    const block = m[0].trim();
-    // 跳过纯英文单词（没有数学符号）
-    if (mathScore(block) >= 1 && block.length >= 3) {
-      return { start: m.index, end: m.index + m[0].length, text: m[0] };
+function protectInlineFormulaSegments(line: string): string {
+  const formulas: string[] = [];
+  const markFormula = (formula: string) => {
+    const index = formulas.push(formula) - 1;
+    return `\uE002${index}\uE003`;
+  };
+
+  let converted = line
+    .replace(/(公式为[:：]?|数学上[:：])([^。\n]+)/g, (full: string, cue: string, formula: string) => {
+      const trimmed = trimFormulaBoundary(formula);
+      if (!isSafeInlineFormula(trimmed)) return full;
+      return `${cue}${markFormula(toKatexFriendly(trimmed))}`;
+    })
+    .replace(/([A-Za-z][A-Za-z0-9_']*)\s*∈\s*R\^\{([^}]+)\}/g, (_, variable: string, shape: string) => {
+      return markFormula(`${variable} \\in \\mathbb{R}^{${shape.replace(/×/g, '\\times ')}}`);
+    });
+
+  converted = wrapDetectedFormulaRuns(converted, markFormula);
+
+  return converted.replace(/\uE002(\d+)\uE003/g, (_, index: string) => `$${formulas[Number(index)]}$`);
+}
+
+function wrapDetectedFormulaRuns(line: string, markFormula: (formula: string) => string): string {
+  let result = '';
+  let index = 0;
+
+  while (index < line.length) {
+    if (line[index] === '\uE002') {
+      const end = line.indexOf('\uE003', index);
+      if (end !== -1) {
+        result += line.slice(index, end + 1);
+        index = end + 1;
+        continue;
+      }
+    }
+
+    if (!isFormulaRunChar(line[index])) {
+      result += line[index];
+      index += 1;
+      continue;
+    }
+
+    const start = index;
+    while (index < line.length && isFormulaRunChar(line[index])) {
+      index += 1;
+    }
+
+    const raw = line.slice(start, index);
+    const leading = raw.match(/^\s*/)?.[0] ?? '';
+    const trailing = raw.match(/\s*$/)?.[0] ?? '';
+    const trimmed = trimFormulaBoundary(raw);
+
+    if (isSafeInlineFormula(trimmed)) {
+      result += `${leading}${markFormula(toKatexFriendly(trimmed))}${trailing}`;
+    } else {
+      result += raw;
     }
   }
-  return null;
+
+  return result;
+}
+
+function isFormulaRunChar(char: string): boolean {
+  return /[A-Za-z0-9_{}[\]()^+\-*/=<>|,.:'%!\\\s√∑Σ∏Π∫∞∂∆Δ∇∈∉⊂∪∩∧∨¬⇒⇔∀∃≈≠≤≥±×÷→←↔↑↓·∘⊕⊗⊙‖⁽⁾⁰¹²³⁴⁵⁶⁷⁸⁹ⁱ⁻⁺ⁿᵀᵗᵢᵧᵏᵐᵈᵃᵇᶜ₀₁₂₃₄₅₆₇₈₉ᵢⱼₖₗₘₙₜα-ωΑ-Ωŷȳỹ]/u.test(char);
+}
+
+function trimFormulaBoundary(text: string): string {
+  let trimmed = text
+    .trim()
+    .replace(/^[-–—•\d.、：:，,。.；;\s]+/, '')
+    .replace(/[，,。.；;：:\s]+$/, '');
+  const colonMatch = trimmed.match(/^([^:：]{1,36})[:：]\s*(.+)$/);
+  if (colonMatch && mathScore(colonMatch[1]) === 0 && mathScore(colonMatch[2]) > 0) {
+    trimmed = colonMatch[2].trim();
+  }
+  return trimmed;
+}
+
+function isSafeInlineFormula(text: string): boolean {
+  if (text.length > 120) return false;
+  if (/[\u4e00-\u9fff]/.test(text)) return false;
+  if (/\$|`|\uE000|\uE001|\uE002|\uE003|\uE004|\uE005/.test(text)) return false;
+  return hasFormulaStructure(text) && mathScore(text) >= 1;
+}
+
+function hasFormulaStructure(text: string): boolean {
+  return /[=<>∈∉≈≠≤≥→←↔⇒⇔∑Σ∏Π∫√∞∂∆Δ∇±×÷·⊙^_⁽⁾⁰¹²³⁴⁵⁶⁷⁸⁹ⁱ⁻⁺ⁿᵀᵗᵢᵧᵏᵐᵈᵃᵇᶜ₀₁₂₃₄₅₆₇₈₉]/.test(text)
+    || /\b[A-Za-z][A-Za-z0-9_]*\s*\(/.test(text)
+    || /[A-Za-z]\s*[+\-*/]\s*[A-Za-z0-9]/.test(text);
 }
 
 /** 判断是否为纯公式行 */
@@ -173,12 +222,116 @@ function isPureFormulaLine(line: string): boolean {
   return mathScore(line) >= 2;
 }
 
+function toKatexFriendly(text: string): string {
+  return normalizeUnicodeScript(text)
+    .replace(/√\s*([A-Za-z0-9_{}]+)/g, '\\sqrt{$1}')
+    .replace(/→/g, '\\to ')
+    .replace(/∞/g, '\\infty ')
+    .replace(/∑/g, '\\sum ')
+    .replace(/∏/g, '\\prod ')
+    .replace(/∫/g, '\\int ')
+    .replace(/≈/g, '\\approx ')
+    .replace(/≠/g, '\\ne ')
+    .replace(/≤/g, '\\le ')
+    .replace(/≥/g, '\\ge ')
+    .replace(/×/g, '\\times ')
+    .replace(/÷/g, '\\div ')
+    .replace(/·/g, '\\cdot ')
+    .replace(/⊙/g, '\\odot ')
+    .replace(/∈/g, '\\in ')
+    .replace(/∝/g, '\\propto ')
+    .replace(/‖([^‖]+)‖/g, '\\left\\lVert $1 \\right\\rVert ')
+    .replace(/\bR\^\{/g, '\\mathbb{R}^{')
+    .replace(/\bAttention\b/g, '\\operatorname{Attention}')
+    .replace(/\bsoftmax\b/g, '\\operatorname{softmax}')
+    .replace(/\bsigmoid\b/g, '\\operatorname{sigmoid}')
+    .replace(/\bargmax\b/g, '\\operatorname*{argmax}')
+    .replace(/\blog\b/g, '\\log')
+    .replace(/\bexp\b/g, '\\exp')
+    .replace(/\bsin\b/g, '\\sin')
+    .replace(/\bcos\b/g, '\\cos');
+}
+
+function normalizeUnicodeScript(text: string): string {
+  return text
+    .replace(/ŷ/g, '\\hat{y}')
+    .replace(/ȳ/g, '\\bar{y}')
+    .replace(/ỹ/g, '\\tilde{y}')
+    .replace(/x̂/g, '\\hat{x}')
+    .replace(/m̂/g, '\\hat{m}')
+    .replace(/v̂/g, '\\hat{v}')
+    .replace(/([A-Za-zα-ωΑ-Ω])([₀₁₂₃₄₅₆₇₈₉ᵢⱼₖₗₘₙₜ]+)/g, (_, base: string, subscript: string) => {
+      return `${base}_{${convertSubscript(subscript)}}`;
+    })
+    .replace(/([A-Za-z0-9)\]}])([⁽⁾⁰¹²³⁴⁵⁶⁷⁸⁹ⁱ⁻⁺ⁿᵀᵗᵢᵧᵏᵐᵈᵃᵇᶜ]+)/g, (_, base: string, superscript: string) => {
+      return `${base}^{${convertSuperscript(superscript)}}`;
+    });
+}
+
+function convertSubscript(text: string): string {
+  const map: Record<string, string> = {
+    '₀': '0',
+    '₁': '1',
+    '₂': '2',
+    '₃': '3',
+    '₄': '4',
+    '₅': '5',
+    '₆': '6',
+    '₇': '7',
+    '₈': '8',
+    '₉': '9',
+    'ᵢ': 'i',
+    'ⱼ': 'j',
+    'ₖ': 'k',
+    'ₗ': 'l',
+    'ₘ': 'm',
+    'ₙ': 'n',
+    'ₜ': 't',
+  };
+  return Array.from(text).map((char) => map[char] ?? char).join('');
+}
+
+function convertSuperscript(text: string): string {
+  const map: Record<string, string> = {
+    '⁰': '0',
+    '¹': '1',
+    '²': '2',
+    '³': '3',
+    '⁴': '4',
+    '⁵': '5',
+    '⁶': '6',
+    '⁷': '7',
+    '⁸': '8',
+    '⁹': '9',
+    'ⁱ': 'i',
+    '⁻': '-',
+    '⁺': '+',
+    'ⁿ': 'n',
+    '⁽': '(',
+    '⁾': ')',
+    'ᵀ': 'T',
+    'ᵗ': 't',
+    'ᵢ': 'i',
+    'ᵧ': 'y',
+    'ᵏ': 'k',
+    'ᵐ': 'm',
+    'ᵈ': 'd',
+    'ᵃ': 'a',
+    'ᵇ': 'b',
+    'ᶜ': 'c',
+  };
+  return Array.from(text).map((char) => map[char] ?? char).join('');
+}
+
 function mathScore(text: string): number {
   let s = 0;
   if (/[α-ωΑ-Ωβγδεζηθικλμνξπρστυφχψω]/.test(text)) s++;
   if (/[∑∏∫√∞∂∇∈∉⊂∪∩∧∨¬⇒⇔∀∃≈≠≤≥±×÷→←↔↑↓·∘⊕⊗]/.test(text)) s++;
   if (/\^\{[^}]+\}/.test(text)) s += 2;
   if (/_\{[^}]+\}/.test(text)) s += 2;
+  if (/[A-Za-z]\^[A-Za-z0-9{]/.test(text)) s++;
+  if (/[A-Za-z]_[A-Za-z0-9{]/.test(text)) s++;
+  if (/[A-Za-z0-9)]\s*[=<>]\s*[A-Za-z0-9(]/.test(text)) s++;
   if (/[⁰¹²³⁴⁵⁶⁷⁸⁹ⁱ⁻⁺ⁿ₀₁₂₃₄₅₆₇₈₉]/.test(text)) s++;
   if (/\b(softmax|sigmoid|tanh|ReLU|log|exp|sin|cos|max|min|argmax|Var|Cov|E\[|Pr\()/.test(text)) s++;
   if (/[+\-×÷·]=/.test(text.replace(/\s/g, '')) && /[a-zA-Zα-ω]/.test(text)) s++;

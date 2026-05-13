@@ -40,3 +40,151 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-in-out;
 }
+
+.math-text {
+  color: inherit;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.math-text > :first-child {
+  margin-top: 0;
+}
+
+.math-text > :last-child {
+  margin-bottom: 0;
+}
+
+.math-text p {
+  margin: 0.65rem 0;
+}
+
+.math-text p:has(.katex-display) {
+  margin: 0.9rem 0;
+}
+
+.math-text ul,
+.math-text ol {
+  margin: 0.65rem 0;
+  padding-left: 1.45rem;
+}
+
+.math-text ul {
+  list-style: disc;
+}
+
+.math-text ol {
+  list-style: decimal;
+}
+
+.math-text li {
+  margin: 0.32rem 0;
+  padding-left: 0.12rem;
+}
+
+.math-text li::marker {
+  color: #9ca3af;
+}
+
+.math-text strong {
+  font-weight: 700;
+  color: #111827;
+}
+
+.dark .math-text strong {
+  color: #f9fafb;
+}
+
+.math-text h3,
+.math-text h4 {
+  color: #111827;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.dark .math-text h3,
+.dark .math-text h4 {
+  color: #f9fafb;
+}
+
+.math-text h3 {
+  margin: 1.05rem 0 0.45rem;
+  font-size: 1rem;
+}
+
+.math-text h4 {
+  margin: 0.9rem 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.math-text hr {
+  margin: 1rem 0;
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .math-text hr {
+  border-top-color: #374151;
+}
+
+.math-text pre {
+  margin: 0.85rem 0;
+  overflow-x: auto;
+}
+
+.math-text code {
+  white-space: break-spaces;
+}
+
+.math-text .katex {
+  font-size: 1.04em;
+  line-height: 1.35;
+}
+
+.math-text .katex-display {
+  margin: 0.85rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0.45rem;
+  text-align: center;
+}
+
+.math-text .katex-display > .katex {
+  display: inline-block;
+  max-width: 100%;
+  text-align: initial;
+}
+
+.math-table-wrap {
+  margin: 0.9rem 0;
+  overflow-x: auto;
+}
+
+.math-table-wrap table {
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.math-table-wrap th,
+.math-table-wrap td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.dark .math-table-wrap th,
+.dark .math-table-wrap td {
+  border-color: #374151;
+}
+
+.math-table-wrap th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.dark .math-table-wrap th {
+  background: #1f2937;
+}
