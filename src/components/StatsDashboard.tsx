@@ -266,6 +266,30 @@ export default function StatsDashboard() {
               })}
             </div>
           </div>
+          {/* Settings */}
+          <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              学习设置
+            </h3>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-500">每日新卡上限</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={state.dailyNewLimit}
+                  onChange={(e) => dispatch({ type: 'SET_DAILY_NEW_LIMIT', payload: Number(e.target.value) })}
+                  className="w-24 h-1.5 accent-primary"
+                />
+                <span className="text-sm font-bold text-primary w-8 text-right">
+                  {state.dailyNewLimit}
+                </span>
+              </div>
+            </div>
+            <p className="text-[10px] text-gray-400">复习模式每天最多学这么多张新卡片</p>
+          </div>
+
           {/* Import / Export */}
           <ImportExport />
         </div>

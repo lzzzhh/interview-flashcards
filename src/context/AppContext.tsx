@@ -74,12 +74,17 @@ function isLeetCodeCard(card: FlashCard): card is LeetCodeCard {
 function computeVisibleIds(state: AppState): string[] {
   let ids = Object.keys(state.cardsById);
 
-  // 复习模式：新卡片 + 到期卡片
+  // 复习模式：新卡片（限制数量）+ 到期卡片
   if (state.reviewMode) {
-    ids = ids.filter((id) => {
+    const newIds = ids.filter((id) => state.cardsById[id].sm2.state === 'new');
+    const reviewIds = ids.filter((id) => {
       const sm2 = state.cardsById[id].sm2;
-      return sm2.state === 'new' || sm2.nextReview <= Date.now();
+      return sm2.state !== 'new' && sm2.nextReview <= Date.now();
     });
+    // 新卡限制每日数量
+    const limitedNew = newIds.slice(0, state.dailyNewLimit);
+    // 到期卡片优先，新卡片排在后面
+    ids = [...reviewIds, ...limitedNew];
   }
 
   // 难度
@@ -290,6 +295,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
     }
 
+    case 'SET_DAILY_NEW_LIMIT':
+      return { ...state, dailyNewLimit: action.payload };
+
     default:
       return state;
   }
@@ -329,6 +337,7 @@ function createInitialState(): AppState {
     showStats: false,
     shuffled: false,
     reviewMode: false,
+    dailyNewLimit: 20,
   };
 }
 
@@ -342,6 +351,7 @@ interface AppContextValue {
   favoritedIds: string[];
   dueCountByCategory: Record<Category, number>;
   totalDue: number;
+  totalNew: number;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -411,6 +421,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const totalDue = useMemo(() => Object.values(dueCountByCategory).reduce((a, b) => a + b, 0), [dueCountByCategory]);
 
+  // 新卡片总数
+  const totalNew = useMemo(() => {
+    let count = 0;
+    for (const cat of Object.values(CARD_DATA) as FlashCard[][]) {
+      count += cat.filter((c) => c.sm2.state === 'new').length;
+    }
+    return count;
+  }, []);
+
   const value: AppContextValue = {
     state,
     dispatch,
@@ -420,6 +439,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     favoritedIds,
     dueCountByCategory,
     totalDue,
+    totalNew,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

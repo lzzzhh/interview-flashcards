@@ -92,6 +92,7 @@ export interface AppState {
   showStats: boolean;
   shuffled: boolean;
   reviewMode: boolean;
+  dailyNewLimit: number;
 }
 
 // ============================================================
@@ -118,7 +119,8 @@ export type AppAction =
   | { type: 'RESET_ORDER' }
   | { type: 'ADD_CARD'; payload: FlashCard }
   | { type: 'UPDATE_CARD'; payload: FlashCard }
-  | { type: 'DELETE_CARD'; payload: string };
+  | { type: 'DELETE_CARD'; payload: string }
+  | { type: 'SET_DAILY_NEW_LIMIT'; payload: number };
 
 // ============================================================
 // localStorage 持久化（兼容旧格式）

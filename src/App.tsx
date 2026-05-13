@@ -20,7 +20,7 @@ import CardEditor from './components/CardEditor';
 import type { FlashCard } from './types';
 
 function AppInner() {
-  const { state, dispatch, visibleCards, currentCard, masteredIds, totalDue } = useAppContext();
+  const { state, dispatch, visibleCards, currentCard, masteredIds, totalDue, totalNew } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
@@ -116,17 +116,23 @@ function AppInner() {
           </div>
         </div>
 
-        {/* Review banner */}
-        {!state.reviewMode && totalDue > 0 && (
+        {/* Review banner — show new + review counts separately */}
+        {!state.reviewMode && (totalDue > 0 || totalNew > 0) && (
           <button
             onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
-            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 text-sm text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors"
+            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 text-sm hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors"
           >
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span className="flex-1 text-left">
-              你有 <strong>{totalDue}</strong> 张卡片到期待复习
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-orange-500" />
+            <span className="flex-1 text-left text-gray-700 dark:text-gray-300">
+              {totalDue > 0 ? (
+                <>复习 <strong className="text-orange-600">{totalDue}</strong> 张</>
+              ) : null}
+              {totalDue > 0 && totalNew > 0 && ' · '}
+              {totalNew > 0 ? (
+                <>新学 <strong className="text-blue-600">{Math.min(totalNew, state.dailyNewLimit)}</strong>/<span className="text-gray-400">{totalNew}</span> 张</>
+              ) : null}
             </span>
-            <span className="text-xs font-medium">开始复习 →</span>
+            <span className="text-xs font-medium text-gray-500">开始 →</span>
           </button>
         )}
 
@@ -134,7 +140,7 @@ function AppInner() {
         {state.reviewMode && (
           <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/30 border-b border-orange-200 dark:border-orange-800 flex items-center gap-2">
             <span className="text-xs text-orange-600 dark:text-orange-400 flex-1">
-              🔬 复习中 · {cardCount} 张到期 · 第 {state.currentVisibleIndex + 1}/{cardCount} 张
+              🔬 复习 {totalDue} 张 · 新学 {Math.min(totalNew, state.dailyNewLimit)} 张 · 第 {state.currentVisibleIndex + 1}/{cardCount} 张
             </span>
             <button
               onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
