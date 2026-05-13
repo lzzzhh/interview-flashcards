@@ -27,6 +27,50 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
   const cardCount = visibleCards.length;
 
+  // Choice screen
+  if (state.studyMode === 'choose') {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="w-full max-w-xs space-y-4">
+          <button onClick={onBack} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-6">
+            <ArrowLeft className="w-4 h-4" /> 返回首页
+          </button>
+
+          <h2 className="text-xl font-bold text-center text-gray-900 dark:text-gray-100">开始学习</h2>
+
+          <button
+            onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'review' })}
+            className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors"
+          >
+            <span className="text-3xl">🔄</span>
+            <span className="text-base font-bold text-orange-700 dark:text-orange-300">开始复习</span>
+            <span className="text-xs text-orange-500">{totalDue} 张卡片到期</span>
+          </button>
+
+          <button
+            onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'new' })}
+            className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+          >
+            <span className="text-3xl">🆕</span>
+            <span className="text-base font-bold text-blue-700 dark:text-blue-300">学习新卡</span>
+            <span className="text-xs text-blue-500">今日上限 {state.dailyNewLimit} 张 · 剩余 {totalNew} 张</span>
+          </button>
+
+          <button onClick={() => setShowBrowser(true)}
+            className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+            📝 管理卡片
+          </button>
+        </div>
+        {showBrowser && (
+          <CardBrowser onEdit={(card) => { if (!card.id) setEditingCard(null); else setEditingCard(card); }} onClose={() => setShowBrowser(false)} />
+        )}
+        {editingCard !== null && (
+          <CardEditor card={editingCard} onSave={() => { setEditingCard(null); dispatch({ type: 'SET_CATEGORY', payload: state.category }); }} onClose={() => setEditingCard(null)} />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
       <div className="max-w-xl mx-auto px-3 sm:px-4 py-3 space-y-3">
@@ -63,30 +107,31 @@ function StudyPage({ onBack }: { onBack: () => void }) {
         </div>
 
         {/* Review banner */}
-        {!state.reviewMode && (totalDue > 0 || totalNew > 0) && (
-          <button onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 text-sm hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors">
-            {totalDue > 0 && <span className="text-xs text-gray-600 dark:text-gray-300">复习 <strong className="text-orange-600">{totalDue}</strong></span>}
-            {totalDue > 0 && totalNew > 0 && <span className="text-gray-300">·</span>}
-            {totalNew > 0 && <span className="text-xs text-gray-600 dark:text-gray-300">新学 <strong className="text-blue-600">{Math.min(totalNew, state.dailyNewLimit)}</strong></span>}
-            <span className="text-xs text-gray-400 ml-auto">开始 →</span>
-          </button>
+        {state.studyMode === 'review' && totalDue === 0 && (
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500">
+            🎉 没有到期卡片！
+            <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button>
+          </div>
         )}
-
-        {/* Review mode bar */}
-        {state.reviewMode && (
-          <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/30 border-b border-orange-200 dark:border-orange-800 flex items-center gap-2">
-            <span className="text-xs text-orange-600 dark:text-orange-400 flex-1">
-              🔬 复习 {totalDue} 张 · 新学 {Math.min(totalNew, state.dailyNewLimit)} 张 · {state.currentVisibleIndex + 1}/{cardCount}
-            </span>
-            <button onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-700 text-xs font-medium">
-              <X className="w-3 h-3" /> 退出
-            </button>
+        {state.studyMode === 'new' && totalNew === 0 && (
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500">
+            🎉 所有卡片都已学过！
+            <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button>
           </div>
         )}
 
-        {/* Tabs hidden — user chose module from home page */}
+        {/* Study mode bar (always shown after choose screen) */}
+        <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/30 border-b border-orange-200 dark:border-orange-800 flex items-center gap-2">
+            <span className="text-xs text-orange-600 dark:text-orange-400 flex-1">
+              {state.studyMode === 'review' ? '🔄' : '🆕'} {state.studyMode === 'review' ? '复习' : '新学'} · {state.currentVisibleIndex + 1}/{Math.max(cardCount, 1)}
+            </span>
+            <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-700 text-xs font-medium dark:text-gray-300">
+              <X className="w-3 h-3" /> 退出
+            </button>
+          </div>
+
+        {/* Tabs hidden */}
 
         {/* Card */}
         {currentCard ? (

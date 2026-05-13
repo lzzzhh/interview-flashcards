@@ -91,17 +91,18 @@ function isLeetCodeCard(card: FlashCard): card is LeetCodeCard {
 function computeVisibleIds(state: AppState): string[] {
   let ids = Object.keys(state.cardsById);
 
-  // 复习模式：新卡片（限制数量）+ 到期卡片
-  if (state.reviewMode) {
-    const newIds = ids.filter((id) => state.cardsById[id].sm2.state === 'new');
-    const reviewIds = ids.filter((id) => {
-      const sm2 = state.cardsById[id].sm2;
-      return sm2.state !== 'new' && sm2.nextReview <= Date.now();
+  // 学习模式：新学 / 复习
+  if (state.studyMode === 'new') {
+    const newIds = ids.filter((id) => {
+      const sm2 = state.cardsById[id]?.sm2;
+      return !sm2 || sm2.state === 'new';
     });
-    // 新卡限制每日数量
-    const limitedNew = newIds.slice(0, state.dailyNewLimit);
-    // 到期卡片优先，新卡片排在后面
-    ids = [...reviewIds, ...limitedNew];
+    ids = newIds.slice(0, state.dailyNewLimit);
+  } else if (state.studyMode === 'review') {
+    ids = ids.filter((id) => {
+      const sm2 = state.cardsById[id]?.sm2;
+      return sm2 && sm2.state !== 'new' && sm2.nextReview <= Date.now();
+    });
   }
 
   // 难度
@@ -316,6 +317,11 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_DAILY_NEW_LIMIT':
       return { ...state, dailyNewLimit: action.payload };
 
+    case 'SET_STUDY_MODE': {
+      const next = { ...state, studyMode: action.payload };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
     case 'UNDO_LAST_RATING': {
       const last = getLastRating();
       if (!last || !state.cardsById[last.cardId]) return state;
@@ -369,6 +375,7 @@ function createInitialState(): AppState {
     shuffled: false,
     reviewMode: false,
     dailyNewLimit: 20,
+    studyMode: 'choose',
   };
 }
 

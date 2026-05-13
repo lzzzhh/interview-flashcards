@@ -93,6 +93,7 @@ export interface AppState {
   shuffled: boolean;
   reviewMode: boolean;
   dailyNewLimit: number;
+  studyMode: 'choose' | 'new' | 'review';
 }
 
 // ============================================================
@@ -121,6 +122,7 @@ export type AppAction =
   | { type: 'UPDATE_CARD'; payload: FlashCard }
   | { type: 'DELETE_CARD'; payload: string }
   | { type: 'SET_DAILY_NEW_LIMIT'; payload: number }
+  | { type: 'SET_STUDY_MODE'; payload: 'choose' | 'new' | 'review' }
   | { type: 'UNDO_LAST_RATING' };
 
 // ============================================================
