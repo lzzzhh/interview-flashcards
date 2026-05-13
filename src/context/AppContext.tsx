@@ -26,7 +26,9 @@ import { llmCards } from '../data/llm';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { sm2, createDefaultSM2 } from '../utils/sm2';
-import { loadProgress, saveProgress, loadSettings, saveSettings } from '../utils/storage';
+import { loadProgress, loadSettings, saveSettings } from '../utils/storage';
+import { saveAppData } from '../utils/nativeStorage';
+import type { AppData } from '../utils/nativeStorage';
 import { shuffle } from '../utils/shuffle';
 
 // ---- 数据源映射 ----
@@ -296,13 +298,39 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, undefined, createInitialState);
 
-  // persist dark mode class on <html>
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', state.isDark);
-  }, [state.isDark]);
+  const progressKeyMap: Record<Category, string> = {
+    leetcode: 'fc-leetcode-progress',
+    statistics: 'fc-stats-progress',
+    'machine-learning': 'fc-ml-progress',
+    llm: 'fc-llm-progress',
+    jargon: 'fc-jargon-progress',
+    workplace: 'fc-workplace-progress',
+  };
 
-  // persist progress after mutations
+  // 统一持久化：Tauri 原生文件 > localStorage
   useEffect(() => {
+    // 读取本地数据构建完整 AppData
+    const local = {
+      progress: {} as Record<string, StoredProgress>,
+      settings: { isDark: state.isDark, lastCategory: state.category },
+      stats: { sessions: [] },
+    } as AppData;
+
+    // 从 localStorage 加载其他分类的进度
+    const allKeys = [
+      'fc-leetcode-progress', 'fc-stats-progress', 'fc-ml-progress',
+      'fc-llm-progress', 'fc-jargon-progress', 'fc-workplace-progress',
+    ];
+    for (const key of allKeys) {
+      try {
+        local.progress[key] = JSON.parse(localStorage.getItem(key) || '{"sm2":{},"mastered":[],"favorited":[]}');
+      } catch {
+        local.progress[key] = { sm2: {}, mastered: [], favorited: [] };
+      }
+    }
+
+    // 更新当前分类的进度
+    const progressKey = progressKeyMap[state.category];
     const progress: StoredProgress = {
       sm2: {},
       mastered: getMasteredIds(state.cards),
@@ -311,10 +339,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
     for (const card of state.cards) {
       progress.sm2[card.id] = card.sm2;
     }
-    saveProgress(state.category, progress);
-  }, [state.cards, state.category]);
+    local.progress[progressKey] = progress;
 
-  // persist settings
+    // 同步设置
+    try {
+      const s = JSON.parse(localStorage.getItem('fc-settings') || '{}');
+      Object.assign(local.settings, s);
+    } catch {}
+    try {
+      const s = JSON.parse(localStorage.getItem('fc-stats') || '{}');
+      Object.assign(local.stats, s);
+    } catch {}
+    local.settings.isDark = state.isDark;
+    local.settings.lastCategory = state.category;
+
+    // 先写 localStorage 保证即时可用
+    localStorage.setItem(progressKey, JSON.stringify(progress));
+    localStorage.setItem('fc-settings', JSON.stringify(local.settings));
+
+    // 再异步写原生文件（Tauri）
+    saveAppData(local);
+  }, [state.cards, state.category, state.isDark]);
+
+  // persist dark mode class on <html>
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', state.isDark);
+  }, [state.isDark]);
+
+  // persist settings (redundant with above but kept for clarity)
   useEffect(() => {
     saveSettings({ isDark: state.isDark, lastCategory: state.category });
   }, [state.isDark, state.category]);
