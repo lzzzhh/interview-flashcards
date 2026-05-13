@@ -167,7 +167,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
             codeOpen ? 'max-h-[600px] opacity-100 mt-2' : 'max-h-0 opacity-0'
           }`}
         >
-          <pre className="text-sm font-mono leading-relaxed bg-[#1e1e2e] text-[#4ade80] rounded-lg p-4 overflow-x-auto">
+          <pre className="text-sm font-mono leading-relaxed bg-gray-100 text-gray-800 dark:bg-[#1e1e2e] dark:text-[#4ade80] rounded-lg p-4 overflow-x-auto">
             <code>{card.code}</code>
           </pre>
         </div>
