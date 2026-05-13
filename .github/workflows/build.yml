@@ -12,10 +12,13 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: linux
+            bundles: deb,appimage
           - os: windows-latest
             artifact_name: windows
+            bundles: nsis
           - os: macos-latest
             artifact_name: macos
+            bundles: dmg
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -37,11 +40,8 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
-      - name: Install Tauri CLI
-        run: npm install -D @tauri-apps/cli
-
       - name: Build Tauri app
-        run: npx tauri build
+        run: npm run tauri build -- --bundles ${{ matrix.bundles }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

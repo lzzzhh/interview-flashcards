@@ -8,7 +8,9 @@
     "dev:local": "vite",
     "dev:desktop": "tauri dev",
     "build": "tsc -b && vite build",
+    "build:ci": "vite build",
     "build:desktop": "npm run build && tauri build",
+    "tauri": "tauri",
     "lint": "eslint .",
     "preview": "vite preview"
   },
