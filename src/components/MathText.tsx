@@ -117,28 +117,34 @@ function preprocess(text: string): string {
 
 /** 判断是否为纯公式行 */
 function isFormulaLine(line: string): boolean {
-  if (line.length > 250) return false;
+  if (line.length > 300) return false;
   // 不能有中文标点
   if (/[。，；：！？、【】「」]/.test(line)) return false;
-  // 中文超过 5 个字符 → 不是纯公式
-  const chineseCount = (line.match(/[\u4e00-\u9fff]/g) || []).length;
-  if (chineseCount > 5) return false;
+  // 如果行中有中文句子（连续中文超过 6 个字），不是纯公式
+  if (/[\u4e00-\u9fff]{6,}/.test(line)) return false;
+  // 去掉英文单词/数字后如果还有中文 > 5 字，也不是
+  const withoutLatin = line.replace(/[a-zA-Z0-9\s\+\-\*\/\=\(\)\[\]\{\}\^\$\.\,\;\:\!\?\"\'\\]/g, '');
+  const chineseInRemainder = (withoutLatin.match(/[\u4e00-\u9fff]/g) || []).length;
+  if (chineseInRemainder > 8) return false;
   // 需要足够的数学特征
   return mathScore(line) >= 2;
 }
 
-/** 行内公式自动包裹 */
+/** 行内公式自动包裹 — 保守策略，只包裹明显是公式的短片段 */
 function wrapInlineMath(line: string): string {
   // 如果已经有 $ 包裹，跳过
   if (/\$[^$]+\$/.test(line)) return line;
 
-  // 对明显的公式片段包上 $
-  // 启发式：非中文片段 + 数学符号
+  // 保守策略：只对明显的 LaTeX 式上下标语法包裹
+  // 如 R^{n×d}、w^T、x_i 等
   let result = line;
-  // 希腊字母 + 数学符号的组合
   result = result.replace(
-    /([α-ωΑ-Ωβγδεζηθικλμνξπρστυφχψω][\s\w\d⁰¹²³⁴⁵⁶⁷⁸⁹ⁱ⁻⁺ⁿ₀₁₂₃₄₅₆₇₈₉·×÷±→←↔≤≥≠≈∞∂∇∫∑∏√∧∨∩∪∈∉⊂⊃⊆⊇⊕⊗⊥∥∠△□▯…‥̴̵̶̷̸̡̢̧̨̛̖̗̘̙̜̝̞̟̠̣̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼̂̃̄̅̆̇̈̉̊̋̌̍̎̏̐̑̒̓̔̽̾̿̕̚ᵀᴺ]+)/g,
-    '$$$1$',
+    /([a-zA-Zα-ωΑ-Ω])\^\{([^}]+)\}/g,
+    '$$$1^{$2}$ $',
+  );
+  result = result.replace(
+    /([a-zA-Zα-ωΑ-Ω])_\{([^}]+)\}/g,
+    '$$$1_{$2}$ $',
   );
   return result;
 }

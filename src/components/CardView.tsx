@@ -58,7 +58,7 @@ function ReviewMeta({ sm2 }: { sm2: { repetitions: number; easeFactor: number; i
   const due = getDueStatus(sm2.nextReview);
 
   return (
-    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700 pb-2 mb-2">
+    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700 pb-2 mb-2 sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-6 px-6 pt-1">
       <span className="flex items-center gap-1">
         <Repeat className="w-3 h-3" />
         重复 {sm2.repetitions} 次
@@ -165,7 +165,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
             approachOpen ? 'max-h-[500px] opacity-100 mt-2' : 'max-h-0 opacity-0'
           }`}
         >
-          <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+          <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 max-h-48 overflow-y-auto">
             {card.approach}
           </div>
         </div>
@@ -189,7 +189,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
             codeOpen ? 'max-h-[600px] opacity-100 mt-2' : 'max-h-0 opacity-0'
           }`}
         >
-          <pre className="text-sm font-mono leading-relaxed bg-gray-100 text-gray-800 dark:bg-[#1e1e2e] dark:text-[#4ade80] rounded-lg p-4 overflow-x-auto">
+          <pre className="text-sm font-mono leading-relaxed bg-gray-100 text-gray-800 dark:bg-[#1e1e2e] dark:text-[#4ade80] rounded-lg p-4 overflow-x-auto max-h-60 overflow-y-auto">
             <code>{card.code}</code>
           </pre>
         </div>
@@ -251,12 +251,14 @@ function QAView({ card }: { card: QACard }) {
 // ---- Main CardView ----
 export default function CardView({ card, showApproach, showCode }: CardViewProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-shadow hover:shadow-md animate-fadeIn">
-      {isLeetCode(card) ? (
-        <LeetCodeView card={card} showApproach={showApproach} showCode={showCode} />
-      ) : (
-        <QAView card={card} />
-      )}
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-shadow hover:shadow-md animate-fadeIn max-h-[calc(100vh-13rem)] flex flex-col">
+      <div className="overflow-y-auto flex-1 pr-1 -mr-1">
+        {isLeetCode(card) ? (
+          <LeetCodeView card={card} showApproach={showApproach} showCode={showCode} />
+        ) : (
+          <QAView card={card} />
+        )}
+      </div>
     </div>
   );
 }
