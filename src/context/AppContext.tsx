@@ -60,6 +60,7 @@ const progressKeyMap: Record<Category, string> = {
 
 // ---- 合并 progress → cardsById ----
 function buildCardsById(category: Category): Record<string, FlashCard> {
+  const now = Date.now();
   // 内置模块
   const rawCards = CARD_DATA[category];
   if (rawCards) {
@@ -68,7 +69,7 @@ function buildCardsById(category: Category): Record<string, FlashCard> {
     for (const card of rawCards) {
       const sm2 = progress.sm2[card.id]
         ? { ...card.sm2, ...progress.sm2[card.id] }
-        : card.sm2;
+        : { ...card.sm2, nextReview: now }; // 新卡片 nextReview 用当前时间
       result[card.id] = { ...card, sm2, favorited: progress.favorited.includes(card.id) };
     }
     return result;
@@ -78,7 +79,7 @@ function buildCardsById(category: Category): Record<string, FlashCard> {
   const customCards = loadCustomCards(category as string);
   const result: Record<string, FlashCard> = {};
   for (const card of customCards) {
-    result[card.id] = card;
+    result[card.id] = { ...card, sm2: { ...card.sm2, nextReview: now } };
   }
   return result;
 }
