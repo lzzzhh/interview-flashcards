@@ -75,9 +75,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
+      - name: List files
+        run: ls -R interview-flashcards-*/
       - uses: softprops/action-gh-release@v2
         with:
-          files: interview-flashcards-*/*
+          files: |
+            interview-flashcards-macos/*.dmg
+            interview-flashcards-windows/*.exe
+            interview-flashcards-linux/*.deb
+            interview-flashcards-linux/*.AppImage
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
