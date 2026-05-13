@@ -53,12 +53,18 @@ function getDueStatus(nextReview: number): { isDue: boolean; overdueDays: number
 }
 
 // ---- Review Meta bar (shows interval + stage) ----
-function ReviewMeta({ sm2 }: { sm2: { repetitions: number; easeFactor: number; interval: number; nextReview: number } }) {
+function ReviewMeta({ sm2 }: { sm2: { state?: string; repetitions: number; easeFactor: number; interval: number; nextReview: number } }) {
   const stage = getReviewStage(sm2);
   const due = getDueStatus(sm2.nextReview);
+  const isNew = !sm2.state || sm2.state === 'new';
 
   return (
     <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700 pb-2 mb-2 sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1">
+      {isNew ? (
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">🆕 新学</span>
+      ) : (
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">🔄 复习</span>
+      )}
       <span className="flex items-center gap-1">
         <Repeat className="w-3 h-3" />
         重复 {sm2.repetitions} 次
@@ -109,7 +115,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
     <div className="space-y-4 text-left">
       {/* Sticky header */}
       <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 pb-3 border-b border-gray-100 dark:border-gray-700">
-        <ReviewMeta sm2={card.sm2 as any} />
+        <ReviewMeta sm2={{ state: (card as any).sm2?.state, ...card.sm2 }} />  {/* LeetCode */}
 
         <div className="flex items-start gap-3 mt-2">
           <span className="text-lg font-bold text-primary whitespace-nowrap">
