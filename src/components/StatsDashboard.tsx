@@ -17,6 +17,35 @@ import {
   getDifficultCards,
   isReallyMastered,
 } from '../utils/reviewLogs';
+import { leetcodeHot100 } from '../data/leetcode-hot100';
+import { statisticsCards } from '../data/statistics';
+import { machineLearningCards } from '../data/machine-learning';
+import { llmCards } from '../data/llm';
+import { jargonCards } from '../data/jargon';
+import { workplaceCards } from '../data/workplace';
+import { loadProgress } from '../utils/storage';
+import type { FlashCard } from '../types';
+
+/** 从所有数据源加载全部卡片（带进度合并） */
+function loadAllCards(): FlashCard[] {
+  const sources: [string, FlashCard[]][] = [
+    ['fc-leetcode-progress', leetcodeHot100 as FlashCard[]],
+    ['fc-stats-progress', statisticsCards as FlashCard[]],
+    ['fc-ml-progress', machineLearningCards as FlashCard[]],
+    ['fc-llm-progress', llmCards as FlashCard[]],
+    ['fc-jargon-progress', jargonCards as FlashCard[]],
+    ['fc-workplace-progress', workplaceCards as FlashCard[]],
+  ];
+  const allCards: FlashCard[] = [];
+  for (const [key, cards] of sources) {
+    const progress = loadProgress(key as any);
+    for (const card of cards) {
+      const sm2 = progress.sm2[card.id] ? { ...card.sm2, ...progress.sm2[card.id] } : card.sm2;
+      allCards.push({ ...card, sm2, favorited: progress.favorited.includes(card.id) });
+    }
+  }
+  return allCards;
+}
 
 /**
  * 艾宾浩斯遗忘曲线数据
@@ -105,17 +134,18 @@ function ReviewDistribution({ cards }: { cards: { sm2: { interval: number; repet
 
 export default function StatsDashboard() {
   const { state, dispatch, totalDue, totalNew } = useAppContext();
-  const cards = Object.values(state.cardsById);
+  const allCardsForDistribution = useMemo(() => loadAllCards(), [state.cardsById]);
 
   const stats = useMemo(() => {
+    const allCards = loadAllCards();
     const allLogs = getAllLogs();
-    const mastered = cards.filter((c) => isReallyMastered(c.sm2.interval, c.sm2.lapses)).length;
-    const difficultIds = getDifficultCards(loadReviewLogs(), cards.map((c) => c.id));
+    const mastered = allCards.filter((c) => isReallyMastered(c.sm2.interval, c.sm2.lapses)).length;
+    const difficultIds = getDifficultCards(loadReviewLogs(), allCards.map((c) => c.id));
     return {
-      total: cards.length,
+      total: allCards.length,
       mastered,
-      pending: cards.length - mastered,
-      masteredPercent: cards.length > 0 ? Math.round((mastered / cards.length) * 100) : 0,
+      pending: allCards.length - mastered,
+      masteredPercent: allCards.length > 0 ? Math.round((mastered / allCards.length) * 100) : 0,
       todayReviewed: getTodayReviewed(allLogs),
       streak: getStreak(allLogs),
       recentAccuracy: getRecentAccuracy(allLogs),
@@ -123,7 +153,7 @@ export default function StatsDashboard() {
       difficultCount: difficultIds.length,
       byDifficulty: {} as Record<string, { total: number; mastered: number }>,
     };
-  }, [cards]);
+  }, [state.cardsById]); // re-evaluate when cardsById changes (triggered by any rating)
 
   if (!state.showStats) return null;
 
@@ -221,7 +251,7 @@ export default function StatsDashboard() {
           </div>
 
           {/* Review Distribution */}
-          <ReviewDistribution cards={cards} />
+          <ReviewDistribution cards={allCardsForDistribution} />
 
           {/* Ebbinghaus Curve */}
           <EbbinghausCurve />
