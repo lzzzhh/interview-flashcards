@@ -120,7 +120,8 @@ export type AppAction =
   | { type: 'ADD_CARD'; payload: FlashCard }
   | { type: 'UPDATE_CARD'; payload: FlashCard }
   | { type: 'DELETE_CARD'; payload: string }
-  | { type: 'SET_DAILY_NEW_LIMIT'; payload: number };
+  | { type: 'SET_DAILY_NEW_LIMIT'; payload: number }
+  | { type: 'UNDO_LAST_RATING' };
 
 // ============================================================
 // localStorage 持久化（兼容旧格式）

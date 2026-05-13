@@ -41,6 +41,29 @@ body {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+/* 3D Flip animation for card answer reveal */
+.card-flip-container {
+  perspective: 1000px;
+}
+
+.card-flip-inner {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.card-flip-inner.flipped {
+  transform: rotateX(180deg);
+}
+
+.card-flip-front,
+.card-flip-back {
+  backface-visibility: hidden;
+}
+
+.card-flip-back {
+  transform: rotateX(180deg);
+}
+
 .math-text {
   color: inherit;
   font-size: 0.95rem;

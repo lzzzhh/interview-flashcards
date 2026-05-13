@@ -288,14 +288,21 @@ function QAView({ card }: { card: QACard }) {
 
 // ---- Main CardView ----
 export default function CardView({ card, showApproach, showCode }: CardViewProps) {
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 transition-shadow hover:shadow-md animate-fadeIn max-h-[calc(100vh-11rem)] sm:max-h-[calc(100vh-13rem)] flex flex-col">
-      <div className="overflow-y-auto flex-1 pr-1 -mr-1">
-        {isLeetCode(card) ? (
+  if (isLeetCode(card)) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 transition-shadow hover:shadow-md animate-fadeIn max-h-[calc(100vh-11rem)] sm:max-h-[calc(100vh-13rem)] flex flex-col">
+        <div className="overflow-y-auto flex-1 pr-1 -mr-1">
           <LeetCodeView card={card} showApproach={showApproach} showCode={showCode} />
-        ) : (
-          <QAView card={card} />
-        )}
+        </div>
+      </div>
+    );
+  }
+
+  // QA cards with flip animation
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 transition-shadow hover:shadow-md animate-fadeIn max-h-[calc(100vh-11rem)] sm:max-h-[calc(100vh-13rem)] flex flex-col">
+      <div className="overflow-y-auto flex-1 pr-1 -mr-1">
+        <QAView card={card} />
       </div>
     </div>
   );

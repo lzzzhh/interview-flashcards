@@ -34,6 +34,11 @@ import { appendReviewLog } from '../utils/reviewLogs';
 import { shuffle } from '../utils/shuffle';
 import { loadCustomCards } from '../utils/customDecks';
 
+// ---- Undo support ----
+let lastRating: { cardId: string; previousSm2: any } | null = null;
+export function setLastRating(data: typeof lastRating) { lastRating = data; }
+export function getLastRating() { const r = lastRating; lastRating = null; return r; }
+
 // ---- 数据源映射 ----
 const CARD_DATA: Partial<Record<Category, FlashCard[]>> = {
   leetcode: leetcodeHot100 as FlashCard[],
@@ -229,8 +234,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
       const { cardId, rating } = action.payload;
       const card = state.cardsById[cardId];
       if (!card) return state;
+      // 保存原始状态用于撤回
+      setLastRating({ cardId, previousSm2: { ...card.sm2 } });
       const result = scheduleReview(cardId, card.sm2, rating);
-      // 持久化 ReviewLog
       appendReviewLog(result.log);
       return {
         ...state,
@@ -309,6 +315,19 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'SET_DAILY_NEW_LIMIT':
       return { ...state, dailyNewLimit: action.payload };
+
+    case 'UNDO_LAST_RATING': {
+      const last = getLastRating();
+      if (!last || !state.cardsById[last.cardId]) return state;
+      return {
+        ...state,
+        cardsById: { 
+          ...state.cardsById, 
+          [last.cardId]: { ...state.cardsById[last.cardId], sm2: last.previousSm2 } 
+        },
+        qaAnswerVisible: false,
+      };
+    }
 
     default:
       return state;

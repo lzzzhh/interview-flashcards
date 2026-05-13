@@ -2,7 +2,7 @@
 // src/components/CardActions.tsx — 适配新 state（cardId 操作）
 // ============================================================
 
-import { ChevronLeft, ChevronRight, Flame, Star, Shuffle, FlaskConical } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flame, Star, Shuffle, FlaskConical, Undo2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { scheduleReview } from '../utils/sm2';
 
@@ -91,6 +91,14 @@ export default function CardActions() {
             title="随机顺序"
           >
             <Shuffle className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={() => dispatch({ type: 'UNDO_LAST_RATING' })}
+            className="p-2 rounded-lg bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            title="撤回上次评分 (Ctrl+Z)"
+          >
+            <Undo2 className="w-4 h-4" />
           </button>
         </div>
 

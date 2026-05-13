@@ -78,6 +78,13 @@ export function useKeyboard({ dispatch, searchInputRef, getCurrentCardId }: Keyb
         return;
       }
 
+      // Ctrl+Z / Cmd+Z to undo last rating
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        dispatch({ type: 'UNDO_LAST_RATING' });
+        return;
+      }
+
       // / to focus search
       if (!isInput && e.key === '/') {
         e.preventDefault();
