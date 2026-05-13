@@ -3,7 +3,7 @@
 // ============================================================
 
 import { useRef, useCallback, useState, useMemo } from 'react';
-import { ArrowLeft, FlaskConical, X } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
 import HomePage from './components/HomePage';
@@ -87,25 +87,9 @@ function StudyPage({ onBack }: { onBack: () => void }) {
             返回
           </button>
 
-          <div className="flex items-center gap-1">
-            {state.reviewMode && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-orange-500 text-white">复习中</span>
-            )}
+          <div className="flex items-center gap-0.5">
             <button onClick={() => setShowBrowser(true)} className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" title="卡片管理">
-              <X className="w-4 h-4 rotate-45 text-gray-500" />
-            </button>
-            <button
-              onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
-              className={`relative p-1.5 rounded-lg transition-colors ${
-                state.reviewMode ? 'bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400' : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500'
-              }`}
-            >
-              <FlaskConical className="w-4 h-4" />
-              {totalDue > 0 && !state.reviewMode && (
-                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-orange-500 text-white text-[8px] font-bold flex items-center justify-center">
-                  {totalDue > 9 ? '!' : totalDue}
-                </span>
-              )}
+              <X className="w-4 h-4 rotate-45 text-gray-500 dark:text-gray-400" />
             </button>
             <DarkModeToggle />
           </div>
