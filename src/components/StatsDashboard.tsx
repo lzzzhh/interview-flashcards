@@ -230,22 +230,17 @@ function ImportExport() {
   const [syncMode, setSyncMode] = useState<'checking' | 'file' | 'fallback'>('checking');
   const [storagePath, setStoragePath] = useState<string | null>(null);
 
-  // Check if file storage is active
+  // Check storage mode on mount
   useEffect(() => {
-    import('../utils/fileStorage').then(({ loadFromFile, isFileSystemAPISupported }) => {
-      if (!isFileSystemAPISupported()) {
+    (async () => {
+      const mod = await import('../utils/nativeStorage');
+      if (mod.isTauri()) {
+        setSyncMode('file');
+        mod.getDataPath().then(setStoragePath);
+      } else {
         setSyncMode('fallback');
-        return;
       }
-      loadFromFile().then((r) => {
-        if (r) {
-          setSyncMode('file');
-          r.handle.getFile().then((f: File) => setStoragePath(f.name));
-        } else {
-          setSyncMode('fallback');
-        }
-      });
-    });
+    })();
   }, []);
 
   const handleConnect = async () => {
@@ -269,14 +264,6 @@ function ImportExport() {
     setSyncMode('file');
   };
 
-  const handleDisconnect = async () => {
-    const { disconnectFile } = await import('../utils/fileStorage');
-    await disconnectFile();
-    setSyncMode('fallback');
-    setStoragePath(null);
-    setMsg({ type: 'success', text: '已断开文件连接，恢复浏览器存储。' });
-  };
-
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -298,43 +285,34 @@ function ImportExport() {
         {isFileMode ? (
           <p>
             📁 存储模式：<strong>本地文件</strong>
-            {storagePath && <span>（{storagePath}）</span>}
-            <br />数据保存在你选择的文件里，换设备时同步该文件即可。
+            {storagePath && <span className="block mt-0.5 text-[11px] break-all opacity-75">{storagePath}</span>}
+            <br />数据保存在固定路径，同步该文件即可跨设备使用。
           </p>
         ) : (
           <p>
             💻 存储模式：<strong>浏览器缓存</strong>
-            <br />数据存在浏览器里，清缓存会丢失。建议连接到本地文件。
+            <br />数据存在浏览器 localStorage 里，清缓存会丢失。
           </p>
         )}
       </div>
 
-      {/* File storage controls */}
-      <div className="flex flex-col gap-2">
-        {!isFileMode ? (
-          <>
-            <button
-              onClick={handleConnect}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors"
-            >
-              连接已有数据文件
-            </button>
-            <button
-              onClick={handleCreateNew}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            >
-              创建新数据文件
-            </button>
-          </>
-        ) : (
+      {/* File storage controls — only in browser mode */}
+      {!isFileMode && (
+        <div className="flex flex-col gap-2">
           <button
-            onClick={handleDisconnect}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
+            onClick={handleConnect}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors"
           >
-            断开文件连接
+            连接已有数据文件
           </button>
-        )}
-      </div>
+          <button
+            onClick={handleCreateNew}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          >
+            创建新数据文件
+          </button>
+        </div>
+      )}
 
       {/* Legacy export/import */}
       <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
