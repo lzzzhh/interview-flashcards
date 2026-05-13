@@ -2354,4 +2354,127 @@ export const statisticsCards: QACard[] = [
     sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
+  // ============================================================
+  // 5. 数学基础 (10 questions)
+  // ============================================================
+  {
+    id: 'stats-190',
+    category: 'statistics',
+    question: '什么是矩阵的特征值和特征向量？在 PCA 降维中如何应用？',
+    answer:
+      '对于方阵 A，若存在非零向量 v 和标量 λ 满足 Av = λv，则 λ 称为 A 的特征值，v 为对应的特征向量。特征向量表示线性变换后方向保持不变的"特殊方向"，特征值表示在该方向上拉伸或压缩的倍数。几何直观：矩阵 A 对大多数向量会改变方向和长度，但对特征向量只改变长度（放大 λ 倍），不改变方向。求解方法：解特征方程 det(A - λI) = 0 得到特征值，再解 (A - λI)v = 0 得到特征向量。在 PCA 降维中，首先计算数据中心化后的协方差矩阵 C = (1/n)XᵀX，然后对该对称矩阵进行特征值分解，得到特征值 λ₁ ≥ λ₂ ≥ ... ≥ λₚ 和对应的正交特征向量。特征值的大小衡量了该方向上的方差——数据在对应特征向量方向上散布最广。选取前 k 个最大特征值对应的特征向量组成投影矩阵 W，将原始数据 X 投影到低维空间 Z = XW，实现降维。保留方差比例为 Σᵢ₌₁ᵏ λᵢ / Σᵢ₌₁ᵖ λᵢ，通常要求 ≥ 85% 或 90%。特征向量互相正交，保证了降维后的坐标轴不相关，这正是 PCA 能去除多重共线性的数学基础。',
+    tags: ['eigenvalue', 'eigenvector', 'PCA', 'dimensionality reduction'],
+    subTopic: '数学基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-191',
+    category: 'statistics',
+    question: '梯度下降的数学推导？为什么负梯度方向是下降最快的方向？',
+    answer:
+      '梯度下降用于最小化可微目标函数 J(θ)。核心更新公式：θₜ₊₁ = θₜ - α∇J(θₜ)，其中 α 为学习率。为什么负梯度方向是最速下降方向？考虑 θ 处沿单位方向向量 d 的方向导数（函数在该方向的变化率）为 ∇J(θ)ᵀd = ‖∇J‖·‖d‖·cos(θ夹角) = ‖∇J‖·cos(夹角)（因为 ‖d‖=1）。当 cos(夹角) 最小时即夹角 = 180° 时（cos = -1），方向导数取最小值 -‖∇J‖，此时 d = -∇J/‖∇J‖——即梯度反方向的单位向量。因此，负梯度方向使函数值下降最快，下降速率为梯度的模 ‖∇J‖。（数学上用 Cauchy-Schwarz 不等式也可得：|∇Jᵀd| ≤ ‖∇J‖·‖d‖ = ‖∇J‖，最小值为 -‖∇J‖，在 d = -∇J/‖∇J‖ 处取到）。梯度下降的推导可以看作是用一阶泰勒展开逼近：J(θ + Δθ) ≈ J(θ) + ∇JᵀΔθ，要使 J 下降即 J(θ + Δθ) < J(θ)，需要 ∇JᵀΔθ < 0。令 Δθ = -α∇J，则 ∇Jᵀ(-α∇J) = -α‖∇J‖² ≤ 0，确保每次迭代目标函数不增。学习率 α 过大可能导致在最小值附近震荡发散；过小则收敛缓慢。梯度下降收敛到局部最小值（凸函数则为全局最小），在实践中是神经网络和机器学习优化的核心算法。',
+    tags: ['gradient descent', 'directional derivative', 'optimization'],
+    subTopic: '数学基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-192',
+    category: 'statistics',
+    question: '什么是凸函数？凸优化问题有什么好的性质？',
+    answer:
+      '凸函数定义：对任意 x, y ∈ dom(f) 和 t ∈ [0,1]，有 f(tx + (1-t)y) ≤ tf(x) + (1-t)f(y)。几何上，函数曲线上任意两点间的线段位于函数图像上方（弦在曲线上方），即函数的"碗形"形态。等价条件（可微时）：f(y) ≥ f(x) + ∇f(x)ᵀ(y-x)，即函数图像位于其任意切线上方（一阶条件）。等价条件（二阶可微时）：Hessian 矩阵 ∇²f(x) ⪰ 0（半正定），即各点的曲率非负。凸优化是指目标函数和约束函数都是凸函数（可行域为凸集）的优化问题。其优良性质：(1) 任意局部最小值即为全局最小值——这是凸优化最核心的优点，意味着优化算法不会"陷入"次优解，一旦找到局部最优就是全局最优；(2) 最优解集合也是凸集；(3) 梯度下降等简单算法即能保证收敛到全局最优（在适当步长条件下）；(4) 强凸函数有唯一的全局最优解；(5) 对偶理论（拉格朗日对偶）在凸条件下具有强对偶性——原问题最优值等于对偶问题最优值（Slater 条件），极大简化了 SVM 等模型的求解。机器学习中许多损失函数（线性回归的 MSE、逻辑回归的交叉熵）是凸函数，SVM 也是凸优化问题，因此这些模型具有理论上的收敛和最优性保证。相对地，深度学习的损失函数通常非凸，存在多个局部极小值，但 SGD 在实践中依然有效（部分因为在高维空间中大部分局部极小值接近全局最优值）。',
+    tags: ['convex function', 'convex optimization', 'hessian', 'global minimum'],
+    subTopic: '数学基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-193',
+    category: 'statistics',
+    question: '什么是拉格朗日乘子法？在 SVM 的推导中如何应用？',
+    answer:
+      '拉格朗日乘子法是求解带等式约束的优化问题的经典方法。对于问题 min f(x) s.t. g(x)=0，构造拉格朗日函数 L(x,λ) = f(x) + λg(x)（如为不等式约束 g(x)≤0，则为 L(x,λ)=f(x)+λg(x), λ≥0 并利用 KKT 条件），在极值点满足 ∇ₓL = 0 和 ∇_λL = 0，即 ∇f + λ∇g = 0 且 g=0。几何解释：在最优解处，目标函数的梯度 ∇f 必须与约束曲面的法向量 ∇g 平行（否则可以沿约束曲面上梯度指向的方向移动以减小目标值但保持约束满足），所以 ∇f = -λ∇g，即二者共线。在 SVM 硬间隔分类器的推导中，原始问题为 min (1/2)‖w‖² s.t. yᵢ(wᵀxᵢ+b) ≥ 1，引入拉格朗日乘子 αᵢ ≥ 0 构造拉格朗日函数 L(w,b,α) = (1/2)‖w‖² - Σαᵢ[yᵢ(wᵀxᵢ+b) - 1]。求解步骤：(1) 对 w 和 b 求偏导并令为零，得到 w = Σαᵢyᵢxᵢ（支持向量的线性组合）和 Σαᵢyᵢ = 0；(2) 代回 L 得到对偶问题 max Σαᵢ - (1/2)ΣΣαᵢαⱼyᵢyⱼ(xᵢᵀxⱼ)，s.t. αᵢ ≥ 0, Σαᵢyᵢ = 0；(3) 对偶问题的优势在于仅依赖样本间内积 xᵢᵀxⱼ——这为核技巧（用核函数 K(xᵢ,xⱼ) 替代内积）铺平了道路，使 SVM 能处理非线性可分问题。KKT 互补松弛条件 αᵢ[yᵢ(wᵀxᵢ+b) - 1] = 0 保证了只有支持向量（αᵢ > 0）才影响决策边界。',
+    tags: ['lagrange multiplier', 'SVM', 'KKT', 'dual problem'],
+    subTopic: '数学基础',
+    difficulty: 'hard',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-194',
+    category: 'statistics',
+    question: '什么是信息熵、交叉熵、KL 散度？三者的关系和区别？',
+    answer:
+      '信息熵 H(P) = -Σ P(x)·log P(x) 衡量随机变量 P 的内在不确定性——分布越"均匀"（越难预测），熵越大；分布越"集中"（越确定），熵越小。交叉熵 H(P,Q) = -Σ P(x)·log Q(x) 衡量用分布 Q 去编码真实分布 P 所需的平均编码长度（比特数）。KL 散度（相对熵）D_KL(P‖Q) = Σ P(x)·log[P(x)/Q(x)] = H(P,Q) - H(P)，衡量 Q 与 P 之间的信息损失——用 Q 近似 P 时额外多需要的比特数。三者的核心关系：交叉熵 = 真实分布的熵 + KL 散度，即 H(P,Q) = H(P) + D_KL(P‖Q)。由于 H(P) 对给定的真实分布为常数（不可优化），最小化交叉熵等价于最小化 KL 散度——这就是为什么深度学习分类任务中最小化交叉熵损失等价于让模型预测分布 Q 尽可能接近真实标签分布 P。KL 散度的重要性质：非对称性——D_KL(P‖Q) ≠ D_KL(Q‖P)（因此不是真正的距离度量）；非负性——D_KL(P‖Q) ≥ 0，当且仅当 P=Q 时等号成立（Gibbs 不等式）。实际例子：如果真实分布 P=[1,0]（确定是猫），模型预测 Q=[0.7,0.3]，则交叉熵 = -(1×log0.7 + 0×log0.3) ≈ 0.357，KL 散度 = 交叉熵 - H(P) = 0.357 - 0 = 0.357（因为确定性分布的熵为 0）。模型预测越接近[1,0]，损失越趋向 0。',
+    tags: ['entropy', 'cross entropy', 'KL divergence', 'information theory'],
+    subTopic: '数学基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-195',
+    category: 'statistics',
+    question: '什么是最大似然估计（MLE）和最大后验估计（MAP）？区别是什么？',
+    answer:
+      '最大似然估计（MLE）是频率学派参数估计方法：选择使观测数据 D 出现概率最大的参数值，θ_MLE = argmax P(D|θ)。假设数据独立同分布，似然函数 L(θ) = ∏ᵢ P(xᵢ|θ)，取 log 后为对数似然 ℓ(θ) = Σᵢ log P(xᵢ|θ)，最大化 ℓ(θ) 即得 MLE。例如，正态分布中 MLE 的均值估计是样本均值，方差估计是 (1/n)Σ(xᵢ-μ)²（有偏，分母为 n 而非 n-1）。最大后验估计（MAP）是贝叶斯学派方法：结合先验信息 θ_MAP = argmax P(θ|D) = argmax P(D|θ)P(θ) / P(D) = argmax log P(D|θ) + log P(θ)。对比可见：MAP = MLE + 先验正则化项 log P(θ)。核心区别：(1) MLE 仅依赖数据，MAP 结合数据 + 先验信念；(2) 小样本下，MLE 可能过拟合或给出不合理估计（如抛硬币 3 次全是正面，MLE 估计正面概率为 1.0），而 MAP 通过先验（如 Beta(2,2)）将估计"拉回"合理范围（如 5/7 ≈ 0.71）；(3) 在大样本极限下，先验影响趋弱，MAP 趋近 MLE；(4) MLE 给出点估计，贝叶斯统计更推崇用完整后验分布采样而非单点 MAP。机器学习中，MLE 对应经验风险最小化（ERM），MAP 对应结构风险最小化（加入正则化项）——L2 正则等价于高斯先验下的 MAP，L1 正则等价于拉普拉斯先验下的 MAP。',
+    tags: ['MLE', 'MAP', 'likelihood', 'posterior', 'regularization'],
+    subTopic: '数学基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-196',
+    category: 'statistics',
+    question: '矩阵的秩（Rank）是什么？满秩矩阵有什么性质？',
+    answer:
+      '矩阵的秩定义为矩阵中线性无关的行（或列）的最大数量——行秩 = 列秩（对任意矩阵，行秩等于列秩，称为矩阵的秩）。等价定义：(1) 矩阵经过初等变换后非零行的个数；(2) 列空间的维数，即列向量张成的子空间的维数；(3) 非零奇异值的数量。对于 m×n 矩阵，秩 r 满足 r ≤ min(m,n)。满秩矩阵：若 r = min(m,n)，即达到其可能的最大秩。若 m=n（方阵），满秩方阵可逆（非奇异），行列式 ≠ 0，线性方程组 Ax=b 有唯一解 x=A⁻¹b。非满秩（秩亏）矩阵的性质：(1) 方阵不满秩 → 不可逆（奇异矩阵），行列式 = 0，Ax=0 存在非零解；(2) 在设计矩阵 X 的线性回归中，若 X 不满秩（存在完全共线性的列），则 XᵀX 也不可逆，无法唯一求解最小二乘，OLS 解不唯一；(3) 秩亏矩阵的零空间维数 > 0，表示信息有冗余。低秩结构在机器学习的应用：(1) 矩阵分解——将一个高秩矩阵分解为两个低秩矩阵的乘积，如推荐系统中的 SVD 分解，利用秩 ≤ k 近似原始矩阵，捕获主要模式同时降噪降维；(2) 深度学习中的 LoRA（Low-Rank Adaptation）微调大语言模型时，将权重更新 ΔW 分解为 BA（B 和 A 均为低秩矩阵），极大减少可训练参数量；(3) PCA 降维的本质是寻找一个低秩近似矩阵 Z = WᵀX，其中 W 的列是前 k 大特征值对应的特征向量，重构矩阵 X̂ = WWᵀX 的秩为 k。',
+    tags: ['matrix rank', 'full rank', 'singular', 'low-rank'],
+    subTopic: '数学基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-197',
+    category: 'statistics',
+    question: '什么是奇异值分解（SVD）？在推荐系统和降维中的应用？',
+    answer:
+      '奇异值分解（SVD）是将任意 m×n 矩阵 A 分解为三个矩阵的乘积：A = UΣVᵀ，其中 U（m×m）是正交矩阵，列向量为左奇异向量（A 的列空间的标准正交基）；Σ（m×n）是对角矩阵，对角线上元素 σ₁ ≥ σ₂ ≥ ... ≥ σᵣ > 0 为奇异值（r 为秩）；V（n×n）是正交矩阵，行向量为右奇异向量（A 的行空间的标准正交基）。SVD 的几何解释：任何矩阵变换可分解为三个步骤——旋转（Vᵀ，将原始坐标旋转到奇异向量方向）、缩放（Σ，在各方向上按奇异值伸缩）、再旋转（U，旋转到目标方向）。在推荐系统中的应用：(1) 协同过滤——用户-物品评分矩阵 R（m×n，稀疏）通过 SVD 分解为 R ≈ Uₖ Σₖ Vₖᵀ（只保留前 k 大奇异值），Uₖ 表示用户在 k 个隐性因子（latent factors）上的偏好矩阵，Vₖ 表示物品在这 k 个因子上的特征矩阵；(2) 对用户 u 的缺失评分的预测：R̂_{ui} = μ + bᵤ + bᵢ + pᵤᵀ qᵢ，其中 pᵤ 和 qᵢ 分别是用户和物品在 k 维潜在空间中的向量表示（即 Uₖ 和 Vₖ 的行）。这就是矩阵分解（Matrix Factorization）推荐的核心原理，也即 Netflix Prize 中 FunkSVD 的方法基础。在降维中的应用：PCA 本质上等价于对中心化的数据矩阵进行 SVD 分解——右奇异向量 V 的列即为协方差矩阵的特征向量（主成分方向），奇异值平方 σᵢ² 与特征值成正比 λᵢ ∝ σᵢ²。相比直接对 XᵀX 进行特征分解，SVD 在数值上更稳定（尤其当 XᵀX 接近奇异时），且不需要显式计算协方差矩阵。Truncated SVD（只保留前 k 个奇异值）是 PCA 的稀疏数据下的变体。SVD 也可用于图像压缩——保留前 k 大奇异值后重建的图像即为原始图像的最优秩 k 近似（Eckart-Young 定理保证 F 范数下的最优性）。',
+    tags: ['SVD', 'singular value decomposition', 'recommender system', 'MF'],
+    subTopic: '数学基础',
+    difficulty: 'hard',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-198',
+    category: 'statistics',
+    question: '梯度消失和梯度爆炸的数学原因是什么？',
+    answer:
+      '两者都是深度神经网络反向传播时梯度异常的问题，根源在于链式法则和激活函数/权重的累积效应。数学推导：在深度前馈网络中，损失 L 对第 l 层参数 W⁽ˡ⁾ 的梯度通过链式法则传播：∂L/∂W⁽ˡ⁾ = ∂L/∂h⁽ᴸ⁾ · (∏_{k=l+1}^{L} ∂h⁽ᵏ⁾/∂h⁽ᵏ⁻¹⁾) · ∂h⁽ˡ⁾/∂W⁽ˡ⁾，中间连乘项 ∏ ∂h⁽ᵏ⁾/∂h⁽ᵏ⁻¹⁾ 是关键。对每层 h⁽ᵏ⁾ = σ(W⁽ᵏ⁾h⁽ᵏ⁻¹⁾ + b⁽ᵏ⁾)，雅可比矩阵 ∂h⁽ᵏ⁾/∂h⁽ᵏ⁻¹⁾ = diag(σ')(W⁽ᵏ⁾)ᵀ，其范数 ≈ ‖σ'‖·‖W‖。若使用 Sigmoid 激活函数，导数 σ'(x) = σ(x)(1-σ(x))，最大值仅为 0.25（在 x=0 处），饱和区（x 远离 0）导数趋近 0。当网络层数 L 很深时，(0.25)ᴸ 指数级趋近 0——这就是梯度消失的数学根源：每层的误差信号被激活函数导数压缩，导致浅层参数几乎无法更新。而梯度爆炸的根源是权重初始值过大：若 ‖W⁽ᵏ⁾‖ > 1（如 > 4），即使 σ' ≤ 0.25，‖σ'‖·‖W‖ 仍可能 > 1，连乘后指数级放大，浅层梯度趋向无穷，参数更新步幅过大导致损失发散。现代解决方案：(1) ReLU 及其变体（LeakyReLU、ELU）——在正半轴导数为 1，解决了饱和区导数消失的问题，有效缓解梯度消失（但对负半轴仍有 Dead ReLU 问题）；(2) 权重初始化策略——Xavier/Glorot 初始化（适用于 Sigmoid/Tanh，保持每层输入输出方差一致）和 He/Kaiming 初始化（适用于 ReLU，考虑 ReLU 只激活一半神经元），使各层梯度方差在反向传播中保持稳定；(3) Batch Normalization——在每层激活前对输入标准化使其均值为 0、方差为 1，将激活值控制在激活函数敏感区间，显著缓解梯度消失并加速训练；(4) 残差连接（ResNet）——通过恒等跳跃连接 h⁽ˡ⁺¹⁾ = h⁽ˡ⁾ + F(h⁽ˡ⁾)，反向传播时梯度有"高速公路"直接流到浅层（∂L/∂h⁽ˡ⁾ 包含不加变换的直接项），即使中间层的梯度退化也不会阻断到浅层的信号，使得训练数百层乃至上千层的网络成为可能；(5) 梯度裁剪——设定梯度范数上限，当梯度超过阈值时统一缩小，防止梯度爆炸。',
+    tags: ['vanishing gradient', 'exploding gradient', 'backpropagation', 'chain rule'],
+    subTopic: '数学基础',
+    difficulty: 'hard',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
+  {
+    id: 'stats-199',
+    category: 'statistics',
+    question: '什么是马尔可夫链蒙特卡洛（MCMC）？Metropolis-Hastings 算法的基本步骤？',
+    answer:
+      'MCMC（Markov Chain Monte Carlo）是一类从复杂概率分布中采样的数值方法，核心思想是构造一个以目标分布 π(x) 为稳态分布的马尔可夫链，通过长时间模拟该链获得近似服从 π 的样本序列，然后用这些样本的样本均值和分位数来近似期望 E[f(x)] 和可信区间等统计量。在贝叶斯推断中，后验分布 P(θ|D) ∝ P(D|θ)P(θ) 通常只有"比例形式"而缺失归一化常数 P(D)（该积分在高维空间中无法解析计算），MCMC 恰好只需要未归一化的密度值即可采样——这是 MCMC 在贝叶斯统计中不可替代的地位。Metropolis-Hastings（MH）算法是最基础的 MCMC 方法，步骤如下：(1) 初始化：选择起始状态 x₀（通常随机）。(2) 提议步：从当前状态 xₜ 出发，从提议分布 q(y|xₜ)（如以 xₜ 为中心的高斯分布，即随机游走提议）中抽取候选点 y。(3) 计算接受概率：α = min(1, [π(y)·q(xₜ|y)] / [π(xₜ)·q(y|xₜ)])。分子为"如果当前在 y，回到 xₜ 的难度"与"y 的密度"的乘积，分母对称。(4) 接受/拒绝：以概率 α 接受候选点（xₜ₊₁ = y），以概率 1-α 拒绝（xₜ₊₁ = xₜ，即停留在原处——注意旧状态被再次计为样本，这是要点）。重复步骤 (2)-(4) 直到获得足够多的样本。(5) 后处理：丢弃前 B 个"预热期"样本（Burn-in，链还未收敛到稳态分布），如果样本间存在自相关，可按每 k 步取一个样本（Thinning）降低相关性。MH 的理论保证：接受概率的设计精确地满足了细致平衡条件 π(xₐ)P(x_b|xₐ) = π(x_b)P(xₐ|x_b)，确保 π 是马尔可夫链的稳态分布。当链不可约（任何状态可到达任何状态）且非周期时，样本分布收敛到目标分布 π。关键超参数是提议分布的步长——步长太小导致高接受率但混合慢（链"走不动"），步长太大导致低接受率（经常被拒绝），最优接受率通常为 0.234（对高维高斯提议分布），或在 0.2-0.5 之间。MH 的变体和升级包括：Gibbs 采样（MH 的特殊情况，当条件分布可采样时接受率恒为 1）、Hamiltonian Monte Carlo / NUTS（利用目标分布的梯度信息进行高效探索，如 Stan 和 PyMC 中的默认方法），极大提升了 MCMC 在高维空间中的采样效率。',
+    tags: ['MCMC', 'Metropolis-Hastings', 'bayesian inference', 'sampling'],
+    subTopic: '数学基础',
+    difficulty: 'hard',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+    favorited: false,
+  },
 ];
