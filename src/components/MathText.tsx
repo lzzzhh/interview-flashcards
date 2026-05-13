@@ -76,77 +76,101 @@ export default function MathText({ text }: MathTextProps) {
 }
 
 /**
- * 预处理文本：智能添加 Markdown 格式
- * - 把 LaTeX 风格的独立行公式用 $$ 包裹
- * - 确保换行符合 Markdown 规范
+ * 预处理文本：中文和公式分离
+ * - 检测混合行，抽出数学公式独占一行（$$ 包裹）
+ * - 纯公式行 → $$...$$
+ * - 纯中文/英文行 → 保持原样
+ * - 已经是 $...$ 或 $$...$$ 的 → 保持
  */
 function preprocess(text: string): string {
-  // 如果文本已包含 $$...$$ 或明显的 $...$，信任用户标记
-  if (/\$\$/.test(text)) return text;
+  if (/\$\$/.test(text)) return text; // 已手动标记，信任用户
 
-  // 按行处理：检测独立公式行，包上 $$
   const lines = text.split('\n');
   const result: string[] = [];
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  for (const line of lines) {
     const trimmed = line.trim();
-
-    // 空行 → 段落分隔
     if (!trimmed) {
       result.push('');
       continue;
     }
 
-    // 检测纯公式行（无中文标点，有数学特征，短行）
-    if (isFormulaLine(trimmed)) {
-      // 已经是 $...$ 包裹的跳过
+    // 纯公式行 → $$ 包裹
+    if (isPureFormulaLine(trimmed)) {
       if (trimmed.startsWith('$') && trimmed.endsWith('$')) {
         result.push(line);
       } else {
-        result.push(`$$${trimmed}$$`);
+        result.push(`$$\n${trimmed}\n$$`);
       }
-    } else {
-      // 非公式行：检查行内公式片段
-      result.push(wrapInlineMath(line));
+      continue;
     }
+
+    // 混合行：中文 + 公式 → 拆分
+    result.push(...separateMathFromChinese(trimmed));
   }
 
-  return result.join('\n');
+  return result.join('\n\n');
+}
+
+/** 将混合行拆分为中文段落和公式行 */
+function separateMathFromChinese(line: string): string[] {
+  const parts: string[] = [];
+  let remaining = line;
+
+  // 寻找公式片段并拆分
+  while (remaining.length > 0) {
+    const match = findNextMathSegment(remaining);
+    if (!match) {
+      // 剩余全是中文/普通文本
+      const rest = remaining.trim();
+      if (rest) parts.push(rest);
+      break;
+    }
+
+    // 公式前面的中文
+    const before = remaining.slice(0, match.start).trim();
+    if (before) parts.push(before);
+
+    // 公式自身 → 单独一行
+    const formula = match.text.trim();
+    if (formula.startsWith('$') && formula.endsWith('$')) {
+      parts.push(formula);
+    } else {
+      parts.push(`$$\n${formula}\n$$`);
+    }
+
+    // 继续处理剩余部分
+    remaining = remaining.slice(match.end);
+  }
+
+  return parts;
+}
+
+/** 在文本中找到下一个数学公式片段 */
+function findNextMathSegment(text: string): { start: number; end: number; text: string } | null {
+  // 策略：找到不含中文的连续片段，检查是否有数学特征
+  // 匹配"非中文 + 非中文标点"的连续片段（至少 3 个字符）
+  const nonChineseBlock = /[^\u4e00-\u9fff\u3000-\u303f\uff00-\uffef。，；：！？、\n]{3,}/g;
+  let m: RegExpExecArray | null;
+  while ((m = nonChineseBlock.exec(text)) !== null) {
+    const block = m[0].trim();
+    // 跳过纯英文单词（没有数学符号）
+    if (mathScore(block) >= 1 && block.length >= 3) {
+      return { start: m.index, end: m.index + m[0].length, text: m[0] };
+    }
+  }
+  return null;
 }
 
 /** 判断是否为纯公式行 */
-function isFormulaLine(line: string): boolean {
-  if (line.length > 300) return false;
-  // 不能有中文标点
-  if (/[。，；：！？、【】「」]/.test(line)) return false;
-  // 如果行中有中文句子（连续中文超过 6 个字），不是纯公式
-  if (/[\u4e00-\u9fff]{6,}/.test(line)) return false;
-  // 去掉英文单词/数字后如果还有中文 > 5 字，也不是
-  const withoutLatin = line.replace(/[a-zA-Z0-9\s\+\-\*\/\=\(\)\[\]\{\}\^\$\.\,\;\:\!\?\"\'\\]/g, '');
-  const chineseInRemainder = (withoutLatin.match(/[\u4e00-\u9fff]/g) || []).length;
-  if (chineseInRemainder > 8) return false;
-  // 需要足够的数学特征
+function isPureFormulaLine(line: string): boolean {
+  if (line.length > 400) return false;
+  // 中文超过 8 个字 → 不是纯公式
+  const chCount = (line.match(/[\u4e00-\u9fff]/g) || []).length;
+  if (chCount > 8) return false;
+  // 有中文标点 → 不是纯公式
+  if (/[。，；：！？、【】「」]/.test(line) && chCount > 2) return false;
   return mathScore(line) >= 2;
-}
-
-/** 行内公式自动包裹 — 保守策略，只包裹明显是公式的短片段 */
-function wrapInlineMath(line: string): string {
-  // 如果已经有 $ 包裹，跳过
-  if (/\$[^$]+\$/.test(line)) return line;
-
-  // 保守策略：只对明显的 LaTeX 式上下标语法包裹
-  // 如 R^{n×d}、w^T、x_i 等
-  let result = line;
-  result = result.replace(
-    /([a-zA-Zα-ωΑ-Ω])\^\{([^}]+)\}/g,
-    '$$$1^{$2}$ $',
-  );
-  result = result.replace(
-    /([a-zA-Zα-ωΑ-Ω])_\{([^}]+)\}/g,
-    '$$$1_{$2}$ $',
-  );
-  return result;
 }
 
 function mathScore(text: string): number {
