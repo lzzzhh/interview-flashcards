@@ -107,48 +107,49 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
 
   return (
     <div className="space-y-4 text-left">
-      {/* Review Meta */}
-      <ReviewMeta sm2={card.sm2} />
+      {/* Sticky header */}
+      <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 pb-3 border-b border-gray-100 dark:border-gray-700">
+        <ReviewMeta sm2={card.sm2 as any} />
 
-      {/* Header: Number + Title + Difficulty */}
-      <div className="flex items-start gap-3">
-        <span className="text-lg font-bold text-primary whitespace-nowrap">
-          #{card.number}
-        </span>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            <MathText text={card.title} />
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {card.titleCn}
-          </p>
-        </div>
-        <span
-          className={`px-2 py-0.5 rounded-full text-xs font-medium ${DIFFICULTY_COLOR[card.difficulty]}`}
-        >
-          {DIFFICULTY_LABEL[card.difficulty]}
-        </span>
-      </div>
-
-      {/* Tags */}
-      <div className="flex flex-wrap gap-1.5">
-        {card.tags.map((tag) => (
-          <span
-            key={tag}
-            className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-          >
-            {tag}
+        <div className="flex items-start gap-3 mt-2">
+          <span className="text-lg font-bold text-primary whitespace-nowrap">
+            #{card.number}
           </span>
-        ))}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+              <MathText text={card.title} />
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              {card.titleCn}
+            </p>
+          </div>
+          <span
+            className={`px-2 py-0.5 rounded-full text-xs font-medium ${DIFFICULTY_COLOR[card.difficulty]}`}
+          >
+            {DIFFICULTY_LABEL[card.difficulty]}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {card.tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mt-2">
+          <MathText text={card.description} />
+        </div>
       </div>
 
-      {/* Description */}
-      <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-        <MathText text={card.description} />
-      </div>
-
-      {/* Approach — collapsible */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+      {/* Scrollable area: approach + code */}
+      <div>
+        {/* Approach — collapsible */}
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
         <button
           onClick={handleToggleApproach}
           className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-hover transition-colors"
@@ -194,6 +195,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
           </pre>
         </div>
       </div>
+      </div>
     </div>
   );
 }
@@ -209,35 +211,36 @@ function QAView({ card }: { card: QACard }) {
 
   return (
     <div className="space-y-4 text-left">
-      {/* Review Meta */}
-      <ReviewMeta sm2={card.sm2} />
+      {/* Sticky header: Meta + Question + Tags */}
+      <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 pb-3 border-b border-gray-100 dark:border-gray-700">
+        <ReviewMeta sm2={card.sm2} />
 
-      {/* Question / Term */}
-      <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed">
-        <MathText text={card.question} />
+        <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed mt-2">
+          <MathText text={card.question} />
+        </div>
+
+        {card.tags && card.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {card.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {card.subTopic && (
+          <span className="inline-block mt-2 px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary">
+            {card.subTopic}
+          </span>
+        )}
       </div>
 
-      {/* Tags if any */}
-      {card.tags && card.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {card.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* SubTopic badge */}
-      {card.subTopic && (
-        <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary">
-          {card.subTopic}
-        </span>
-      )}
-
+      {/* Scrollable answer area */}
+      <div>
       {/* Reveal / Hide Answer Toggle */}
       <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
         <button
@@ -278,6 +281,7 @@ function QAView({ card }: { card: QACard }) {
           参考: {card.source}
         </p>
       )}
+      </div>
     </div>
   );
 }
