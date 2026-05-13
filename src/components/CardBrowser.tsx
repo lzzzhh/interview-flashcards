@@ -112,16 +112,15 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
         <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
           <X className="w-5 h-5" />
         </button>
-        <h2 className="text-lg font-bold flex-1">卡片管理</h2>
+        <h2 className="text-lg font-bold flex-1 dark:text-gray-100">卡片管理</h2>
         <button
           onClick={handleExportCSV}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm"
-          title="导出 CSV"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm"
         >
           <Download className="w-4 h-4" />
           <span className="hidden sm:inline">导出</span>
         </button>
-        <label className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm cursor-pointer">
+        <label className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm cursor-pointer">
           <Upload className="w-4 h-4" />
           <span className="hidden sm:inline">导入</span>
           <input type="file" accept=".csv" onChange={handleImportCSV} className="hidden" />
@@ -143,7 +142,7 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜索卡片..."
-            className="w-full pl-8 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm"
+            className="w-full pl-8 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
           />
         </div>
         <p className="text-xs text-gray-400 mt-1">{filtered.length} 张卡片</p>
@@ -157,10 +156,10 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
             className="flex items-start gap-2 py-2.5 border-b border-gray-100 dark:border-gray-800"
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">
+              <p className="text-sm font-medium truncate dark:text-gray-200">
                 {card.category === 'leetcode' ? `#${card.number} ${card.titleCn}` : card.question}
               </p>
-              <p className="text-xs text-gray-400 truncate mt-0.5">
+              <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
                 {(card.tags || []).slice(0, 3).join(' · ')}
                 {card.category === 'leetcode' && ` · ${card.difficulty}`}
               </p>

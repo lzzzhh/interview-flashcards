@@ -32,9 +32,10 @@ import { loadProgress, saveSettings } from '../utils/storage';
 import { saveAppData } from '../utils/nativeStorage';
 import { appendReviewLog } from '../utils/reviewLogs';
 import { shuffle } from '../utils/shuffle';
+import { loadCustomCards } from '../utils/customDecks';
 
 // ---- 数据源映射 ----
-const CARD_DATA: Record<Category, FlashCard[]> = {
+const CARD_DATA: Partial<Record<Category, FlashCard[]>> = {
   leetcode: leetcodeHot100 as FlashCard[],
   statistics: statisticsCards as FlashCard[],
   'machine-learning': machineLearningCards as FlashCard[],
@@ -54,14 +55,25 @@ const progressKeyMap: Record<Category, string> = {
 
 // ---- 合并 progress → cardsById ----
 function buildCardsById(category: Category): Record<string, FlashCard> {
+  // 内置模块
   const rawCards = CARD_DATA[category];
-  const progress = loadProgress(category);
+  if (rawCards) {
+    const progress = loadProgress(category);
+    const result: Record<string, FlashCard> = {};
+    for (const card of rawCards) {
+      const sm2 = progress.sm2[card.id]
+        ? { ...card.sm2, ...progress.sm2[card.id] }
+        : card.sm2;
+      result[card.id] = { ...card, sm2, favorited: progress.favorited.includes(card.id) };
+    }
+    return result;
+  }
+  
+  // 自定义模块
+  const customCards = loadCustomCards(category as string);
   const result: Record<string, FlashCard> = {};
-  for (const card of rawCards) {
-    const sm2 = progress.sm2[card.id]
-      ? { ...card.sm2, ...progress.sm2[card.id] } // merge stored state
-      : card.sm2;
-    result[card.id] = { ...card, sm2, favorited: progress.favorited.includes(card.id) };
+  for (const card of customCards) {
+    result[card.id] = card;
   }
   return result;
 }

@@ -2,7 +2,7 @@
 // src/types/index.ts — 所有类型定义
 // ============================================================
 
-export type Category = 'leetcode' | 'statistics' | 'machine-learning' | 'llm' | 'jargon' | 'workplace';
+export type Category = 'leetcode' | 'statistics' | 'machine-learning' | 'llm' | 'jargon' | 'workplace' | string;
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type CardState = 'new' | 'learning' | 'review' | 'relearning';
 
