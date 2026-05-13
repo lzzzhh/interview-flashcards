@@ -37,8 +37,9 @@ function StudyPage({ onBack }: { onBack: () => void }) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
         <div className="w-full max-w-sm space-y-4">
-          <button onClick={onBack} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-6">
-            <ArrowLeft className="w-4 h-4" /> 返回首页
+          {/* Back button — same position as study page */}
+          <button onClick={onBack} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+            <ArrowLeft className="w-4 h-4" /> 返回
           </button>
 
           <h2 className="text-xl font-bold text-center text-gray-900 dark:text-gray-100">开始学习</h2>
@@ -109,14 +110,12 @@ function StudyPage({ onBack }: { onBack: () => void }) {
           </div>
         )}
 
-        {/* Study mode bar (always shown after choose screen) */}
-        <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/30 border-b border-orange-200 dark:border-orange-800 flex items-center gap-2">
-            <span className="text-xs text-orange-600 dark:text-orange-400">
-              {state.studyMode === 'review' ? '🔄' : '🆕'} {state.studyMode === 'review' ? '复习' : '新学'} · {state.currentVisibleIndex + 1}/{Math.max(cardCount, 1)}
-            </span>
-          </div>
-
         {/* Tabs hidden */}
+
+        {/* Study mode indicator — subtle text */}
+        <div className="text-center text-xs text-gray-400 dark:text-gray-500">
+          {state.studyMode === 'review' ? '🔄 复习' : '🆕 新学'} · {state.currentVisibleIndex + 1}/{Math.max(cardCount, 1)}
+        </div>
 
         {/* Card */}
         {currentCard ? (
