@@ -3,7 +3,7 @@
 // ============================================================
 
 import { useRef, useCallback } from 'react';
-import { BarChart3, FlaskConical, AlertCircle } from 'lucide-react';
+import { BarChart3, FlaskConical, AlertCircle, X } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
 import CategoryTabs from './components/CategoryTabs';
@@ -82,10 +82,19 @@ function AppInner() {
           </button>
         )}
 
-        {/* Review mode — simplified header */}
+        {/* Review mode bar — clear exit button */}
         {state.reviewMode && (
-          <div className="text-center text-sm text-orange-600 dark:text-orange-400 font-medium">
-            🔬 正在复习 {filteredCards.length} 张到期卡片
+          <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/30 border-b border-orange-200 dark:border-orange-800 flex items-center gap-2">
+            <span className="text-xs text-orange-600 dark:text-orange-400 flex-1">
+              🔬 复习中 · {filteredCards.length} 张到期 · 第 {state.currentIndex + 1}/{filteredCards.length} 张
+            </span>
+            <button
+              onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <X className="w-4 h-4" />
+              退出复习
+            </button>
           </div>
         )}
 
