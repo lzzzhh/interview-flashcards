@@ -7,12 +7,11 @@
   <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript" alt="TypeScript">
   <img src="https://img.shields.io/badge/Tauri-v2-FFC131?logo=tauri" alt="Tauri v2">
   <img src="https://img.shields.io/badge/TailwindCSS-v4-06B6D4?logo=tailwindcss" alt="TailwindCSS v4">
-  <img src="https://img.shields.io/badge/547_cards-8A2BE2" alt="547 Cards">
 </p>
 
 <p align="center">
   Active Recall + SM-2 间隔重复驱动的面试复习桌面应用。<br>
-  547 张高质量卡片覆盖算法 · 统计学 · 机器学习 · 大模型 · 行业黑话 · 职场话术六大方向。<br>
+  高质量卡片覆盖算法 · 统计学 · 机器学习 · 大模型 · 行业黑话 · 职场话术六大方向。<br>
   数据本地存储，Tauri 原生桌面体感，跨平台（macOS / Windows / Linux）。
 </p>
 
@@ -66,16 +65,16 @@ curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/in
 
 评分后自动跳转下一题，形成无缝复习流。
 
-### 📊 六大题库 · 547 张卡片
+### 📊 六大题库
 
-| 题库 | 数量 | 覆盖范围 |
-|------|------|----------|
-| 🔥 力扣 Hot 100 | 100 | 题号 + 题目描述 + 解题思路 + Python 实现 |
-| 📊 统计学 | 162 | 描述统计 / 概率论 / 假设检验 / 贝叶斯 / AB 实验 / 因果推断 / 时间序列 / 生存分析 / 实验设计 / 大数据统计 |
-| 🤖 机器学习 | 155 | 监督 / 无监督 / 集成 / 深度学习 / NLP / 强化学习 / GNN / 生成模型 / 推荐系统 / MLOps / 特征工程 / 模型评估 |
-| 🧠 大模型 | 43 | Transformer / 训练微调 / 推理部署 / Agent / RAG / 评估安全 |
-| 💬 行业黑话 | 45 | 对齐颗粒度、赋能、闭环、飞轮效应等互联网面试常考术语 |
-| 👔 职场话术 | 42 | 向上沟通、跨部门协作、面试技巧、项目汇报模板 |
+| 题库 | 覆盖范围 |
+|------|----------|
+| 🔥 力扣 Hot 100 | 题号 + 题目描述 + 解题思路 + Python 实现 |
+| 📊 统计学 | 描述统计 / 概率论 / 假设检验 / 贝叶斯 / AB 实验 / 因果推断 / 时间序列 / 生存分析 / 实验设计 / 大数据统计 |
+| 🤖 机器学习 | 监督 / 无监督 / 集成 / 深度学习 / NLP / 强化学习 / GNN / 生成模型 / 推荐系统 / MLOps / 特征工程 / 模型评估 |
+| 🧠 大模型 | Transformer / 训练微调 / 推理部署 / Agent / RAG / 评估安全 |
+| 💬 行业黑话 | 对齐颗粒度、赋能、闭环、飞轮效应等互联网面试常考术语 |
+| 👔 职场话术 | 向上沟通、跨部门协作、面试技巧、项目汇报模板 |
 
 ### ✏️ 卡片管理 (CRUD)
 
