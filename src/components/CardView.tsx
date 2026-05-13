@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Clock, Repeat } from 'lucide-react';
 import type { FlashCard, LeetCodeCard, QACard } from '../types';
 import { DIFFICULTY_LABEL, DIFFICULTY_COLOR } from '../constants';
+import { useAppContext } from '../context/AppContext';
 
 interface CardViewProps {
   card: FlashCard;
@@ -77,11 +78,31 @@ function ReviewMeta({ sm2 }: { sm2: { repetitions: number; easeFactor: number; i
 
 // ---- LeetCode Card ----
 function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; showApproach: boolean; showCode: boolean }) {
+  const { dispatch } = useAppContext();
   const [localApproach, setLocalApproach] = useState(false);
   const [localCode, setLocalCode] = useState(false);
 
   const approachOpen = showApproach || localApproach;
   const codeOpen = showCode || localCode;
+
+  // When clicking the toggle button:
+  // - If global flag is ON, turn it OFF (so the button closes it)
+  // - If global flag is OFF, toggle local state
+  const handleToggleApproach = () => {
+    if (showApproach) {
+      dispatch({ type: 'TOGGLE_APPROACH' });
+    } else {
+      setLocalApproach((prev) => !prev);
+    }
+  };
+
+  const handleToggleCode = () => {
+    if (showCode) {
+      dispatch({ type: 'TOGGLE_CODE' });
+    } else {
+      setLocalCode((prev) => !prev);
+    }
+  };
 
   return (
     <div className="space-y-4 text-left">
@@ -128,7 +149,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
       {/* Approach — collapsible */}
       <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
         <button
-          onClick={() => setLocalApproach(!localApproach)}
+          onClick={handleToggleApproach}
           className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-hover transition-colors"
         >
           <span>💡 显示思路</span>
@@ -152,7 +173,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
       {/* Code — collapsible, terminal style */}
       <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
         <button
-          onClick={() => setLocalCode(!localCode)}
+          onClick={handleToggleCode}
           className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-hover transition-colors"
         >
           <span>📝 显示代码</span>
