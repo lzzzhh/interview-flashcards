@@ -470,7 +470,8 @@ export function useAppContext(): AppContextValue {
 // ---- helpers ----
 function saveProgressToLS(category: Category, progress: StoredProgress) {
   try {
-    localStorage.setItem(progressKeyMap[category], JSON.stringify(progress));
+    const key = progressKeyMap[category] ?? `fc-progress-${category}`;
+    localStorage.setItem(key, JSON.stringify(progress));
   } catch {}
 }
 

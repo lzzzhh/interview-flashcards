@@ -7,7 +7,7 @@ import { DIFFICULTY_OPTIONS, SUBTOPIC_OPTIONS } from '../constants';
 
 export default function FilterBar() {
   const { state, dispatch } = useAppContext();
-  const subtopicOptions = SUBTOPIC_OPTIONS[state.category];
+  const subtopicOptions = SUBTOPIC_OPTIONS[state.category] ?? [];
 
   return (
     <div className="flex gap-2 flex-shrink-0">
