@@ -58,7 +58,7 @@ function ReviewMeta({ sm2 }: { sm2: { repetitions: number; easeFactor: number; i
   const due = getDueStatus(sm2.nextReview);
 
   return (
-    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700 pb-2 mb-2 sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-6 px-6 pt-1">
+    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700 pb-2 mb-2 sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1">
       <span className="flex items-center gap-1">
         <Repeat className="w-3 h-3" />
         重复 {sm2.repetitions} 次
@@ -285,7 +285,7 @@ function QAView({ card }: { card: QACard }) {
 // ---- Main CardView ----
 export default function CardView({ card, showApproach, showCode }: CardViewProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-shadow hover:shadow-md animate-fadeIn max-h-[calc(100vh-13rem)] flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 transition-shadow hover:shadow-md animate-fadeIn max-h-[calc(100vh-11rem)] sm:max-h-[calc(100vh-13rem)] flex flex-col">
       <div className="overflow-y-auto flex-1 pr-1 -mr-1">
         {isLeetCode(card) ? (
           <LeetCodeView card={card} showApproach={showApproach} showCode={showCode} />

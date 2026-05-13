@@ -116,21 +116,21 @@ export default function CardActions() {
       </div>
 
       {/* Anki-style Rating — big buttons with interval preview */}
-      <div className="flex gap-1.5">
-        {ANKI_BUTTONS.map(({ quality, label, short, color, textColor, desc }) => {
+      <div className="flex gap-1">
+        {ANKI_BUTTONS.map(({ quality, label, color, textColor, desc }) => {
           const interval = previewInterval(currentCard.sm2, quality);
           return (
             <button
               key={quality}
-              onClick={() =>
-                dispatch({ type: 'RATE_CARD', payload: quality as 0 | 1 | 2 | 3 | 4 | 5 })
-              }
-              className={`flex-1 flex flex-col items-center py-2.5 px-1 rounded-xl ${color} ${textColor} transition-all active:scale-95`}
+              onClick={() => {
+                dispatch({ type: 'RATE_CARD', payload: quality as 0 | 1 | 2 | 3 | 4 | 5 });
+                dispatch({ type: 'NEXT' });
+              }}
+              className={`flex-1 flex flex-col items-center py-2 sm:py-2.5 px-0.5 rounded-xl ${color} ${textColor} transition-all active:scale-95`}
               title={`${desc} → 下次间隔: ${interval}`}
             >
-              <span className="text-sm font-bold leading-none">{label}</span>
-              <span className="text-[10px] opacity-80 mt-0.5">{interval}</span>
-              <span className="sm:hidden text-[10px] font-bold">{short}</span>
+              <span className="text-xs sm:text-sm font-bold leading-none">{label}</span>
+              <span className="text-[9px] sm:text-[10px] opacity-80 mt-0.5">{interval}</span>
             </button>
           );
         })}

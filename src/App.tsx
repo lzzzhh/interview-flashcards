@@ -26,7 +26,7 @@ function AppInner() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-      <div className="max-w-xl mx-auto px-4 py-4 sm:py-8 space-y-4">
+      <div className="max-w-xl mx-auto px-3 sm:px-4 py-3 sm:py-8 space-y-3 sm:space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
