@@ -74,9 +74,12 @@ function isLeetCodeCard(card: FlashCard): card is LeetCodeCard {
 function computeVisibleIds(state: AppState): string[] {
   let ids = Object.keys(state.cardsById);
 
-  // 复习模式：只看到期卡片
+  // 复习模式：新卡片 + 到期卡片
   if (state.reviewMode) {
-    ids = ids.filter((id) => state.cardsById[id].sm2.nextReview <= Date.now());
+    ids = ids.filter((id) => {
+      const sm2 = state.cardsById[id].sm2;
+      return sm2.state === 'new' || sm2.nextReview <= Date.now();
+    });
   }
 
   // 难度
@@ -399,7 +402,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const progress = loadProgress(cat);
       counts[cat] = allCards.filter((c) => {
         const sm2 = progress.sm2[c.id] ?? c.sm2;
-        return sm2.nextReview <= Date.now();
+        // 新卡片不计入到期数，只有复习过的卡片到期才算
+        return sm2.state !== 'new' && sm2.nextReview <= Date.now();
       }).length;
     }
     return counts as Record<Category, number>;
