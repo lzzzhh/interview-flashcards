@@ -74,8 +74,8 @@ function ReviewMeta({ sm2 }: { sm2: { state?: string; repetitions: number; easeF
         间隔 {formatInterval(sm2.interval)}
       </span>
       <span className={`font-medium ${stage.color}`}>{stage.label}</span>
-      {due.isDue && (
-        <span className="ml-auto px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 font-medium">
+      {!isNew && due.isDue && (
+        <span className="ml-auto px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 font-medium text-[10px]">
           {due.overdueDays > 0 ? `逾期 ${due.overdueDays} 天` : '到期'}
         </span>
       )}
