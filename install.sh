@@ -6,7 +6,7 @@ set -e
 # 自动检测平台，下载最新 Release 安装
 # ============================================================
 
-REPO="your-username/interview-flashcards"
+REPO="lzzzhh/interview-flashcards"
 APP_NAME="面经闪卡"
 
 RED='\033[0;31m'

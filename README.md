@@ -1,6 +1,6 @@
 # 📚 面经闪卡 — Interview Flashcards
 
-[![Build Desktop Apps](https://github.com/your-username/interview-flashcards/actions/workflows/build.yml/badge.svg)](https://github.com/your-username/interview-flashcards/actions/workflows/build.yml)
+[![Build Desktop Apps](https://github.com/lzzzhh/interview-flashcards/actions/workflows/build.yml/badge.svg)](https://github.com/lzzzhh/interview-flashcards/actions/workflows/build.yml)
 
 > Active Recall + Spaced Repetition = 肌肉记忆级面试准备
 
@@ -11,10 +11,10 @@
 ## 一键安装
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/your-username/interview-flashcards/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/install.sh | bash
 ```
 
-或手动下载 [GitHub Releases](https://github.com/your-username/interview-flashcards/releases) 中对应平台的安装包。
+或手动下载 [GitHub Releases](https://github.com/lzzzhh/interview-flashcards/releases) 中对应平台的安装包。
 
 | 平台 | 安装包 |
 |------|--------|
@@ -97,7 +97,7 @@ curl -fsSL https://raw.githubusercontent.com/your-username/interview-flashcards/
 ### 构建
 
 ```bash
-git clone https://github.com/your-username/interview-flashcards.git
+git clone https://github.com/lzzzhh/interview-flashcards.git
 cd interview-flashcards
 npm install
 npm run build:desktop
