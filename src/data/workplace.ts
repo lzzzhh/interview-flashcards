@@ -2165,4 +2165,161 @@ Don'ts：
     sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     favorited: false,
   },
+  // ── 65. TCP 三次握手和四次挥手 ──
+  {
+    id: 'wp-65',
+    category: 'workplace',
+    question: 'TCP 三次握手和四次挥手的过程？为什么是三次不是两次？',
+    answer: `TCP 三次握手是建立可靠连接的过程。第一步：客户端发送 SYN 报文（SYN=1，随机初始序号 seq=x），客户端进入 SYN_SENT 状态。第二步：服务端收到后回复 SYN+ACK 报文（SYN=1，ACK=1，确认号 ack=x+1，自己的序号 seq=y），服务端进入 SYN_RCVD 状态。第三步：客户端再发送 ACK 报文（ACK=1，seq=x+1，ack=y+1），双方进入 ESTABLISHED 状态，连接建立完成。为什么不是两次而是三次？因为两次握手只能确认客户端的发送能力和服务端的接收与发送能力，但无法确认客户端的接收能力是否正常。如果一个已经失效的旧连接请求报文突然到达服务端，两次握手会在服务端立即建立连接分配资源，但客户端其实已经关闭了，造成服务端资源浪费。三次握手让客户端有最后一次确认机会，防止历史连接请求导致服务端单方面维护无效连接。TCP 四次挥手是断开连接的过程。第一步：客户端发送 FIN 报文，进入 FIN_WAIT_1 状态。第二步：服务端回复 ACK，进入 CLOSE_WAIT 状态，客户端收到后进入 FIN_WAIT_2。第三步：服务端数据处理完毕后发送 FIN 报文，进入 LAST_ACK 状态。第四步：客户端回复 ACK，进入 TIME_WAIT 状态等待 2MSL（最大报文存活时间的两倍），确保最后一个 ACK 能被服务端收到，服务端收到后关闭连接。四次挥手是因为 TCP 是全双工的，每个方向都需要单独关闭，服务端收到关闭请求后可能还有数据需要发送，故 ACK 和 FIN 分开发送。`,
+    tags: ['计算机网络', 'TCP', '三次握手', '四次挥手'],
+    subTopic: '计算机基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 66. HTTP 和 HTTPS 的区别 ──
+  {
+    id: 'wp-66',
+    category: 'workplace',
+    question: 'HTTP 和 HTTPS 的区别？HTTPS 的加密过程（SSL/TLS 握手）是怎样的？',
+    answer: `HTTP 和 HTTPS 的核心区别在于安全性。HTTP 是明文传输的超文本传输协议，默认使用 80 端口，数据在传输过程中可以被中间人截获、篡改和窃听。HTTPS 在 HTTP 下层加入了 SSL/TLS 加密层，默认使用 443 端口，提供数据加密、身份认证和数据完整性保护三大安全能力。HTTPS 还需要向 CA（证书颁发机构）申请数字证书来证明服务端的身份。SSL/TLS 握手过程如下：第一步，客户端发送 Client Hello，包含支持的 TLS 版本、密码套件列表和一个客户端随机数。第二步，服务端回复 Server Hello，选定 TLS 版本和密码套件，发送服务端随机数和含有公钥的数字证书。第三步，客户端验证证书的有效性（颁发机构、域名、有效期等），生成一个预主密钥（Premaster Secret），用服务端公钥加密后发给服务端。第四步，双方根据客户端随机数、服务端随机数和预主密钥，各自计算生成相同的会话密钥（Session Key）。第五步，双方互相发送加密握手完成消息进行验证，之后所有通信都使用会话密钥进行对称加密。TLS 1.3 对握手做了优化，将握手时间从 2-RTT 降低到 1-RTT，并且废弃了不安全的加密算法。HTTPS 虽然会消耗一定的计算和网络资源建立加密通道，但在现代计算条件下性能损耗几乎可忽略，配合 HTTP/2 和 HTTP/3 的多路复用能力，整体性能反而可能超过 HTTP。`,
+    tags: ['计算机网络', 'HTTP', 'HTTPS', 'SSL/TLS'],
+    subTopic: '计算机基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 67. 进程和线程 ──
+  {
+    id: 'wp-67',
+    category: 'workplace',
+    question: '什么是进程和线程？它们之间的区别是什么？协程又是什么？',
+    answer: `进程（Process）是操作系统资源分配的最小单位，每个进程拥有独立的地址空间、内存、文件描述符和堆栈，进程间相互隔离，一个进程崩溃不会影响其他进程。线程（Thread）是 CPU 调度的最小单位，一个进程可以包含多个线程，同一进程内的线程共享进程的内存、文件句柄等资源，但拥有独立的栈空间和寄存器上下文。进程和线程的主要区别：第一，资源占用上进程更重，创建和销毁开销大，线程是轻量级的执行单元，切换成本更低；第二，通信方式上进程间通信（IPC）需要管道、消息队列、共享内存等机制，而线程间可以直接共享进程内的全局变量和堆内存；第三，隔离性上进程间完全隔离更安全，线程间由于共享内存，需要引入锁机制来防止数据竞争。协程（Coroutine）是比线程更轻量级的执行单元，是在用户态实现的并发模型，不由操作系统内核调度，而是由程序自身控制切换。协程的特点包括：切换不涉及内核态和用户态的切换，开销极小；一个线程可以运行成千上万个协程；协程的调度是协作式的，需要主动让出控制权。在 Go 语言中 goroutine、Python 的 asyncio、Kotlin 的协程都是协程实现的例子。三者关系可以概括为：一个程序可以有多个进程，一个进程可以有多个线程，一个线程可以运行多个协程。`,
+    tags: ['操作系统', '进程', '线程', '协程'],
+    subTopic: '计算机基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 68. 死锁 ──
+  {
+    id: 'wp-68',
+    category: 'workplace',
+    question: '什么是死锁？死锁的四个必要条件是什么？如何预防和避免死锁？',
+    answer: `死锁（Deadlock）是指两个或多个进程/线程在执行过程中，因争夺共享资源而陷入彼此等待的僵局，如果没有外部干预，这些进程将永远无法推进。死锁产生的四个必要条件缺一不可：第一，互斥条件（Mutual Exclusion），资源在同一时刻只能被一个进程持有，其他进程请求时必须等待；第二，持有并等待（Hold and Wait），进程已经持有一个资源，同时又在请求其他资源，且不释放已持有的资源；第三，不可剥夺（No Preemption），已分配给进程的资源不能被强制剥夺，只能由持有者主动释放；第四，循环等待（Circular Wait），存在一个进程等待环路，P1 等待 P2 的资源，P2 等待 P3 的资源，...，Pn 等待 P1 的资源。只要破坏这四个条件中的任意一个，就可以预防死锁。具体方法：破坏互斥条件不太现实，因为很多资源本身就必须互斥访问。破坏持有并等待可以要求进程一次性申请所有需要的资源。破坏不可剥夺可以在进程请求不到资源时强制释放已持有的资源，可以设置超时主动回滚。破坏循环等待可以对资源进行全局编号，进程必须按序号递增的顺序申请资源。在实际工程中，数据库使用锁超时机制和死锁检测算法来发现和回滚死锁事务。Java 中可以通过 tryLock 带超时的方法获取锁，配合 lock ordering 统一加锁顺序来避免死锁。`,
+    tags: ['操作系统', '死锁', '并发'],
+    subTopic: '计算机基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 69. 虚拟内存 ──
+  {
+    id: 'wp-69',
+    category: 'workplace',
+    question: '虚拟内存是什么？分页和分段的区别？',
+    answer: `虚拟内存（Virtual Memory）是操作系统提供的一种内存管理技术，它将物理内存和磁盘存储结合，为每个进程提供一个独立且连续的虚拟地址空间。虚拟内存的核心思想是让进程以为自己拥有全部内存，而实际上操作系统在后台将虚拟地址映射到物理地址，不常用部分暂存在磁盘的交换空间中。虚拟内存的三大作用：第一，进程隔离，每个进程拥有独立的虚拟地址空间，无法访问其他进程内存；第二，更大的地址空间，程序可以使用的内存不受物理内存大小限制；第三，高效共享，多进程可将相同的物理内存页映射到各自的虚拟地址空间实现共享库。实现虚拟内存的两种主要机制是分页和分段。分页（Paging）将虚拟地址空间和物理内存都分成固定大小的页（通常 4KB），通过页表完成虚拟页到物理页帧的映射，解决外部碎片问题，对程序员透明，现代操作系统普遍使用多级页表来节省页表所占空间。分段（Segmentation）按程序的逻辑结构划分内存，如代码段、数据段、堆栈段，每段长度可变，更符合程序员的思维但会产生外部碎片，现代操作系统通常将二者结合为段页式管理。页表访问涉及 TLB（Translation Lookaside Buffer）缓存来加速地址转换，缺页中断是虚拟内存的核心处理机制，在发生缺页时由操作系统从磁盘加载对应页面到物理内存。`,
+    tags: ['操作系统', '虚拟内存', '分页', '分段'],
+    subTopic: '计算机基础',
+    difficulty: 'hard',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 70. IO 多路复用 ──
+  {
+    id: 'wp-70',
+    category: 'workplace',
+    question: '什么是 IO 多路复用？select、poll、epoll 的区别？',
+    answer: `IO 多路复用（IO Multiplexing）是一种让单个线程能同时监控多个文件描述符 IO 事件的机制，当某个描述符变为可读或可写时，线程再对相应描述符进行操作，从而实现单线程处理大量并发连接。select 是早期的 IO 多路复用实现，它将所有需要监控的描述符集合从用户态拷贝到内核态，内核遍历所有描述符检测状态后返回，select 使用 fd_set 位图标识描述符，最大仅支持 1024 个描述符，每次调用都需要将整个集合重新拷贝，效率随描述符数量线性下降。poll 与 select 类似，但使用 pollfd 结构体数组存储描述符，没有 1024 的数量限制，但仍需横向遍历所有描述符，在大量描述符中仅少数活跃时依然低效。epoll 是 Linux 特有的高性能 IO 多路复用方案，通过三个系统调用实现：epoll_create 在内核创建一个 eventpoll 对象，epoll_ctl 增删改监控的描述符及事件，epoll_wait 阻塞等待就绪事件。epoll 的核心优势在于使用红黑树存储所有监控的描述符，增删改复杂度为 O(log N)，使用就绪链表存储活跃描述符，epoll_wait 直接返回就绪描述符而无需遍历全部，采用事件驱动机制在描述符就绪时通过回调将事件加入就绪链表。epoll 支持水平触发（LT）和边沿触发（ET）两种模式，ET 模式下系统调用更少但对编程要求更高。在高并发服务端如 Nginx 和 Redis 中，epoll 是实现高性能 IO 的关键技术。`,
+    tags: ['操作系统', 'IO多路复用', 'select', 'poll', 'epoll'],
+    subTopic: '计算机基础',
+    difficulty: 'hard',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 71. DNS 解析和 URL 到页面展示 ──
+  {
+    id: 'wp-71',
+    category: 'workplace',
+    question: 'DNS 解析的完整过程是怎样的？从输入 URL 到页面展示发生了什么？',
+    answer: `DNS 解析是将域名转换为 IP 地址的过程。第一步，浏览器检查自身 DNS 缓存中是否有该域名的记录。第二步，查询操作系统的 hosts 文件和本地 DNS 缓存。第三步，如果本地未命中，向本地 DNS 服务器即递归解析器发起查询请求。第四步，本地 DNS 服务器向根域名服务器查询，根服务器返回顶级域名服务器的地址。第五步，向顶级域名服务器查询，返回权威域名服务器的地址。第六步，向权威域名服务器查询，获得最终的 IP 地址返回给客户端。从输入 URL 到页面展示的完整流程如下：首先浏览器进行 URL 解析，判断输入的是搜索还是网址。接着通过 DNS 解析获取服务器 IP 地址。然后与服务器建立 TCP 连接，如果是 HTTPS 还需进行 TLS 握手协商加密密钥。连接建立后浏览器发送 HTTP 请求报文，服务器处理后返回 HTTP 响应。浏览器收到响应后开始解析 HTML 构建 DOM 树，同时解析 CSS 构建 CSSOM 树，当遇到 script 标签需要下载并执行 JavaScript 后继续解析。将 DOM 树和 CSSOM 树合成渲染树，接着进行布局计算每个元素的几何位置，然后绘制将像素渲染到屏幕，最终将各层合并展示给用户。此外，浏览器还会发起其他资源的请求如图片、字体等，并在下载过程中通过预加载扫描器提前发现并请求关键资源优化加载速度。整个过程涉及 DNS、TCP/IP、HTTP、浏览器渲染引擎等多个层次的协作。`,
+    tags: ['计算机网络', 'DNS', '浏览器', 'HTTP'],
+    subTopic: '计算机基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 72. Cookie、Session、Token ──
+  {
+    id: 'wp-72',
+    category: 'workplace',
+    question: '什么是 Cookie、Session、Token？三者的区别和使用场景？',
+    answer: `Cookie 是服务器发送到浏览器并保存在浏览器本地的一小段数据（通常 4KB 以内），浏览器后续请求同一服务器时会自动携带 Cookie。Cookie 可以设置过期时间、域名、路径、HttpOnly 和 Secure 等属性来增加安全性。Session 是服务器端为每个用户维护的状态信息，通常将 Session ID 通过 Cookie 传递给客户端，服务端根据 Session ID 从内存、Redis 或数据库中读取对应的用户状态数据。Session 解决了 Cookie 存储容量小和不安全的问题，但在分布式系统中需要做 Session 共享。Token 是一个加密签名的凭证字符串，通常是 JWT 格式，包含用户标识、过期时间等信息，由服务端用密钥签发，客户端存储后可附在请求 Header 的 Authorization 字段发给服务端验证。三者的区别是：存储位置上 Cookie 和 Token 在客户端，Session 在服务端。状态管理上 Cookie 和 Session 都是有状态的（服务端需要记录），Token 通常是无状态的（服务端只用密钥验证签名即可）。跨域问题上 Cookie 受同源策略限制，Token 可自由用于跨域 API。安全性上 Token 可包含加密信息防篡改，Session 信息全在服务端更安全但占用服务器资源。使用场景上 Cookie 适合简单的客户端状态记录和广告追踪。Session 适合传统单体应用的登录状态管理。Token 适合 RESTful API、微服务架构、移动端和单点登录等场景。现代实践常将三者结合，如登录后用 JWT Token 做请求认证，用 Redis 存 Token 映射实现主动失效。`,
+    tags: ['计算机网络', '认证', 'Cookie', 'Session', 'Token'],
+    subTopic: '计算机基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 73. HTTP 状态码 301/302 & 401/403 ──
+  {
+    id: 'wp-73',
+    category: 'workplace',
+    question: 'HTTP 状态码 301 和 302 的区别？401 和 403 的区别？',
+    answer: `HTTP 重定向状态码中，301 表示永久重定向（Moved Permanently），告诉浏览器和搜索引擎该资源已经永久移动到新的 URL，浏览器会缓存这个重定向，后续请求直接跳转到新地址，搜索引擎也会将权重和排名转移到新 URL。302 表示临时重定向（Found），告诉浏览器资源临时转移到新 URL，浏览器不会缓存这个重定向，每次仍然请求原地址，搜索引擎继续保持原 URL 的索引。301 适合域名迁移、页面永久下线等场景，302 适合活动页面临时跳转、维护期暂时调整等场景。如果错误地使用 301 而非 302 做了临时跳转，浏览器会长期缓存导致后续改回原地址时用户仍被重定向，修复成本很高。HTTP 认证相关状态码中，401 表示未授权（Unauthorized），表示请求没有携带有效的认证凭据或凭据已过期，服务器的响应中必须包含 WWW-Authenticate 头部指示客户端应该如何认证，客户端收到后应提示用户重新登录获取凭据。403 表示禁止访问（Forbidden），表示服务器理解请求并已识别用户身份，但用户没有访问该资源的权限，即使重新认证也不会改变结果。两者的区别本质上在于 401 是「你是谁我不认识，请先证明身份」，403 是「我已经知道你是谁了，但你没资格访问该资源」。理论上所有 401 错误都可以通过提供正确凭据来解决，而 403 错误需要管理员授权后才能解决。`,
+    tags: ['计算机网络', 'HTTP', '状态码', '重定向', '认证'],
+    subTopic: '计算机基础',
+    difficulty: 'easy',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 74. 跨域 CORS ──
+  {
+    id: 'wp-74',
+    category: 'workplace',
+    question: '什么是跨域（CORS）？如何解决跨域问题？',
+    answer: `跨域是指浏览器的同源策略（Same-Origin Policy）限制从一个源的文档或脚本去请求另一个源的资源。同源的定义是协议、域名、端口三者完全相同，任意一项不同即为跨域。同源策略是浏览器最核心的安全机制，防止恶意网站读取其他网站的敏感数据，但这给前后端分离开发带来了不便。CORS（Cross-Origin Resource Sharing）跨域资源共享是 W3C 的标准方案，让服务器通过 HTTP 响应头部告知浏览器允许哪些源的跨域请求。CORS 请求分为简单请求和预检请求。简单请求需要满足三个条件：请求方法是 GET、HEAD 或 POST，Content-Type 是特定类型如 text/plain 或 application/x-www-form-urlencoded，且无自定义请求头，浏览器直接发送请求并在响应中检查 Access-Control-Allow-Origin 头部。预检请求即 OPTIONS 预检，在不满足简单请求条件时浏览器会先发送一个 OPTIONS 方法请求询问服务器是否允许该跨域操作，服务器通过 Access-Control-Allow-Methods、Access-Control-Allow-Headers 等头部回应允许的规则，预检通过后才发送真实请求。解决跨域的方法还有以下几种方案：一是使用 JSONP，利用 script 标签不受同源策略限制的特性，但仅支持 GET 请求且存在安全风险；二是配置反向代理，在开发环境中将前端请求代理到后端服务，Nginx 和 Webpack Dev Server 是最常用的代理工具，生产环境中 Nginx 统一处理跨域头部是最稳妥的方案；三是使用 WebSocket，WebSocket 协议不受同源策略限制；四是使用 postMessage 实现不同窗口间的数据通信。`,
+    tags: ['计算机网络', 'CORS', '跨域', '浏览器'],
+    subTopic: '计算机基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 75. CDN ──
+  {
+    id: 'wp-75',
+    category: 'workplace',
+    question: '什么是 CDN？它的工作原理是什么？',
+    answer: `CDN（Content Delivery Network）内容分发网络是一种通过在全球各地部署边缘服务器节点，将网站内容分发到离用户最近的节点，从而加速用户访问速度和降低源站负载的技术架构。CDN 的工作原理如下：第一步，用户请求某个资源时，DNS 解析将请求指向 CDN 的全局负载均衡系统。第二步，CDN 的 DNS 调度系统根据用户的 IP 地址、网络状况、节点负载等因素，将用户分配到最优的边缘节点。第三步，边缘节点检查是否已有该资源的缓存，如果命中缓存则直接返回给用户，这是回源率最低的最优情况。第四步，如果缓存未命中，边缘节点会向上一级缓存层或直接向源站发起请求拉取资源，缓存到本地后返回给用户，后续同一区域的用户请求即可命中缓存。CDN 的核心技术包括：DNS 智能调度实现就近访问、内容缓存和缓存淘汰策略如 LRU 保持热点资源在边缘、回源机制控制对源站的请求频率、动态加速技术对不可缓存的动态请求做链路优化。CDN 主要适用于静态资源加速如图片、CSS、JavaScript、视频流等，也通过动态加速支持需要低延迟的 API 请求。使用 CDN 的好处包括大幅降低用户访问延迟、减少源站的并发压力和带宽成本、提供 DDoS 攻击防护和隐藏源站 IP。常见的 CDN 有阿里云 CDN、腾讯云 CDN、CloudFront、Cloudflare 等。`,
+    tags: ['计算机网络', 'CDN', '内容分发', '缓存'],
+    subTopic: '计算机基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
+  // ── 76. WebSocket 和 HTTP ──
+  {
+    id: 'wp-76',
+    category: 'workplace',
+    question: 'WebSocket 和 HTTP 的区别？什么场景适合用 WebSocket？',
+    answer: `WebSocket 是 HTML5 中提供的一种在单个 TCP 连接上进行全双工通信的协议。与 HTTP 的核心区别在于：HTTP 是请求-响应模式，每次通信由客户端主动发起，服务端被动回应，适合获取资源和提交数据。WebSocket 建立连接后双方可以随时互相发送消息，真正实现了服务端主动推送，适合实时双向通信。连接建立上 HTTP 每次请求可能建立新的 TCP 连接，HTTP/1.1 的 keep-alive 虽然可以复用连接但仍是半双工的请求-响应模式，而 WebSocket 通过 HTTP 的 Upgrade 机制完成握手升级协议后保持长连接双向通信。性能上 WebSocket 减少了 HTTP 的冗余头部，每条消息的帧头部仅 2~14 字节，大幅降低通信开销。WebSocket 的状态用 readyState 表示，支持文本和二进制数据帧的发送，也内置了心跳机制 Ping/Pong 帧来检测连接存活。适合使用 WebSocket 的场景包括：实时聊天应用如微信网页版、在线协作编辑如腾讯文档、体育或金融行情实时推送、多人在线游戏的状态同步、物联网设备实时控制和数据上报、以及需要服务端主动通知的各种场景。不适合的场景是简单的数据提交和页面请求，此时使用 RESTful API 或 GraphQL 更合适，因为 WebSocket 需要维持长连接会消耗服务器连接资源。实际开发中常用 Socket.IO 等库封装 WebSocket 提供自动重连、房间管理、广播和降级到 HTTP 长轮询等能力。`,
+    tags: ['计算机网络', 'WebSocket', 'HTTP', '实时通信'],
+    subTopic: '计算机基础',
+    difficulty: 'medium',
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    favorited: false,
+  },
+
 ];
+
