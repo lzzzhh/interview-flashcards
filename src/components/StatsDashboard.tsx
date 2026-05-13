@@ -2,7 +2,7 @@
 // src/components/StatsDashboard.tsx — 学习统计面板（含艾宾浩斯曲线）
 // ============================================================
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { useProgress } from '../hooks/useProgress';
@@ -227,45 +227,141 @@ export default function StatsDashboard() {
 function ImportExport() {
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [syncMode, setSyncMode] = useState<'checking' | 'file' | 'fallback'>('checking');
+  const [storagePath, setStoragePath] = useState<string | null>(null);
+
+  // Check if file storage is active
+  useEffect(() => {
+    import('../utils/fileStorage').then(({ loadFromFile, isFileSystemAPISupported }) => {
+      if (!isFileSystemAPISupported()) {
+        setSyncMode('fallback');
+        return;
+      }
+      loadFromFile().then((r) => {
+        if (r) {
+          setSyncMode('file');
+          r.handle.getFile().then((f: File) => setStoragePath(f.name));
+        } else {
+          setSyncMode('fallback');
+        }
+      });
+    });
+  }, []);
+
+  const handleConnect = async () => {
+    const { pickDataFile } = await import('../utils/fileStorage');
+    const result = await pickDataFile();
+    if (result?.data) {
+      for (const [key, value] of Object.entries(result.data.progress)) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+      localStorage.setItem('fc-settings', JSON.stringify(result.data.settings));
+      localStorage.setItem('fc-stats', JSON.stringify(result.data.stats));
+      setSyncMode('file');
+      window.location.reload();
+    }
+  };
+
+  const handleCreateNew = async () => {
+    const { createDataFile, loadFromLocalStorage } = await import('../utils/fileStorage');
+    const data = loadFromLocalStorage();
+    await createDataFile(data);
+    setSyncMode('file');
+  };
+
+  const handleDisconnect = async () => {
+    const { disconnectFile } = await import('../utils/fileStorage');
+    await disconnectFile();
+    setSyncMode('fallback');
+    setStoragePath(null);
+    setMsg({ type: 'success', text: '已断开文件连接，恢复浏览器存储。' });
+  };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const result = await importProgress(file);
     setMsg({ type: result.success ? 'success' : 'error', text: result.message });
-    // Reset input so same file can be re-imported
     if (fileRef.current) fileRef.current.value = '';
   };
+
+  const isFileMode = syncMode === 'file';
 
   return (
     <div className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-700">
       <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-        备份与同步
+        数据存储
       </h3>
-      <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
-        进度数据存储在浏览器本地。导出 JSON 文件可备份到电脑/手机，或发送到其他设备导入恢复。
-      </p>
 
-      <div className="flex gap-2">
-        <button
-          onClick={exportProgress}
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          导出备份
-        </button>
+      {/* Storage status */}
+      <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+        {isFileMode ? (
+          <p>
+            📁 存储模式：<strong>本地文件</strong>
+            {storagePath && <span>（{storagePath}）</span>}
+            <br />数据保存在你选择的文件里，换设备时同步该文件即可。
+          </p>
+        ) : (
+          <p>
+            💻 存储模式：<strong>浏览器缓存</strong>
+            <br />数据存在浏览器里，清缓存会丢失。建议连接到本地文件。
+          </p>
+        )}
+      </div>
 
-        <label className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer">
-          <Upload className="w-4 h-4" />
-          导入恢复
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".json"
-            onChange={handleImport}
-            className="hidden"
-          />
-        </label>
+      {/* File storage controls */}
+      <div className="flex flex-col gap-2">
+        {!isFileMode ? (
+          <>
+            <button
+              onClick={handleConnect}
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors"
+            >
+              连接已有数据文件
+            </button>
+            <button
+              onClick={handleCreateNew}
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            >
+              创建新数据文件
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={handleDisconnect}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
+          >
+            断开文件连接
+          </button>
+        )}
+      </div>
+
+      {/* Legacy export/import */}
+      <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
+          兼容方式：导出/导入 JSON 备份文件
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={exportProgress}
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          >
+            <Download className="w-3.5 h-3.5" />
+            导出 JSON
+          </button>
+
+          <label className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer">
+            <Upload className="w-3.5 h-3.5" />
+            导入 JSON
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+            />
+          </label>
+        </div>
       </div>
 
       {msg && (
