@@ -62,6 +62,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         currentIndex: 0,
         showApproach: false,
         showCode: false,
+        qaAnswerVisible: false,
         filterDifficulty: 'all',
         filterSubTopic: 'all',
         searchQuery: '',
@@ -82,12 +83,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         currentIndex: Math.min(state.currentIndex + 1, state.cards.length - 1),
+        qaAnswerVisible: false,
+        showApproach: false,
+        showCode: false,
       };
 
     case 'PREV':
       return {
         ...state,
         currentIndex: Math.max(state.currentIndex - 1, 0),
+        qaAnswerVisible: false,
+        showApproach: false,
+        showCode: false,
       };
 
     case 'TOGGLE_APPROACH':
@@ -166,11 +173,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'TOGGLE_REVIEW_MODE': {
       const next = !state.reviewMode;
       if (next) {
-        // Entering review mode — reset to due cards only
         const due = state.cards.filter((c) => c.sm2.nextReview <= Date.now());
         return { ...state, reviewMode: true, cards: due, currentIndex: 0 };
       } else {
-        // Exiting review mode — reload all cards
         const rawCards = CARD_DATA[state.category];
         const progress = loadProgress(state.category);
         return {
@@ -181,6 +186,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
         };
       }
     }
+
+    case 'TOGGLE_QA_ANSWER':
+      return { ...state, qaAnswerVisible: !state.qaAnswerVisible };
 
     default:
       return state;
@@ -267,6 +275,7 @@ function createInitialState(): AppState {
     showStats: false,
     shuffled: false,
     reviewMode: false,
+    qaAnswerVisible: false,
   };
 }
 

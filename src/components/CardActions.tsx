@@ -138,7 +138,7 @@ export default function CardActions() {
 
       {/* Keyboard hints */}
       <div className="text-center text-[10px] text-gray-400 dark:text-gray-600 leading-relaxed">
-        ← → 翻页 &nbsp; Space 思路 &nbsp; S 代码 &nbsp; M 掌握 &nbsp; F 收藏 &nbsp; 1-5 评分 &nbsp; D 深色
+        ← → 翻页 &nbsp; Space 答案/思路 &nbsp; S 代码 &nbsp; M 掌握 &nbsp; F 收藏 &nbsp; 1-5 评分 &nbsp; D 深色
       </div>
     </div>
   );

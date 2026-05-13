@@ -58,6 +58,7 @@ export interface AppState {
   showStats: boolean;
   shuffled: boolean;
   reviewMode: boolean;
+  qaAnswerVisible: boolean;
 }
 
 export type AppAction =
@@ -78,7 +79,8 @@ export type AppAction =
   | { type: 'TOGGLE_STATS' }
   | { type: 'SHUFFLE' }
   | { type: 'RESET_ORDER' }
-  | { type: 'TOGGLE_REVIEW_MODE' };
+  | { type: 'TOGGLE_REVIEW_MODE' }
+  | { type: 'TOGGLE_QA_ANSWER' };
 
 // ============================================================
 // localStorage 持久化相关类型

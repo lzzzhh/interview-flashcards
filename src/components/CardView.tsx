@@ -200,6 +200,13 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
 
 // ---- QA Card (Statistics / ML / LLM / Jargon / Workplace) ----
 function QAView({ card }: { card: QACard }) {
+  const { state, dispatch } = useAppContext();
+  const showAnswer = state.qaAnswerVisible;
+
+  const handleToggleAnswer = () => {
+    dispatch({ type: 'TOGGLE_QA_ANSWER' });
+  };
+
   return (
     <div className="space-y-4 text-left">
       {/* Review Meta */}
@@ -231,10 +238,37 @@ function QAView({ card }: { card: QACard }) {
         </span>
       )}
 
-      {/* Answer — with math rendering */}
+      {/* Reveal / Hide Answer Toggle */}
       <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
-        <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-          <MathText text={card.answer} />
+        <button
+          onClick={handleToggleAnswer}
+          className={`flex items-center gap-1.5 text-sm font-medium transition-colors w-full justify-center py-2 rounded-lg
+            ${showAnswer
+              ? 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
+              : 'text-primary hover:text-primary-hover bg-primary/5 hover:bg-primary/10'}`}
+        >
+          {showAnswer ? (
+            <>
+              <ChevronUp className="w-4 h-4" />
+              <span>隐藏答案</span>
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-4 h-4" />
+              <span>显示答案 — 先回忆再查看</span>
+            </>
+          )}
+        </button>
+
+        {/* Answer — collapsible with smooth transition */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            showAnswer ? 'max-h-[2000px] opacity-100 mt-3' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+            <MathText text={card.answer} />
+          </div>
         </div>
       </div>
 

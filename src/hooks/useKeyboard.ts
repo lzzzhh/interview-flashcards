@@ -32,9 +32,10 @@ export function useKeyboard({ dispatch, searchInputRef, getCurrentCardId }: Keyb
         }
       }
 
-      // Space to toggle approach (not in input)
+      // Space to toggle QA answer / LeetCode approach
       if (!isInput && e.key === ' ') {
         e.preventDefault();
+        dispatch({ type: 'TOGGLE_QA_ANSWER' });
         dispatch({ type: 'TOGGLE_APPROACH' });
         return;
       }
