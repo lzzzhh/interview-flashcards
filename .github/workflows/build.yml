@@ -43,7 +43,7 @@ jobs:
         run: npm run build:ci
 
       - name: Build Tauri app
-        run: npx tauri build --bundles ${{ matrix.bundles }}
+        run: npm run tauri build -- --bundles ${{ matrix.bundles }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
