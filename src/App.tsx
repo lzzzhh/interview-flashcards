@@ -82,7 +82,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          <button onClick={onBack} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm transition-colors">
+          <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm transition-colors">
             <ArrowLeft className="w-4 h-4" />
             返回
           </button>
@@ -127,13 +127,9 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
         {/* Study mode bar (always shown after choose screen) */}
         <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/30 border-b border-orange-200 dark:border-orange-800 flex items-center gap-2">
-            <span className="text-xs text-orange-600 dark:text-orange-400 flex-1">
+            <span className="text-xs text-orange-600 dark:text-orange-400">
               {state.studyMode === 'review' ? '🔄' : '🆕'} {state.studyMode === 'review' ? '复习' : '新学'} · {state.currentVisibleIndex + 1}/{Math.max(cardCount, 1)}
             </span>
-            <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-700 text-xs font-medium dark:text-gray-300">
-              <X className="w-3 h-3" /> 退出
-            </button>
           </div>
 
         {/* Tabs hidden */}
