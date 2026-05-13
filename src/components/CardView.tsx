@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp, Clock, Repeat } from 'lucide-react';
 import type { FlashCard, LeetCodeCard, QACard } from '../types';
 import { DIFFICULTY_LABEL, DIFFICULTY_COLOR } from '../constants';
 import { useAppContext } from '../context/AppContext';
+import MathText from './MathText';
 
 interface CardViewProps {
   card: FlashCard;
@@ -143,7 +144,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
 
       {/* Description */}
       <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-        {card.description}
+        <MathText text={card.description} />
       </div>
 
       {/* Approach — collapsible */}
@@ -230,10 +231,10 @@ function QAView({ card }: { card: QACard }) {
         </span>
       )}
 
-      {/* Answer — with formatting */}
+      {/* Answer — with math rendering */}
       <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
-        <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-          {card.answer}
+        <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+          <MathText text={card.answer} />
         </div>
       </div>
 
