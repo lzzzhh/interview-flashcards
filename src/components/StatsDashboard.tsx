@@ -2,12 +2,21 @@
 // src/components/StatsDashboard.tsx — 学习统计面板（含艾宾浩斯曲线）
 // ============================================================
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import { useProgress } from '../hooks/useProgress';
 import { DIFFICULTY_LABEL } from '../constants';
 import { exportProgress, importProgress } from '../utils/backup';
+import {
+  loadReviewLogs,
+  getAllLogs,
+  getTodayReviewed,
+  getStreak,
+  getRecentAccuracy,
+  getAverageRating,
+  getDifficultCards,
+  isReallyMastered,
+} from '../utils/reviewLogs';
 
 /**
  * 艾宾浩斯遗忘曲线数据
@@ -97,7 +106,24 @@ function ReviewDistribution({ cards }: { cards: { sm2: { interval: number; repet
 export default function StatsDashboard() {
   const { state, dispatch, totalDue } = useAppContext();
   const cards = Object.values(state.cardsById);
-  const stats = useProgress(cards);
+
+  const stats = useMemo(() => {
+    const allLogs = getAllLogs();
+    const mastered = cards.filter((c) => isReallyMastered(c.sm2.interval, c.sm2.lapses)).length;
+    const difficultIds = getDifficultCards(loadReviewLogs(), cards.map((c) => c.id));
+    return {
+      total: cards.length,
+      mastered,
+      pending: cards.length - mastered,
+      masteredPercent: cards.length > 0 ? Math.round((mastered / cards.length) * 100) : 0,
+      todayReviewed: getTodayReviewed(allLogs),
+      streak: getStreak(allLogs),
+      recentAccuracy: getRecentAccuracy(allLogs),
+      avgRating: getAverageRating(allLogs),
+      difficultCount: difficultIds.length,
+      byDifficulty: {} as Record<string, { total: number; mastered: number }>,
+    };
+  }, [cards]);
 
   if (!state.showStats) return null;
 
@@ -127,7 +153,7 @@ export default function StatsDashboard() {
         {/* Content */}
         <div className="p-4 space-y-6">
           {/* Overview cards */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             <StatBox
               icon={<BookOpen className="w-4 h-4" />}
               label="总卡片"
@@ -156,6 +182,21 @@ export default function StatsDashboard() {
               color="text-purple-600 dark:text-purple-400"
               bg="bg-purple-50 dark:bg-purple-900/30"
             />
+            <StatBox
+              icon={<TrendingUp className="w-4 h-4" />}
+              label="7日正确率"
+              value={stats.recentAccuracy}
+              suffix="%"
+              color="text-emerald-600 dark:text-emerald-400"
+              bg="bg-emerald-50 dark:bg-emerald-900/30"
+            />
+            <StatBox
+              icon={<Clock className="w-4 h-4" />}
+              label="今日复习"
+              value={stats.todayReviewed}
+              color="text-cyan-600 dark:text-cyan-400"
+              bg="bg-cyan-50 dark:bg-cyan-900/30"
+            />
           </div>
 
           {/* Progress bar */}
@@ -178,13 +219,22 @@ export default function StatsDashboard() {
           {/* Ebbinghaus Curve */}
           <EbbinghausCurve />
 
-          {/* Today */}
-          <div className="text-center py-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
-            <p className="text-sm text-gray-500 dark:text-gray-400">今日学习</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {stats.todayReviewed}
-            </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500">张卡片</p>
+          {/* Average rating + difficult */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500 dark:text-gray-400">平均评分</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                {stats.avgRating > 0 ? `${stats.avgRating} / 5` : '暂无'}
+              </span>
+            </div>
+            {stats.difficultCount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-red-500 dark:text-red-400">薄弱卡片</span>
+                <span className="font-medium text-red-600 dark:text-red-400">
+                  {stats.difficultCount} 张
+                </span>
+              </div>
+            )}
           </div>
 
           {/* By Difficulty */}
@@ -358,23 +408,16 @@ function ImportExport() {
 }
 
 function StatBox({
-  icon,
-  label,
-  value,
-  color,
-  bg,
+  icon, label, value, suffix, color, bg,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  color: string;
-  bg: string;
+  icon: React.ReactNode; label: string; value: number;
+  suffix?: string; color: string; bg: string;
 }) {
   return (
-    <div className={`rounded-xl p-3 ${bg}`}>
+    <div className={`rounded-xl p-2.5 ${bg}`}>
       <div className={`mb-1 ${color}`}>{icon}</div>
-      <p className={`text-xl font-bold ${color}`}>{value}</p>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+      <p className={`text-lg font-bold ${color}`}>{value}{suffix || ''}</p>
+      <p className="text-[10px] text-gray-500 dark:text-gray-400">{label}</p>
     </div>
   );
 }

@@ -30,6 +30,7 @@ import { workplaceCards } from '../data/workplace';
 import { scheduleReview, createDefaultSM2 } from '../utils/sm2';
 import { loadProgress, saveSettings } from '../utils/storage';
 import { saveAppData } from '../utils/nativeStorage';
+import { appendReviewLog } from '../utils/reviewLogs';
 import { shuffle } from '../utils/shuffle';
 
 // ---- 数据源映射 ----
@@ -209,6 +210,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
       const card = state.cardsById[cardId];
       if (!card) return state;
       const result = scheduleReview(cardId, card.sm2, rating);
+      // 持久化 ReviewLog
+      appendReviewLog(result.log);
       return {
         ...state,
         cardsById: {
