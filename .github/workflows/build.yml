@@ -11,79 +11,40 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            artifact_name: linux
-            bundles: deb,appimage
-          - os: windows-latest
-            artifact_name: windows
-            bundles: nsis
           - os: macos-latest
             artifact_name: macos
             bundles: dmg
+            file_pattern: 'src-tauri/target/release/bundle/dmg/*.dmg'
+          - os: windows-latest
+            artifact_name: windows
+            bundles: nsis
+            file_pattern: 'src-tauri/target/release/bundle/nsis/*.exe'
+          - os: ubuntu-latest
+            artifact_name: linux
+            bundles: deb,appimage
+            file_pattern: 'src-tauri/target/release/bundle/deb/*.deb\nsrc-tauri/target/release/bundle/appimage/*.AppImage'
 
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install Linux dependencies
+      - name: Install Linux deps
         if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libsoup-3.0-dev
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libsoup-3.0-dev
 
-      - name: Install frontend dependencies
-        run: npm install
-
-      - name: Build Tauri app
-        run: npm run tauri build -- --bundles ${{ matrix.bundles }}
+      - name: Build
+        run: npm install && npm run tauri build -- --bundles ${{ matrix.bundles }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload artifacts (macOS)
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
+      - name: Upload to Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
-          name: interview-flashcards-${{ matrix.artifact_name }}
-          path: src-tauri/target/release/bundle/dmg/*.dmg
-
-      - name: Upload artifacts (Windows)
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: interview-flashcards-${{ matrix.artifact_name }}
-          path: src-tauri/target/release/bundle/nsis/*.exe
-
-      - name: Upload artifacts (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: interview-flashcards-${{ matrix.artifact_name }}
-          path: |
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/appimage/*.AppImage
-
-  release:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-      - name: List files
-        run: ls -R interview-flashcards-*/
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            interview-flashcards-macos/*.dmg
-            interview-flashcards-windows/*.exe
-            interview-flashcards-linux/*.deb
-            interview-flashcards-linux/*.AppImage
-          draft: false
+          files: ${{ matrix.file_pattern }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
