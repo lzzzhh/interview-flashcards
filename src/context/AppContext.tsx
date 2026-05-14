@@ -35,6 +35,7 @@ import { saveAppData } from '../utils/nativeStorage';
 import { appendReviewLog } from '../utils/reviewLogs';
 import { shuffle } from '../utils/shuffle';
 import { loadCustomCards } from '../utils/customDecks';
+import { getModuleDailyLimit } from '../utils/customDecks';
 
 // ---- Undo support ----
 let lastRating: { cardId: string; previousSm2: any } | null = null;
@@ -104,7 +105,8 @@ function computeVisibleIds(state: AppState): string[] {
       const sm2 = state.cardsById[id]?.sm2;
       return !sm2 || sm2.state === 'new';
     });
-    ids = newIds.slice(0, state.dailyNewLimit);
+    const limit = getModuleDailyLimit(state.category);
+    ids = newIds.slice(0, limit);
   } else if (state.studyMode === 'review') {
     ids = ids.filter((id) => {
       const sm2 = state.cardsById[id]?.sm2;

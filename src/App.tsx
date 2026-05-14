@@ -11,6 +11,7 @@ import EmptyState from './components/EmptyState';
 import CardBrowser from './components/CardBrowser';
 import CardEditor from './components/CardEditor';
 import type { FlashCard } from './types';
+import { getModuleDailyLimit } from './utils/customDecks';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
   const { state, dispatch, currentCard, totalDue, totalNew } = useAppContext();
@@ -44,7 +45,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
                 className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
                 <span className="text-3xl">🆕</span>
                 <span className="text-base font-bold text-blue-700 dark:text-blue-300">学习新卡</span>
-                <span className="text-xs text-blue-500">今日上限 {state.dailyNewLimit} 张 · 剩余 {moduleNewCount} 张</span>
+                <span className="text-xs text-blue-500">今日上限 {getModuleDailyLimit(state.category)} 张 · 剩余 {moduleNewCount} 张</span>
               </button>
               <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'review' })}
                 className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors">

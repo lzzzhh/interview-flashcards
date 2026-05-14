@@ -126,3 +126,16 @@ function parseCSVRow(line: string): string[] {
   result.push(current);
   return result;
 }
+
+/** 获取模块的每日新卡上限 */
+export function getModuleDailyLimit(moduleId: string): number {
+  try {
+    const v = localStorage.getItem(`fc-limit-${moduleId}`);
+    return v ? parseInt(v) : 20;
+  } catch { return 20; }
+}
+
+/** 设置模块的每日新卡上限 */
+export function setModuleDailyLimit(moduleId: string, limit: number): void {
+  localStorage.setItem(`fc-limit-${moduleId}`, String(Math.max(1, Math.min(100, limit))));
+}

@@ -6,9 +6,10 @@ import { useState } from 'react';
 import { Plus, BookOpen, X, Trash2 } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
-import { loadCustomDecks, createCustomDeck, deleteCustomDeck, type CustomDeck } from '../utils/customDecks';
+import { loadCustomDecks, createCustomDeck, deleteCustomDeck, setModuleDailyLimit, type CustomDeck } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
 import { loadProgress } from '../utils/storage';
+import DarkModeToggle from './DarkModeToggle';
 
 const ICONS: Record<string, string> = {
   leetcode: '🔥',
@@ -29,13 +30,16 @@ export default function HomePage({ onEnterStudy }: Props) {
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newIcon, setNewIcon] = useState('📦');
+  const [newLimit, setNewLimit] = useState(20);
 
   const handleCreate = () => {
     if (!newName.trim()) return;
-    createCustomDeck(newName.trim(), newIcon || '📦');
+    const deck = createCustomDeck(newName.trim(), newIcon || '📦');
+    setModuleDailyLimit(deck.id, newLimit);
     setCustomDecks(loadCustomDecks());
     setShowCreate(false);
     setNewName('');
+    setNewLimit(20);
   };
 
   const handleDelete = (id: string) => {
@@ -47,7 +51,10 @@ export default function HomePage({ onEnterStudy }: Props) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center">
       <div className="max-w-xl w-full px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
+          <div className="absolute right-0 top-0">
+            <DarkModeToggle />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             📚 面经闪卡
           </h1>
@@ -147,6 +154,11 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="例如：风控算法面试"
                   className="w-full mt-0.5 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 text-sm"
                   onKeyDown={(e) => e.key === 'Enter' && handleCreate()} autoFocus />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500">每日新卡上限</label>
+                <input type="number" min="1" max="100" value={newLimit} onChange={(e) => setNewLimit(Number(e.target.value))}
+                  className="w-full mt-0.5 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 text-sm" />
               </div>
               <button onClick={handleCreate} disabled={!newName.trim()}
                 className="w-full py-2.5 rounded-xl bg-primary text-white font-medium disabled:opacity-30">
