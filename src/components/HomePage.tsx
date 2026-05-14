@@ -2,13 +2,14 @@
 // src/components/HomePage.tsx — 首页模块选择
 // ============================================================
 
-import { useState, useMemo, useRef, useEffect } from 'react';
-import { BookOpen, X } from 'lucide-react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { X } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
 import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, type CustomDeck } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
 import { loadProgress } from '../utils/storage';
+import type { Category } from '../types';
 
 const ICONS: Record<string, string> = {
   leetcode: '🔥',
@@ -23,6 +24,15 @@ interface Props {
   onEnterStudy: (category: string) => void;
 }
 
+interface ModuleSlot {
+  key: string;
+  label: string;
+  emoji?: string;
+  isCustom?: boolean;
+  isCreate?: boolean;
+  isPlaceholder?: boolean;
+}
+
 export default function HomePage({ onEnterStudy }: Props) {
   const { dispatch, dueCountByCategory } = useAppContext();
   const [customDecks, setCustomDecks] = useState<CustomDeck[]>(() => loadCustomDecks());
@@ -31,14 +41,18 @@ export default function HomePage({ onEnterStudy }: Props) {
   const [newIcon, setNewIcon] = useState('📦');
   const [newLimit, setNewLimit] = useState(20);
   const [page, setPage] = useState(0);
+  const [pageDirection, setPageDirection] = useState<1 | -1>(1);
 
   // Build all modules list
-  const allModules = useMemo(() => {
-    const builtIn = CATEGORIES.map((cat) => ({ ...cat, isCustom: false }));
+  const allModules = useMemo<ModuleSlot[]>(() => {
+    const builtIn = CATEGORIES.map((cat) => ({
+      key: cat.key,
+      label: cat.label,
+      isCustom: false,
+    }));
     const custom = customDecks.map((d) => ({
-      key: d.id as any,
+      key: d.id,
       label: d.name,
-      icon: null as any,
       emoji: d.icon,
       isCustom: true,
     }));
@@ -46,29 +60,51 @@ export default function HomePage({ onEnterStudy }: Props) {
   }, [customDecks]);
 
   const PER_PAGE = 6;
-  const totalPages = Math.ceil((allModules.length + 1) / PER_PAGE); // +1 for create button
-  const pageModules = allModules.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
-  // Fill remaining slots with placeholder create cards
+  const moduleSlots = useMemo<ModuleSlot[]>(
+    () => [
+      ...allModules,
+      { key: 'create-module', label: '新建模块', emoji: '➕', isCreate: true },
+    ],
+    [allModules],
+  );
+  const totalPages = Math.ceil(moduleSlots.length / PER_PAGE);
+  const pageModules = moduleSlots.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
   const slots = [...pageModules];
   while (slots.length < PER_PAGE) {
-    slots.push({ key: `placeholder-${slots.length}`, label: '', icon: null, isPlaceholder: true } as any);
+    slots.push({ key: `placeholder-${page}-${slots.length}`, label: '', isPlaceholder: true });
   }
 
   // Touch + wheel swipe
   const touchStartX = useRef(0);
+  const lastWheelAt = useRef(0);
 
-  const goNext = () => { if (page < totalPages - 1) setPage(p => p + 1); };
-  const goPrev = () => { if (page > 0) setPage(p => p - 1); };
+  const goToPage = useCallback((nextPage: number) => {
+    const clamped = Math.max(0, Math.min(totalPages - 1, nextPage));
+    if (clamped === page) return;
+    setPageDirection(clamped > page ? 1 : -1);
+    setPage(clamped);
+  }, [page, totalPages]);
+
+  const goNext = useCallback(() => goToPage(page + 1), [goToPage, page]);
+  const goPrev = useCallback(() => goToPage(page - 1), [goToPage, page]);
 
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e: React.TouchEvent) => {
     const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) diff > 0 ? goNext() : goPrev();
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) goNext();
+      else goPrev();
+    }
   };
 
   const handleWheel = (e: React.WheelEvent) => {
-    if (Math.abs(e.deltaX) > 20 || (e.shiftKey && Math.abs(e.deltaY) > 20)) {
-      (e.deltaX > 0 || e.deltaY > 0) ? goNext() : goPrev();
+    const primaryDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.shiftKey ? e.deltaY : 0;
+    if (Math.abs(primaryDelta) > 28) {
+      const now = Date.now();
+      if (now - lastWheelAt.current < 460) return;
+      lastWheelAt.current = now;
+      if (primaryDelta > 0) goNext();
+      else goPrev();
     }
   };
 
@@ -80,7 +116,7 @@ export default function HomePage({ onEnterStudy }: Props) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [page, totalPages]);
+  }, [goNext, goPrev]);
 
   const handleCreate = () => {
     if (!newName.trim()) return;
@@ -94,9 +130,9 @@ export default function HomePage({ onEnterStudy }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center">
-      <div className="max-w-xl w-full px-4 py-8 min-h-screen flex flex-col justify-center" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel}>
+      <div className="homepage-shell max-w-xl w-full px-4 py-8" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel}>
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="homepage-header text-center">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             📚 面经闪卡
           </h1>
@@ -106,19 +142,37 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         {/* Module grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[260px]">
+        <div
+          key={page}
+          className={`homepage-module-grid homepage-page ${
+            pageDirection > 0 ? 'homepage-page-next' : 'homepage-page-prev'
+          }`}
+        >
           {slots.map((mod) => {
-            if ((mod as any).isPlaceholder) {
+            if (mod.isPlaceholder) {
+              return (
+                <div key={mod.key} className="homepage-module-card homepage-module-card-empty" aria-hidden="true">
+                  <span className="text-3xl opacity-0">📚</span>
+                  <span className="w-full truncate text-center text-sm font-medium opacity-0">占位</span>
+                  <div className="text-center text-[10px] leading-4 opacity-0">
+                    <div>占位</div>
+                    <div>占位</div>
+                  </div>
+                </div>
+              );
+            }
+            if (mod.isCreate) {
               return (
                 <button
                   key={mod.key}
                   onClick={() => setShowCreate(true)}
-                  className="flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-primary/30 hover:text-primary transition-colors"
+                  className="homepage-module-card group border-dashed text-gray-500 dark:text-gray-400 hover:border-primary/50 hover:text-primary hover:shadow-md active:scale-95"
                 >
                   <span className="text-3xl">➕</span>
-                  <span className="text-sm font-medium">新建模块</span>
-                  <div className="text-[10px] text-gray-400 dark:text-gray-500">
-                    <div>待自定义</div>
+                  <span className="w-full truncate text-center text-sm font-medium">新建模块</span>
+                  <div className="text-center text-[10px] leading-4 text-gray-400 dark:text-gray-500">
+                    <div>创建自定义题库</div>
+                    <div>设置每日新卡</div>
                   </div>
                 </button>
               );
@@ -128,15 +182,18 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <button
                   key={mod.key}
                   onClick={() => onEnterStudy(mod.key)}
-                  className="group relative flex flex-col items-center gap-1.5 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:shadow-md transition-all active:scale-95"
+                  className="homepage-module-card group hover:border-primary/50 hover:shadow-md active:scale-95"
                 >
-                  <span className="text-3xl">{(mod as any).emoji || '📦'}</span>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate w-full text-center">{mod.label}</span>
-                  <span className="text-[10px] text-gray-400">自定义</span>
+                  <span className="text-3xl">{mod.emoji || '📦'}</span>
+                  <span className="w-full truncate text-center text-sm font-medium text-gray-700 dark:text-gray-300">{mod.label}</span>
+                  <div className="text-center text-[10px] leading-4 text-gray-400 dark:text-gray-500">
+                    <div>自定义题库</div>
+                    <div>开始学习</div>
+                  </div>
                 </button>
               );
             }
-            const cat = CATEGORIES.find((c) => c.key === mod.key)!;
+            const cat = CATEGORIES.find((c) => c.key === mod.key as Category)!;
             const due = dueCountByCategory[cat.key] ?? 0;
             const progress = loadProgress(cat.key);
             const newCount = Object.values(progress.sm2).filter((s) => !s || s.state === 'new').length;
@@ -144,11 +201,11 @@ export default function HomePage({ onEnterStudy }: Props) {
               <button
                 key={cat.key}
                 onClick={() => onEnterStudy(cat.key)}
-                className="group relative flex flex-col items-center gap-1.5 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:shadow-md transition-all active:scale-95"
+                className="homepage-module-card group hover:border-primary/50 hover:shadow-md active:scale-95"
               >
                 <span className="text-3xl">{ICONS[cat.key] || '📚'}</span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{cat.label}</span>
-                <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                <span className="w-full truncate text-center text-sm font-medium text-gray-700 dark:text-gray-300">{cat.label}</span>
+                <div className="text-center text-[10px] leading-4 text-gray-400 dark:text-gray-500">
                   <div>今日待学习：<span className="text-blue-500 font-medium">{newCount}</span> 张</div>
                   <div>今日待复习：<span className="text-orange-500 font-medium">{due}</span> 张</div>
                 </div>
@@ -158,15 +215,15 @@ export default function HomePage({ onEnterStudy }: Props) {
 
         </div>
 
-                {/* Pagination dots + arrows */}
-        <div className="flex items-center justify-center gap-3 mt-4">
+        {/* Pagination dots + arrows */}
+        <div className="homepage-pagination flex items-center justify-center gap-3">
           <button onClick={goPrev} disabled={page === 0} className="text-gray-300 dark:text-gray-600 disabled:opacity-20 hover:text-gray-500">
             ◀
           </button>
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}
-              onClick={() => setPage(i)}
+              onClick={() => goToPage(i)}
               className={`w-2.5 h-2.5 rounded-full transition-colors ${
                 i === page ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
               }`}
@@ -179,13 +236,6 @@ export default function HomePage({ onEnterStudy }: Props) {
 
         {/* Quick actions */}
         <div className="flex justify-center gap-3 mt-6">
-          <button
-            onClick={() => {}}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors"
-          >
-            <BookOpen className="w-4 h-4" />
-            全部复习
-          </button>
           <button
             onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
