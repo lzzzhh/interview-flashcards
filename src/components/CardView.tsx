@@ -128,17 +128,18 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {card.titleCn}
             </p>
-            <div className="flex flex-wrap gap-1 mt-1.5">
-              {card.tags.map((tag) => (
-                <span key={tag} className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                  {tag}
-                </span>
-              ))}
-            </div>
           </div>
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${DIFFICULTY_COLOR[card.difficulty]}`}>
             {DIFFICULTY_LABEL[card.difficulty]}
           </span>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {card.tags.map((tag) => (
+            <span key={tag} className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+              {tag}
+            </span>
+          ))}
         </div>
 
         <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mt-2">
@@ -215,23 +216,24 @@ function QAView({ card }: { card: QACard }) {
       <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 pb-3 border-b border-gray-100 dark:border-gray-700">
         <ReviewMeta sm2={card.sm2} />
 
-        <div className="flex items-start justify-between gap-3 mt-2">
-          <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed flex-1 text-justify">
+        <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed text-justify">
             <MathText text={card.question} />
           </div>
-          <div className="flex flex-wrap gap-1 justify-end flex-shrink-0">
-            {card.tags && card.tags.map((tag) => (
-              <span key={tag} className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                {tag}
-              </span>
-            ))}
-            {card.subTopic && (
-              <span className="px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary">
-                {card.subTopic}
-              </span>
-            )}
-          </div>
-        </div>
+
+          {card.tags && card.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {card.tags.map((tag) => (
+                <span key={tag} className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                  {tag}
+                </span>
+              ))}
+              {card.subTopic && (
+                <span className="px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary">
+                  {card.subTopic}
+                </span>
+              )}
+            </div>
+          )}
       </div>
 
       {/* Scrollable answer area */}
