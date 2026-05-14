@@ -68,13 +68,15 @@ export default function MathText({ text }: MathTextProps) {
  * - 已经是 $...$ 或 $$...$$ 的 → 保持用户标记
  */
 function preprocess(text: string): string {
+  const readableText = normalizeReadableBreaks(text);
+
   // 如果文本已经包含 $...$ 数学标记，信任用户的格式，但确保换行保留
-  const hasDollarMath = /\$[^$\n]+\$/.test(text) || /\$\$/.test(text);
+  const hasDollarMath = /\$[^$\n]+\$/.test(readableText) || /\$\$/.test(readableText);
   if (hasDollarMath) {
     // 将单换行转为双换行（Markdown 段落分隔）
-    let result = text.replace(/\n/g, '\n\n');
+    let result = readableText.replace(/\n/g, '\n\n');
     // 如果文本没有换行，在句子边界自动分段（。）或编号分隔
-    if (!text.includes('\n')) {
+    if (!readableText.includes('\n')) {
       result = result
         .replace(/。([^$])/g, '。\n\n$1')
         .replace(/；([^$])/g, '；\n$1')
@@ -84,7 +86,7 @@ function preprocess(text: string): string {
     return result;
   }
 
-  const lines = text.split('\n');
+  const lines = readableText.split('\n');
   const result: string[] = [];
   let inFence = false;
   let inDisplayMath = false;
@@ -123,6 +125,118 @@ function preprocess(text: string): string {
   }
 
   return result.join('\n\n');
+}
+
+function normalizeReadableBreaks(text: string): string {
+  const lines = text.split('\n');
+  const formatted: string[] = [];
+  let inFence = false;
+  let inDisplayMath = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (/^```/.test(trimmed)) {
+      inFence = !inFence;
+      formatted.push(line);
+      continue;
+    }
+
+    if (trimmed.startsWith('$$')) {
+      inDisplayMath = !inDisplayMath;
+      formatted.push(line);
+      continue;
+    }
+
+    if (inFence || inDisplayMath || !trimmed) {
+      formatted.push(line);
+      continue;
+    }
+
+    if (/^\s*([-*+]|\d+[.)、]|[（(]\d+[）)])\s+/.test(line)) {
+      formatted.push(line);
+      continue;
+    }
+
+    formatted.push(formatReadableLine(line));
+  }
+
+  return formatted.join('\n');
+}
+
+function formatReadableLine(line: string): string {
+  const { text: protectedLine, restore } = protectReadableSegments(line);
+  const withExplicitItems = splitExplicitItems(protectedLine);
+
+  if (withExplicitItems !== protectedLine) {
+    return restore(withExplicitItems);
+  }
+
+  if (visibleLength(protectedLine) < 150) {
+    return restore(protectedLine);
+  }
+
+  return restore(splitLongParagraph(protectedLine));
+}
+
+function protectReadableSegments(line: string): { text: string; restore: (value: string) => string } {
+  const segments: string[] = [];
+  const mark = (value: string) => {
+    const index = segments.push(value) - 1;
+    return `\uE100${index}\uE101`;
+  };
+
+  const protectedText = line
+    .replace(/`[^`]+`/g, mark)
+    .replace(/\$\$[^]+?\$\$/g, mark)
+    .replace(/\$[^$\n]+\$/g, mark)
+    .replace(/https?:\/\/\S+/g, mark);
+
+  return {
+    text: protectedText,
+    restore: (value: string) => value.replace(/\uE100(\d+)\uE101/g, (_, index: string) => segments[Number(index)] ?? ''),
+  };
+}
+
+function splitExplicitItems(line: string): string {
+  return line
+    .replace(/([：:，,；;。.!?？\s])\((\d{1,2})\)\s*/g, '$1\n（$2）')
+    .replace(/([：:，,；;。.!?？\s])（(\d{1,2})）\s*/g, '$1\n（$2）')
+    .replace(/([：:，,；;。!?？\s])([1-9]\d{0,1})[.、]\s+(?=[^\d])/g, '$1\n（$2）')
+    .replace(/([^\n])((?:第一|第二|第三|第四|第五|第六|第七|第八|第九|第十)(?:步|阶段|类|种|点|层|方面)[:：])/g, '$1\n$2')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function splitLongParagraph(line: string): string {
+  const parts = line
+    .split(/(?<=[。！？；])/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length < 3) {
+    return line;
+  }
+
+  const [intro, ...rest] = parts;
+  const shouldNumber = /[:：]$/.test(intro)
+    || /(?:如下|包括|主要|原因|策略|方案|步骤|流程|优势|缺点|区别|注意事项|关键|核心|方法|类型|场景)/.test(intro);
+  const body = shouldNumber ? rest : parts;
+  const prefix = shouldNumber ? `${intro}\n` : '';
+
+  if (body.length < 2) {
+    return line;
+  }
+
+  if (body.length <= 9) {
+    return `${prefix}${body.map((part, index) => `（${index + 1}）${part}`).join('\n')}`;
+  }
+
+  return parts.join('\n');
+}
+
+function visibleLength(text: string): number {
+  return text.replace(/\uE100\d+\uE101/g, 'MATH').length;
 }
 
 function wrapInlineMath(line: string): string {
