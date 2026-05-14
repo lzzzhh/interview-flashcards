@@ -11,7 +11,9 @@ const progressKeyMap: Record<Category, string> = {
   leetcode: STORAGE_KEYS.LEETCODE_PROGRESS,
   statistics: STORAGE_KEYS.STATISTICS_PROGRESS,
   'machine-learning': STORAGE_KEYS.ML_PROGRESS,
+  'deep-learning': STORAGE_KEYS.DEEP_LEARNING_PROGRESS,
   llm: STORAGE_KEYS.LLM_PROGRESS,
+  agent: STORAGE_KEYS.AGENT_PROGRESS,
   jargon: STORAGE_KEYS.JARGON_PROGRESS,
   workplace: STORAGE_KEYS.WORKPLACE_PROGRESS,
 };
