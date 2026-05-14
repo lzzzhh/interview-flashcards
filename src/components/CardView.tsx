@@ -112,7 +112,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
   };
 
   return (
-    <div className="space-y-4 text-left">
+    <div className="space-y-4">
       {/* Sticky header */}
       <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 pb-3 border-b border-gray-100 dark:border-gray-700">
         <ReviewMeta sm2={card.sm2 as any} />
@@ -216,7 +216,7 @@ function QAView({ card }: { card: QACard }) {
   };
 
   return (
-    <div className="space-y-4 text-left">
+    <div className="space-y-4">
       {/* Sticky header: Meta + Question + Tags */}
       <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 pb-3 border-b border-gray-100 dark:border-gray-700">
         <ReviewMeta sm2={card.sm2} />
