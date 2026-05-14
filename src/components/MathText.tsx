@@ -71,8 +71,17 @@ function preprocess(text: string): string {
   // 如果文本已经包含 $...$ 数学标记，信任用户的格式，但确保换行保留
   const hasDollarMath = /\$[^$\n]+\$/.test(text) || /\$\$/.test(text);
   if (hasDollarMath) {
-    // 将单换行转为双换行（Markdown 段落分隔），remark-breaks 处理 <br>
-    return text.replace(/\n/g, '\n\n');
+    // 将单换行转为双换行（Markdown 段落分隔）
+    let result = text.replace(/\n/g, '\n\n');
+    // 如果文本没有换行，在句子边界自动分段（。）或编号分隔
+    if (!text.includes('\n')) {
+      result = result
+        .replace(/。([^$])/g, '。\n\n$1')
+        .replace(/；([^$])/g, '；\n$1')
+        .replace(/(\d+)\.\s*([^\d])/g, '$1. $2')
+        .replace(/\((\d+)\)/g, '\n($1) ');
+    }
+    return result;
   }
 
   const lines = text.split('\n');
