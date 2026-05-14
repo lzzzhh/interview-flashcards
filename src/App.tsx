@@ -9,7 +9,6 @@ import { useKeyboard } from './hooks/useKeyboard';
 import HomePage from './components/HomePage';
 import CardView from './components/CardView';
 import CardActions from './components/CardActions';
-import ProgressBar from './components/ProgressBar';
 import DarkModeToggle from './components/DarkModeToggle';
 import EmptyState from './components/EmptyState';
 import CardBrowser from './components/CardBrowser';
@@ -17,15 +16,13 @@ import CardEditor from './components/CardEditor';
 import type { FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
-  const { state, dispatch, visibleCards, currentCard, masteredIds, totalDue, totalNew } = useAppContext();
+  const { state, dispatch, currentCard, totalDue, totalNew } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
 
   const getCurrentCardId = useCallback(() => currentCard?.id ?? null, [currentCard]);
   useKeyboard({ dispatch, searchInputRef, getCurrentCardId });
-
-  const cardCount = visibleCards.length;
 
   // Count new cards in current module
   const moduleNewCount = useMemo(() => {
@@ -128,12 +125,6 @@ function StudyPage({ onBack }: { onBack: () => void }) {
           </div>
         ) : (
           <EmptyState message={state.reviewMode ? '🎉 没有到期卡片！' : state.searchQuery ? `未找到「${state.searchQuery}」` : undefined} />
-        )}
-
-        {cardCount > 0 && (
-          <div className="pt-2 pb-8">
-            <ProgressBar current={Math.min(state.currentVisibleIndex, cardCount - 1)} total={cardCount} mastered={masteredIds.length} />
-          </div>
         )}
       </div>
 
