@@ -2,7 +2,7 @@
 // src/components/HomePage.tsx — 首页模块选择
 // ============================================================
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Plus, BookOpen, X } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
@@ -48,7 +48,22 @@ export default function HomePage({ onEnterStudy }: Props) {
   const PER_PAGE = 6;
   const totalPages = Math.ceil((allModules.length + 1) / PER_PAGE); // +1 for create button
   const pageModules = allModules.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
-  const showCreateOnPage = pageModules.length < PER_PAGE || page === totalPages - 1;
+  // Fill remaining slots with placeholder create cards
+  const slots = [...pageModules];
+  while (slots.length < PER_PAGE) {
+    slots.push({ key: `placeholder-${slots.length}`, label: '', icon: null, isPlaceholder: true } as any);
+  }
+
+  // Touch swipe
+  const touchStartX = useRef(0);
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0 && page < totalPages - 1) setPage(page + 1);
+      else if (diff < 0 && page > 0) setPage(page - 1);
+    }
+  };
 
   const handleCreate = () => {
     if (!newName.trim()) return;
@@ -74,8 +89,20 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         {/* Module grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[260px]">
-          {pageModules.map((mod) => {
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[260px]" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+          {slots.map((mod) => {
+            if ((mod as any).isPlaceholder) {
+              return (
+                <button
+                  key={mod.key}
+                  onClick={() => setShowCreate(true)}
+                  className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-primary/30 hover:text-primary transition-colors"
+                >
+                  <Plus className="w-6 h-6" />
+                  <span className="text-xs">新建模块</span>
+                </button>
+              );
+            }
             if (mod.isCustom) {
               return (
                 <button
@@ -109,16 +136,6 @@ export default function HomePage({ onEnterStudy }: Props) {
             );
           })}
 
-          {/* Create button on last page */}
-          {showCreateOnPage && (
-            <button
-              onClick={() => setShowCreate(true)}
-              className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-primary/30 hover:text-primary transition-colors"
-            >
-              <Plus className="w-6 h-6" />
-              <span className="text-xs">新建模块</span>
-            </button>
-          )}
         </div>
 
         {/* Pagination dots */}
