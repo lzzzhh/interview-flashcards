@@ -51,7 +51,8 @@ async function tauriGetPath(): Promise<string> {
 function lsRead(): AppData {
   const keys = [
     'fc-leetcode-progress', 'fc-stats-progress', 'fc-ml-progress',
-    'fc-llm-progress', 'fc-jargon-progress', 'fc-workplace-progress',
+    'fc-deep-learning-progress', 'fc-llm-progress', 'fc-agent-progress',
+    'fc-jargon-progress', 'fc-workplace-progress',
   ];
   const progress: Record<string, StoredProgress> = {};
   for (const key of keys) {

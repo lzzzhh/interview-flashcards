@@ -10,6 +10,7 @@ import {
   useReducer,
   useEffect,
   useMemo,
+  useRef,
   type ReactNode,
 } from 'react';
 import type {
@@ -31,7 +32,7 @@ import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { scheduleReview, createDefaultSM2 } from '../utils/sm2';
 import { loadProgress, saveSettings } from '../utils/storage';
-import { saveAppData } from '../utils/nativeStorage';
+import { loadAppData, saveAppData } from '../utils/nativeStorage';
 import { appendReviewLog } from '../utils/reviewLogs';
 import { shuffle } from '../utils/shuffle';
 import { loadCustomCards } from '../utils/customDecks';
@@ -451,9 +452,18 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, undefined, createInitialState);
 
+  // 启动时从 data.json 恢复进度到 localStorage
+  const hasLoadedData = useRef(false);
+  useEffect(() => {
+    loadAppData().then(() => {
+      hasLoadedData.current = true;
+      // 重建 cardsById，使用刚从文件恢复的进度
+      dispatch({ type: 'SET_CATEGORY', payload: state.category });
+    });
+  }, []);
+
   // 初始化时触发可见卡片计算
   useEffect(() => {
-    // Dispatch a no-op filter change to trigger visibleCardIds computation
     dispatch({ type: 'SET_FILTER_DIFFICULTY', payload: 'all' });
   }, []);
 
@@ -462,8 +472,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle('dark', state.isDark);
   }, [state.isDark]);
 
-  // 持久化
+  // 持久化（数据未从文件恢复前跳过，防止空数据覆盖 data.json）
   useEffect(() => {
+    if (!hasLoadedData.current) return;
+
     const progress: StoredProgress = {
       sm2: {},
       mastered: getMasteredIds(state.cardsById),
@@ -505,7 +517,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       counts[cat] = allCards.filter((c) => {
         const sm2 = progress.sm2[c.id] ?? c.sm2;
         // 新卡片不计入到期数，只有复习过的卡片到期才算
-        return sm2.state !== 'new' && sm2.nextReview <= Date.now();
+        // 防御：state 可以是 learning / review / relearning，缺失或不认识的视为 new
+        const knownStates = new Set(['learning', 'review', 'relearning']);
+        if (!knownStates.has(sm2.state)) return false;
+        return sm2.nextReview <= Date.now();
       }).length;
     }
     return counts as Record<Category, number>;

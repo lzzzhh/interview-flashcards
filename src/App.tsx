@@ -20,7 +20,7 @@ const MODULES_WITH_DIFFICULTY = new Set([
 ]);
 
 function StudyPage({ onBack }: { onBack: () => void }) {
-  const { state, dispatch, currentCard, totalDue, totalNew } = useAppContext();
+  const { state, dispatch, currentCard, totalNew, dueCountByCategory } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
   const [showDifficultyPicker, setShowDifficultyPicker] = useState(false);
@@ -74,7 +74,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
                 className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors">
                 <span className="text-3xl">🔄</span>
                 <span className="text-base font-bold text-orange-700 dark:text-orange-300">开始复习</span>
-                <span className="text-xs text-orange-500">{totalDue} 张卡片到期</span>
+                <span className="text-xs text-orange-500">[{state.category}] {(dueCountByCategory[state.category] ?? 0)} 张卡片到期</span>
               </button>
               <button onClick={() => setShowBrowser(true)}
                 className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm hover:bg-gray-200 dark:hover:bg-gray-700">
@@ -104,8 +104,8 @@ function StudyPage({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        {state.studyMode === 'review' && totalDue === 0 && (
-          <div className="text-center py-8 text-gray-400">🎉 没有到期卡片！<button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button></div>
+        {state.studyMode === 'review' && (dueCountByCategory[state.category] ?? 0) === 0 && (
+          <div className="text-center py-8 text-gray-400">🎉 没有到期卡片！</div>
         )}
         {state.studyMode === 'new' && totalNew === 0 && (
           <div className="text-center py-8 text-gray-400">🎉 所有卡片都已学过！<button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button></div>

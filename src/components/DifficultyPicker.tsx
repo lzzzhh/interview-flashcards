@@ -2,8 +2,8 @@
 // src/components/DifficultyPicker.tsx — 新卡难度分配选择器
 // ============================================================
 
-import { useState, useMemo } from 'react';
-import { Minus, Plus, ArrowLeft, RotateCcw, Equal } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { Minus, Plus, ArrowLeft, RotateCcw, Equal, Check } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { getModuleDailyLimit } from '../utils/customDecks';
 import { DIFFICULTY_LABEL } from '../constants';
@@ -56,25 +56,33 @@ function autoDistribute(limit: number, available: Record<Difficulty, number>): R
   return { easy, medium, hard };
 }
 
-/** 均分：limit / 3，不能整除的余数优先给中等、再简单、再困难 */
+/** 均分：limit / 3，余数轮询分配给尚有容量的难度，确保最均匀分布 */
 function equalDistribute(limit: number, available: Record<Difficulty, number>): Record<Difficulty, number> {
   const base = Math.floor(limit / 3);
   let easy = Math.min(base, available.easy);
   let medium = Math.min(base, available.medium);
   let hard = Math.min(base, available.hard);
 
-  // Distribute remainder to difficulty with most capacity
+  // 轮询分配余数：每次给尚有容量且当前最少的难度 +1
   let remaining = limit - (easy + medium + hard);
   const order: Difficulty[] = ['medium', 'easy', 'hard'];
-  for (const d of order) {
-    const cap = d === 'easy' ? available.easy : d === 'medium' ? available.medium : available.hard;
-    const cur = d === 'easy' ? easy : d === 'medium' ? medium : hard;
-    const add = Math.min(remaining, cap - cur);
-    if (d === 'easy') easy += add;
-    else if (d === 'medium') medium += add;
-    else hard += add;
-    remaining = limit - (easy + medium + hard);
-    if (remaining <= 0) break;
+  while (remaining > 0) {
+    // 找到当前值最小且还有容量的难度
+    let best: Difficulty | null = null;
+    let bestVal = Infinity;
+    for (const d of order) {
+      const cur = d === 'easy' ? easy : d === 'medium' ? medium : hard;
+      const cap = d === 'easy' ? available.easy : d === 'medium' ? available.medium : available.hard;
+      if (cur < cap && cur < bestVal) {
+        best = d;
+        bestVal = cur;
+      }
+    }
+    if (!best) break; // 所有难度都满了
+    if (best === 'easy') easy++;
+    else if (best === 'medium') medium++;
+    else hard++;
+    remaining--;
   }
 
   return { easy, medium, hard };
@@ -107,6 +115,14 @@ export default function DifficultyPicker({ onBack }: Props) {
   );
 
   const [counts, setCounts] = useState(initialDist);
+  const [equalActive, setEqualActive] = useState(false);
+
+  // 清除均分高亮
+  useEffect(() => {
+    if (!equalActive) return;
+    const t = setTimeout(() => setEqualActive(false), 800);
+    return () => clearTimeout(t);
+  }, [equalActive]);
 
   const total = counts.easy + counts.medium + counts.hard;
   const canConfirm = total > 0;
@@ -124,7 +140,10 @@ export default function DifficultyPicker({ onBack }: Props) {
   };
 
   const handleReset = () => setCounts({ easy: 0, medium: 0, hard: 0 });
-  const handleEqual = () => setCounts(equalDist);
+  const handleEqual = () => {
+    setCounts(equalDist);
+    setEqualActive(true);
+  };
 
   const handleConfirm = () => {
     if (!canConfirm) return;
@@ -192,7 +211,7 @@ export default function DifficultyPicker({ onBack }: Props) {
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="text-lg font-bold w-12 text-center tabular-nums">{val}</span>
+                  <span className={`text-lg font-bold w-12 text-center tabular-nums transition-all duration-200 ${equalActive ? 'scale-125 text-primary' : ''}`}>{val}</span>
                   <button
                     onClick={() => adjust(diff, 1)}
                     disabled={val >= maxVal || total >= limit}
@@ -231,9 +250,13 @@ export default function DifficultyPicker({ onBack }: Props) {
           </button>
           <button
             onClick={handleEqual}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm transition-all duration-200 ${
+              equalActive
+                ? 'bg-primary/10 text-primary border border-primary/30'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 border border-transparent'
+            }`}
           >
-            <Equal className="w-3.5 h-3.5" />
+            {equalActive ? <Check className="w-3.5 h-3.5" /> : <Equal className="w-3.5 h-3.5" />}
             均分
           </button>
           <button
