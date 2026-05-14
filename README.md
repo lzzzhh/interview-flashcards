@@ -150,33 +150,75 @@ $CI = \\bar{x} \\pm z_{\\alpha/2} \\cdot \\frac{\\sigma}{\\sqrt{n}}$
 
 ## 架构
 
-```
-┌─────────────────────────────────────────────────────┐
-│              面经闪卡.app (9.5 MB)                    │
-│                                                     │
-│  ┌─────────────────────────────────────────────┐   │
-│  │         Web 前端 (React + TypeScript)        │   │
-│  │  ┌─────────┐ ┌──────────┐ ┌────────────┐   │   │
-│  │  │ 卡片渲染 │ │ 评分交互  │ │ 搜索/筛选   │   │   │
-│  │  ├─────────┤ ├──────────┤ ├────────────┤   │   │
-│  │  │ Markdown│ │ 数学公式 │ │ 遗忘曲线    │   │   │
-│  │  │ 渲染    │ │ KaTeX    │ │ 可视化      │   │   │
-│  │  └─────────┘ └──────────┘ └────────────┘   │   │
-│  │  ┌──────────────────────────────────────┐   │   │
-│  │  │ 状态管理: AppContext + useReducer     │   │   │
-│  │  │ SM-2 算法 / ReviewLog / 卡片 CRUD     │   │   │
-│  │  └──────────────────────────────────────┘   │   │
-│  └──────────────────┬──────────────────────────┘   │
-│                     │ IPC (Tauri invoke)            │
-│  ┌──────────────────▼──────────────────────────┐   │
-│  │    Rust 后端 (Tauri v2)                     │   │
-│  │    read_data() / write_data()               │   │
-│  └──────────────────┬──────────────────────────┘   │
-│                     │                               │
-│  ┌──────────────────▼──────────────────────────┐   │
-│  │  ~/Documents/interview-flashcards/data.json  │   │
-│  └─────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────┘
+```mermaid
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Inter, ui-sans-serif, system-ui", "primaryColor": "#eff6ff", "primaryBorderColor": "#2563eb", "primaryTextColor": "#172554", "lineColor": "#64748b", "tertiaryColor": "#f8fafc"}}}%%
+flowchart TB
+  user["面试复习用户"]
+
+  subgraph app["面经闪卡 Desktop App"]
+    direction TB
+
+    subgraph ui["React 19 + TypeScript UI"]
+      direction LR
+      home["HomePage<br/>题库入口"]
+      study["StudyPage<br/>学习 / 复习流"]
+      cards["CardView / CardActions<br/>主动回忆 + 五级评分"]
+      manager["CardBrowser / CardEditor<br/>搜索筛选 + CRUD"]
+      stats["StatsDashboard<br/>进度统计"]
+    end
+
+    subgraph state["应用状态与学习引擎"]
+      direction LR
+      context["AppContext + useReducer<br/>cardsById / visibleCardIds"]
+      sm2["SM-2 调度<br/>到期复习 / 掌握状态"]
+      keyboard["useKeyboard<br/>全键盘操作"]
+      render["Markdown + KaTeX<br/>公式与代码渲染"]
+    end
+
+    subgraph data["题库与本地数据层"]
+      direction LR
+      builtin["内置题库<br/>算法 / 统计 / ML / DL / LLM / Agent / 黑话 / 职场"]
+      custom["自定义卡组<br/>CSV 导入导出"]
+      browserStore["浏览器模式<br/>File System Access API"]
+      nativeStore["Tauri 模式<br/>nativeStorage"]
+    end
+
+    subgraph tauri["Tauri v2 Shell"]
+      direction TB
+      invoke["IPC invoke"]
+      rust["Rust commands<br/>read_data / write_data / get_data_path"]
+      file["~/Documents/interview-flashcards/data.json"]
+    end
+  end
+
+  user --> home
+  home --> study
+  study --> cards
+  study --> manager
+  study --> stats
+  cards --> context
+  manager --> context
+  keyboard --> context
+  context --> sm2
+  context --> render
+  builtin --> context
+  custom --> context
+  context --> browserStore
+  context --> nativeStore
+  nativeStore --> invoke --> rust --> file
+  browserStore -. 可选同步路径 .-> file
+
+  classDef surface fill:#eff6ff,stroke:#2563eb,color:#172554,stroke-width:1.4px;
+  classDef engine fill:#f0fdf4,stroke:#16a34a,color:#052e16,stroke-width:1.4px;
+  classDef storage fill:#fff7ed,stroke:#ea580c,color:#431407,stroke-width:1.4px;
+  classDef shell fill:#f5f3ff,stroke:#7c3aed,color:#2e1065,stroke-width:1.4px;
+  classDef actor fill:#f8fafc,stroke:#475569,color:#0f172a,stroke-width:1.4px;
+
+  class user actor;
+  class home,study,cards,manager,stats surface;
+  class context,sm2,keyboard,render engine;
+  class builtin,custom,browserStore,nativeStore storage;
+  class invoke,rust,file shell;
 ```
 
 ## 从源码构建
