@@ -28,17 +28,19 @@ case "$OS" in
   Darwin)
     PLATFORM="macos"
     if [ "$ARCH" = "arm64" ]; then
-      ARCH_NAME="aarch64"
+      ARCH_PATTERN="aarch64.dmg"
       EXT="dmg"
     else
-      ARCH_NAME="x86_64"
+      ARCH_PATTERN="x64.dmg"
       EXT="dmg"
     fi
+    INSTALL_CMD='hdiutil attach "$DL" -quiet && cp -R "/Volumes/面经闪卡/面经闪卡.app" /Applications/ && hdiutil detach "/Volumes/面经闪卡" -quiet'
     ;;
   Linux)
     PLATFORM="linux"
-    ARCH_NAME="amd64"
-    EXT="AppImage"
+    ARCH_PATTERN="amd64.deb"
+    EXT="deb"
+    INSTALL_CMD='sudo dpkg -i "$DL"'
     ;;
   MINGW*|MSYS*|CYGWIN*)
     echo -e "${RED}Windows 请手动下载 .exe 安装包${NC}"
@@ -51,48 +53,44 @@ case "$OS" in
     ;;
 esac
 
-echo "  平台: $PLATFORM ($ARCH_NAME)"
+echo "  平台: $PLATFORM"
 
 # ---- 获取最新 Release ----
 echo "  正在查找最新版本..."
-LATEST_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep "browser_download_url" | grep "$PLATFORM" | grep "$ARCH_NAME" | head -1 | cut -d '"' -f 4)
+LATEST_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep "browser_download_url" | grep "$ARCH_PATTERN" | head -1 | cut -d '"' -f 4)
 
 if [ -z "$LATEST_URL" ]; then
-  echo -e "${RED}未找到 $PLATFORM ($ARCH_NAME) 的安装包${NC}"
+  echo -e "${RED}未找到 ${PLATFORM} 安装包${NC}"
   echo "  请访问: https://github.com/$REPO/releases"
   exit 1
 fi
 
-VERSION=$(echo "$LATEST_URL" | grep -o 'v[0-9.]*' | head -1)
-echo "  最新版本: $VERSION"
+echo "  下载地址: $LATEST_URL"
 
 # ---- 下载 ----
 TMP_DIR=$(mktemp -d)
-FILENAME="${APP_NAME}_${VERSION}_${PLATFORM}_${ARCH_NAME}.${EXT}"
-echo "  正在下载 $FILENAME ..."
-curl -L -# -o "$TMP_DIR/$FILENAME" "$LATEST_URL"
+DL_FILE="$TMP_DIR/面经闪卡.${EXT}"
+echo "  正在下载..."
+curl -L -# -o "$DL_FILE" "$LATEST_URL"
 
 # ---- 安装 ----
 case "$PLATFORM" in
   macos)
     echo "  正在挂载 DMG..."
-    hdiutil attach "$TMP_DIR/$FILENAME" -quiet
+    hdiutil attach "$DL_FILE" -quiet
     echo "  正在复制到 /Applications..."
-    cp -R "/Volumes/$APP_NAME/$APP_NAME.app" /Applications/ 2>/dev/null || true
-    hdiutil detach "/Volumes/$APP_NAME" -quiet 2>/dev/null || true
+    cp -R "/Volumes/面经闪卡/面经闪卡.app" /Applications/ 2>/dev/null || true
+    hdiutil detach "/Volumes/面经闪卡" -quiet 2>/dev/null || true
+    xattr -cr /Applications/面经闪卡.app 2>/dev/null || true
     echo ""
     echo -e "${GREEN}✅ 安装完成！${NC}"
-    echo "  在 /Applications 中找到「面经闪卡」并打开"
-    echo "  或运行: open /Applications/面经闪卡.app"
+    echo "  运行: open /Applications/面经闪卡.app"
     ;;
   linux)
-    chmod +x "$TMP_DIR/$FILENAME"
-    echo "  移动到 ~/Applications/"
-    mkdir -p ~/Applications
-    mv "$TMP_DIR/$FILENAME" ~/Applications/
+    echo "  正在安装..."
+    sudo dpkg -i "$DL_FILE"
     echo ""
     echo -e "${GREEN}✅ 安装完成！${NC}"
-    echo "  运行: ~/Applications/$FILENAME"
     ;;
 esac
 
