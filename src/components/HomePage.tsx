@@ -3,7 +3,7 @@
 // ============================================================
 
 import { useState, useMemo, useRef } from 'react';
-import { Plus, BookOpen, X } from 'lucide-react';
+import { BookOpen, X } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
 import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, type CustomDeck } from '../utils/customDecks';
@@ -77,7 +77,7 @@ export default function HomePage({ onEnterStudy }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center">
-      <div className="max-w-xl w-full px-4 py-8">
+      <div className="max-w-xl w-full px-4 py-8" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -89,17 +89,18 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         {/* Module grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[260px]" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[260px]">
           {slots.map((mod) => {
             if ((mod as any).isPlaceholder) {
               return (
                 <button
                   key={mod.key}
                   onClick={() => setShowCreate(true)}
-                  className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-primary/30 hover:text-primary transition-colors"
+                  className="flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-primary/30 hover:text-primary transition-colors"
                 >
-                  <Plus className="w-6 h-6" />
-                  <span className="text-xs">新建模块</span>
+                  <span className="text-3xl">➕</span>
+                  <span className="text-sm font-medium">新建模块</span>
+                  <div className="text-[10px] text-gray-400">待自定义</div>
                 </button>
               );
             }
