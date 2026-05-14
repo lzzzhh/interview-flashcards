@@ -37,6 +37,11 @@ import { shuffle } from '../utils/shuffle';
 import { loadCustomCards } from '../utils/customDecks';
 import { getModuleDailyLimit } from '../utils/customDecks';
 
+// ---- Modules that support difficulty-based new card picking ----
+const MODULES_WITH_DIFFICULTY = new Set([
+  'leetcode', 'statistics', 'machine-learning', 'deep-learning', 'llm', 'agent',
+]);
+
 // ---- Undo support ----
 let lastRating: { cardId: string; previousSm2: any } | null = null;
 export function setLastRating(data: typeof lastRating) { lastRating = data; }
@@ -105,8 +110,32 @@ function computeVisibleIds(state: AppState): string[] {
       const sm2 = state.cardsById[id]?.sm2;
       return !sm2 || sm2.state === 'new';
     });
-    const limit = getModuleDailyLimit(state.category);
-    ids = newIds.slice(0, limit);
+
+    if (MODULES_WITH_DIFFICULTY.has(state.category)) {
+      // 按难度分组，按 distribution 取对应数量
+      const byDiff: Record<'easy' | 'medium' | 'hard', string[]> = { easy: [], medium: [], hard: [] };
+      for (const id of newIds) {
+        const card = state.cardsById[id];
+        let diff: 'easy' | 'medium' | 'hard' = 'medium';
+        if (isLeetCodeCard(card)) {
+          diff = card.difficulty;
+        } else if ('difficulty' in card && card.difficulty) {
+          diff = card.difficulty as 'easy' | 'medium' | 'hard';
+        }
+        byDiff[diff].push(id);
+      }
+      const { easy, medium, hard } = state.difficultyDistribution;
+      const picked = [
+        ...byDiff.easy.slice(0, easy),
+        ...byDiff.medium.slice(0, medium),
+        ...byDiff.hard.slice(0, hard),
+      ];
+      // 打乱使不同难度的卡片混合
+      ids = shuffle(picked);
+    } else {
+      const limit = getModuleDailyLimit(state.category);
+      ids = newIds.slice(0, limit);
+    }
   } else if (state.studyMode === 'review') {
     ids = ids.filter((id) => {
       const sm2 = state.cardsById[id]?.sm2;
@@ -179,6 +208,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
         searchQuery: '',
         shuffled: false,
         reviewMode: false,
+        studyMode: 'choose' as const,
+        difficultyDistribution: { easy: 0, medium: 0, hard: 0 },
       };
       return { ...nextState, visibleCardIds: computeVisibleIds(nextState), currentVisibleIndex: 0 };
     }
@@ -327,8 +358,21 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, dailyNewLimit: action.payload };
 
     case 'SET_STUDY_MODE': {
-      const next = { ...state, studyMode: action.payload };
+      const next = { 
+        ...state, 
+        studyMode: action.payload,
+        difficultyDistribution: action.payload === 'choose' ? { easy: 0, medium: 0, hard: 0 } : state.difficultyDistribution,
+      };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
+    case 'START_NEW_STUDY': {
+      const next = {
+        ...state,
+        studyMode: 'new' as const,
+        difficultyDistribution: { easy: action.payload.easy, medium: action.payload.medium, hard: action.payload.hard },
+      };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0, qaAnswerVisible: false };
     }
 
     case 'UNDO_LAST_RATING': {
@@ -385,6 +429,7 @@ function createInitialState(): AppState {
     reviewMode: false,
     dailyNewLimit: 20,
     studyMode: 'choose',
+    difficultyDistribution: { easy: 0, medium: 0, hard: 0 },
   };
 }
 

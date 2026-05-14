@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host --port 3000",
-    "dev:local": "vite",
+    "dev:local": "vite --port 3000",
     "dev:desktop": "tauri dev",
     "build": "tsc -b && vite build",
     "build:ci": "vite build",

@@ -5,6 +5,7 @@
 export type Category = 'leetcode' | 'statistics' | 'machine-learning' | 'deep-learning' | 'llm' | 'agent' | 'jargon' | 'workplace' | string;
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type CardState = 'new' | 'learning' | 'review' | 'relearning';
+export type StudyMode = 'choose' | 'new' | 'review';
 
 /** SM-2 复习状态（增强版） */
 export interface SM2Record {
@@ -93,7 +94,8 @@ export interface AppState {
   shuffled: boolean;
   reviewMode: boolean;
   dailyNewLimit: number;
-  studyMode: 'choose' | 'new' | 'review';
+  studyMode: StudyMode;
+  difficultyDistribution: Record<Difficulty, number>;
 }
 
 // ============================================================
@@ -122,7 +124,8 @@ export type AppAction =
   | { type: 'UPDATE_CARD'; payload: FlashCard }
   | { type: 'DELETE_CARD'; payload: string }
   | { type: 'SET_DAILY_NEW_LIMIT'; payload: number }
-  | { type: 'SET_STUDY_MODE'; payload: 'choose' | 'new' | 'review' }
+  | { type: 'SET_STUDY_MODE'; payload: StudyMode }
+  | { type: 'START_NEW_STUDY'; payload: { easy: number; medium: number; hard: number } }
   | { type: 'UNDO_LAST_RATING' };
 
 // ============================================================

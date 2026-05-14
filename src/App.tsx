@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, useMemo } from 'react';
+import { useRef, useCallback, useState, useMemo, useEffect } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
@@ -10,14 +10,26 @@ import DarkModeToggle from './components/DarkModeToggle';
 import EmptyState from './components/EmptyState';
 import CardBrowser from './components/CardBrowser';
 import CardEditor from './components/CardEditor';
+import DifficultyPicker from './components/DifficultyPicker';
 import type { FlashCard } from './types';
 import { getModuleDailyLimit } from './utils/customDecks';
+
+/** Built-in modules that support difficulty-based new card distribution */
+const MODULES_WITH_DIFFICULTY = new Set([
+  'leetcode', 'statistics', 'machine-learning', 'deep-learning', 'llm', 'agent',
+]);
 
 function StudyPage({ onBack }: { onBack: () => void }) {
   const { state, dispatch, currentCard, totalDue, totalNew } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
+  const [showDifficultyPicker, setShowDifficultyPicker] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
+
+  // Reset picker visibility when study mode changes
+  useEffect(() => {
+    setShowDifficultyPicker(false);
+  }, [state.studyMode]);
 
   const getCurrentCardId = useCallback(() => currentCard?.id ?? null, [currentCard]);
   useKeyboard({ dispatch, searchInputRef, getCurrentCardId });
@@ -28,7 +40,18 @@ function StudyPage({ onBack }: { onBack: () => void }) {
     return Object.values(state.cardsById).filter((c) => !c.sm2.state || c.sm2.state === 'new').length;
   }, [state.cardsById]);
 
+  if (state.studyMode === 'choose' && showDifficultyPicker) {
+    return <DifficultyPicker onBack={() => setShowDifficultyPicker(false)} />;
+  }
+
   if (state.studyMode === 'choose') {
+    const handleStartNew = () => {
+      if (MODULES_WITH_DIFFICULTY.has(state.category)) {
+        setShowDifficultyPicker(true);
+      } else {
+        dispatch({ type: 'SET_STUDY_MODE', payload: 'new' });
+      }
+    };
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
         <div className="max-w-xl mx-auto px-3 sm:px-4 py-3 space-y-3">
@@ -41,7 +64,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
           <div className="flex flex-col items-center justify-center py-16">
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">开始学习</h2>
             <div className="w-full max-w-xs space-y-4">
-              <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'new' })}
+              <button onClick={handleStartNew}
                 className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
                 <span className="text-3xl">🆕</span>
                 <span className="text-base font-bold text-blue-700 dark:text-blue-300">学习新卡</span>
