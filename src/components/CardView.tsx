@@ -59,7 +59,7 @@ function ReviewMeta({ sm2 }: { sm2: { state?: string; repetitions: number; easeF
   const isNew = !sm2.state || sm2.state === 'new';
 
   return (
-    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700 pb-2 mb-2 sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 mx-4">
+    <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700 pb-2 mb-2 sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1">
       {isNew ? (
         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">🆕 新学</span>
       ) : (
