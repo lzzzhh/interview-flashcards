@@ -221,7 +221,7 @@ function QAView({ card }: { card: QACard }) {
           </div>
 
           {card.tags && card.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
+            <div className="flex flex-wrap gap-1.5 mt-2 px-3">
               {card.tags.map((tag) => (
                 <span key={tag} className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                   {tag}
