@@ -74,7 +74,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
                 className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors">
                 <span className="text-3xl">🔄</span>
                 <span className="text-base font-bold text-orange-700 dark:text-orange-300">开始复习</span>
-                <span className="text-xs text-orange-500">[{state.category}] {(dueCountByCategory[state.category] ?? 0)} 张卡片到期</span>
+                <span className="text-xs text-orange-500">{(dueCountByCategory[state.category] ?? 0)} 张卡片到期</span>
               </button>
               <button onClick={() => setShowBrowser(true)}
                 className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm hover:bg-gray-200 dark:hover:bg-gray-700">
