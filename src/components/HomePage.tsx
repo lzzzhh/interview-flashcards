@@ -2,7 +2,7 @@
 // src/components/HomePage.tsx — 首页模块选择
 // ============================================================
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { BookOpen, X } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
@@ -54,16 +54,37 @@ export default function HomePage({ onEnterStudy }: Props) {
     slots.push({ key: `placeholder-${slots.length}`, label: '', icon: null, isPlaceholder: true } as any);
   }
 
-  // Touch swipe
+  // Touch + wheel swipe
   const touchStartX = useRef(0);
+  const lastWheelTime = useRef(0);
+
+  const goNext = () => { if (page < totalPages - 1) setPage(p => p + 1); };
+  const goPrev = () => { if (page > 0) setPage(p => p - 1); };
+
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e: React.TouchEvent) => {
     const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0 && page < totalPages - 1) setPage(page + 1);
-      else if (diff < 0 && page > 0) setPage(page - 1);
+    if (Math.abs(diff) > 50) diff > 0 ? goNext() : goPrev();
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    const now = Date.now();
+    if (now - lastWheelTime.current < 800) return; // debounce
+    if (Math.abs(e.deltaX) > 40 || (e.shiftKey && Math.abs(e.deltaY) > 40)) {
+      lastWheelTime.current = now;
+      (e.deltaX > 0 || e.deltaY > 0) ? goNext() : goPrev();
     }
   };
+
+  // Keyboard arrows
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'ArrowRight') goNext();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [page, totalPages]);
 
   const handleCreate = () => {
     if (!newName.trim()) return;
@@ -77,7 +98,7 @@ export default function HomePage({ onEnterStudy }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center">
-      <div className="max-w-xl w-full px-4 py-8" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div className="max-w-xl w-full px-4 py-8 min-h-screen flex flex-col justify-center" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel}>
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -139,20 +160,24 @@ export default function HomePage({ onEnterStudy }: Props) {
 
         </div>
 
-        {/* Pagination dots */}
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2 mt-4">
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setPage(i)}
-                className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                  i === page ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
-                }`}
-              />
-            ))}
-          </div>
-        )}
+                {/* Pagination dots + arrows */}
+        <div className="flex items-center justify-center gap-3 mt-4">
+          <button onClick={goPrev} disabled={page === 0} className="text-gray-300 dark:text-gray-600 disabled:opacity-20 hover:text-gray-500">
+            ◀
+          </button>
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i)}
+              className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                i === page ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            />
+          ))}
+          <button onClick={goNext} disabled={page >= totalPages - 1} className="text-gray-300 dark:text-gray-600 disabled:opacity-20 hover:text-gray-500">
+            ▶
+          </button>
+        </div>
 
         {/* Quick actions */}
         <div className="flex justify-center gap-3 mt-6">
