@@ -158,8 +158,8 @@ function AppInner() {
   const { dispatch } = useAppContext();
 
   const handleEnterStudy = (category: string) => {
-    dispatch({ type: 'SET_CATEGORY', payload: category as any });
     setStudyCategory(category);
+    dispatch({ type: 'SET_CATEGORY', payload: category as any });
   };
 
   if (studyCategory) {

@@ -216,12 +216,12 @@ function QAView({ card }: { card: QACard }) {
       <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 pb-3 border-b border-gray-100 dark:border-gray-700">
         <ReviewMeta sm2={card.sm2} />
 
-        <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed text-justify px-4 overflow-x-auto">
+        <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-relaxed text-justify overflow-x-auto">
             <MathText text={card.question} />
           </div>
 
           {card.tags && card.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2 px-4">
+            <div className="flex flex-wrap gap-1.5 mt-2">
               {card.tags.map((tag) => (
                 <span key={tag} className="px-2 py-0.5 rounded-md text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                   {tag}
