@@ -120,11 +120,6 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
         {/* Tabs hidden */}
 
-        {/* Study mode indicator — subtle text */}
-        <div className="text-center text-xs text-gray-400 dark:text-gray-500">
-          {state.studyMode === 'review' ? '🔄 复习' : '🆕 新学'} · {state.currentVisibleIndex + 1}/{Math.max(cardCount, 1)}
-        </div>
-
         {/* Card */}
         {currentCard ? (
           <div className="space-y-4" key={currentCard.id}>
@@ -162,10 +157,14 @@ function AppInner() {
     dispatch({ type: 'SET_CATEGORY', payload: category as any });
   };
 
-  if (studyCategory) {
-    return <StudyPage onBack={() => setStudyCategory(null)} />;
-  }
-  return <HomePage onEnterStudy={handleEnterStudy} />;
+  return (
+    <>
+      <div className={studyCategory ? 'hidden' : ''}>
+        <HomePage onEnterStudy={handleEnterStudy} />
+      </div>
+      {studyCategory && <StudyPage onBack={() => setStudyCategory(null)} />}
+    </>
+  );
 }
 
 export default function App() {
