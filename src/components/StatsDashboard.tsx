@@ -5,7 +5,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import { DIFFICULTY_LABEL } from '../constants';
+import { DIFFICULTY_LABEL, CATEGORIES } from '../constants';
 import { exportProgress, importProgress } from '../utils/backup';
 import {
   loadReviewLogs,
@@ -17,6 +17,7 @@ import {
   getDifficultCards,
   isReallyMastered,
 } from '../utils/reviewLogs';
+import { loadCustomDecks, getModuleDailyLimit, setModuleDailyLimit } from '../utils/customDecks';
 import { leetcodeHot100 } from '../data/leetcode-hot100';
 import { statisticsCards } from '../data/statistics';
 import { machineLearningCards } from '../data/machine-learning';
@@ -322,25 +323,15 @@ export default function StatsDashboard() {
           {/* Settings */}
           <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              学习设置
+              每日新卡上限
             </h3>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">每日新卡上限</span>
-              <div className="flex items-center gap-2">
-                <input
-                  type="range"
-                  min="1"
-                  max="100"
-                  value={state.dailyNewLimit}
-                  onChange={(e) => dispatch({ type: 'SET_DAILY_NEW_LIMIT', payload: Number(e.target.value) })}
-                  className="w-24 h-1.5 accent-primary"
-                />
-                <span className="text-sm font-bold text-primary w-8 text-right">
-                  {state.dailyNewLimit}
-                </span>
-              </div>
-            </div>
-            <p className="text-[10px] text-gray-400">复习模式每天最多学这么多张新卡片</p>
+            {CATEGORIES.map((cat) => (
+              <ModuleLimitSlider key={cat.key} moduleId={cat.key} label={cat.label} />
+            ))}
+            {loadCustomDecks().map((d) => (
+              <ModuleLimitSlider key={d.id} moduleId={d.id} label={d.name} />
+            ))}
+            <p className="text-[10px] text-gray-400">每个模块独立设置，学习新卡时生效</p>
           </div>
 
           {/* Import / Export */}
@@ -495,6 +486,26 @@ function StatBox({
       <div className={`mb-1 ${color}`}>{icon}</div>
       <p className={`text-lg font-bold ${color}`}>{value}{suffix || ''}</p>
       <p className="text-[10px] text-gray-500 dark:text-gray-400">{label}</p>
+    </div>
+  );
+}
+
+function ModuleLimitSlider({ moduleId, label }: { moduleId: string; label: string }) {
+  const [limit, setLimit] = useState(() => getModuleDailyLimit(moduleId));
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-gray-500 w-24 truncate">{label}</span>
+      <div className="flex items-center gap-2">
+        <input
+          type="range"
+          min="1"
+          max="100"
+          value={limit}
+          onChange={(e) => { const v = Number(e.target.value); setLimit(v); setModuleDailyLimit(moduleId, v); }}
+          className="w-20 h-1.5 accent-primary"
+        />
+        <span className="text-xs font-bold text-primary w-6 text-right">{limit}</span>
+      </div>
     </div>
   );
 }

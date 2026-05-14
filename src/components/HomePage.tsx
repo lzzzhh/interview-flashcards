@@ -6,7 +6,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
-import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, type CustomDeck } from '../utils/customDecks';
+import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, getModuleDailyLimit, type CustomDeck } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
 import { loadProgress } from '../utils/storage';
 import type { Category } from '../types';
@@ -213,6 +213,8 @@ export default function HomePage({ onEnterStudy }: Props) {
             const due = dueCountByCategory[cat.key] ?? 0;
             const progress = loadProgress(cat.key);
             const newCount = Object.values(progress.sm2).filter((s) => !s || s.state === 'new').length;
+            const limit = getModuleDailyLimit(cat.key);
+            const showNew = Math.min(newCount, limit);
             return (
               <button
                 key={cat.key}
@@ -222,7 +224,7 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <span className="text-3xl">{ICONS[cat.key] || '📚'}</span>
                 <span className="w-full truncate text-center text-sm font-medium text-gray-700 dark:text-gray-300">{cat.label}</span>
                 <div className="text-center text-[10px] leading-4 text-gray-400 dark:text-gray-500">
-                  <div>今日待学习：<span className="text-blue-500 font-medium">{newCount}</span> 张</div>
+                  <div>今日待学习：<span className="text-blue-500 font-medium">{showNew}</span>/<span className="text-gray-400">{limit}</span> 张</div>
                   <div>今日待复习：<span className="text-orange-500 font-medium">{due}</span> 张</div>
                 </div>
               </button>
