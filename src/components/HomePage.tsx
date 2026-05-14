@@ -8,6 +8,7 @@ import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
 import { loadCustomDecks, createCustomDeck, deleteCustomDeck, type CustomDeck } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
+import { loadProgress } from '../utils/storage';
 
 const ICONS: Record<string, string> = {
   leetcode: '🔥',
@@ -23,7 +24,7 @@ interface Props {
 }
 
 export default function HomePage({ onEnterStudy }: Props) {
-  const { dispatch, dueCountByCategory, totalNew, totalDue } = useAppContext();
+  const { dispatch, dueCountByCategory } = useAppContext();
   const [customDecks, setCustomDecks] = useState<CustomDeck[]>(() => loadCustomDecks());
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
@@ -51,11 +52,7 @@ export default function HomePage({ onEnterStudy }: Props) {
             📚 面经闪卡
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {totalNew + totalDue > 0 ? (
-              <>到期复习 <span className="text-orange-500 font-medium">{totalDue}</span> · 可学新卡 <span className="text-blue-500 font-medium">{totalNew}</span></>
-            ) : (
-              '选择一个模块开始学习'
-            )}
+            选择一个模块开始学习
           </p>
         </div>
 
@@ -63,17 +60,21 @@ export default function HomePage({ onEnterStudy }: Props) {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {CATEGORIES.map((cat) => {
             const due = dueCountByCategory[cat.key] ?? 0;
+            const progress = loadProgress(cat.key);
+            const newCount = Object.values(progress.sm2).filter((s) => !s || s.state === 'new').length;
             return (
               <button
                 key={cat.key}
                 onClick={() => onEnterStudy(cat.key)}
-                className="group relative flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:shadow-md transition-all active:scale-95"
+                className="group relative flex flex-col items-center gap-1.5 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:shadow-md transition-all active:scale-95"
               >
                 <span className="text-3xl">{ICONS[cat.key] || '📚'}</span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{cat.label}</span>
-                {due > 0 && (
-                  <span className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-orange-500 text-white">
-                    {due > 99 ? '99+' : due}
+                {(due > 0 || newCount > 0) && (
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                    {due > 0 && <span className="text-orange-500 font-medium">{due}复习</span>}
+                    {due > 0 && newCount > 0 && ' · '}
+                    {newCount > 0 && <span className="text-blue-500 font-medium">{newCount}新</span>}
                   </span>
                 )}
               </button>
