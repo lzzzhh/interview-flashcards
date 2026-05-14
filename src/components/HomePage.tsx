@@ -118,6 +118,22 @@ export default function HomePage({ onEnterStudy }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   }, [goNext, goPrev]);
 
+  // Mouse drag to flip
+  const dragRef = useRef({ down: false, startX: 0, lastOffset: 0 });
+  const handleMouseDown = (e: React.MouseEvent) => {
+    dragRef.current = { down: true, startX: e.clientX, lastOffset: 0 };
+  };
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!dragRef.current.down) return;
+    const diff = e.clientX - dragRef.current.startX;
+    if (Math.abs(diff) > 5 && Math.abs(diff - dragRef.current.lastOffset) > 2) {
+      dragRef.current.lastOffset = diff;
+      if (diff < -60) { dragRef.current.down = false; goNext(); }
+      else if (diff > 60) { dragRef.current.down = false; goPrev(); }
+    }
+  };
+  const handleMouseUp = () => { dragRef.current.down = false; };
+
   const handleCreate = () => {
     if (!newName.trim()) return;
     const deck = createCustomDeck(newName.trim(), newIcon || '📦');
@@ -130,7 +146,7 @@ export default function HomePage({ onEnterStudy }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center">
-      <div className="homepage-shell max-w-xl w-full px-4 py-8" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel}>
+      <div className="homepage-shell max-w-xl w-full px-4 py-8 select-none" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
         {/* Header */}
         <div className="homepage-header text-center">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
