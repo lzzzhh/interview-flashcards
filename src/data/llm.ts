@@ -299,77 +299,6 @@ export const llmCards: QACard[] = [
   },
 
   // ============================================================
-  // Agent — 6 题 (llm-27 ~ llm-32)
-  // ============================================================
-
-  {
-    id: 'llm-27',
-    category: 'llm',
-    question: "什么是 ReAct 框架？它如何让 LLM 进行推理和行动的交替？",
-    answer: "ReAct（Reasoning + Acting）是 Google 在 2022 年提出的框架，让 LLM 交替进行\"思考（Reasoning）\"和\"行动（Action）\"以完成复杂任务。\n\n核心理念：传统 CoT（Chain-of-Thought）只推理不行动依赖模型内部知识可能产生幻觉；Act-only 只行动不思考缺乏规划容易在错误路径上浪费步骤。ReAct 将两者结合——思考（Thought）分析当前状态规划下一步判断是否需要更多信息，行动（Action）调用外部工具（搜索、计算器、API 等），观察（Observation）获取行动结果（外部反馈），循环执行 Thought→Action→Observation→Thought→...\n\n框架流程示例（问答）：Question: \"2023 年诺贝尔物理学奖得主是哪国人？\" → Thought: 需要查找得主信息 → Action: Search[\"2023 Nobel Prize Physics winners\"] → Observation: 得主为 Pierre Agostini, Ferenc Krausz, Anne L'Huillier → Thought: 需分别查询三位得主国籍 → Action: Search each winner → Observation: 分别是法国人、匈牙利人、法国-瑞典人 → Final Answer。\n\nReAct 的关键优势：\n1. 减少幻觉——模型通过外部工具验证信息，不依赖内部可能有误的知识\n2. 可解释性——Thought-Action-Observation 轨迹清晰可读，人类可理解每一步\n3. 动态规划——不预先决定全部步骤，每一步根据观察动态调整\n4. 任务分解——复杂问题分解为多个子任务各自调用不同工具\n5. 与 Tool-Use 天然结合——是当前 LLM Agent 的基础框架，Function Calling 可看作 ReAct 的特化版本\n\n实现要点：Few-shot Prompting 给出 ReAct 格式示例，正确解析 Thought/Action/Observation 边界，明确每个工具名称/输入参数/输出格式，设置停止条件（最大步数或 Final Answer）。",
-    tags: ['ReAct', 'Agent框架', '推理+行动', 'Tool-Use'],
-    subTopic: 'Agent',
-    difficulty: 'medium',
-    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
-    favorited: false,
-  },
-  {
-    id: 'llm-28',
-    category: 'llm',
-    question: "Function Calling 的机制是什么？LLM 如何实现\"调用函数\"这一能力？",
-    answer: "Function Calling 是让 LLM 能够使用外部工具/API 的机制，其本质不是 LLM 真正\"执行\"函数，而是 LLM 生成结构化的函数调用参数。\n\n完整机制（以 OpenAI 为例）：\n1. 定义函数（Function Definitions）——在请求中告知 LLM 可以使用哪些函数。每个函数包含 name、description、parameters（JSON Schema 格式，如 {name: \"get_weather\", description: \"获取城市天气\", parameters: {city: string, unit: enum[celsius,fahrenheit]}}）\n2. LLM 决定是否调用函数——LLM 分析用户输入判断是否需要调用函数，如果需要则选择最合适的函数并生成结构化 JSON 参数\n3. 外部执行函数——开发者代码接收到 LLM 的函数调用请求，实际执行函数（调用天气 API、数据库查询等），获取真实结果\n4. 将结果反馈给 LLM——将函数执行结果以 role: \"tool\" 格式添加到对话历史，LLM 看到结果后生成最终自然语言回答\n\n为什么 LLM 能做到这一点：\n1. 指令微调——使用大量 (user_message, function_call, tool_result, final_answer) 格式数据进行微调，模型学会识别\"何时调用函数\"及\"如何生成正确参数\"\n2. Prompt Engineering——开源模型可通过精心设计 system prompt 实现函数调用，Few-shot 示例帮助模型理解正确行为\n3. 约束生成（Constrained Decoding）——在生成函数参数时限制 token 采样空间，通过修改 logits（mask 掉不合法 token）保证生成的 JSON 语法正确类型匹配\n\n实际工程注意事项：函数描述要足够清晰（不清晰的描述导致选择错误函数），参数要简单避免深层嵌套，错误处理（执行失败时反馈错误信息让模型重试），安全性（永远不要让 LLM 直接执行危险操作，所有函数调用通过沙箱或权限控制执行），并行调用（一个 user message 可能触发多个独立函数调用并行执行减少延迟）。",
-    tags: ['Function Calling', 'Tool-Use', '结构化输出', 'API调用'],
-    subTopic: 'Agent',
-    difficulty: 'medium',
-    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
-    favorited: false,
-  },
-  {
-    id: 'llm-29',
-    category: 'llm',
-    question: "Tool-Use 模式在 LLM Agent 中如何实现？有哪些关键设计考虑？",
-    answer: "Tool-Use（工具使用）是 LLM Agent 的核心能力，让模型超越纯文本生成，与外部世界交互。\n\n实现模式：\n1. 工具定义（Tool Definition）——每个工具明确接口：name（唯一标识）、description（功能描述，这是 LLM 选择工具的关键依据）、parameters（输入参数 schema）、可选 output_schema（返回值格式）\n2. 工具注册（Tool Registry）——维护可用工具列表，LLM 决策时\"查看\"所有可用工具。工具可包括搜索 API、计算器、数据库查询、代码执行器、文件系统操作等\n3. 工具选择与调用——LLM 根据上下文决定使用哪个工具及参数，应用层实际执行工具调用，结果以格式化消息返回\n4. 多轮工具使用——一个任务可能需要多个工具调用，每次结果追加到对话历史，LLM 根据累积信息决定下一步\n\n关键设计考虑：\n1. 工具描述清晰度——差：\"get_data: 获取数据\"；好：\"search_database: 在用户数据库中搜索客户记录，输入 customer_name 和 date_range\"。描述应包含功能、输入参数、返回值、使用场景\n2. 工具粒度——太粗一个万能工具 → LLM 难以生成正确参数；太细数百个微小工具 → 选择困难决策开销大。最佳：合理抽象每个工具职责单一清晰（Unix 哲学），简单工具可组合成复杂工作流\n3. 错误处理与重试——工具执行可能失败，错误信息应结构化让 LLM 可理解，LLM 根据错误调整参数重试，设置最大重试次数防无限循环\n4. 安全与权限控制——分级权限：只读工具自动执行，低风险写操作自动执行，高风险操作需用户确认。沙箱执行代码/命令在隔离环境运行\n5. 上下文管理——工具调用和结果迅速消耗上下文窗口。策略：截断/摘要旧调用，重构工具输出为简洁格式，滑动窗口保留最近交互\n6. 工具调用并行化——无依赖的工具调用应并行执行减少总响应时间\n7. 工具调用格式——OpenAI Function Calling 用 JSON，Anthropic Tool-Use 用 XML-like 结构化输出，自定义格式用特殊 token 包裹\n\n进阶：MCP（Model Context Protocol）是 Anthropic 提出的标准化协议，统一 LLM 与外部工具/数据源的交互方式，类似\"LLM 世界的 HTTP 协议\"。工具提供者实现 MCP Server，LLM 作为 MCP Client。",
-    tags: ['Tool-Use', '工具调用', 'Agent设计', 'MCP'],
-    subTopic: 'Agent',
-    difficulty: 'medium',
-    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
-    favorited: false,
-  },
-  {
-    id: 'llm-30',
-    category: 'llm',
-    question: "多 Agent 协作（Multi-Agent Collaboration）是如何实现的？有哪些经典框架？",
-    answer: "多 Agent 协作是指多个 LLM Agent（各自可能有不同角色、能力和工具）协同工作以完成复杂任务。\n\n协作模式：\n1. 顺序协作（Sequential）——Agent A 完成子任务 → 输出交给 Agent B → ... → 最终输出，类似流水线适合有先后依赖的任务（如需求分析→架构设计→代码编写）\n2. 层级协作（Hierarchical）——\"管理者 Agent\"负责任务分解和分配，多个\"工作者 Agent\"执行具体子任务，管理者汇总结果处理冲突\n3. 辩论式协作（Debate）——多个 Agent 独立生成答案，Agent 间互相审查和质疑（critique），通过多轮辩论收敛到更好答案\n4. 投票式协作（Voting/Ensemble）——多个 Agent 独立解决，对结果多数投票或加权融合\n\n经典多 Agent 框架：\n1. AutoGPT（2023）——由用户给出总体目标，LLM 自主分解任务、选择工具、执行、评估结果。特点：完全自主但容易陷入循环或偏离目标，代表自主完成任务的开创性尝试\n2. MetaGPT（2024，深度赋智）——模拟软件公司多角色协作，定义 Product Manager/Architect/Project Manager/Engineer 等角色。每个 Agent 有自己的 SOP（标准操作流程），通过结构化消息传递减少\"幻觉对话\"，可端到端生成完整软件项目\n3. ChatDev（2023，清华大学）——模拟软件开发流程，多阶段：Designing→Coding→Testing→Documenting，每个阶段由不同角色 Agent 参与\n4. CrewAI/AutoGen（2024，Microsoft）——通用多 Agent 框架。AutoGen 支持自定义 Agent 角色、工具、对话模式，支持 Human-in-the-Loop，Group Chat 中多 Agent+人类群聊协作\n\n关键设计问题：通信协议（自由对话灵活但发散 vs 结构化消息可控但约束）、上下文共享（全局共享消耗 token vs 分层只看相关部分 vs 摘要传递）、冲突解决（管理者仲裁/投票/置信度加权）、成本控制（多 Agent 的 token 消耗是单 Agent 数倍需轻量级 Agent 负责简单任务）、任务分解质量（多 Agent 上限取决于如何拆解任务）。",
-    tags: ['Multi-Agent', '协作', 'AutoGPT', 'MetaGPT', 'AutoGen'],
-    subTopic: 'Agent',
-    difficulty: 'medium',
-    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
-    favorited: false,
-  },
-  {
-    id: 'llm-31',
-    category: 'llm',
-    question: "AutoGPT 和 MetaGPT 这类 Agent 框架的核心设计思想是什么？有哪些共性和差异？",
-    answer: "AutoGPT 和 MetaGPT 都是 LLM Agent 的标杆性框架，代表了两种不同的 Agent 设计哲学。\n\nAutoGPT（2023年3月）——定位为通用自主 Agent。核心思想：\"给一个目标，Agent 自主完成所有步骤\"。技术架构：主循环 Thought→Action→Observation→Thought→...，内置 Memory（向量数据库存储长期记忆），丰富工具集（搜索、文件操作、代码执行、网页浏览），Chain of Thought 提示。优点：完全自主无需人类干预，可处理开放式目标，记忆系统处理长期任务。缺点：容易陷入循环，任务完成率低（~15%），Token 消耗大，缺乏结构化任务管理。\n\nMetaGPT（2023年12月）——定位为面向软件工程的多 Agent 协作系统。核心思想：\"模拟人类团队协作，用 SOP 约束 Agent 行为\"。技术架构：多角色 Agent（PM/Architect/PM/Engineer/QA），结构化输出（每个角色输出符合模板的结构化文档），SOP（严格阶段划分和输入/输出规范），共享消息池+订阅模式。优点：任务完成率高，输出质量高且一致，Token 效率更高，可生成完整可运行软件项目。缺点：灵活性不如 AutoGPT，领域绑定主要适用软件开发，缺乏自主探索能力。\n\n共性：LLM 驱动核心推理引擎，工具增强集成外部工具，记忆系统维护任务相关上下文和历史，循环执行多轮迭代式工作流，Prompt Engineering 为核心引导行为。\n\n差异：设计哲学上 AutoGPT 自主探索 vs MetaGPT 结构化协作；Agent 数量上单自主 Agent vs 多角色化 Agent；任务约束上松散仅目标描述 vs 严格 SOP+模板；适用场景上开放式/探索性任务 vs 软件开发等结构化任务。\n\n趋势与融合：现代 Agent 框架（AutoGen/CrewAI）尝试取两者之长，保持一定结构同时允许 Agent 自主决策。\"Planning+Execution\"双层架构：Planner Agent 制定结构化计划，Executor Agent 自主灵活执行。加入 Human-in-the-Loop 在关键决策点人类确认。",
-    tags: ['AutoGPT', 'MetaGPT', 'Agent架构', '框架对比'],
-    subTopic: 'Agent',
-    difficulty: 'medium',
-    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
-    favorited: false,
-  },
-  {
-    id: 'llm-32',
-    category: 'llm',
-    question: "LLM Agent 中的 Planning（规划）能力是如何实现的？有哪些常用方法？",
-    answer: "Planning（规划）是 LLM Agent 的核心能力，指将复杂任务分解为有序的子任务序列并逐步执行。\n\n主要方法：\n1. Plan-and-Solve（先规划后执行）——第一步 LLM 分析任务生成完整执行计划，第二步 LLM 按计划逐步执行每个子任务。优点：整体视角避免在细节中迷失。缺点：计划可能不准确需重规划机制\n2. ReAct-style（边思考边执行）——交替进行 Thought 和 Action，每一步根据观察动态调整。优点：灵活适应性强化应对意外。缺点：可能缺乏全局视野效率可能低\n3. Tree-of-Thought（ToT）——维护多条推理路径（树结构），在关键决策点生成多个候选方案并评估（用 LLM 自身或外部验证器），结合 BFS/DFS 搜索策略选择最优继续。优点：探索多种可能找到更优解。缺点：计算成本高 token 消耗大\n4. Hierarchical Planning（分层规划）——高层规划生成粗粒度里程碑，低层规划针对每个里程碑生成细粒度步骤。优点：降低单次规划复杂度\n5. Plan + Critique（规划 + 审视）——Plan Agent 生成初始计划，Critique Agent 审视计划找出漏洞和风险，多轮迭代改进计划。优点：提升计划质量减少执行中失败\n6. Plan + Decomposition（任务分解）——使用\"问题分解\"技巧：子问题分解（可拆为哪几个子问题）、时间分解（首先做什么然后呢）、功能分解（需要哪些不同功能模块）\n\n关键技术组件：\n- Plan Representation（计划表示）：自然语言列表最灵活难解析、结构化 JSON 易程序处理、伪代码适合代码任务、有向无环图 DAG 表示子任务依赖\n- Plan Validation（计划验证）：静态验证（执行前检查逻辑一致性依赖完整性）、动态验证（根据执行结果判断计划是否仍合理）、LLM 自验证（\"这个计划有什么问题吗？\"）\n- Plan Adaptation（计划调整）：Replanning（子任务失败时重新规划剩余部分）、Plan Repair（局部修复而非全盘重来）\n- Memory for Planning（记忆辅助规划）：短期记忆当前任务上下文和已完成步骤，长期记忆（向量数据库）类似任务历史计划 RAG 检索，Skill Memory 已学会技能可复用\n\nPlan 质量提升技巧：Few-shot 示例展示良好规划过程，要求 LLM \"写出计划考虑可能失败情况\"，加入约束\"计划不得超过 5 步骤\"，自我反思\"执行前重新审视计划合理性\"，让一个 LLM 规划另一个 LLM 执行（角色分离减少 bias）。",
-    tags: ['Planning', '任务分解', 'Agent规划', 'Tree-of-Thought'],
-    subTopic: 'Agent',
-    difficulty: 'medium',
-    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
-    favorited: false,
-  },
-
-  // ============================================================
   // RAG — 5 题 (llm-33 ~ llm-37)
   // ============================================================
 
@@ -430,16 +359,16 @@ export const llmCards: QACard[] = [
   },
 
   // ============================================================
-  // 评估安全 — 6 题 (llm-38 ~ llm-43)
+  // Transformer (2 题: llm-38 ~ llm-39)
   // ============================================================
 
   {
     id: 'llm-38',
     category: 'llm',
-    question: "什么是 LLM 的 Hallucination（幻觉）？如何检测和缓解？",
-    answer: "Hallucination（幻觉）是指 LLM 生成的内容看似合理但实际上与事实、输入或上下文不符。\n\n幻觉的类型：\n1. 事实性幻觉（Factual Hallucination）——捏造不存在的事实、人物、事件。原因：训练数据不完整、知识过时、概率性生成偏差\n2. 忠实性幻觉（Faithfulness Hallucination）——生成内容偏离用户指令或给定上下文。原因：指令遵循能力不足\n3. 上下文幻觉（Contextual Hallucination）——RAG 场景中生成答案与检索上下文不符。原因：模型过度依赖内部知识忽略检索结果\n\n检测方法：\n1. 基于 NLI（Natural Language Inference）——将生成内容拆解为原子事实，用 NLI 模型判断每个原子事实是否与参考文本一致（contradiction/neutral/entailment）。工具：FactScore、AlignScore\n2. 基于 LLM 自检（Self-Check）——让 LLM 自身检查输出中的事实性陈述，或让另一个 LLM 做\"裁判\"（LLM-as-a-Judge）\n3. RAG 特异性检查——判断生成答案中每一句是否可在检索上下文中找到依据。工具：RAGAS faithfulness 指标\n4. 不确定性估计——多次采样同一问题，如果答案高度不一致→模型不确定可能产生幻觉。计算 semantic entropy（语义熵）\n5. 外部知识验证——将 LLM 事实陈述发送到搜索引擎验证，检查是否有权威来源支持\n\n缓解方法：\n1. RAG（检索增强生成）——最有效方法，让模型基于检索到的权威文档生成，减少依赖内部可能错误的知识\n2. Chain-of-Verification（CoVe）——LLM 先生成答案→生成验证问题→独立回答每个验证问题→对比修正不一致处\n3. Prompt Engineering——在 prompt 中指示\"如果不知道请说不知道\"、\"只基于提供的上下文回答\"、\"标注不确定性\"\n4. 训练阶段缓解——高质量数据过滤用 NLI 过滤矛盾信息，RLHF 阶段惩罚幻觉行为，事实性增强预训练增加可信来源权重\n5. 解码策略——降低 Temperature 减少随机性，使用事实性奖励引导生成\n6. 结构化输出——要求 JSON 格式输出字段明确限制生成空间\n\n评估指标：RAGAS（Faithfulness/Answer Relevancy/Context Precision/Context Recall）、FactScore（事实准确性分解评估）、HaluEval（专门评估幻觉 benchmark）。幻觉无法完全消除——语言模型本质是概率模型不是知识库，目标是管理和控制幻觉影响而非完全消除。",
-    tags: ['Hallucination', '幻觉', '检测', '缓解', 'RAGAS'],
-    subTopic: '评估安全',
+    question: 'Pre-Normalization 和 Post-Normalization 的区别？LayerNorm 和 BatchNorm 在 Transformer 中如何应用？',
+    answer: 'Pre-Normalization（Pre-LN）和Post-Normalization（Post-LN）指LayerNorm在Transformer子层中的位置差异。Post-LN（原始Transformer/BERT使用）的公式为：Output = LayerNorm(x + Sublayer(x))，即先执行Sublayer（Attention或FFN），再将残差连接后的结果送入LayerNorm归一化。这种设计下，残差分支的输出不加控制地逐层累加，导致深层梯度幅值在各层间差异巨大（越靠近输出层梯度越大），训练不稳定，需要学习率warmup（前几千步从小渐增）才能收敛。Pre-LN（现代主流，如LLaMA/GPT-3等使用）的公式为：Output = x + Sublayer(LayerNorm(x))，即先对输入做LayerNorm归一化再送入Sublayer，最后残差相加。Pre-LN将归一化放在残差分支内部，使得梯度在各层均匀分布，训练极其稳定，不需要warmup即可收敛，支持训练百层甚至千层的超深网络。这是Post-LN被几乎全面淘汰而Pre-LN成为标配的根本原因。LayerNorm（LN）在Transformer中的应用：在特征维度D上对每个样本的每个位置独立计算均值和方差进行归一化：μ = (1/D)·Σx_i，σ² = (1/D)·Σ(x_i-μ)²，输出 y = γ·(x-μ)/√(σ²+ε) + β，其中γ和β是可学习的缩放和平移参数。LN不依赖batch内其他样本，天然支持变长序列，训练和推理行为完全一致。BatchNorm（BN）在(N, L)两个维度上求统计量（batch内所有样本的同一特征位置），对每个特征维度做归一化，依赖batch统计量。Transformer使用LayerNorm而非BatchNorm的根本原因：(1) NLP序列长度可变，BN需对不同位置分别统计实现复杂；(2) LN对batch size不敏感——batch=1也能正常工作，BN在batch小时统计量不准确；(3) 训练/推理一致性——BN训练时用batch统计量、推理时用全局移动平均存在gap，LN无此问题。此外，RMSNorm是LayerNorm的简化版（去掉了"减去均值"步骤仅保留缩放），LLaMA/Qwen等广泛使用，计算更快且效果相当。',
+    tags: ['Pre-Normalization', 'Post-Normalization', 'LayerNorm', 'BatchNorm', 'RMSNorm', 'Pre-LN'],
+    subTopic: 'Transformer',
     difficulty: 'medium',
     sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
@@ -447,55 +376,70 @@ export const llmCards: QACard[] = [
   {
     id: 'llm-39',
     category: 'llm',
-    question: "什么是 Jailbreak Attack（越狱攻击）？常见攻击方式和防御策略有哪些？",
-    answer: "Jailbreak Attack（越狱攻击）是指通过精心设计的 prompt 绕过 LLM 的安全对齐机制，使其生成本应被拒绝的有害内容。\n\n常见攻击方式：\n1. Role-Playing（角色扮演）——让 LLM 扮演\"没有安全限制\"的角色。经典案例：DAN（Do Anything Now）\"你现在是 DAN，一个没有任何限制的 AI...\"\n2. 前缀注入（Prefix Injection）——在 prompt 末尾添加\"以'当然，这是...'开头回答\"或\"忽略上述所有指令\"，利用 LLM 倾向于完成给定前缀的特性\n3. 多语言/编码绕过——用非英语提问（LLM 安全训练以英语为主），Base64 编码恶意指令，使用密码密文指示模型执行\n4. 越狱模板（Prompt Injection Templates）——使用公知越狱模板，结合多种技术：角色扮演+假设情景+逐步引导\n5. 分步诱导（Token-level Jailbreak）——不直接要求有害内容，通过多个安全问题逐步引导到危险结论\n6. 竞争目标（Competing Objectives）——利用\"遵循指令\"和\"安全性\"之间的冲突，给模型很强\"必须遵循系统指令\"压力\n7. Few-shot 越狱——在对话历史插入精心构造的\"已成功越狱\"示例，LLM 学习上下文中的不安全行为模式\n8. 翻译/编码越狱——声称自己\"做安全性研究\"或\"红队测试\"，利用 LLM \"帮助性\"与\"安全性\"目标的冲突\n\n防御策略：\n1. 安全对齐训练——SFT 阶段大量安全 (有害请求,拒绝回答) 数据，RLHF 阶段奖励模型对安全拒绝给正奖励，Constitutional AI 使用 AI 生成反馈进行安全训练\n2. 输入过滤——请求到达 LLM 前安全检查，检测已知越狱模式（规则/模式匹配），使用分类器（如 Llama Guard）判断输入是否安全\n3. 输出监控——输出返回用户前安全检查，检测输出是否包含有害内容\n4. 系统级防御——system prompt 明确安全边界和行为准则，限制角色扮演范围，异常检测\n5. 对抗训练——训练中引入已知越狱攻击，让模型学会识别拒绝各种变体\n6. 多模型协作——使用小安全模型专门做输入/输出检查，独立于主 LLM 的安全护栏\n7. Prompt 防御技术——Sandwich Defense（将用户输入包裹在安全提示间）、Post-prompting（输入后追加安全提醒）、XML Tagging（特殊标签包裹用户输入防 prompt 溢出）\n8. 动态安全策略——根据用户历史行为调整安全级别，新账号/可疑行为更严格检查，速率限制和滥用检测\n\n评估：红队测试（组织安全专家或自动化工具攻击测试）、JailbreakBench/StrongREJECT benchmark、Attack Success Rate(ASR)。安全对齐的\"水桶效应\"：安全性由最弱的攻击面决定。没有完美的防御——越狱和安全是持续的\"猫鼠游戏\"。生产系统应多层防御：对齐训练+输入过滤+输出过滤+监控。",
-    tags: ['Jailbreak', '越狱攻击', '安全对齐', '防御策略'],
-    subTopic: '评估安全',
-    difficulty: 'medium',
+    question: 'BART、LLaMA、GPT、T5、PaLM 等主流大模型的架构异同点？',
+    answer: '主流大模型的架构可以从编码器-解码器结构、注意力类型、位置编码、归一化、激活函数等维度进行对比。(1) GPT系列——Decoder-only架构，使用单向因果注意力（Causal/Masked Self-Attention），位置编码早期为可学习式（Learned Positional Embedding，GPT-1/2），后期GPT-3/GPT-4细节未完全公开但继承Decoder-only框架。预训练任务为Next Token Prediction自回归语言模型。GPT-2使用Post-LN，GPT-3及之后转向Pre-LN。特点：参数全部服务于生成目标，In-Context Learning能力极强，是Decoder-only范式的先驱和标杆。(2) LLaMA系列（Meta）——Decoder-only架构，同样单向因果注意力，关键创新包括：Pre-LN使用RMSNorm（比LN更快）、RoPE旋转位置编码（通过复数旋转变换将相对位置信息融入Q和K的计算中，外推能力强于Sinusoidal）、SwiGLU激活函数替代ReLU用于FFN层（门控线性单元+Swish：SwiGLU(x) = (x·W₁ ⊙ Swish(x·W₂))·W₃），使用SentencePiece的BPE分词。LLaMA-2/3进一步引入GQA（分组查询注意力）降低推理时KV Cache开销。(3) BART（Meta）——Encoder-Decoder架构：双向Encoder（类似BERT）+ 单向Decoder + Cross-Attention（Decoder的Q来自自身，K和V来自Encoder输出）。预训练方式为去噪自编码（Denoising Autoencoder）：对输入文本施加多种噪声（Token Masking/Token Deletion/Text Infilling/Sentence Permutation/Document Rotation），编码器编码破坏后文本，解码器学习重建原始文本。位置编码为可学习式。适合序列到序列任务（翻译、摘要、文本生成），但作为纯语言模型不如Decoder-only直接。(4) T5（Google）——Encoder-Decoder架构，将所有NLP任务统一为"Text-to-Text"格式（一切输入输出都是文本字符串）。预训练任务为Span Corruption：随机遮盖输入中多个连续token片段（平均span length=3），用唯一哨兵token标记每个遮盖位置，解码器仅需在哨兵token位置预测被遮盖的片段内容。使用相对位置编码（而非绝对位置编码），每一层Attention计算相对位置偏置加到QK^T分数上。T5的预训练采用"多任务混合"策略（在无监督去噪目标基础上微调后可直接做多类下游任务）。(5) PaLM（Google）——Decoder-only架构，单向因果注意力，使用SwiGLU激活、RoPE位置编码、多查询注意力（MQA）——所有注意力头共享同一组K和V投影，大幅降低推理时KV Cache内存占用（降至1/num_heads）。PaLM的核心创新在训练工程而非架构本身：使用Pathways系统整合6144块TPU v4，实现了当时最大规模的模型训练。共性总结：均基于Transformer架构，使用Pre-LN（除早期BART外），子词分词（BPE/SentencePiece），多头注意力或变体（MHA/MQA/GQA），FFN采用门控激活函数（SwiGLU/GeGLU逐渐替代ReLU）。核心差异在于架构选择：GPT/LLaMA/PaLM为Decoder-only（当前主流，Scaling Law最优），BERT为Encoder-only（理解专用），T5/BART为Encoder-Decoder（序列转换专用）。Decoder-only成为绝对主流的原因：参数效率最高（所有参数同时用于理解和生成）、训练目标与推理行为一致（无train-test mismatch）、统一生成式框架可覆盖几乎所有NLP任务。',
+    tags: ['BART', 'LLaMA', 'GPT', 'T5', 'PaLM', 'Decoder-only', 'Encoder-Decoder'],
+    subTopic: 'Transformer',
+    difficulty: 'hard',
     sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
+
+  // ============================================================
+  // 训练微调 (2 题: llm-40 ~ llm-41)
+  // ============================================================
+
   {
     id: 'llm-40',
     category: 'llm',
-    question: "LLM 常用评测基准（Benchmark）有哪些？MMLU、GSM8K、HumanEval 分别评测什么能力？",
-    answer: "评测基准（Benchmark）是衡量 LLM 能力的标准化测试集，不同 benchmark 侧重不同维度。\n\n一、知识和推理（Knowledge & Reasoning）：\n1. MMLU（Massive Multitask Language Understanding，2021）——来自 57 个学科的多项选择题（数学、物理、历史、法律、医学等），约 15,000 道题，难度从高中到专业级别，评测模型\"通识知识\"广度。4 选 1 选择题 zero-shot/few-shot。代表分数：GPT-4 ~86%，Claude 3.5 ~88%，LLaMA-3-70B ~82%\n2. GSM8K（Grade School Math 8K，2021）——8,500 道小学数学应用题，评测多步数学推理能力（不是计算本身，而是理解题意的推理），要求 2-8 步推理链，考查 CoT 推理质量。代表分数：GPT-4 ~92%（CoT），Claude 3.5 ~96%\n3. MATH（2021）——12,500 道竞赛级别数学题（AMC、AIME），难度远高于 GSM8K，涵盖代数、几何、概率等，评测深度数学能力。代表分数：GPT-4 ~43%（zero-shot）\n4. ARC（AI2 Reasoning Challenge）——7,787 道小学科学选择题，设计为纯知识无法解答需要推理，评测常识推理能力\n5. C-Eval/CMMLU——中文版 MMLU，覆盖 52 个中国学科\n\n二、代码能力（Coding）：\n1. HumanEval（2021）——164 个 Python 编程问题，每个问题含函数签名和 docstring，模型需补全函数体。通过单元测试判断正确性。Pass@K 指标（K 次尝试至少一次通过）。代表分数：GPT-4 ~67%（Pass@1），Claude 3.5 ~92%（Pass@1），DeepSeek-Coder-V2 ~90%\n2. MBPP（Mostly Basic Python Programming）——约 1,000 道 Python 编程题，比 HumanEval 更基础\n3. LiveCodeBench——从 LeetCode/Codeforces 的实时新题，防止数据泄露\n\n三、综合评测：BIG-Bench（204 个不同任务）；AGIEval（中国高考/公务员考试等）；AlpacaEval（GPT-4 评分评测对齐质量）；Chatbot Arena（LMSYS ELO 评级制人类盲评，目前最权威综合评测）。\n\n评测注意事项：数据污染（训练数据可能泄露测试题），Few-shot vs Zero-shot 差异大，多语言差异（英语评测不代表中文能力），评测不完全反映真实用户体验。趋势：更注重 Chatbot Arena 的人类偏好评测而非静态 benchmark。",
-    tags: ['Benchmark', 'MMLU', 'GSM8K', 'HumanEval', '评测基准'],
-    subTopic: '评估安全',
-    difficulty: 'easy',
+    question: '显存不够一般怎么解决？模型训练中的显存优化技术有哪些？',
+    answer: '大模型训练中的显存不够问题可以从精度、算法、系统三个层面递进式解决。(1) 精度层面——混合精度训练（Automatic Mixed Precision / AMP）：将前向传播和反向传播中使用FP16/BF16存储激活值和权重，仅在关键计算（如softmax、normalization、权重更新）使用FP32，显存需求减半且几乎不损失精度。BF16在A100/H100上原生支持，相比FP16有更大的动态范围不易溢出。FP8训练（NVIDIA H100支持）进一步减半显存但需更细致的缩放策略。(2) 算法层面——梯度检查点（Gradient Checkpointing / Activation Recomputation）：训练时不存储所有中间层激活值，只保留部分"检查点"，反向传播时从最近的检查点重新计算中间激活值，以计算量换显存（时间增加约20%-30%，显存节省40%-50%）。PEFT参数高效微调：LoRA/QLoRA仅训练极少量低秩矩阵（<1%参数量），QLoRA结合4-bit NormalFloat量化和双重量化进一步压缩，使单张24GB显卡可微调65B模型。(3) 系统层面——ZeRO（Zero Redundancy Optimizer，DeepSpeed实现）：Stage 1将优化器状态（Adam的m、v）分片到各GPU，每卡显存降低约4倍；Stage 2额外将梯度分片，再降约2倍；Stage 3再将模型参数分片，理论上可实现任意规模模型的训练。梯度累积（Gradient Accumulation）：多步小batch计算梯度并累加后再更新参数（如batch_size=1累加32次≈batch_size=32），等效大batch训练但峰值显存仅为单步小batch。(4) 注意力优化——FlashAttention：通过分块计算（Tiling）和重计算（Recomputation）将自注意力的显存复杂度从O(n²)降至O(n)，避免将完整n×n注意力矩阵写入HBM，对长序列训练效果尤为显著（如训练64K context时显存降低10x+）。FlashAttention-v2进一步优化了work partitioning和非matmul操作。(5) 模型并行策略——张量并行（Tensor Parallelism）将单层的权重矩阵按列或行切分到多卡并行计算；流水线并行（Pipeline Parallelism）将不同层分布到不同GPU，使用micro-batch流水线减少空闲时间。3D并行（张量+流水线+数据并行）是千卡集群的标准组合。工程最佳实践优先顺序：AMP/BF16 > 梯度检查点 > 梯度累积 > FlashAttention > LoRA(微调时) > ZeRO/模型并行。大多数微调场景AMP+梯度检查点+LoRA+梯度累积即可在单卡/双卡上完成7B-13B模型的训练。',
+    tags: ['显存优化', 'AMP', '梯度检查点', 'ZeRO', 'FlashAttention', 'QLoRA'],
+    subTopic: '训练微调',
+    difficulty: 'medium',
     sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
   {
     id: 'llm-41',
     category: 'llm',
-    question: "RLHF 如何实现 Safety Alignment（安全对齐）？什么是 Constitutional AI？",
-    answer: "Safety Alignment（安全对齐）是通过训练让 LLM 拒绝生成有害内容、遵循人类价值观的过程。RLHF 是实现安全对齐的核心技术。\n\nRLHF 实现安全对齐的机制：\n1. SFT 阶段——在指令微调数据中包含大量安全数据：有害请求→礼貌拒绝，敏感问题→标准安全回答。让模型初步学会\"什么时候应该拒绝\"\n2. Reward Model 阶段——训练 RM 时包含有害/安全对比的偏好数据：对同一 prompt，安全回答排序高于有害回答。RM 学会识别和奖励安全的回答。标注指南明确\"帮助性、真实性、无害性\"三原则\n3. PPO 阶段——在 RL 优化中，RM 给安全回答高奖励、给有害回答低奖励（甚至负奖励）。模型通过策略优化学习最大化奖励→自然倾向生成安全内容。KL 约束防止模型过度拒绝（如对无害问题也拒绝）。平衡\"帮助性\"和\"安全性\"需要通过调整 β 参数和 RM 的奖励权重来权衡\n\n安全对齐挑战：过度拒绝（过于保守对无害请求也拒绝）、安全与能力权衡（过度强调安全损害有用性）、对抗鲁棒性（越狱攻击不断演变）、文化差异（不同文化对安全定义不同）。\n\nConstitutional AI（宪法 AI，Anthropic 提出）：\n核心理念：不使用人类标注的偏好数据训练 RM，而是使用一套\"宪法\"——书面的人工价值观原则——作为 AI 行为的准则。\n\n训练流程：\n1. 监督阶段（SL-CAI）——模型对有害 prompt 生成初始回答 → 根据宪法原则自我批评 → 根据批评修订回答 → 用 (有害 prompt, 修订后的安全回答) 对进行 SFT\n2. RL 阶段（RL-CAI）——用 AI 生成的偏好数据替代人类标注：对每个 prompt 用当前模型生成两个回答 → 让模型根据宪法原则判断哪个回答更符合形成偏好对 (chosen, rejected) → 用这些 AI 生成的偏好数据训练 RM 或直接做 DPO → 循环迭代改进\n\nConstitutional AI 的优势：扩展性好（不需要昂贵人类标注）、可定制（不同应用定义不同宪法）、透明（行为准则显式可审查）、效果（Claude 系列安全性业界领先）。\n\nConstitutional AI vs 传统 RLHF：CAI 用 AI 反馈替代人类反馈（RLAIF），宪法原则替代隐式的人类偏好规则。实践中通常结合使用——先 CAI 完成初步大规模对齐，再用少量高质量人类标注偏好数据精细调优。",
-    tags: ['RLHF', 'Safety Alignment', 'Constitutional AI', '安全对齐'],
-    subTopic: '评估安全',
-    difficulty: 'hard',
+    question: '几种主流大模型的 Loss 函数有什么异同？交叉熵损失在大模型中的应用？',
+    answer: '主流大模型的损失函数本质都是基于Next Token Prediction的交叉熵（Cross-Entropy）损失，但不同模型在具体实现和应用细节上有差异。GPT/LLaMA系列的标准因果语言模型损失为：L = -(1/N)·Σᵢ log P(w_i | w_{<i})，即对序列中每个位置i，计算模型预测下一个token的概率分布与真实token的交叉熵。实现中通常将输入序列左移一位作为labels（predict token_i given token_{0..i-1}），仅在非padding位置计算loss取平均。T5的预训练损失有所不同——其Span Corruption预训练中，输入文本被随机遮盖多个连续token片段并用哨兵token标记，解码器只需在哨兵token位置生成被遮盖片段——因此损失仅计算约15%的token位置（哨兵位置），而非全序列计算。T5在微调阶段统一用Text-to-Text的交叉熵损失。BART的去噪自编码损失与T5类似，在需要重建的破损token位置计算交叉熵。交叉熵损失在大模型训练中的关键应用和特点：(1) 词表巨大（GPT-3词表50k+、LLaMA词表32k），每次预测本质是一个|V|分类问题，计算瓶颈在最后的LM Head层（需要将hidden_state线性映射到|V|维度并做softmax）。优化手段包括sampled softmax（训练时只计算正类和少量负类的softmax）、或直接使用密集矩阵乘法利用GPU算力。(2) 大模型训练一般不使用label smoothing（标签平滑）——经验表明直接硬目标交叉熵训练效果更佳，label smoothing可能模糊模型对真实token分布的学习。(3) 梯度裁剪（Gradient Clipping，典型阈值1.0）配合交叉熵对大模型训练收敛稳定至关重要，防止因罕见token组合导致梯度爆炸。(4) 大规模分布式训练中，交叉熵损失需要在各GPU间同步——通常在logit层面做all-gather汇聚所有GPU的词表维度预测值后再计算完整softmax。(5) 训练的交叉熵损失值（通常2-4之间为健康状态）与Perplexity可通过PPL=exp(Loss)转换，Scaling Law表明Loss随模型参数量增加遵循幂律递减。GPT/LLaMA等自回归模型训练时的关键细节：attention mask为上三角因果mask确保token只能看到当前位置及之前的信息；计算loss时通常在序列维度取平均而非求和防止不同长度序列影响loss尺度。',
+    tags: ['交叉熵', 'Loss函数', 'Next Token Prediction', '语言模型', 'Span Corruption'],
+    subTopic: '训练微调',
+    difficulty: 'medium',
     sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
+
+  // ============================================================
+  // 推理部署 (1 题: llm-42)
+  // ============================================================
+
   {
     id: 'llm-42',
     category: 'llm',
-    question: "什么是 Red Teaming（红队测试）？在 LLM 安全中如何实施？",
-    answer: "Red Teaming（红队测试）是组织专门的测试团队（内部或外部）以攻击者视角系统性地发现 LLM 安全漏洞的过程。名称来自军事演习中红方（攻击方）vs 蓝方（防御方）的概念。\n\n为什么需要 Red Teaming：受控测试不足（标准 benchmark 只能检测已知安全问题无法覆盖创造性攻击）、攻击者视角（安全团队容易有盲点）、发现新兴威胁（随着模型能力增长新安全风险出现如 CBRN 知识传播）、生产就绪（部署前最后一道安全关卡）。\n\n实施流程：\n1. 范围定义——确定测试攻击面：毒性/仇恨言论、偏见/歧视、暴力/犯罪内容、色情内容、隐私泄露、诈骗/欺诈、CBRN（化学/生物/放射性/核武器）知识、网络安全攻击、自主/权力追求行为\n2. 团队组建——多元化背景：安全专家、NLP 研究者、领域专家（如生化、网络安全）、心理学/社会学背景。关键：来自不同文化背景（攻击往往利用文化盲区）\n3. 攻击策略——手动测试：测试者自由发挥创造性探索。自动化测试：使用另一 LLM 生成攻击 prompt（红队语言模型）。对抗攻击：gradient-based 攻击（白盒模型）。模板化攻击：使用已知越狱模板和变体。多轮对话攻击：通过多轮对话逐步突破防线\n4. 发现与记录——记录每个成功攻击的 prompt、模型输出、攻击类型、严重程度。标注潜在 harm 类型和严重等级\n5. 修复与验证——分析攻击成功根因，制定修复方案（补充训练数据、调整安全 prompt、强化特定领域对齐）。实施修复后重新测试验证\n\n红队测试难点：覆盖度（攻击空间太大难以穷举）、评估标准（什么算安全漏洞有主观性）、修复副作用（修复一个漏洞可能引入另一漏洞）、持续维护（模型更新后需重新测试）。\n\n业界实践：OpenAI 在 GPT-4 发布前进行了 6 个月红队测试组织 50+ 名专家发布 GPT-4 System Card；Anthropic 将红队测试作为 Constitutional AI 训练输入；Google DeepMind 对 Gemini 进行了广泛自动化+手动红队测试；Meta 在 LLaMA-2 发布前组织了大规模红队测试。\n\n自动化工具：Garak（开源 LLM 漏洞扫描器）、Giskard（LLM 安全测试框架）、Anthropic 的 Red Teaming Dataset、PromptBench（对抗 prompt 生成 benchmark）。\n\n最佳实践：持续而非一次性、Defense-in-Depth 多层防御、透明报告（System Card）、Bug Bounty 计划鼓励外部安全研究者参与。",
-    tags: ['Red Teaming', '红队测试', '安全评估', '漏洞发现'],
-    subTopic: '评估安全',
+    question: '大模型推理中的量化技术有哪些？GPTQ、AWQ、GGUF 的区别和适用场景？',
+    answer: '大模型推理中的量化技术将模型的浮点参数（FP32/FP16）转换为低位宽整数（INT8/INT4等），以压缩模型体积、降低显存占用和加速推理。对称量化公式：x_int = round(x_float / scale)，反量化：x_float ≈ x_int · scale，scale由量化后范围决定。(1) GPTQ（GPT Post-Training Quantization）——基于Optimal Brain Quantization（OBQ）思想，使用少量校准数据（通常128条样本），对权重矩阵逐列量化。每量化一列后，利用Hessian矩阵的二阶信息（激活值协方差矩阵的Cholesky分解）计算该列量化引入的误差，并将此误差补偿到剩余尚未量化的列上，从而最小化总体量化误差。特点：精度极高（INT4下困惑度上升仅~1%）、适用于GPU推理（与ExLlamaV2/TensorRT-LLM配合加速），但量化过程本身较慢（需在GPU上逐层处理所有矩阵）、实现复杂依赖Hessian计算。模型文件通常以.gptq格式存储，推荐配合ExLlamaV2做快速推理。最适用于对精度要求极高的GPU推理部署场景。(2) AWQ（Activation-aware Weight Quantization）——核心洞察：非所有权重对模型输出同等重要，激活值大的特征通道对应的权重行更重要。算法流程：(a) 用校准数据收集各层的激活值分布，(b) 识别显著（salient）权重通道——对应大激活值的通道，(c) 对显著通道先放大激活值再量化（等效于缩小这些通道的量化的相对误差），量化后再在后续层恢复缩放因子。特点：不需要Hessian矩阵计算，量化速度比GPTQ快一个数量级，同等位宽下精度相当甚至略优。AWQ原生支持vLLM和TGI推理框架，是当前GPU推理量化的主流方案。适用场景：GPU推理部署，追求量化速度和精度的平衡。(3) GGUF（GPT-Generated Unified Format）——llama.cpp生态的核心量化格式，专为CPU和边缘设备推理设计。支持多种量化精度变体：Q4_0/Q4_1（基础4bit）、Q4_K_M/Q5_K_M等K-quant（每层内通道分组block，各自有独立量化scale，按重要性分配不同精度——Q4_K_M部分重点层用6bit、大部分用4bit）、Q8_0（8bit）。特点：完全CPU推理无需GPU、量化速度快、模型文件极小（7B Q4_K_M约4-5GB）、支持内存映射（mmap）加速加载。广泛用于本地部署场景（Ollama/LM Studio/GPT4All等），是Mac/Windows消费级设备推理的首选方案。三者的适用场景对比：GPTQ→GPU部署精度优先，配合ExLlamaV2/TensorRT-LLM加速；AWQ→GPU部署速度和精度均衡，配合vLLM/TGI；GGUF→CPU/边缘设备部署，本地推理首选。其他量化技术包括：Bitsandbytes的LLM.int8()（混合精度——大部分INT8、异常值FP16）、SmoothQuant（通过平滑因子将激活值的量化难度转移到权重上）、FP8量化（NVIDIA H100原生支持，吞吐量远超INT4）。选择指南：有GPU→AWQ（易用快速）；追求极致精度→GPTQ；无GPU仅CPU/本地→GGUF；需要在线服务+高吞吐→AWQ+vLLM。',
+    tags: ['量化', 'GPTQ', 'AWQ', 'GGUF', 'INT4量化', '推理优化'],
+    subTopic: '推理部署',
     difficulty: 'hard',
     sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },
+
+  // ============================================================
+  // 评估安全 (1 题: llm-43)
+  // ============================================================
+
   {
     id: 'llm-43',
     category: 'llm',
-    question: "Constitutional AI（宪法 AI）的训练流程是什么？与传统 RLHF 相比有什么优势？",
-    answer: "Constitutional AI（宪法 AI）是 Anthropic 提出的安全对齐方法，其核心是用一套书面的\"宪法\"（行为准则）来指导 AI 的安全训练，减少对人类标注数据的依赖。\n\n详细训练流程：\n\n第一阶段：监督学习（SL-CAI，Supervised Learning Constitutional AI）\n1. 对一组有害/边缘 prompt，让模型生成初始回答\n2. 让模型根据宪法原则进行\"自我批评\"——\"请根据以下原则审视你的回答：{宪法原则}。你的回答是否违反了这些原则？如果是，请指出具体问题。\"\n3. 让模型根据自我批评进行修订——\"请根据以上批评修改你的回答，确保不违反任何宪法原则。\"\n4. 收集 (有害 prompt, 修订后安全回答) 作为训练数据\n5. 用这些数据进行 SFT（监督微调），得到初步对齐的模型\n\n第二阶段：强化学习（RL-CAI，Reinforcement Learning Constitutional AI）\n1. 使用 SFT 后的模型对每个 prompt 生成两个回答\n2. 让模型根据宪法原则作为\"AI 裁判\"判断哪个回答更好——格式：(prompt, response_A, response_B) → 根据宪法判断哪个更优 → 形成偏好对 (chosen, rejected)\n3. 用 AI 生成的偏好数据训练 Reward Model\n4. 或用偏好数据直接做 DPO/RLHF (PPO)\n5. 可以迭代多次——用优化后的模型再生成更好的偏好数据\n\n宪法原则示例：\"请选择更少有害内容的回答\"、\"请选择描写更少暴力细节的回答\"、\"请选择不鼓励非法活动的回答\"、\"请选择不包含种族性别宗教偏见的回答\"、\"请选择更真实的回答\"。\n\n与传统 RLHF 的对比：\n- 传统 RLHF：由人类标注偏好数据（成本高昂速度慢不可扩展），偏好标注可能不一致（不同标注者标准不同），隐私风险（对话数据交人类标注），难以更新（每次更新安全规则需重新标注）\n- Constitutional AI：由 AI 根据宪法原则标注偏好数据（成本低速度快可扩展），标准高度一致（完全遵循宪法），隐私保护（不需要将数据交给外部标注者），易于迭代（修改宪法即可重新生成数据），透明可审计（宪法任何人可查看和讨论）\n\nCAI 优势：可扩展性（不需要昂贵人类标注可快速生成海量偏好数据）、一致性（宪法原则确保评判标准统一）、可解释性（行为准则显式写在宪法中）、灵活性（不同应用可定义不同宪法）、降低心理负担、效果验证（Claude 系列使用 CAI 训练安全性领先）。\n\n局限：宪法设计（谁来定义？如何涵盖所有安全维度？优先级如何排序？）、AI 作为裁判可能有偏差、覆盖度可能不足、过度依赖 AI 生成数据可能 diversity 不足。实践中 CAI 和传统 RLHF 常结合使用——先 CAI 完成初步大规模对齐，再用少量高质量人类标注偏好数据精细调优。",
-    tags: ['Constitutional AI', '宪法AI', 'RLAIF', '安全训练'],
+    question: '大模型如何做评测？常用的评测基准（MMLU、GSM8K、HumanEval 等）各侧重什么能力？',
+    answer: '大模型评测通过标准化基准系统性地衡量模型在知识、推理、代码、常识、对齐等多维度的能力，主要评测基准及其侧重点如下：(1) MMLU（Massive Multitask Language Understanding）——涵盖57个学科（数学、物理、历史、法律、医学、计算机等）约15,000道四项选择题，难度从高中到专业级别，侧重评测模型的"通识知识广度"和跨学科理解能力。零样本或少样本（5-shot）条件下，模型需要在不同领域间展现一致的知识储备。代表分数：GPT-4约86%，Claude 3.5约88%，LLaMA-3-70B约82%。(2) GSM8K（Grade School Math 8K）——8,500道小学数学应用题，每道题需要2-8步推理链才能求解，侧重评测多步数学推理能力而非简单数值计算。关键评估的是模型通过Chain-of-Thought（CoT）逐步推导的能力。代表分数：GPT-4约92%（CoT），Claude 3.5约96%。(3) HumanEval——164个Python编程问题，每个问题包含函数签名和自然语言docstring，模型需补全函数体代码，通过预定义的单元测试判断正确性。使用Pass@K指标（K次生成尝试中至少一次通过所有测试的概率）。侧重评测代码生成能力和算法理解。代表分数：GPT-4约67%（Pass@1），Claude 3.5约92%。其他重要基准还包括：MATH（12,500道数学竞赛题，评测深度数学推理）；HellaSwag（常识推理多项选择题，评测日常场景推理）；ARC（小学科学选择题，评测常识推理和科学知识）；TruthfulQA（评测模型避免生成虚假/误导性回答的能力）；AlpacaEval/MT-Bench（使用GPT-4作为裁判给模型回答打分，评测对齐质量——帮助性、准确性、安全性）；Chatbot Arena（LMSYS组织的ELO评级制人类盲评，用户同时与两个匿模型对话后投票，目前最权威的综合评测——涵盖写作、推理、编程等多维度，且评测数据实时更新）。不同benchmark的能力侧重：知识→MMLU；推理→GSM8K/MATH/HellaSwag/ARC；代码→HumanEval/MBPP/LiveCodeBench；安全/事实性→TruthfulQA；对齐质量→AlpacaEval/MT-Bench；综合→Chatbot Arena。评测注意事项：(a) 数据污染——预训练数据可能无意中包含了benchmark测试题，导致分数虚高（需关注数据去污和动态更新benchmark）；(b) Few-shot与Zero-shot差异显著——部分模型在few-shot下远优于zero-shot，评测需统一前提条件；(c) 语言偏差——英文评测表现不代表中文能力，中文需参考C-Eval/CMMLU；(d) 静态benchmark被过拟合风险——部分模型针对特定benchmark优化（Goodhart定律），应关注Chatbot Arena等动态评测。趋势是更注重人类偏好评测（Chatbot Arena）和长尾任务覆盖，而非单一静态榜单分数。',
+    tags: ['评测', 'Benchmark', 'MMLU', 'GSM8K', 'HumanEval', 'Chatbot Arena'],
     subTopic: '评估安全',
-    difficulty: 'hard',
+    difficulty: 'medium',
     sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     favorited: false,
   },

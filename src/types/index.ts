@@ -2,7 +2,7 @@
 // src/types/index.ts — 所有类型定义
 // ============================================================
 
-export type Category = 'leetcode' | 'statistics' | 'machine-learning' | 'llm' | 'jargon' | 'workplace' | string;
+export type Category = 'leetcode' | 'statistics' | 'machine-learning' | 'deep-learning' | 'llm' | 'agent' | 'jargon' | 'workplace' | string;
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type CardState = 'new' | 'learning' | 'review' | 'relearning';
 
@@ -52,7 +52,7 @@ export interface LeetCodeCard {
 /** 通用问答卡片（统计学/ML/大模型/黑话/话术） */
 export interface QACard {
   id: string;
-  category: 'statistics' | 'machine-learning' | 'llm' | 'jargon' | 'workplace';
+  category: 'statistics' | 'machine-learning' | 'deep-learning' | 'llm' | 'agent' | 'jargon' | 'workplace';
   question: string;
   answer: string;
   tags?: string[];
@@ -132,7 +132,9 @@ export const STORAGE_KEYS = {
   LEETCODE_PROGRESS: 'fc-leetcode-progress',
   STATISTICS_PROGRESS: 'fc-stats-progress',
   ML_PROGRESS: 'fc-ml-progress',
+  DEEP_LEARNING_PROGRESS: 'fc-deep-learning-progress',
   LLM_PROGRESS: 'fc-llm-progress',
+  AGENT_PROGRESS: 'fc-agent-progress',
   JARGON_PROGRESS: 'fc-jargon-progress',
   WORKPLACE_PROGRESS: 'fc-workplace-progress',
   SETTINGS: 'fc-settings',

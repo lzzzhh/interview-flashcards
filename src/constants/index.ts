@@ -8,6 +8,7 @@ import {
   BarChart3,
   Bot,
   Brain,
+  BrainCircuit,
   MessageSquare,
   Briefcase,
   type LucideIcon,
@@ -23,7 +24,9 @@ export const CATEGORIES: CategoryMeta[] = [
   { key: 'leetcode', label: '力扣', icon: Flame },
   { key: 'statistics', label: '统计学', icon: BarChart3 },
   { key: 'machine-learning', label: '机器学习', icon: Bot },
+  { key: 'deep-learning', label: '深度学习', icon: BrainCircuit },
   { key: 'llm', label: '大模型', icon: Brain },
+  { key: 'agent', label: 'Agent', icon: Bot },
   { key: 'jargon', label: '黑话', icon: MessageSquare },
   { key: 'workplace', label: '职场', icon: Briefcase },
 ];
@@ -67,6 +70,11 @@ export const SUBTOPIC_OPTIONS: Record<Category, { value: string; label: string }
     { value: '评估指标', label: '评估指标' },
     { value: '优化', label: '优化' },
   ],
+  'deep-learning': [
+    { value: 'all', label: '全部' },
+    { value: '深度学习基础', label: '深度学习基础' },
+    { value: '生成模型', label: '生成模型' },
+  ],
   llm: [
     { value: 'all', label: '全部' },
     { value: 'Transformer', label: 'Transformer' },
@@ -75,6 +83,10 @@ export const SUBTOPIC_OPTIONS: Record<Category, { value: string; label: string }
     { value: 'Agent', label: 'Agent' },
     { value: 'RAG', label: 'RAG' },
     { value: '评估安全', label: '评估安全' },
+  ],
+  agent: [
+    { value: 'all', label: '全部' },
+    { value: 'Agent', label: 'Agent' },
   ],
   jargon: [
     { value: 'all', label: '全部' },

@@ -24,7 +24,9 @@ import type {
 import { leetcodeHot100 } from '../data/leetcode-hot100';
 import { statisticsCards } from '../data/statistics';
 import { machineLearningCards } from '../data/machine-learning';
+import { deepLearningCards } from '../data/deep-learning';
 import { llmCards } from '../data/llm';
+import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { scheduleReview, createDefaultSM2 } from '../utils/sm2';
@@ -44,7 +46,9 @@ const CARD_DATA: Partial<Record<Category, FlashCard[]>> = {
   leetcode: leetcodeHot100 as FlashCard[],
   statistics: statisticsCards as FlashCard[],
   'machine-learning': machineLearningCards as FlashCard[],
+  'deep-learning': deepLearningCards as FlashCard[],
   llm: llmCards as FlashCard[],
+  agent: agentCards as FlashCard[],
   jargon: jargonCards as FlashCard[],
   workplace: workplaceCards as FlashCard[],
 };
@@ -53,7 +57,9 @@ const progressKeyMap: Record<Category, string> = {
   leetcode: 'fc-leetcode-progress',
   statistics: 'fc-stats-progress',
   'machine-learning': 'fc-ml-progress',
+  'deep-learning': 'fc-deep-learning-progress',
   llm: 'fc-llm-progress',
+  agent: 'fc-agent-progress',
   jargon: 'fc-jargon-progress',
   workplace: 'fc-workplace-progress',
 };
