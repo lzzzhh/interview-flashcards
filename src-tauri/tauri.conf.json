@@ -36,6 +36,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "windows": {
+      "wix": null
+    },
     "android": {
       "debugApplicationIdSuffix": ".debug"
     }
