@@ -56,7 +56,6 @@ export default function HomePage({ onEnterStudy }: Props) {
 
   // Touch + wheel swipe
   const touchStartX = useRef(0);
-  const lastWheelTime = useRef(0);
 
   const goNext = () => { if (page < totalPages - 1) setPage(p => p + 1); };
   const goPrev = () => { if (page > 0) setPage(p => p - 1); };
@@ -68,10 +67,7 @@ export default function HomePage({ onEnterStudy }: Props) {
   };
 
   const handleWheel = (e: React.WheelEvent) => {
-    const now = Date.now();
-    if (now - lastWheelTime.current < 800) return; // debounce
-    if (Math.abs(e.deltaX) > 40 || (e.shiftKey && Math.abs(e.deltaY) > 40)) {
-      lastWheelTime.current = now;
+    if (Math.abs(e.deltaX) > 20 || (e.shiftKey && Math.abs(e.deltaY) > 20)) {
       (e.deltaX > 0 || e.deltaY > 0) ? goNext() : goPrev();
     }
   };
@@ -121,7 +117,9 @@ export default function HomePage({ onEnterStudy }: Props) {
                 >
                   <span className="text-3xl">➕</span>
                   <span className="text-sm font-medium">新建模块</span>
-                  <div className="text-[10px] text-gray-400">待自定义</div>
+                  <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                    <div>待自定义</div>
+                  </div>
                 </button>
               );
             }
