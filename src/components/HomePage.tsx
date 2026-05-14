@@ -2,11 +2,11 @@
 // src/components/HomePage.tsx — 首页模块选择
 // ============================================================
 
-import { useState } from 'react';
-import { Plus, BookOpen, X, Trash2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Plus, BookOpen, X } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
-import { loadCustomDecks, createCustomDeck, deleteCustomDeck, setModuleDailyLimit, type CustomDeck } from '../utils/customDecks';
+import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, type CustomDeck } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
 import { loadProgress } from '../utils/storage';
 
@@ -30,6 +30,25 @@ export default function HomePage({ onEnterStudy }: Props) {
   const [newName, setNewName] = useState('');
   const [newIcon, setNewIcon] = useState('📦');
   const [newLimit, setNewLimit] = useState(20);
+  const [page, setPage] = useState(0);
+
+  // Build all modules list
+  const allModules = useMemo(() => {
+    const builtIn = CATEGORIES.map((cat) => ({ ...cat, isCustom: false }));
+    const custom = customDecks.map((d) => ({
+      key: d.id as any,
+      label: d.name,
+      icon: null as any,
+      emoji: d.icon,
+      isCustom: true,
+    }));
+    return [...builtIn, ...custom];
+  }, [customDecks]);
+
+  const PER_PAGE = 6;
+  const totalPages = Math.ceil((allModules.length + 1) / PER_PAGE); // +1 for create button
+  const pageModules = allModules.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
+  const showCreateOnPage = pageModules.length < PER_PAGE || page === totalPages - 1;
 
   const handleCreate = () => {
     if (!newName.trim()) return;
@@ -39,11 +58,6 @@ export default function HomePage({ onEnterStudy }: Props) {
     setShowCreate(false);
     setNewName('');
     setNewLimit(20);
-  };
-
-  const handleDelete = (id: string) => {
-    deleteCustomDeck(id);
-    setCustomDecks(loadCustomDecks());
   };
 
   return (
@@ -60,8 +74,22 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         {/* Module grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {CATEGORIES.map((cat) => {
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[260px]">
+          {pageModules.map((mod) => {
+            if (mod.isCustom) {
+              return (
+                <button
+                  key={mod.key}
+                  onClick={() => onEnterStudy(mod.key)}
+                  className="group relative flex flex-col items-center gap-1.5 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:shadow-md transition-all active:scale-95"
+                >
+                  <span className="text-3xl">{(mod as any).emoji || '📦'}</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate w-full text-center">{mod.label}</span>
+                  <span className="text-[10px] text-gray-400">自定义</span>
+                </button>
+              );
+            }
+            const cat = CATEGORIES.find((c) => c.key === mod.key)!;
             const due = dueCountByCategory[cat.key] ?? 0;
             const progress = loadProgress(cat.key);
             const newCount = Object.values(progress.sm2).filter((s) => !s || s.state === 'new').length;
@@ -73,43 +101,40 @@ export default function HomePage({ onEnterStudy }: Props) {
               >
                 <span className="text-3xl">{ICONS[cat.key] || '📚'}</span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{cat.label}</span>
-                {(due > 0 || newCount > 0) && (
-                  <div className="text-[10px] text-gray-400 dark:text-gray-500">
-                    <div>今日待学习：<span className="text-blue-500 font-medium">{newCount}</span> 张</div>
-                    <div>今日待复习：<span className="text-orange-500 font-medium">{due}</span> 张</div>
-                  </div>
-                )}
+                <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                  <div>今日待学习：<span className="text-blue-500 font-medium">{newCount}</span> 张</div>
+                  <div>今日待复习：<span className="text-orange-500 font-medium">{due}</span> 张</div>
+                </div>
               </button>
             );
           })}
 
-          {/* Custom decks */}
-          {customDecks.map((deck) => (
+          {/* Create button on last page */}
+          {showCreateOnPage && (
             <button
-              key={deck.id}
-              onClick={() => onEnterStudy(deck.id)}
-              className="group relative flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:shadow-md transition-all active:scale-95"
+              onClick={() => setShowCreate(true)}
+              className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-primary/30 hover:text-primary transition-colors"
             >
-              <span className="text-3xl">{deck.icon || '📦'}</span>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate w-full text-center">{deck.name}</span>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleDelete(deck.id); }}
-                className="absolute top-1 right-1 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/30 transition-opacity"
-              >
-                <Trash2 className="w-3 h-3 text-red-400" />
-              </button>
+              <Plus className="w-6 h-6" />
+              <span className="text-xs">新建模块</span>
             </button>
-          ))}
-
-          {/* + Create */}
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-primary/30 hover:text-primary transition-colors"
-          >
-            <Plus className="w-6 h-6" />
-            <span className="text-xs">新建模块</span>
-          </button>
+          )}
         </div>
+
+        {/* Pagination dots */}
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-4">
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                  i === page ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Quick actions */}
         <div className="flex justify-center gap-3 mt-6">
