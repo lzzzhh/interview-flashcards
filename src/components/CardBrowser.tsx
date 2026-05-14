@@ -35,6 +35,35 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
     setConfirmDelete(null);
   };
 
+  const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        const items = Array.isArray(data) ? data : [data];
+        for (const item of items) {
+          if (!item.question || !item.answer) continue;
+          const card: QACard = {
+            id: `import-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            category: state.category as QACard['category'],
+            question: item.question,
+            answer: item.answer,
+            tags: item.tags || [],
+            subTopic: item.subTopic || undefined,
+            difficulty: item.difficulty || 'medium',
+            sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+            favorited: false,
+          };
+          dispatch({ type: 'ADD_CARD', payload: card });
+        }
+      } catch { /* ignore invalid JSON */ }
+    };
+    reader.readAsText(file);
+    if (e.target) e.target.value = '';
+  };
+
   const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -147,6 +176,11 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
           <Upload className="w-4 h-4" />
           <span className="hidden sm:inline">导入</span>
           <input type="file" accept=".csv" onChange={handleImportCSV} className="hidden" />
+        </label>
+        <label className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm cursor-pointer">
+          <Upload className="w-4 h-4" />
+          <span className="hidden sm:inline">JSON</span>
+          <input type="file" accept=".json" onChange={handleImportJSON} className="hidden" />
         </label>
         <button
           onClick={() => onEdit({} as FlashCard)}

@@ -6,7 +6,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
-import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, getModuleDailyLimit, type CustomDeck } from '../utils/customDecks';
+import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, getModuleDailyLimit, deleteCustomDeck, type CustomDeck } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
 import { loadProgress } from '../utils/storage';
 import type { Category } from '../types';
@@ -198,8 +198,15 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <button
                   key={mod.key}
                   onClick={() => onEnterStudy(mod.key)}
-                  className="homepage-module-card group hover:border-primary/50 hover:shadow-md active:scale-95"
+                  className="homepage-module-card group relative hover:border-primary/50 hover:shadow-md active:scale-95"
                 >
+                  <button
+                    onClick={(e) => { e.stopPropagation(); deleteCustomDeck(mod.key); setCustomDecks(loadCustomDecks()); }}
+                    className="absolute top-1 right-1 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/30 transition-opacity"
+                    title="删除模块"
+                  >
+                    <X className="w-3 h-3 text-red-400" />
+                  </button>
                   <span className="text-3xl">{mod.emoji || '📦'}</span>
                   <span className="w-full truncate text-center text-sm font-medium text-gray-700 dark:text-gray-300">{mod.label}</span>
                   <div className="text-center text-[10px] leading-4 text-gray-400 dark:text-gray-500">
