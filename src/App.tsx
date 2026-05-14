@@ -9,6 +9,7 @@ import { useKeyboard } from './hooks/useKeyboard';
 import HomePage from './components/HomePage';
 import CardView from './components/CardView';
 import CardActions from './components/CardActions';
+import ProgressBar from './components/ProgressBar';
 import DarkModeToggle from './components/DarkModeToggle';
 import EmptyState from './components/EmptyState';
 import CardBrowser from './components/CardBrowser';
@@ -16,13 +17,15 @@ import CardEditor from './components/CardEditor';
 import type { FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
-  const { state, dispatch, currentCard, totalDue, totalNew } = useAppContext();
+  const { state, dispatch, currentCard, totalDue, totalNew, masteredIds } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
 
   const getCurrentCardId = useCallback(() => currentCard?.id ?? null, [currentCard]);
   useKeyboard({ dispatch, searchInputRef, getCurrentCardId });
+
+  const cardCount = state.visibleCardIds.length;
 
   // Count new cards in current module
   const moduleNewCount = useMemo(() => {
@@ -76,8 +79,14 @@ function StudyPage({ onBack }: { onBack: () => void }) {
         {editingCard !== null && (
           <CardEditor card={editingCard} onSave={() => { setEditingCard(null); dispatch({ type: 'SET_CATEGORY', payload: state.category }); }} onClose={() => setEditingCard(null)} />
         )}
-          </div>
+      </div>
+
+      {cardCount > 0 && (
+        <div className="pt-2 pb-8">
+          <ProgressBar current={Math.min(state.currentVisibleIndex, cardCount - 1)} total={cardCount} mastered={masteredIds.length} />
         </div>
+      )}
+    </div>
       </div>
     );
   }
