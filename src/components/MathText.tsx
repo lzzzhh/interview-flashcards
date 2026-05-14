@@ -68,9 +68,12 @@ export default function MathText({ text }: MathTextProps) {
  * - 已经是 $...$ 或 $$...$$ 的 → 保持用户标记
  */
 function preprocess(text: string): string {
-  // 如果文本已经包含 $...$ 数学标记，信任用户的格式，不做预处理
+  // 如果文本已经包含 $...$ 数学标记，信任用户的格式，但确保换行保留
   const hasDollarMath = /\$[^$\n]+\$/.test(text) || /\$\$/.test(text);
-  if (hasDollarMath) return text;
+  if (hasDollarMath) {
+    // 将单换行转为双换行（Markdown 段落分隔），remark-breaks 处理 <br>
+    return text.replace(/\n/g, '\n\n');
+  }
 
   const lines = text.split('\n');
   const result: string[] = [];
