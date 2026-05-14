@@ -17,7 +17,7 @@ import CardEditor from './components/CardEditor';
 import type { FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
-  const { state, dispatch, currentCard, totalDue, totalNew, masteredIds } = useAppContext();
+  const { state, dispatch, currentCard, totalDue, totalNew } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
@@ -83,7 +83,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
       {cardCount > 0 && (
         <div className="pt-2 pb-8">
-          <ProgressBar current={Math.min(state.currentVisibleIndex, cardCount - 1)} total={cardCount} mastered={masteredIds.length} />
+          <ProgressBar current={Math.min(state.currentVisibleIndex, cardCount - 1)} total={cardCount} mastered={0} />
         </div>
       )}
     </div>
