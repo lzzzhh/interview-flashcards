@@ -71,11 +71,10 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <span className="text-3xl">{ICONS[cat.key] || '📚'}</span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{cat.label}</span>
                 {(due > 0 || newCount > 0) && (
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                    {due > 0 && <span className="text-orange-500 font-medium">{due}复习</span>}
-                    {due > 0 && newCount > 0 && ' · '}
-                    {newCount > 0 && <span className="text-blue-500 font-medium">{newCount}新</span>}
-                  </span>
+                  <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                    <div>今日待学习：<span className="text-blue-500 font-medium">{newCount}</span> 张</div>
+                    <div>今日待复习：<span className="text-orange-500 font-medium">{due}</span> 张</div>
+                  </div>
                 )}
               </button>
             );
