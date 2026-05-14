@@ -9,7 +9,6 @@ import { useAppContext } from '../context/AppContext';
 import { loadCustomDecks, createCustomDeck, deleteCustomDeck, setModuleDailyLimit, type CustomDeck } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
 import { loadProgress } from '../utils/storage';
-import DarkModeToggle from './DarkModeToggle';
 
 const ICONS: Record<string, string> = {
   leetcode: '🔥',
@@ -51,10 +50,7 @@ export default function HomePage({ onEnterStudy }: Props) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center">
       <div className="max-w-xl w-full px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-8 relative">
-          <div className="absolute right-0 top-0">
-            <DarkModeToggle />
-          </div>
+        <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             📚 面经闪卡
           </h1>
