@@ -2,13 +2,80 @@
 // src/components/SubModulePicker.tsx — 子模块选择页面
 // ============================================================
 
-import { useMemo } from 'react';
-import { ArrowLeft, RotateCw } from 'lucide-react';
+import { useMemo, useState, useRef, useEffect } from 'react';
+import { X, Plus, Settings, Trash2, FileText } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import { SUB_MODULES, CATEGORIES } from '../constants';
+import { SUB_MODULES, CATEGORIES, type SubModuleMeta } from '../constants';
+import ModulePageTemplate, { type ModuleTone, type ModuleTopicCardModel } from './ModulePageTemplate';
+import CardBrowser from './CardBrowser';
+import CardEditor from './CardEditor';
+import StatsDashboard from './StatsDashboard';
+import type { FlashCard } from '../types';
 
 interface Props {
   onBack: () => void;
+}
+
+type SubModuleWithStats = SubModuleMeta & {
+  newCount: number;
+  dueCount: number;
+  total: number;
+};
+
+const COLOR_TONES: Record<string, Omit<ModuleTone, 'label'>> = {
+  'bg-blue-500': { bg: 'from-[#2F86FF] to-[#1267EE]', fg: '#2378f4', bar: '#2378f4', glow: 'rgba(35,120,244,0.28)' },
+  'bg-green-500': { bg: 'from-[#20D452] to-[#0EB442]', fg: '#14b83f', bar: '#14b83f', glow: 'rgba(20,184,63,0.26)' },
+  'bg-amber-500': { bg: 'from-[#FFB11A] to-[#FB8C00]', fg: '#fb8c00', bar: '#fb8c00', glow: 'rgba(251,140,0,0.26)' },
+  'bg-red-500': { bg: 'from-[#FF4655] to-[#F51F38]', fg: '#f5263d', bar: '#f5263d', glow: 'rgba(245,38,61,0.25)' },
+  'bg-purple-500': { bg: 'from-[#C64DFF] to-[#9D2EEB]', fg: '#a438f1', bar: '#a438f1', glow: 'rgba(164,56,241,0.24)' },
+  'bg-teal-500': { bg: 'from-[#15CDB8] to-[#08A891]', fg: '#08a891', bar: '#08a891', glow: 'rgba(8,168,145,0.24)' },
+  'bg-pink-500': { bg: 'from-[#FF5DA8] to-[#EB2F79]', fg: '#eb2f79', bar: '#eb2f79', glow: 'rgba(235,47,121,0.22)' },
+  'bg-orange-500': { bg: 'from-[#FF9C2F] to-[#F97316]', fg: '#f97316', bar: '#f97316', glow: 'rgba(249,115,22,0.23)' },
+  'bg-cyan-500': { bg: 'from-[#22D3EE] to-[#0891B2]', fg: '#0891b2', bar: '#0891b2', glow: 'rgba(8,145,178,0.22)' },
+  'bg-indigo-500': { bg: 'from-[#718BFF] to-[#4F46E5]', fg: '#4f46e5', bar: '#4f46e5', glow: 'rgba(79,70,229,0.22)' },
+  'bg-rose-500': { bg: 'from-[#FB7185] to-[#E11D48]', fg: '#e11d48', bar: '#e11d48', glow: 'rgba(225,29,72,0.22)' },
+  'bg-sky-500': { bg: 'from-[#38BDF8] to-[#0284C7]', fg: '#0284c7', bar: '#0284c7', glow: 'rgba(2,132,199,0.22)' },
+  'bg-emerald-500': { bg: 'from-[#34D399] to-[#059669]', fg: '#059669', bar: '#059669', glow: 'rgba(5,150,105,0.22)' },
+  'bg-violet-500': { bg: 'from-[#A78BFA] to-[#7C3AED]', fg: '#7c3aed', bar: '#7c3aed', glow: 'rgba(124,58,237,0.22)' },
+  'bg-yellow-500': { bg: 'from-[#FACC15] to-[#EAB308]', fg: '#eab308', bar: '#eab308', glow: 'rgba(234,179,8,0.22)' },
+  'bg-lime-500': { bg: 'from-[#A3E635] to-[#65A30D]', fg: '#65a30d', bar: '#65a30d', glow: 'rgba(101,163,13,0.22)' },
+  'bg-gray-600': { bg: 'from-[#64748B] to-[#475569]', fg: '#475569', bar: '#475569', glow: 'rgba(71,85,105,0.18)' },
+  'bg-gray-400': { bg: 'from-[#94A3B8] to-[#64748B]', fg: '#64748b', bar: '#64748b', glow: 'rgba(100,116,139,0.18)' },
+};
+
+const COLOR_OPTIONS = Object.keys(COLOR_TONES);
+
+const LABEL_OVERRIDES: Record<string, string> = {
+  'lc-array': '数', 'lc-twopointer': '双', 'lc-binary': '二', 'lc-linkedlist': '链',
+  'lc-stack': '栈', 'lc-tree': '二', 'lc-dp': '动', 'lc-backtrack': '回',
+  'lc-bfs': '图', 'lc-greedy': '贪', 'lc-heap': '堆', 'lc-other': '其',
+};
+
+const FALLBACK_TONE = COLOR_TONES['bg-gray-400'];
+
+function getTone(sm: Pick<SubModuleMeta, 'key' | 'label' | 'color'>): ModuleTone {
+  return { ...(COLOR_TONES[sm.color] || FALLBACK_TONE), label: LABEL_OVERRIDES[sm.key] || sm.label.charAt(0) };
+}
+
+function getTopicModel(sm: SubModuleWithStats): ModuleTopicCardModel {
+  const completed = Math.max(0, sm.total - sm.newCount);
+  const progress = sm.total > 0 ? Math.round((completed / sm.total) * 100) : 0;
+  return { key: sm.key, title: sm.label, tone: getTone(sm), newCount: sm.newCount, dueCount: sm.dueCount, total: sm.total, completed, progress, isCustom: sm.key.startsWith('custom-') };
+}
+
+function loadCustomTopics(category: string): SubModuleMeta[] {
+  try { const raw = localStorage.getItem(`fc-custom-topics-${category}`); return raw ? JSON.parse(raw) : []; } catch { return []; }
+}
+function saveCustomTopics(category: string, topics: SubModuleMeta[]) {
+  localStorage.setItem(`fc-custom-topics-${category}`, JSON.stringify(topics));
+}
+function loadDeletedTopics(category: string): string[] {
+  try { const raw = localStorage.getItem(`fc-deleted-topics-${category}`); return raw ? JSON.parse(raw) : []; } catch { return []; }
+}
+function saveDeletedTopic(category: string, key: string) {
+  const deleted = loadDeletedTopics(category);
+  if (!deleted.includes(key)) { deleted.push(key); }
+  localStorage.setItem(`fc-deleted-topics-${category}`, JSON.stringify(deleted));
 }
 
 export default function SubModulePicker({ onBack }: Props) {
@@ -16,119 +83,200 @@ export default function SubModulePicker({ onBack }: Props) {
   const { category } = state;
 
   const catMeta = CATEGORIES.find((c) => c.key === category);
-  const subModules = SUB_MODULES[category] || [];
+  const builtInSubs = useMemo(() => {
+    const deleted = loadDeletedTopics(category);
+    return (SUB_MODULES[category] || []).filter((s) => !deleted.includes(s.key));
+  }, [category]);
+  const [customTopics, setCustomTopics] = useState<SubModuleMeta[]>(() => loadCustomTopics(category));
+  const [showCreate, setShowCreate] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newColor, setNewColor] = useState('bg-blue-500');
+  const [showMenu, setShowMenu] = useState(false);
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ key: string; label: string } | null>(null);
+  const [showBrowser, setShowBrowser] = useState(false);
+  const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const subStats = useMemo(() => {
+  useEffect(() => {
+    if (!showMenu) return;
+    const on = (e: MouseEvent) => { if (menuRef.current && !menuRef.current.contains(e.target as Node)) setShowMenu(false); };
+    document.addEventListener('mousedown', on);
+    return () => document.removeEventListener('mousedown', on);
+  }, [showMenu]);
+
+  const subModules = useMemo(() => [...builtInSubs, ...customTopics], [builtInSubs, customTopics]);
+
+  const subStats = useMemo<SubModuleWithStats[]>(() => {
     const cards = Object.values(state.cardsById);
     return subModules.map((sm) => {
-      let mine: any[];
+      let mine: FlashCard[];
       if (sm.tags && sm.tags.length > 0) {
-        // LeetCode: match by overlapping tags
-        mine = cards.filter((c) => {
-          if (c.category !== 'leetcode') return false;
-          const ct = (c as any).tags || [];
-          return sm.tags!.some((t: string) => ct.includes(t));
-        });
+        mine = cards.filter((c) => { if (c.category !== 'leetcode') return false; return sm.tags!.some((t) => c.tags.includes(t)); });
       } else if (sm.subTopic) {
-        // QA cards: match by subTopic
-        mine = cards.filter((c) => (c as any).subTopic === sm.subTopic);
+        mine = cards.filter((c) => 'subTopic' in c && c.subTopic === sm.subTopic);
       } else {
-        // "其他专题": cards not matching any defined sub-module
         const knownSubTopics = new Set(subModules.filter((s) => s.subTopic).map((s) => s.subTopic));
         const knownTags = new Set(subModules.filter((s) => s.tags).flatMap((s) => s.tags!));
         mine = cards.filter((c) => {
-          if (c.category === 'leetcode') {
-            if (knownTags.size === 0) return false;
-            const ct = (c as any).tags || [];
-            return !ct.some((t: string) => knownTags.has(t));
-          }
-          const st = (c as any).subTopic;
+          if (c.category === 'leetcode') { if (knownTags.size === 0) return false; return !c.tags.some((t) => knownTags.has(t)); }
+          const st = 'subTopic' in c ? c.subTopic : undefined;
           return !st || !knownSubTopics.has(st);
         });
       }
-      const newCount = mine.filter((c) => !c.sm2.state || c.sm2.state === 'new').length;
-      const dueCount = mine.filter((c) => {
-        const s = c.sm2.state;
-        return s && s !== 'new' && c.sm2.nextReview <= Date.now();
-      }).length;
-      return { ...sm, newCount, dueCount, total: mine.length };
+      return { ...sm, newCount: mine.filter((c) => !c.sm2.state || c.sm2.state === 'new').length, dueCount: mine.filter((c) => { const s = c.sm2.state; return s && s !== 'new' && c.sm2.nextReview <= Date.now(); }).length, total: mine.length };
     });
   }, [state.cardsById, subModules]);
 
-  const handleStudyNew = (sm: any) => {
-    dispatch({ type: 'SET_FILTER_SUBTOPIC', payload: sm.key });
+  const topics = useMemo(() => subStats.map(getTopicModel), [subStats]);
+
+  const handleStudyNew = (topic: ModuleTopicCardModel) => {
+    if (topic.total === 0) {
+      setShowBrowser(true);
+      return;
+    }
+    // For custom topics, use the subTopic value; for built-in, use the key
+    const sm = subModules.find((s) => s.key === topic.key);
+    const filterValue = sm?.key.startsWith('custom-') ? (sm.subTopic || sm.key) : sm?.key || topic.key;
+    dispatch({ type: 'SET_FILTER_SUBTOPIC', payload: filterValue });
     dispatch({ type: 'SET_STUDY_MODE', payload: 'new' });
   };
 
-  const handleReviewAll = () => {
-    dispatch({ type: 'SET_STUDY_MODE', payload: 'review' });
+  const handleDeleteTopic = () => {
+    if (!deleteTarget) return;
+    if (deleteTarget.key.startsWith('custom-')) {
+      const updated = customTopics.filter((t) => t.key !== deleteTarget.key);
+      setCustomTopics(updated);
+      saveCustomTopics(category, updated);
+    } else {
+      saveDeletedTopic(category, deleteTarget.key);
+    }
+    setDeleteTarget(null);
+    setDeleteMode(false);
   };
 
+  const handleCreate = () => {
+    if (!newName.trim()) return;
+    const newTopic: SubModuleMeta = {
+      key: `custom-${Date.now()}`,
+      label: newName.trim(),
+      category: category as any,
+      subTopic: newName.trim(),
+      color: newColor,
+    };
+    const updated = [...customTopics, newTopic];
+    setCustomTopics(updated);
+    saveCustomTopics(category, updated);
+    setShowCreate(false);
+    setNewName('');
+    setNewColor('bg-blue-500');
+    setShowBrowser(true);
+  };
+
+  const handleReviewAll = () => dispatch({ type: 'SET_STUDY_MODE', payload: 'review' });
   const moduleDue = dueCountByCategory[category] ?? 0;
+  const totalNewCards = subStats.reduce((s, sm) => s + sm.newCount, 0);
+  const totalCards = subStats.reduce((s, sm) => s + sm.total, 0);
 
   return (
-    <div className="h-screen overflow-y-auto bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-      <div className="max-w-xl mx-auto px-3 sm:px-4 py-3 space-y-4 pb-24">
-        <div className="flex items-center justify-between">
-          <button onClick={onBack} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm">
-            <ArrowLeft className="w-4 h-4" /> 返回
-          </button>
-          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            {catMeta?.label || category}
-          </h2>
-        </div>
+    <>
+      <ModulePageTemplate
+        categoryLabel={catMeta?.label || category}
+        categoryIcon={catMeta?.icon}
+        moduleDue={moduleDue}
+        totalNewCards={totalNewCards}
+        totalCards={totalCards}
+        topics={topics}
+        onBack={onBack}
+        onStartReview={handleReviewAll}
+        onShowStats={() => dispatch({ type: 'TOGGLE_STATS' })}
+        onTopicClick={handleStudyNew}
+        onDeleteTopic={(topic) => { setDeleteTarget({ key: topic.key, label: topic.title }); }}
+        deleteMode={deleteMode}
+        onExitDeleteMode={() => setDeleteMode(false)}
+      />
+      <StatsDashboard category={category} />
+      {showBrowser && <CardBrowser onEdit={(card) => { if (!card.id) setEditingCard(null); else setEditingCard(card); }} onClose={() => setShowBrowser(false)} />}
+      {editingCard !== null && <CardEditor card={editingCard} onSave={() => { setEditingCard(null); dispatch({ type: 'SET_CATEGORY', payload: state.category }); }} onClose={() => setEditingCard(null)} />}
 
-        <button
-          onClick={handleReviewAll}
-          className="w-full flex items-center justify-between p-4 rounded-2xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <RotateCw className="w-6 h-6 text-orange-500" />
-            <div className="text-left">
-              <p className="font-bold text-orange-700 dark:text-orange-300">复习全部</p>
-              <p className="text-xs text-orange-500">{moduleDue} 张到期</p>
+      {/* Floating manage button */}
+      <div className="fixed bottom-6 right-6 z-30" ref={menuRef}>
+        {showMenu && (
+          <div className="absolute bottom-14 right-0 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 py-1.5 min-w-[140px]">
+            <button onClick={() => { setShowMenu(false); setShowBrowser(true); }}
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+              <FileText className="w-4 h-4" /> 卡片管理
+            </button>
+            <button onClick={() => { setShowMenu(false); setShowCreate(true); }}
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+              <Plus className="w-4 h-4" /> 新增专题
+            </button>
+            <button onClick={() => { setShowMenu(false); setDeleteMode(true); }}
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+              <Trash2 className="w-4 h-4" /> 删除专题
+            </button>
+          </div>
+        )}
+        <button onClick={() => setShowMenu(!showMenu)}
+          className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 shadow-lg hover:shadow-xl transition-all active:scale-95">
+          <Settings className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Create topic dialog */}
+      {showCreate && (
+        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-5 w-full max-w-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold dark:text-gray-100">新增专题</h3>
+              <button onClick={() => setShowCreate(false)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-gray-500">专题名称</label>
+                <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="例如：强化学习"
+                  className="w-full mt-0.5 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 text-sm"
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreate()} autoFocus />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500">颜色</label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {COLOR_OPTIONS.map((c) => (
+                    <button key={c} onClick={() => setNewColor(c)}
+                      className={`w-8 h-8 rounded-lg ${c} transition-all ${newColor === c ? 'ring-2 ring-offset-2 ring-blue-500 scale-110' : 'opacity-60 hover:opacity-100'}`} />
+                  ))}
+                </div>
+              </div>
+              <button onClick={handleCreate} disabled={!newName.trim()}
+                className="w-full py-2.5 rounded-xl bg-blue-500 text-white font-medium disabled:opacity-30 hover:bg-blue-600 transition-colors">
+                创建并添加卡片
+              </button>
             </div>
           </div>
-        </button>
-
-        <div className="grid grid-cols-2 gap-3">
-          {subStats.map((sm) => (
-            <button
-              key={sm.key}
-              onClick={() => handleStudyNew(sm)}
-              disabled={sm.newCount === 0}
-              className="homepage-module-card-dashboard group disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl ${sm.color} bg-opacity-10 text-sm font-bold`} style={{ backgroundColor: sm.color === 'bg-gray-400' ? '#f1f5f9' : undefined }}>
-                <span className={`w-8 h-8 rounded-full ${sm.color} flex items-center justify-center text-white text-xs font-bold`}>
-                  {sm.label.charAt(0)}
-                </span>
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{sm.label}</h3>
-              <div className="my-3 h-px bg-gray-100 dark:bg-gray-700" />
-              <div className="flex items-end justify-between">
-                <div className="space-y-1 text-[10px]">
-                  <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                    <span className="font-semibold text-blue-500">{sm.newCount}</span>
-                    <span>新卡</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                    <span className="font-semibold text-orange-500">{sm.dueCount}</span>
-                    <span>待复习</span>
-                  </div>
-                </div>
-                {sm.dueCount > 0 && (
-                  <span className="rounded-full bg-orange-50 dark:bg-orange-900/30 px-2 py-0.5 text-[10px] font-medium text-orange-500 dark:text-orange-400">
-                    待复习 {sm.dueCount}
-                  </span>
-                )}
-              </div>
-              <div className="mt-1.5 text-[10px] text-gray-400">{sm.total} 张</div>
-            </button>
-          ))}
-          {subStats.length % 2 === 1 && <div aria-hidden="true" />}
         </div>
-      </div>
-    </div>
+      )}
+
+      {/* Delete confirmation dialog */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-5 w-full max-w-sm">
+            <h3 className="text-lg font-bold dark:text-gray-100 mb-2">确认删除</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              确定要删除「{deleteTarget.label}」专题吗？专题下的卡片不会被删除，将回到未分配状态。
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteTarget(null)}
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                取消
+              </button>
+              <button onClick={handleDeleteTopic}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-colors">
+                确认删除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

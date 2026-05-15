@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "📚 面经闪卡",
+        "title": "",
         "width": 440,
         "height": 780,
         "minWidth": 360,

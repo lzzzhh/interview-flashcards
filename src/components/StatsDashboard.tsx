@@ -133,20 +133,28 @@ function ReviewDistribution({ cards }: { cards: { sm2: { interval: number; repet
   );
 }
 
-export default function StatsDashboard() {
+interface Props {
+  category?: string;
+}
+
+export default function StatsDashboard({ category }: Props) {
   const { state, dispatch, totalDue, totalNew } = useAppContext();
-  const allCardsForDistribution = useMemo(() => loadAllCards(), [state.cardsById]);
+  const allCardsForDistribution = useMemo(() => {
+    const cards = loadAllCards();
+    return category ? cards.filter((c) => c.category === category) : cards;
+  }, [state.cardsById, category]);
 
   const stats = useMemo(() => {
     const allCards = loadAllCards();
+    const filteredCards = category ? allCards.filter((c) => c.category === category) : allCards;
     const allLogs = getAllLogs();
-    const mastered = allCards.filter((c) => isReallyMastered(c.sm2.interval, c.sm2.lapses)).length;
-    const difficultIds = getDifficultCards(loadReviewLogs(), allCards.map((c) => c.id));
+    const mastered = filteredCards.filter((c) => isReallyMastered(c.sm2.interval, c.sm2.lapses)).length;
+    const difficultIds = getDifficultCards(loadReviewLogs(), filteredCards.map((c) => c.id));
     return {
-      total: allCards.length,
+      total: filteredCards.length,
       mastered,
-      pending: allCards.length - mastered,
-      masteredPercent: allCards.length > 0 ? Math.round((mastered / allCards.length) * 100) : 0,
+      pending: filteredCards.length - mastered,
+      masteredPercent: filteredCards.length > 0 ? Math.round((mastered / filteredCards.length) * 100) : 0,
       todayReviewed: getTodayReviewed(allLogs),
       streak: getStreak(allLogs),
       recentAccuracy: getRecentAccuracy(allLogs),

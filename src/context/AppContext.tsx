@@ -156,6 +156,13 @@ function computeVisibleIds(state: AppState): string[] {
         const st = (c as any).subTopic;
         return !st || !knownSubTopics.has(st);
       });
+    } else {
+      // 自定义专题：按 subTopic 直接匹配（自定义专题的 key 不在 SUB_MODULES 中）
+      ids = ids.filter((id) => {
+        const c = state.cardsById[id];
+        if (isLeetCodeCard(c)) return false;
+        return 'subTopic' in c && c.subTopic === state.filterSubTopic;
+      });
     }
   }
 

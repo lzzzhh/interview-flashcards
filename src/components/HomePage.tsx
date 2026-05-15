@@ -10,17 +10,6 @@ import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, getModuleDailyL
 import StatsDashboard from './StatsDashboard';
 import type { Category } from '../types';
 
-const BADGE_MAP: Record<string, { label: string; bg: string; text: string }> = {
-  leetcode:           { label: 'LC',  bg: 'bg-orange-50 dark:bg-orange-900/30',  text: 'text-orange-600 dark:text-orange-400' },
-  statistics:         { label: 'ST',  bg: 'bg-green-50 dark:bg-green-900/30',    text: 'text-green-600 dark:text-green-400' },
-  'machine-learning': { label: 'ML',  bg: 'bg-purple-50 dark:bg-purple-900/30',  text: 'text-purple-600 dark:text-purple-400' },
-  'deep-learning':    { label: 'DL',  bg: 'bg-blue-50 dark:bg-blue-900/30',      text: 'text-blue-600 dark:text-blue-400' },
-  llm:                { label: 'LLM', bg: 'bg-indigo-50 dark:bg-indigo-900/30',  text: 'text-indigo-600 dark:text-indigo-400' },
-  agent:              { label: 'AG',  bg: 'bg-teal-50 dark:bg-teal-900/30',      text: 'text-teal-600 dark:text-teal-400' },
-  jargon:             { label: 'JG',  bg: 'bg-pink-50 dark:bg-pink-900/30',      text: 'text-pink-600 dark:text-pink-400' },
-  workplace:          { label: 'WP',  bg: 'bg-amber-50 dark:bg-amber-900/30',    text: 'text-amber-600 dark:text-amber-400' },
-};
-
 interface Props {
   onEnterStudy: (category: string) => void;
 }
@@ -169,20 +158,18 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <button
                   key={mod.key}
                   onClick={() => onEnterStudy(mod.key)}
-                  className="homepage-module-card-dashboard group relative"
+                  className="homepage-module-card-dashboard group relative px-4"
                 >
                   <button
                     onClick={(e) => { e.stopPropagation(); deleteCustomDeck(mod.key); setCustomDecks(loadCustomDecks()); }}
-                    className="absolute top-2 right-2 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/30 transition-opacity"
+                    className="absolute -top-1.5 -right-1.5 p-1 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-opacity"
                     title="删除模块"
                   >
                     <X className="w-3 h-3 text-red-400" />
                   </button>
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                    {mod.label.charAt(0)}
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">{mod.label}</h3>
-                  <div className="mt-2 text-[11px] text-gray-400 dark:text-gray-500">自定义题库</div>
+                  <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mr-4">{mod.label}</h3>
+                  <span className="text-[11px] text-gray-400 dark:text-gray-500 ml-auto mr-3">自定义题库</span>
+                  <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 shrink-0" />
                 </button>
               );
             }
@@ -190,40 +177,19 @@ export default function HomePage({ onEnterStudy }: Props) {
             const cat = CATEGORIES.find((c) => c.key === mod.key as Category)!;
             const due = dueCountByCategory[cat.key] ?? 0;
             const limit = getModuleDailyLimit(cat.key);
-            const badge = BADGE_MAP[cat.key] || { label: mod.label.slice(0, 2).toUpperCase(), bg: 'bg-gray-50 dark:bg-gray-800', text: 'text-gray-600 dark:text-gray-400' };
 
             return (
               <button
                 key={cat.key}
                 onClick={() => onEnterStudy(cat.key)}
-                className="homepage-module-card-dashboard group"
+                className="flex items-center w-3/4 max-w-sm rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 shadow-sm hover:border-blue-300 hover:shadow-md active:scale-[0.98] transition-all group"
               >
-                <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl ${badge.bg} text-sm font-bold ${badge.text}`}>
-                  {badge.label}
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mr-4">{cat.label}</h3>
+                <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 ml-auto mr-3">
+                  <span>新卡 <span className="font-semibold text-blue-500">{limit}</span></span>
+                  <span>准备复习 <span className="font-semibold text-orange-500">{due}</span></span>
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                  {cat.label}
-                </h3>
-                <div className="my-3 h-px bg-gray-100 dark:bg-gray-700" />
-                <div className="flex items-end justify-between">
-                  <div className="space-y-1.5 text-[11px]">
-                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-                    <span className="w-14 shrink-0">每日新卡</span>
-                    <span className="font-semibold text-blue-500">{limit}</span>
-                    <span className="text-gray-400">张</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-                    <span className="w-14 shrink-0">今日待复习</span>
-                    <span className="font-semibold text-orange-500">{due}</span>
-                    <span className="text-gray-400">张</span>
-                  </div>
-                </div>
-                  {due > 0 && (
-                    <span className="rounded-full bg-orange-50 dark:bg-orange-900/30 px-2.5 py-0.5 text-[11px] font-medium text-orange-500 dark:text-orange-400">
-                      待复习 {due}
-                    </span>
-                  )}
-                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 shrink-0 group-hover:text-blue-500 transition-colors" />
               </button>
             );
           })}

@@ -108,14 +108,6 @@ export interface SubModuleMeta {
   category: Category;
   subTopic: string;
   color: string;
-}
-
-export interface SubModuleMeta {
-  key: string;
-  label: string;
-  category: Category;
-  subTopic: string;
-  color: string;
   tags?: string[];
 }
 
