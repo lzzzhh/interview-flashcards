@@ -95,7 +95,6 @@ export interface AppState {
   reviewMode: boolean;
   dailyNewLimit: number;
   studyMode: StudyMode;
-  difficultyDistribution: Record<Difficulty, number>;
 }
 
 // ============================================================
@@ -125,7 +124,6 @@ export type AppAction =
   | { type: 'DELETE_CARD'; payload: string }
   | { type: 'SET_DAILY_NEW_LIMIT'; payload: number }
   | { type: 'SET_STUDY_MODE'; payload: StudyMode }
-  | { type: 'START_NEW_STUDY'; payload: { easy: number; medium: number; hard: number } }
   | { type: 'UNDO_LAST_RATING' };
 
 // ============================================================

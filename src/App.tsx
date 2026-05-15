@@ -1,4 +1,5 @@
-import { useRef, useCallback, useState, useMemo, useEffect } from 'react';
+import { SUB_MODULES } from './constants';
+import { useRef, useCallback, useState, useMemo } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
@@ -10,26 +11,18 @@ import DarkModeToggle from './components/DarkModeToggle';
 import EmptyState from './components/EmptyState';
 import CardBrowser from './components/CardBrowser';
 import CardEditor from './components/CardEditor';
-import DifficultyPicker from './components/DifficultyPicker';
+import SubModulePicker from './components/SubModulePicker';
 import type { FlashCard } from './types';
-import { getModuleDailyLimit } from './utils/customDecks';
 
-/** Built-in modules that support difficulty-based new card distribution */
-const MODULES_WITH_DIFFICULTY = new Set([
-  'leetcode', 'statistics', 'machine-learning', 'deep-learning', 'llm', 'agent',
-]);
+function hasSubModules(category: string): boolean {
+  return category in SUB_MODULES;
+}
 
 function StudyPage({ onBack }: { onBack: () => void }) {
   const { state, dispatch, currentCard, totalNew, dueCountByCategory } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
-  const [showDifficultyPicker, setShowDifficultyPicker] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
-
-  // Reset picker visibility when study mode changes
-  useEffect(() => {
-    setShowDifficultyPicker(false);
-  }, [state.studyMode]);
 
   const getCurrentCardId = useCallback(() => currentCard?.id ?? null, [currentCard]);
   useKeyboard({ dispatch, searchInputRef, getCurrentCardId });
@@ -40,18 +33,10 @@ function StudyPage({ onBack }: { onBack: () => void }) {
     return Object.values(state.cardsById).filter((c) => !c.sm2.state || c.sm2.state === 'new').length;
   }, [state.cardsById]);
 
-  if (state.studyMode === 'choose' && showDifficultyPicker) {
-    return <DifficultyPicker onBack={() => setShowDifficultyPicker(false)} />;
-  }
-
   if (state.studyMode === 'choose') {
-    const handleStartNew = () => {
-      if (MODULES_WITH_DIFFICULTY.has(state.category)) {
-        setShowDifficultyPicker(true);
-      } else {
-        dispatch({ type: 'SET_STUDY_MODE', payload: 'new' });
-      }
-    };
+    if (hasSubModules(state.category)) {
+      return <SubModulePicker onBack={onBack} />;
+    }
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
         <div className="max-w-xl mx-auto px-3 sm:px-4 py-3 space-y-3">
@@ -59,16 +44,15 @@ function StudyPage({ onBack }: { onBack: () => void }) {
             <button onClick={onBack} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm">
               <ArrowLeft className="w-4 h-4" /> 返回
             </button>
-            <DarkModeToggle />
           </div>
           <div className="flex flex-col items-center justify-center py-16">
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">开始学习</h2>
             <div className="w-full max-w-xs space-y-4">
-              <button onClick={handleStartNew}
+              <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'new' })}
                 className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
                 <span className="text-3xl">🆕</span>
                 <span className="text-base font-bold text-blue-700 dark:text-blue-300">学习新卡</span>
-                <span className="text-xs text-blue-500">今日上限 {getModuleDailyLimit(state.category)} 张 · 剩余 {moduleNewCount} 张</span>
+                <span className="text-xs text-blue-500">剩余 {moduleNewCount} 张</span>
               </button>
               <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'review' })}
                 className="w-full flex flex-col items-center gap-2 p-5 rounded-2xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors">
@@ -122,7 +106,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
         {cardCount > 0 && (
           <div className="pt-2 pb-8">
-            <ProgressBar current={Math.min(state.currentVisibleIndex, cardCount - 1)} total={cardCount} mastered={0} />
+            <ProgressBar current={Math.min(state.currentVisibleIndex, cardCount - 1)} total={cardCount} mastered={state.currentVisibleIndex + 1} />
           </div>
         )}
       </div>
@@ -143,7 +127,11 @@ function AppInner() {
       <div className={studyCategory ? 'hidden' : ''}>
         <HomePage onEnterStudy={handleEnterStudy} />
       </div>
-      {studyCategory && <StudyPage onBack={() => setStudyCategory(null)} />}
+      {studyCategory && (
+        <div className="page-enter" key={studyCategory}>
+          <StudyPage onBack={() => setStudyCategory(null)} />
+        </div>
+      )}
     </>
   );
 }

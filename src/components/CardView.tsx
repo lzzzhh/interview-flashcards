@@ -257,11 +257,13 @@ function QAView({ card }: { card: QACard }) {
 
         {/* Answer — collapsible with smooth transition */}
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            showAnswer ? 'max-h-[2000px] opacity-100 mt-3' : 'max-h-0 opacity-0'
+          className={`transition-all duration-400 ease-out ${
+            showAnswer
+              ? 'max-h-[2000px] opacity-100 mt-3 overflow-visible'
+              : 'max-h-0 opacity-0 overflow-hidden'
           }`}
         >
-          <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 px-3 sm:px-4 text-justify">
+          <div key={showAnswer ? 'visible' : 'hidden'} className={`text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 px-3 sm:px-4 text-justify ${showAnswer ? 'answer-reveal' : ''}`}>
             <MathText text={card.answer} />
           </div>
         </div>
@@ -282,7 +284,7 @@ function QAView({ card }: { card: QACard }) {
 export default function CardView({ card, showApproach, showCode }: CardViewProps) {
   if (isLeetCode(card)) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 transition-shadow hover:shadow-md animate-fadeIn max-h-[calc(100vh-11rem)] sm:max-h-[calc(100vh-13rem)] flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 transition-shadow hover:shadow-md card-slide-in max-h-[calc(100vh-11rem)] sm:max-h-[calc(100vh-13rem)] flex flex-col">
         <div className="overflow-y-auto flex-1 pr-1 -mr-1">
           <LeetCodeView card={card} showApproach={showApproach} showCode={showCode} />
         </div>
@@ -292,7 +294,7 @@ export default function CardView({ card, showApproach, showCode }: CardViewProps
 
   // QA cards with flip animation
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 transition-shadow hover:shadow-md animate-fadeIn max-h-[calc(100vh-11rem)] sm:max-h-[calc(100vh-13rem)] flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 transition-shadow hover:shadow-md card-slide-in max-h-[calc(100vh-11rem)] sm:max-h-[calc(100vh-13rem)] flex flex-col">
       <div className="overflow-y-auto flex-1 pr-1 -mr-1">
         <QAView card={card} />
       </div>
