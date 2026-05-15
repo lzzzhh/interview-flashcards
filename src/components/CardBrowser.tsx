@@ -202,13 +202,6 @@ export default function CardBrowser({ onEdit, onClose }: Props) {
           <span className="hidden sm:inline">上传</span>
           <input type="file" accept=".csv,.json" onChange={handleImport} className="hidden" />
         </label>
-        <button
-          onClick={() => onEdit({} as FlashCard)}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white text-sm hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">新建</span>
-        </button>
       </div>
 
       {/* Search */}

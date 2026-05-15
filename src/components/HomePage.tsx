@@ -4,11 +4,17 @@
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { X, BarChart3, ChevronRight, Plus } from 'lucide-react';
+import appIcon from '../../icon.png';
 import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
 import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, getModuleDailyLimit, deleteCustomDeck, type CustomDeck } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
 import type { Category } from '../types';
+
+const TOTAL_MAP: Record<string, number> = {
+  leetcode: 100, statistics: 199, 'machine-learning': 171, 'deep-learning': 32,
+  llm: 37, agent: 26, jargon: 45, workplace: 76,
+};
 
 interface Props {
   onEnterStudy: (category: string) => void;
@@ -112,22 +118,33 @@ export default function HomePage({ onEnterStudy }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center">
-      <div className="homepage-shell max-w-xl w-full px-4 py-8 select-none" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+      <div className="homepage-shell max-w-xl w-full px-4 py-8 select-none relative" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+
+        {/* Stats button — top right */}
+        <button
+          onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
+          className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-blue-500 hover:border-blue-200 transition-colors shadow-sm"
+        >
+          <BarChart3 size={18} />
+        </button>
 
         {/* Header */}
-        <div className="homepage-header text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            面经闪卡
-          </h1>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            选择一个模块开始学习
-          </p>
+        <div className="homepage-header flex items-center justify-center gap-4">
+          <img src={appIcon} alt="面经闪卡" className="h-14 w-14 rounded-2xl shadow-sm shrink-0" />
+          <div>
+            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              面经闪卡
+            </h1>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+              都是同龄人我原本没想高效学习
+            </p>
+          </div>
         </div>
 
-        {/* Module grid */}
+        {/* Module list */}
         <div
           key={page}
-          className={`homepage-module-grid homepage-page ${
+          className={`flex flex-col items-center gap-2.5 homepage-page ${
             pageDirection > 0 ? 'homepage-page-next' : 'homepage-page-prev'
           }`}
         >
@@ -141,14 +158,10 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <button
                   key={mod.key}
                   onClick={() => setShowCreate(true)}
-                  className="homepage-module-card-dashed group text-gray-400 dark:text-gray-500 hover:text-blue-500 hover:shadow-md active:scale-95"
+                  className="flex items-center justify-center w-3/4 max-w-sm rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-transparent px-4 py-3 hover:border-blue-400 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 active:scale-[0.98] transition-all"
                 >
-                  <div className="flex flex-col items-center justify-center h-full gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                      <Plus className="w-5 h-5" />
-                    </div>
-                    <span className="text-sm font-medium">新建模块</span>
-                  </div>
+                  <Plus className="w-5 h-5 text-gray-400 mr-2" />
+                  <span className="text-sm font-medium text-gray-400">新建模块</span>
                 </button>
               );
             }
@@ -158,7 +171,7 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <button
                   key={mod.key}
                   onClick={() => onEnterStudy(mod.key)}
-                  className="homepage-module-card-dashboard group relative px-4"
+                  className="flex items-center w-3/4 max-w-sm rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 shadow-sm hover:border-blue-300 hover:shadow-md active:scale-[0.98] transition-all group relative"
                 >
                   <button
                     onClick={(e) => { e.stopPropagation(); deleteCustomDeck(mod.key); setCustomDecks(loadCustomDecks()); }}
@@ -177,6 +190,7 @@ export default function HomePage({ onEnterStudy }: Props) {
             const cat = CATEGORIES.find((c) => c.key === mod.key as Category)!;
             const due = dueCountByCategory[cat.key] ?? 0;
             const limit = getModuleDailyLimit(cat.key);
+            const total = TOTAL_MAP[cat.key] ?? 0;
 
             return (
               <button
@@ -188,6 +202,7 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 ml-auto mr-3">
                   <span>新卡 <span className="font-semibold text-blue-500">{limit}</span></span>
                   <span>准备复习 <span className="font-semibold text-orange-500">{due}</span></span>
+                  <span>共 <span className="font-semibold text-gray-600 dark:text-gray-300">{total}</span> 张</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 shrink-0 group-hover:text-blue-500 transition-colors" />
               </button>
@@ -204,20 +219,6 @@ export default function HomePage({ onEnterStudy }: Props) {
             />
           ))}
           <button onClick={goNext} disabled={page >= totalPages - 1} className="text-gray-300 dark:text-gray-600 disabled:opacity-20 hover:text-gray-500">▶</button>
-        </div>
-
-        {/* Stats button */}
-        <div className="homepage-actions flex justify-center mt-5">
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-            className="flex items-center gap-3 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-5 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 shadow-sm transition hover:shadow-md"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-500">
-              <BarChart3 size={18} />
-            </div>
-            <span>学习统计</span>
-            <ChevronRight size={16} className="text-gray-300 dark:text-gray-600" />
-          </button>
         </div>
       </div>
 
