@@ -151,6 +151,18 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
     radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.03), transparent 35%);
 }
 
+.homepage-shell {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: 5.25rem auto minmax(23.5rem, 1fr) 3rem;
+  align-content: center;
+  row-gap: 0.875rem;
+}
+
+.homepage-header {
+  align-self: end;
+}
+
 .homepage-module-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
