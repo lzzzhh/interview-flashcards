@@ -196,7 +196,9 @@ export default function HomePage({ onEnterStudy }: Props) {
           </div>
         </div>
 
-        <RecommendBar />
+        <div className="-mt-2">
+          <RecommendBar />
+        </div>
 
         {/* Module list */}
         <div
