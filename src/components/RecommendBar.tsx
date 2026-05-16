@@ -41,11 +41,12 @@ export default function RecommendBar() {
     return all.slice(0, 5);
   }, [state.cardsById]);
 
-  if (recommendations.length === 0) return null;
-
   return (
     <div className="w-full rounded-2xl bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800 p-4 shadow-sm">
       <h3 className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2">推荐复习</h3>
+      {recommendations.length === 0 ? (
+        <p className="text-xs text-gray-400 dark:text-gray-500">暂无待复习卡片</p>
+      ) : (
       <div className="space-y-1.5">
         {recommendations.map((rec) => (
           <div key={rec.id} className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
@@ -60,6 +61,7 @@ export default function RecommendBar() {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }
