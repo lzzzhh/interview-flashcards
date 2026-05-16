@@ -295,6 +295,14 @@ function appReducer(state: AppState, action: AppAction): AppState {
         op: 'rate', cardId, ts: Date.now(), deviceId: 'local', seq: Date.now(),
         data: { rating, sm2: result.sm2, reviewLog: result.log },
       });
+      // 持久化评分进度到 localStorage
+      const key = progressKeyMap[card.category] ?? `fc-progress-${card.category}`;
+      try {
+        const raw = localStorage.getItem(key);
+        const prev: StoredProgress = raw ? JSON.parse(raw) : { sm2: {}, mastered: [], favorited: [] };
+        prev.sm2[cardId] = result.sm2;
+        localStorage.setItem(key, JSON.stringify(prev));
+      } catch {}
       return {
         ...state,
         cardsById: {
