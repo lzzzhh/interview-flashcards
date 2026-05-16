@@ -20,6 +20,11 @@ async function tauriInvoke<T>(cmd: string, args?: Record<string, unknown>): Prom
 async function appendOpToFile(op: SyncOp) { if (isTauri()) await tauriInvoke('sync_append_op', { opJson: JSON.stringify(op) }); }
 async function readSeenOps(): Promise<SeenOps> { return isTauri() ? tauriInvoke<SeenOps>('sync_read_seen_ops') : {} as SeenOps; }
 
+/** 全局 oplog 写入（供 reducer 等非组件代码调用） */
+export async function logSyncOp(op: SyncOp) {
+  if (isTauri()) await tauriInvoke('sync_append_op', { opJson: JSON.stringify(op) });
+}
+
 async function readMyOps(): Promise<SyncOp[]> {
   if (!isTauri()) return [];
   const files: Record<string, string> = await tauriInvoke('sync_read_all_ops');
@@ -62,8 +67,34 @@ export function useSync() {
       }
       const seen = await readSeenOps();
       const fromTs = Object.values(seen).reduce((max, v) => Math.max(max, v), 0);
-      // Read client's own ops to send to server
-      const myOps = await readMyOps();
+
+      // Gather ops to send: from oplog (Tauri) or from card state (browser)
+      let myOps: SyncOp[] = [];
+      if (isTauri()) {
+        myOps = await readMyOps();
+      } else {
+        // Browser: convert current card state to create_card ops
+        const now = Date.now();
+        for (const card of Object.values(state.cardsById)) {
+          if (card.category === 'leetcode') {
+            myOps.push({
+              op: 'create_card', cardId: card.id, ts: now, deviceId, seq: now,
+              data: { category: card.category, question: card.titleCn, answer: card.approach || '' },
+            });
+          } else {
+            myOps.push({
+              op: 'create_card', cardId: card.id, ts: now, deviceId, seq: now,
+              data: { category: card.category, question: card.question, answer: card.answer, tags: card.tags, difficulty: card.difficulty, subTopic: card.subTopic },
+            });
+          }
+          // Also sync SM2 state
+          myOps.push({
+            op: 'rate', cardId: card.id, ts: now, deviceId, seq: now + 1,
+            data: { rating: 4, sm2: card.sm2, reviewLog: { id: `sync-${card.id}`, cardId: card.id, rating: 4, stateBefore: card.sm2.state, stateAfter: card.sm2.state, intervalBefore: card.sm2.interval, intervalAfter: card.sm2.interval, easeBefore: card.sm2.easeFactor, easeAfter: card.sm2.easeFactor, elapsedDays: 0, scheduledDays: card.sm2.interval, reviewedAt: now } },
+          });
+        }
+      }
+
       const result = await doSync(ip, port, fromTs, deviceId, deviceName, myOps);
       if (result.ops.length === 0) {
         setSyncState((s) => ({ ...s, syncing: false, lastResult: '已是最新，无需同步' }));
@@ -79,5 +110,29 @@ export function useSync() {
   const logOp = useCallback(async (op: SyncOp) => { await appendOpToFile(op); }, []);
   const nextSeq = useCallback(() => { seqRef.current += 1; return seqRef.current; }, []);
 
-  return { ...syncState, startServer, stopServer, connectAndSync, logOp, nextSeq };
+  // 重放本地 oplog 到应用状态
+  const replayLocal = useCallback(async () => {
+    if (!isTauri()) return;
+    const files: Record<string, string> = await tauriInvoke('sync_read_all_ops');
+    const ops: SyncOp[] = [];
+    for (const content of Object.values(files)) {
+      for (const line of content.split('\n')) {
+        const t = line.trim(); if (!t) continue;
+        try { ops.push(JSON.parse(t)); } catch {}
+      }
+    }
+    if (ops.length === 0) return;
+    const seen = await readSeenOps();
+    const merged = replayOps(ops, { cardsById: state.cardsById, reviewLogs: [] }, seen);
+    let count = 0;
+    for (const [id, card] of Object.entries(merged.cardsById)) {
+      if (JSON.stringify(state.cardsById[id]?.sm2) !== JSON.stringify(card.sm2)) {
+        dispatch({ type: 'UPDATE_CARD', payload: card });
+        count++;
+      }
+    }
+    setSyncState((s) => ({ ...s, lastResult: `本地重放：更新了 ${count} 张卡片` }));
+  }, [state.cardsById, dispatch]);
+
+  return { ...syncState, startServer, stopServer, connectAndSync, logOp, nextSeq, replayLocal };
 }
