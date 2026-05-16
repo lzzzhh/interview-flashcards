@@ -140,10 +140,14 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
   align-items: stretch;
   justify-content: flex-start;
   border-radius: 1.125rem;
-  border: 1px solid #dbe3ef;
-  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
   padding: 0.875rem;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.045);
+  box-shadow:
+    0 8px 32px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
@@ -153,15 +157,34 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
 }
 
 .homepage-module-card:hover {
-  border-color: #bfdbfe;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  border-color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow:
+    0 12px 40px rgba(15, 23, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   transform: translateY(-1px);
 }
 
 .dark .homepage-module-card {
-  border-color: #1f2937;
-  background: #111827;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(31, 41, 55, 0.45);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.dark .homepage-module-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(31, 41, 55, 0.58);
+  backdrop-filter: blur(22px) saturate(1.3);
+  -webkit-backdrop-filter: blur(22px) saturate(1.3);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .homepage-module-card-dashed {
@@ -173,9 +196,12 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
   align-items: center;
   justify-content: center;
   border-radius: 1.125rem;
-  border: 1.5px dashed #cbd5e1;
-  background: rgba(255, 255, 255, 0.45);
+  border: 1.5px dashed rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 0.875rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
   transition:
     border-color 180ms ease,
     background-color 180ms ease,
@@ -183,27 +209,34 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
     transform 120ms ease;
 }
 .homepage-module-card-dashed:hover {
-  border-color: #93c5fd;
-  background: rgba(239, 246, 255, 0.75);
-  box-shadow: 0 8px 18px rgba(59, 130, 246, 0.08);
+  border-color: rgba(147, 197, 253, 0.7);
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.1);
   transform: translateY(-1px);
 }
 
 .dark .homepage-module-card-dashed {
-  border-color: #374151;
-  background: rgba(17, 24, 39, 0.5);
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(31, 41, 55, 0.3);
+}
+
+.dark .homepage-module-card-dashed:hover {
+  border-color: rgba(96, 165, 250, 0.4);
+  background: rgba(31, 41, 55, 0.45);
 }
 
 .homepage-module-card-empty {
   pointer-events: none;
   border-style: dashed;
-  background: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   box-shadow: none;
-  opacity: 0.55;
+  opacity: 0.45;
 }
 
 .dark .homepage-module-card-empty {
-  background: rgba(17, 24, 39, 0.45);
+  background: rgba(17, 24, 39, 0.25);
 }
 
 .homepage-pagination,
