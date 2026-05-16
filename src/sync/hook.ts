@@ -2,7 +2,7 @@
 // src/sync/hook.ts — React Hook
 // ============================================================
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { replayOps } from './engine';
 import { doSync } from './lan/client';
@@ -133,6 +133,34 @@ export function useSync() {
     }
     setSyncState((s) => ({ ...s, lastResult: `本地重放：更新了 ${count} 张卡片` }));
   }, [state.cardsById, dispatch]);
+
+  // 自动重放：作为服务端时，定期检查 oplog 是否有新数据
+  const cardsRef = useRef(state.cardsById);
+  cardsRef.current = state.cardsById;
+  useEffect(() => {
+    if (!isTauri()) return;
+    const interval = setInterval(async () => {
+      try {
+        const files: Record<string, string> = await tauriInvoke('sync_read_all_ops');
+        const ops: SyncOp[] = [];
+        for (const content of Object.values(files)) {
+          for (const line of content.split('\n')) {
+            const t = line.trim(); if (!t) continue;
+            try { ops.push(JSON.parse(t)); } catch {}
+          }
+        }
+        if (ops.length === 0) return;
+        const seen = await readSeenOps();
+        const merged = replayOps(ops, { cardsById: cardsRef.current, reviewLogs: [] }, seen);
+        for (const [id, card] of Object.entries(merged.cardsById)) {
+          if (JSON.stringify(cardsRef.current[id]?.sm2) !== JSON.stringify(card.sm2)) {
+            dispatch({ type: 'UPDATE_CARD', payload: card });
+          }
+        }
+      } catch {}
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { ...syncState, startServer, stopServer, connectAndSync, logOp, nextSeq, replayLocal };
 }
