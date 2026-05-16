@@ -44,7 +44,15 @@ export default function SyncPanel({ onClose }: Props) {
           <button onClick={replayLocal} className="w-full py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">刷新本地数据</button>
           {lastResult && <div className="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 text-sm text-green-700 dark:text-green-300 flex items-center gap-2"><CheckCircle2 className="w-4 h-4" />{lastResult}</div>}
           {error && <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-sm text-red-700 dark:text-red-300 flex items-center gap-2"><XCircle className="w-4 h-4" />{error}</div>}
-          <div className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed"><p className="font-medium mb-1">使用说明：</p><ol className="list-decimal pl-4 space-y-0.5"><li>两台设备连接同一个 WiFi</li><li>一台点「开启主机模式」</li><li>另一台输入主机 IP，点「连接」</li></ol></div>
+          <div className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            <p className="font-medium mb-1">使用说明：</p>
+            <ol className="list-decimal pl-4 space-y-0.5">
+              <li>两台设备连接同一个 WiFi</li>
+              <li>桌面端点「开启主机模式」</li>
+              <li>手机端输入主机 IP，点「连接并同步」</li>
+              <li>桌面端点「刷新本地数据」</li>
+            </ol>
+          </div>
         </div>
       </div>
     </div>
