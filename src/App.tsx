@@ -41,9 +41,7 @@ function SyncBackground() {
         const seen: Record<string, number> = await invoke('sync_read_seen_ops');
         const merged = replayOps(ops, { cardsById: cardsRef.current, reviewLogs: [] }, seen);
         for (const [, card] of Object.entries(merged.cardsById)) {
-          if (JSON.stringify(cardsRef.current[card.id]?.sm2) !== JSON.stringify(card.sm2)) {
-            dispatch({ type: 'UPDATE_CARD', payload: card });
-          }
+          dispatch({ type: 'UPDATE_CARD', payload: card });
         }
       } catch {}
     }, 3000);
