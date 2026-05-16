@@ -3,9 +3,8 @@
 // ============================================================
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload, Wifi } from 'lucide-react';
+import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
-import SyncPanel from './SyncPanel';
 import { useAppContext } from '../context/AppContext';
 import { DIFFICULTY_LABEL, CATEGORIES } from '../constants';
 import { exportProgress, importProgress } from '../utils/backup';
@@ -167,7 +166,6 @@ function getTodayNewAllowance(cards: FlashCard[], category?: string) {
 
 export default function StatsDashboard({ category }: Props) {
   const { state, dispatch } = useAppContext();
-  const [showSync, setShowSync] = useState(false);
   const cardVersion = Object.values(state.cardsById)
     .map((card) => `${card.id}:${card.sm2.state}:${card.sm2.interval}:${card.sm2.lapses}:${card.sm2.nextReview}`)
     .join('|');
@@ -203,7 +201,6 @@ export default function StatsDashboard({ category }: Props) {
     };
   }, [cardVersion, category]); // re-evaluate when cardsById changes (triggered by any rating)
 
-  if (showSync) return <SyncPanel onClose={() => setShowSync(false)} />;
   if (!state.showStats) return null;
 
   return (
@@ -223,9 +220,6 @@ export default function StatsDashboard({ category }: Props) {
           </h2>
           <div className="flex items-center gap-1">
             <DarkModeToggle />
-            <button onClick={() => setShowSync(true)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="局域网同步">
-              <Wifi className="w-5 h-5 text-gray-500" />
-            </button>
             <button
               onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
               className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
