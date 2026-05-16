@@ -1,5 +1,5 @@
 import { useRef, useCallback, useState } from 'react';
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft, X, Wifi } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
 import HomePage from './components/HomePage';
@@ -11,12 +11,14 @@ import EmptyState from './components/EmptyState';
 import CardBrowser from './components/CardBrowser';
 import CardEditor from './components/CardEditor';
 import SubModulePicker from './components/SubModulePicker';
+import SyncPanel from './components/SyncPanel';
 import type { Category, FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
   const { state, dispatch, currentCard, totalNew, dueCountByCategory } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
+  const [showSync, setShowSync] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
 
   const getCurrentCardId = useCallback(() => currentCard?.id ?? null, [currentCard]);
@@ -38,6 +40,9 @@ function StudyPage({ onBack }: { onBack: () => void }) {
             <ArrowLeft className="w-4 h-4" /> 返回
           </button>
           <div className="flex items-center gap-0.5">
+            <button onClick={() => setShowSync(true)} className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700" title="局域网同步">
+              <Wifi className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            </button>
             <button onClick={() => setShowBrowser(true)} className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700" title="卡片管理">
               <X className="w-4 h-4 rotate-45 text-gray-500 dark:text-gray-400" />
             </button>
@@ -78,6 +83,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
       </div>
 
       {showBrowser && <CardBrowser onEdit={(card) => { if (!card.id) setEditingCard(null); else setEditingCard(card); }} onClose={() => setShowBrowser(false)} />}
+      {showSync && <SyncPanel onClose={() => setShowSync(false)} />}
       {editingCard !== null && <CardEditor card={editingCard} onSave={() => { setEditingCard(null); dispatch({ type: 'SET_CATEGORY', payload: state.category }); }} onClose={() => setEditingCard(null)} />}
     </div>
   );

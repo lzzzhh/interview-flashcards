@@ -22,3 +22,6 @@ log = "0.4"
 tauri = { version = "2", features = [] }
 tauri-plugin-log = "2"
 dirs-next = "2.0"
+tiny_http = "0.12"
+uuid = { version = "1", features = ["v4"] }
+chrono = "0.4"
