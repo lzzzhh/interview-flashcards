@@ -4,14 +4,22 @@
 
 import type { SyncOp, DeviceInfo, ExchangeRequest, ExchangeResponse } from '../types';
 
+const isTauri = () => typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
+function baseUrl(ip: string, port: number): string {
+  if (isTauri()) return `http://${ip}:${port}`;
+  // 浏览器模式：通过 Vite 代理访问，避免跨端口 CORS 问题
+  return `http://${ip}:3000/sync-api`;
+}
+
 export async function pingHost(ip: string, port: number): Promise<DeviceInfo> {
-  const resp = await fetch(`http://${ip}:${port}/ping`, { signal: AbortSignal.timeout(3000) });
+  const resp = await fetch(`${baseUrl(ip, port)}/ping`, { signal: AbortSignal.timeout(3000) });
   if (!resp.ok) throw new Error(`Ping failed: ${resp.status}`);
   return resp.json();
 }
 
 export async function exchangeWithHost(ip: string, port: number, req: ExchangeRequest, clientOps: SyncOp[]): Promise<ExchangeResponse> {
-  const resp = await fetch(`http://${ip}:${port}/sync/exchange`, {
+  const resp = await fetch(`${baseUrl(ip, port)}/sync/exchange`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...req, ops: clientOps }), signal: AbortSignal.timeout(15000),
   });

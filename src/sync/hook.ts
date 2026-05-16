@@ -129,7 +129,21 @@ export function useSync() {
         dispatch({ type: 'UPDATE_CARD', payload: card });
         count++;
       }
-      setSyncState((s) => ({ ...s, lastResult: `已刷新 ${count} 张卡片` }));
+      // 持久化进度到文件
+      try {
+        const { loadAppData, saveAppData } = await import('../utils/nativeStorage');
+        const data = await loadAppData();
+        if (data) {
+          for (const [id, card] of Object.entries(merged.cardsById)) {
+            const key = `fc-${card.category}-progress`;
+            if (!data.progress[key]) data.progress[key] = { sm2: {}, mastered: [], favorited: [] };
+            if (!data.progress[key].sm2) data.progress[key].sm2 = {};
+            data.progress[key].sm2[id] = card.sm2;
+          }
+          await saveAppData(data);
+        }
+      } catch {}
+      setSyncState((s) => ({ ...s, lastResult: `已刷新 ${count} 张卡片并保存` }));
     } catch (e: any) {
       setSyncState((s) => ({ ...s, error: e?.toString() || '刷新失败' }));
     }
