@@ -4,6 +4,7 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload } from 'lucide-react';
+import DarkModeToggle from './DarkModeToggle';
 import { useAppContext } from '../context/AppContext';
 import { DIFFICULTY_LABEL, CATEGORIES } from '../constants';
 import { exportProgress, importProgress } from '../utils/backup';
@@ -217,12 +218,15 @@ export default function StatsDashboard({ category }: Props) {
           <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
             学习统计
           </h2>
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-            className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
+          <div className="flex items-center gap-1">
+            <DarkModeToggle />
+            <button
+              onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
+              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
