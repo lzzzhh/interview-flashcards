@@ -38,8 +38,7 @@ function SyncBackground() {
         }
         if (ops.length === 0) return;
 
-        const seen: Record<string, number> = await invoke('sync_read_seen_ops');
-        const merged = replayOps(ops, { cardsById: cardsRef.current, reviewLogs: [] }, seen);
+        const merged = replayOps(ops, { cardsById: cardsRef.current, reviewLogs: [] });
         for (const [, card] of Object.entries(merged.cardsById)) {
           dispatch({ type: 'UPDATE_CARD', payload: card });
         }

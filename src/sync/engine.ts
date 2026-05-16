@@ -19,8 +19,8 @@ export function replayOps(ops: SyncOp[], target: MergeTarget, seen: SeenOps = {}
   const logSet = new Set(target.reviewLogs.map((l) => l.id));
 
   for (const op of sorted) {
-    const lastSeen = seen[op.deviceId] ?? 0;
-    if (op.seq <= lastSeen) continue;
+    const lastTs = seen[op.deviceId] ?? 0;
+    if (op.ts <= lastTs) continue;
 
     switch (op.op) {
       case 'rate': {
@@ -63,7 +63,7 @@ export function replayOps(ops: SyncOp[], target: MergeTarget, seen: SeenOps = {}
         break;
       }
     }
-    seen[op.deviceId] = op.seq;
+    seen[op.deviceId] = op.ts;
   }
   return { cardsById: cards, reviewLogs: logs };
 }
