@@ -11,7 +11,7 @@ import EmptyState from './components/EmptyState';
 import CardBrowser from './components/CardBrowser';
 import CardEditor from './components/CardEditor';
 import SubModulePicker from './components/SubModulePicker';
-import type { FlashCard } from './types';
+import type { Category, FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
   const { state, dispatch, currentCard, totalNew, dueCountByCategory } = useAppContext();
@@ -29,9 +29,11 @@ function StudyPage({ onBack }: { onBack: () => void }) {
     }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-      <div className="max-w-xl mx-auto px-3 sm:px-4 py-3 space-y-3">
-        <div className="flex items-center justify-between">
+    <div className="h-dvh flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+      <div className="max-w-md mx-auto w-full px-3 sm:px-4 flex flex-col flex-1 min-h-0">
+
+        {/* Top bar — fixed height */}
+        <div className="shrink-0 py-3 flex items-center justify-between">
           <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm">
             <ArrowLeft className="w-4 h-4" /> 返回
           </button>
@@ -43,24 +45,33 @@ function StudyPage({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
+        {/* Status messages */}
         {state.studyMode === 'review' && (dueCountByCategory[state.category] ?? 0) === 0 && (
-          <div className="text-center py-8 text-gray-400">🎉 没有到期卡片！</div>
+          <div className="shrink-0 text-center py-8 text-gray-400">🎉 没有到期卡片！</div>
         )}
         {state.studyMode === 'new' && totalNew === 0 && (
-          <div className="text-center py-8 text-gray-400">🎉 所有卡片都已学过！<button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button></div>
+          <div className="shrink-0 text-center py-8 text-gray-400">🎉 所有卡片都已学过！<button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button></div>
         )}
 
+        {/* Card area — fills remaining space, fixed height per card */}
         {currentCard ? (
-          <div className="space-y-4" key={currentCard.id}>
-            <CardView card={currentCard} showApproach={state.showApproach} showCode={state.showCode} />
-            <CardActions />
+          <div className="flex-1 flex flex-col min-h-0" key={currentCard.id}>
+            <div className="flex-1 min-h-0">
+              <CardView card={currentCard} showApproach={state.showApproach} showCode={state.showCode} />
+            </div>
+            <div className="shrink-0">
+              <CardActions />
+            </div>
           </div>
         ) : (
-          <EmptyState message={state.searchQuery ? `未找到「${state.searchQuery}」` : undefined} />
+          <div className="flex-1 flex items-center justify-center min-h-0">
+            <EmptyState message={state.searchQuery ? `未找到「${state.searchQuery}」` : undefined} />
+          </div>
         )}
 
+        {/* Progress bar — fixed at bottom */}
         {cardCount > 0 && (
-          <div className="pt-2 pb-8">
+          <div className="shrink-0 pt-1 pb-6">
             <ProgressBar current={Math.min(state.currentVisibleIndex, cardCount - 1)} total={cardCount} mastered={state.currentVisibleIndex + 1} />
           </div>
         )}
@@ -75,7 +86,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 function AppInner() {
   const [studyCategory, setStudyCategory] = useState<string | null>(null);
   const { dispatch } = useAppContext();
-  const handleEnterStudy = (category: string) => { setStudyCategory(category); dispatch({ type: 'SET_CATEGORY', payload: category as any }); };
+  const handleEnterStudy = (category: Category) => { setStudyCategory(category); dispatch({ type: 'SET_CATEGORY', payload: category }); };
 
   return (
     <>

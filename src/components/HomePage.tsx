@@ -9,6 +9,7 @@ import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
 import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, getModuleDailyLimit, deleteCustomDeck, type CustomDeck } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
+import RecommendBar from './RecommendBar';
 import type { Category } from '../types';
 
 const TOTAL_MAP: Record<string, number> = {
@@ -17,7 +18,7 @@ const TOTAL_MAP: Record<string, number> = {
 };
 
 interface Props {
-  onEnterStudy: (category: string) => void;
+  onEnterStudy: (category: Category) => void;
 }
 
 interface ModuleSlot {
@@ -26,6 +27,59 @@ interface ModuleSlot {
   isCustom?: boolean;
   isCreate?: boolean;
   isPlaceholder?: boolean;
+}
+
+interface HomeModuleCardProps {
+  label: string;
+  total?: number;
+  due?: number;
+  limit?: number;
+  isCustom?: boolean;
+  onClick: () => void;
+  onDelete?: () => void;
+}
+
+function HomeModuleCard({ label, total = 0, due = 0, limit = 0, isCustom, onClick, onDelete }: HomeModuleCardProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="homepage-module-card group text-left"
+    >
+      {onDelete && (
+        <span
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-300 opacity-0 shadow-sm transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-red-900/60 dark:hover:bg-red-950/30"
+          title="删除模块"
+        >
+          <X className="h-3.5 w-3.5" />
+        </span>
+      )}
+
+      <div className="flex w-full items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="truncate text-[15px] font-semibold leading-tight text-gray-900 dark:text-gray-100">{label}</h3>
+          <p className="mt-1 truncate text-[11px] font-medium text-gray-400 dark:text-gray-500">
+            {isCustom ? '自定义题库' : `共 ${total} 张卡片`}
+          </p>
+        </div>
+        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-gray-300 transition-colors group-hover:text-blue-500 dark:text-gray-600" />
+      </div>
+
+      <div className="mt-auto grid w-full grid-cols-2 gap-2 pt-3 text-[11px]">
+        <div className="rounded-lg bg-blue-50 px-2 py-1.5 text-blue-600 dark:bg-blue-950/30 dark:text-blue-300">
+          <span className="block text-[10px] text-blue-400 dark:text-blue-500">新卡</span>
+          <span className="font-semibold tabular-nums">{isCustom ? '--' : limit}</span>
+        </div>
+        <div className="rounded-lg bg-orange-50 px-2 py-1.5 text-orange-600 dark:bg-orange-950/30 dark:text-orange-300">
+          <span className="block text-[10px] text-orange-400 dark:text-orange-500">复习</span>
+          <span className="font-semibold tabular-nums">{isCustom ? '--' : due}</span>
+        </div>
+      </div>
+    </button>
+  );
 }
 
 export default function HomePage({ onEnterStudy }: Props) {
@@ -117,34 +171,37 @@ export default function HomePage({ onEnterStudy }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center">
-      <div className="homepage-shell max-w-xl w-full px-4 py-8 select-none relative" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+    <div className="flex min-h-screen items-center justify-center bg-[#F6F8FB] transition-colors dark:bg-gray-950">
+      <div className="homepage-shell relative w-full max-w-md select-none px-4 py-8" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
 
         {/* Stats button — top right */}
         <button
           onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-          className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-blue-500 hover:border-blue-200 transition-colors shadow-sm"
+          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-900/60"
+          title="学习统计"
         >
           <BarChart3 size={18} />
         </button>
 
         {/* Header */}
-        <div className="homepage-header flex items-center justify-center gap-4">
-          <img src={appIcon} alt="面经闪卡" className="h-14 w-14 rounded-2xl shadow-sm shrink-0" />
-          <div>
-            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+        <div className="homepage-header flex items-center justify-center gap-3">
+          <img src={appIcon} alt="面经闪卡" className="h-[52px] w-[52px] shrink-0 rounded-2xl shadow-sm" />
+          <div className="min-w-0">
+            <h1 className="text-[25px] font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
               面经闪卡
             </h1>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+            <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
               都是同龄人我原本没想高效学习
             </p>
           </div>
         </div>
 
+        <RecommendBar />
+
         {/* Module list */}
         <div
           key={page}
-          className={`flex flex-col items-center gap-2.5 homepage-page ${
+          className={`homepage-module-grid homepage-page ${
             pageDirection > 0 ? 'homepage-page-next' : 'homepage-page-prev'
           }`}
         >
@@ -158,32 +215,27 @@ export default function HomePage({ onEnterStudy }: Props) {
                 <button
                   key={mod.key}
                   onClick={() => setShowCreate(true)}
-                  className="flex items-center justify-center w-3/4 max-w-sm rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-transparent px-4 py-3 hover:border-blue-400 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 active:scale-[0.98] transition-all"
+                  className="homepage-module-card-dashed"
                 >
-                  <Plus className="w-5 h-5 text-gray-400 mr-2" />
-                  <span className="text-sm font-medium text-gray-400">新建模块</span>
+                  <Plus className="mb-2 h-5 w-5 text-gray-400" />
+                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">新建模块</span>
+                  <span className="mt-1 text-[11px] text-gray-400">导入或记录新题库</span>
                 </button>
               );
             }
 
             if (mod.isCustom) {
               return (
-                <button
+                <HomeModuleCard
                   key={mod.key}
+                  label={mod.label}
+                  isCustom
                   onClick={() => onEnterStudy(mod.key)}
-                  className="flex items-center w-3/4 max-w-sm rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 shadow-sm hover:border-blue-300 hover:shadow-md active:scale-[0.98] transition-all group relative"
-                >
-                  <button
-                    onClick={(e) => { e.stopPropagation(); deleteCustomDeck(mod.key); setCustomDecks(loadCustomDecks()); }}
-                    className="absolute -top-1.5 -right-1.5 p-1 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-opacity"
-                    title="删除模块"
-                  >
-                    <X className="w-3 h-3 text-red-400" />
-                  </button>
-                  <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mr-4">{mod.label}</h3>
-                  <span className="text-[11px] text-gray-400 dark:text-gray-500 ml-auto mr-3">自定义题库</span>
-                  <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 shrink-0" />
-                </button>
+                  onDelete={() => {
+                    deleteCustomDeck(mod.key);
+                    setCustomDecks(loadCustomDecks());
+                  }}
+                />
               );
             }
 
@@ -193,32 +245,27 @@ export default function HomePage({ onEnterStudy }: Props) {
             const total = TOTAL_MAP[cat.key] ?? 0;
 
             return (
-              <button
+              <HomeModuleCard
                 key={cat.key}
+                label={cat.label}
+                total={total}
+                due={due}
+                limit={limit}
                 onClick={() => onEnterStudy(cat.key)}
-                className="flex items-center w-3/4 max-w-sm rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 shadow-sm hover:border-blue-300 hover:shadow-md active:scale-[0.98] transition-all group"
-              >
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mr-4">{cat.label}</h3>
-                <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 ml-auto mr-3">
-                  <span>新卡 <span className="font-semibold text-blue-500">{limit}</span></span>
-                  <span>准备复习 <span className="font-semibold text-orange-500">{due}</span></span>
-                  <span>共 <span className="font-semibold text-gray-600 dark:text-gray-300">{total}</span> 张</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 shrink-0 group-hover:text-blue-500 transition-colors" />
-              </button>
+              />
             );
           })}
         </div>
 
         {/* Pagination */}
         <div className="homepage-pagination flex items-center justify-center gap-3">
-          <button onClick={goPrev} disabled={page === 0} className="text-gray-300 dark:text-gray-600 disabled:opacity-20 hover:text-gray-500">◀</button>
+          <button onClick={goPrev} disabled={page === 0} className="flex h-7 w-7 items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-white hover:text-gray-500 disabled:opacity-20 dark:text-gray-600 dark:hover:bg-gray-900">‹</button>
           {Array.from({ length: totalPages }).map((_, i) => (
             <button key={i} onClick={() => goToPage(i)}
-              className={`w-2 h-2 rounded-full transition-colors ${i === page ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+              className={`h-2 rounded-full transition-all ${i === page ? 'w-5 bg-blue-500' : 'w-2 bg-gray-300 dark:bg-gray-700'}`}
             />
           ))}
-          <button onClick={goNext} disabled={page >= totalPages - 1} className="text-gray-300 dark:text-gray-600 disabled:opacity-20 hover:text-gray-500">▶</button>
+          <button onClick={goNext} disabled={page >= totalPages - 1} className="flex h-7 w-7 items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-white hover:text-gray-500 disabled:opacity-20 dark:text-gray-600 dark:hover:bg-gray-900">›</button>
         </div>
       </div>
 

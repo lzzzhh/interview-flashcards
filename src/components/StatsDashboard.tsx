@@ -1,5 +1,5 @@
 // ============================================================
-// src/components/StatsDashboard.tsx — 学习统计面板（含艾宾浩斯曲线）
+// src/components/StatsDashboard.tsx — 学习统计面板
 // ============================================================
 
 import { useState, useRef, useEffect, useMemo } from 'react';
@@ -17,81 +17,82 @@ import {
   getDifficultCards,
   isReallyMastered,
 } from '../utils/reviewLogs';
-import { loadCustomDecks, getModuleDailyLimit, setModuleDailyLimit } from '../utils/customDecks';
+import TagRadar from './TagRadar';
+import { loadCustomCards, loadCustomDecks, getModuleDailyLimit, setModuleDailyLimit } from '../utils/customDecks';
 import { leetcodeHot100 } from '../data/leetcode-hot100';
 import { statisticsCards } from '../data/statistics';
 import { machineLearningCards } from '../data/machine-learning';
+import { deepLearningCards } from '../data/deep-learning';
 import { llmCards } from '../data/llm';
+import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { loadProgress } from '../utils/storage';
-import type { FlashCard } from '../types';
+import type { Category, FlashCard } from '../types';
 
 /** 从所有数据源加载全部卡片（带进度合并） */
 function loadAllCards(): FlashCard[] {
-  const sources: [string, FlashCard[]][] = [
-    ['fc-leetcode-progress', leetcodeHot100 as FlashCard[]],
-    ['fc-stats-progress', statisticsCards as FlashCard[]],
-    ['fc-ml-progress', machineLearningCards as FlashCard[]],
-    ['fc-llm-progress', llmCards as FlashCard[]],
-    ['fc-jargon-progress', jargonCards as FlashCard[]],
-    ['fc-workplace-progress', workplaceCards as FlashCard[]],
+  const sources: [Category, FlashCard[]][] = [
+    ['leetcode', leetcodeHot100 as FlashCard[]],
+    ['statistics', statisticsCards as FlashCard[]],
+    ['machine-learning', machineLearningCards as FlashCard[]],
+    ['deep-learning', deepLearningCards as FlashCard[]],
+    ['llm', llmCards as FlashCard[]],
+    ['agent', agentCards as FlashCard[]],
+    ['jargon', jargonCards as FlashCard[]],
+    ['workplace', workplaceCards as FlashCard[]],
   ];
   const allCards: FlashCard[] = [];
-  for (const [key, cards] of sources) {
-    const progress = loadProgress(key as any);
+  for (const [category, cards] of sources) {
+    const progress = loadProgress(category);
     for (const card of cards) {
       const sm2 = progress.sm2[card.id] ? { ...card.sm2, ...progress.sm2[card.id] } : card.sm2;
       allCards.push({ ...card, sm2, favorited: progress.favorited.includes(card.id) });
     }
   }
+  for (const deck of loadCustomDecks()) {
+    allCards.push(...loadCustomCards(deck.id));
+  }
   return allCards;
 }
 
-/**
- * 艾宾浩斯遗忘曲线数据
- * 横轴：复习间隔（天），纵轴：记忆保留率
- * 模拟曲线: R = e^(-t/S) where S ≈ 1.25
- */
-function EbbinghausCurve() {
-  const points = [1, 2, 4, 7, 14, 21, 30, 60, 90];
-  const retention = points.map((d) => Math.round(Math.exp(-d / 15) * 100));
-
+/** 复习间隔分布 */
+function TagMasterySection({ cards }: { cards: FlashCard[] }) {
+  const tagScores = useMemo(() => {
+    const tagMap = new Map<string, { total: number; easeSum: number; lapseSum: number; intervalSum: number }>();
+    for (const card of cards) {
+      const tags = card.tags || [];
+      const sm2 = card.sm2;
+      if (!sm2 || sm2.state === 'new') continue;
+      for (const tag of tags) {
+        const entry = tagMap.get(tag) || { total: 0, easeSum: 0, lapseSum: 0, intervalSum: 0 };
+        entry.total++;
+        entry.easeSum += sm2.easeFactor;
+        entry.lapseSum += sm2.lapses;
+        entry.intervalSum += Math.min(sm2.interval, 30);
+        tagMap.set(tag, entry);
+      }
+    }
+    const scores: { tag: string; score: number }[] = [];
+    for (const [tag, entry] of tagMap) {
+      const avgEase = entry.easeSum / entry.total;
+      const avgLapses = entry.lapseSum / entry.total;
+      const avgInterval = entry.intervalSum / entry.total;
+      scores.push({ tag, score: avgEase - avgLapses * 0.5 - (30 - avgInterval) * 0.02 });
+    }
+    scores.sort((a, b) => b.score - a.score);
+    return scores.slice(0, 8);
+  }, [cards]);
+  if (tagScores.length < 3) return null;
   return (
-    <div className="space-y-2">
-      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-        <TrendingUp className="w-4 h-4 text-purple-500" />
-        艾宾浩斯遗忘曲线
-      </h3>
-      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3">
-        {/* Bar chart */}
-        <div className="flex items-end gap-1 h-20 mb-2">
-          {retention.map((r, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
-              <div
-                className="w-full rounded-t-sm bg-gradient-to-t from-purple-500 to-purple-300 transition-all"
-                style={{ height: `${r}%` }}
-              />
-            </div>
-          ))}
-        </div>
-        {/* X-axis labels */}
-        <div className="flex gap-1">
-          {points.map((d, i) => (
-            <div key={i} className="flex-1 text-center text-[9px] text-gray-400 dark:text-gray-500">
-              {d === 1 ? '1天' : d === 90 ? '90天' : `${d}天`}
-            </div>
-          ))}
-        </div>
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5 text-center">
-          模拟记忆保留率（每格代表 10%）
-        </p>
-      </div>
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-4">
+      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">标签掌握度</h4>
+      <TagRadar tagScores={tagScores} size={220} />
     </div>
   );
 }
 
-/** 复习间隔分布 */
+
 function ReviewDistribution({ cards }: { cards: { sm2: { interval: number; repetitions: number } }[] }) {
   // Group by stage
   const stages = [
@@ -137,24 +138,59 @@ interface Props {
   category?: string;
 }
 
+function getNewCount(cards: FlashCard[]) {
+  return cards.filter((c) => !c.sm2.state || c.sm2.state === 'new').length;
+}
+
+function getDueCount(cards: FlashCard[]) {
+  const now = Date.now();
+  return cards.filter((c) => c.sm2.state && c.sm2.state !== 'new' && c.sm2.nextReview <= now).length;
+}
+
+function getTodayNewAllowance(cards: FlashCard[], category?: string) {
+  if (category) return Math.min(getNewCount(cards), getModuleDailyLimit(category));
+
+  const byModule = new Map<string, number>();
+  for (const card of cards) {
+    if (card.sm2.state && card.sm2.state !== 'new') continue;
+    byModule.set(card.category, (byModule.get(card.category) || 0) + 1);
+  }
+
+  let total = 0;
+  for (const [moduleId, count] of byModule) {
+    total += Math.min(count, getModuleDailyLimit(moduleId));
+  }
+  return total;
+}
+
 export default function StatsDashboard({ category }: Props) {
-  const { state, dispatch, totalDue, totalNew } = useAppContext();
+  const { state, dispatch } = useAppContext();
+  const cardVersion = Object.values(state.cardsById)
+    .map((card) => `${card.id}:${card.sm2.state}:${card.sm2.interval}:${card.sm2.lapses}:${card.sm2.nextReview}`)
+    .join('|');
   const allCardsForDistribution = useMemo(() => {
+    void cardVersion;
     const cards = loadAllCards();
     return category ? cards.filter((c) => c.category === category) : cards;
-  }, [state.cardsById, category]);
+  }, [cardVersion, category]);
 
   const stats = useMemo(() => {
+    void cardVersion;
     const allCards = loadAllCards();
     const filteredCards = category ? allCards.filter((c) => c.category === category) : allCards;
     const allLogs = getAllLogs();
     const mastered = filteredCards.filter((c) => isReallyMastered(c.sm2.interval, c.sm2.lapses)).length;
     const difficultIds = getDifficultCards(loadReviewLogs(), filteredCards.map((c) => c.id));
+    const newCount = getNewCount(filteredCards);
+    const dueCount = getDueCount(filteredCards);
     return {
       total: filteredCards.length,
       mastered,
       pending: filteredCards.length - mastered,
       masteredPercent: filteredCards.length > 0 ? Math.round((mastered / filteredCards.length) * 100) : 0,
+      newCount,
+      dueCount,
+      todayNewAllowance: getTodayNewAllowance(filteredCards, category),
       todayReviewed: getTodayReviewed(allLogs),
       streak: getStreak(allLogs),
       recentAccuracy: getRecentAccuracy(allLogs),
@@ -162,7 +198,7 @@ export default function StatsDashboard({ category }: Props) {
       difficultCount: difficultIds.length,
       byDifficulty: {} as Record<string, { total: number; mastered: number }>,
     };
-  }, [state.cardsById]); // re-evaluate when cardsById changes (triggered by any rating)
+  }, [cardVersion, category]); // re-evaluate when cardsById changes (triggered by any rating)
 
   if (!state.showStats) return null;
 
@@ -207,17 +243,17 @@ export default function StatsDashboard({ category }: Props) {
               color="text-green-600 dark:text-green-400"
               bg="bg-green-50 dark:bg-green-900/30"
             />
-            <StatBox
+              <StatBox
               icon={<Clock className="w-4 h-4" />}
               label="到期复习"
-              value={totalDue}
+              value={stats.dueCount}
               color="text-orange-600 dark:text-orange-400"
               bg="bg-orange-50 dark:bg-orange-900/30"
             />
             <StatBox
               icon={<BookOpen className="w-4 h-4" />}
               label="今日可学新卡"
-              value={Math.min(totalNew, state.dailyNewLimit)}
+              value={stats.todayNewAllowance}
               color="text-blue-600 dark:text-blue-400"
               bg="bg-blue-50 dark:bg-blue-900/30"
             />
@@ -262,22 +298,22 @@ export default function StatsDashboard({ category }: Props) {
           {/* Review Distribution */}
           <ReviewDistribution cards={allCardsForDistribution} />
 
-          {/* Ebbinghaus Curve */}
-          <EbbinghausCurve />
+          {/* Tag Radar */}
+          <TagMasterySection cards={allCardsForDistribution} />
 
           {/* Review queue summary */}
           <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-3">
             <div className="flex justify-between">
               <span>到期复习</span>
-              <span className="font-medium text-orange-600">{totalDue} 张</span>
+              <span className="font-medium text-orange-600">{stats.dueCount} 张</span>
             </div>
             <div className="flex justify-between">
-              <span>今日新学（上限 {state.dailyNewLimit}）</span>
-              <span className="font-medium text-blue-600">{Math.min(totalNew, state.dailyNewLimit)} / {totalNew} 张</span>
+              <span>{category ? `今日新学（上限 ${getModuleDailyLimit(category)}）` : '今日新学（按模块上限）'}</span>
+              <span className="font-medium text-blue-600">{stats.todayNewAllowance} / {stats.newCount} 张</span>
             </div>
             <div className="flex justify-between pt-1 border-t border-gray-200 dark:border-gray-600">
               <span>今日总计</span>
-              <span className="font-bold">{totalDue + Math.min(totalNew, state.dailyNewLimit)} 张</span>
+              <span className="font-bold">{stats.dueCount + stats.todayNewAllowance} 张</span>
             </div>
           </div>
 
@@ -333,13 +369,21 @@ export default function StatsDashboard({ category }: Props) {
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
               每日新卡上限
             </h3>
-            {CATEGORIES.map((cat) => (
-              <ModuleLimitSlider key={cat.key} moduleId={cat.key} label={cat.label} />
-            ))}
-            {loadCustomDecks().map((d) => (
-              <ModuleLimitSlider key={d.id} moduleId={d.id} label={d.name} />
-            ))}
-            <p className="text-[10px] text-gray-400">每个模块独立设置，学习新卡时生效</p>
+            {category ? (
+              <ModuleLimitSlider moduleId={category} label={CATEGORIES.find((cat) => cat.key === category)?.label || loadCustomDecks().find((d) => d.id === category)?.name || category} />
+            ) : (
+              <>
+                {CATEGORIES.map((cat) => (
+                  <ModuleLimitSlider key={cat.key} moduleId={cat.key} label={cat.label} />
+                ))}
+                {loadCustomDecks().map((d) => (
+                  <ModuleLimitSlider key={d.id} moduleId={d.id} label={d.name} />
+                ))}
+              </>
+            )}
+            <p className="text-[10px] text-gray-400">
+              {category ? '当前模块独立设置，学习新卡时生效' : '首页统计可调整每个模块的新卡上限'}
+            </p>
           </div>
 
           {/* Import / Export */}

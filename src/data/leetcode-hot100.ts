@@ -29,14 +29,6 @@ const arrayHash: LeetCodeCard[] = [  {
     tags: ['数组', '哈希表'],
     description: '给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出和为目标值 target 的那两个整数，并返回它们的数组下标。你可以假设每种输入只会对应一个答案，且不能使用同一个元素两次。',
     approach: '使用哈希表存储遍历过的元素及其下标。遍历数组时，计算 target - nums[i]，检查哈希表中是否存在该差值。若存在，直接返回两个下标；若不存在，将当前元素和下标存入哈希表。时间复杂度 O(n)，空间复杂度 O(n)。',
-    code: `def twoSum(nums: List[int], target: int) -> List[int]:
-    seen = {}
-    for i, num in enumerate(nums):
-        diff = target - num
-        if diff in seen:
-            return [seen[diff], i]
-        seen[num] = i
-    return []`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -50,14 +42,6 @@ const arrayHash: LeetCodeCard[] = [  {
     tags: ['数组', '哈希表', '字符串', '排序'],
     description: '给你一个字符串数组 strs，请你将字母异位词组合在一起。字母异位词是由重新排列源单词的所有字母得到的一个新单词。可以按任意顺序返回结果列表。',
     approach: '遍历每个字符串，将其排序后作为键存入哈希表。排序后的字符串相同即为字母异位词，归入同一组。也可使用字符计数作为键（如统计 a-z 出现次数拼接成字符串）。时间复杂度 O(n·klogk)，n 为字符串数量，k 为字符串最大长度。',
-    code: `from collections import defaultdict
-
-def groupAnagrams(strs: List[str]) -> List[List[str]]:
-    groups = defaultdict(list)
-    for s in strs:
-        key = ''.join(sorted(s))
-        groups[key].append(s)
-    return list(groups.values())`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -71,18 +55,6 @@ def groupAnagrams(strs: List[str]) -> List[List[str]]:
     tags: ['数组', '哈希表', '并查集'],
     description: '给定一个未排序的整数数组 nums，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。必须设计并实现时间复杂度为 O(n) 的算法。',
     approach: '将所有数字存入哈希集合。遍历每个数字 n，若 n-1 不在集合中（即 n 是一个连续序列的起点），则从 n 开始向后查找 n+1、n+2...，统计序列长度。每个数字最多被访问两次，时间复杂度 O(n)。',
-    code: `def longestConsecutive(nums: List[int]) -> int:
-    num_set = set(nums)
-    longest = 0
-    for num in num_set:
-        if num - 1 not in num_set:
-            cur = num
-            streak = 1
-            while cur + 1 in num_set:
-                cur += 1
-                streak += 1
-            longest = max(longest, streak)
-    return longest`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -96,18 +68,6 @@ def groupAnagrams(strs: List[str]) -> List[List[str]]:
     tags: ['数组', '哈希表', '前缀和'],
     description: '给你一个整数数组 nums 和一个整数 k，请你统计并返回该数组中和为 k 的连续子数组的个数。子数组是数组中元素的连续非空序列。',
     approach: '使用前缀和与哈希表。遍历数组时维护前缀和 preSum，检查 preSum - k 是否在哈希表中出现过，若出现则加上对应的计数。将当前前缀和存入哈希表。哈希表初始化为 {0:1} 表示空前缀和。时间复杂度 O(n)。',
-    code: `from collections import defaultdict
-
-def subarraySum(nums: List[int], k: int) -> int:
-    count = defaultdict(int)
-    count[0] = 1
-    pre_sum = 0
-    ans = 0
-    for num in nums:
-        pre_sum += num
-        ans += count[pre_sum - k]
-        count[pre_sum] += 1
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -121,12 +81,6 @@ def subarraySum(nums: List[int], k: int) -> int:
     tags: ['数组', '双指针'],
     description: '给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。必须在不复制数组的情况下原地对数组进行操作。',
     approach: '使用双指针，slow 指向下一个非零元素应放置的位置，fast 遍历数组。当 nums[fast] ≠ 0 时，交换 nums[slow] 和 nums[fast]，slow 右移。所有非零元素被依次移到前面，剩余位置自然补零。时间复杂度 O(n)，空间 O(1)。',
-    code: `def moveZeroes(nums: List[int]) -> None:
-    slow = 0
-    for fast in range(len(nums)):
-        if nums[fast] != 0:
-            nums[slow], nums[fast] = nums[fast], nums[slow]
-            slow += 1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -140,17 +94,6 @@ def subarraySum(nums: List[int], k: int) -> int:
     tags: ['数组', '双指针', '贪心'],
     description: '给定一个长度为 n 的整数数组 height，有 n 条垂直线，第 i 条线的两个端点是 (i, 0) 和 (i, height[i])。找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。返回容器可以储存的最大水量。',
     approach: '双指针从两端向中间收缩。面积由较短的线决定：area = min(height[l], height[r]) * (r-l)。每次移动较短一侧的指针，因为移动较长一侧面积一定不会增加。不断更新最大面积。时间复杂度 O(n)。',
-    code: `def maxArea(height: List[int]) -> int:
-    l, r = 0, len(height) - 1
-    ans = 0
-    while l < r:
-        area = min(height[l], height[r]) * (r - l)
-        ans = max(ans, area)
-        if height[l] < height[r]:
-            l += 1
-        else:
-            r -= 1
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -164,29 +107,6 @@ def subarraySum(nums: List[int], k: int) -> int:
     tags: ['数组', '双指针', '排序'],
     description: '给你一个整数数组 nums，判断是否存在三元组 [nums[i], nums[j], nums[k]] 满足 i != j、i != k 且 j != k，同时满足 nums[i] + nums[j] + nums[k] == 0。返回所有和为 0 且不重复的三元组。',
     approach: '先对数组排序。固定一个数 nums[i]，然后在 i 右侧使用双指针找两数之和为 -nums[i]。注意跳过重复元素以避免重复三元组：当 nums[i] == nums[i-1] 时跳过；找到答案后，两指针也需跳过重复值。时间复杂度 O(n²)。',
-    code: `def threeSum(nums: List[int]) -> List[List[int]]:
-    nums.sort()
-    n = len(nums)
-    res = []
-    for i in range(n - 2):
-        if i > 0 and nums[i] == nums[i - 1]:
-            continue
-        l, r = i + 1, n - 1
-        while l < r:
-            s = nums[i] + nums[l] + nums[r]
-            if s < 0:
-                l += 1
-            elif s > 0:
-                r -= 1
-            else:
-                res.append([nums[i], nums[l], nums[r]])
-                while l < r and nums[l] == nums[l + 1]:
-                    l += 1
-                while l < r and nums[r] == nums[r - 1]:
-                    r -= 1
-                l += 1
-                r -= 1
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -200,20 +120,6 @@ def subarraySum(nums: List[int], k: int) -> int:
     tags: ['数组', '双指针', '动态规划', '单调栈'],
     description: '给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子下雨之后能接多少雨水。',
     approach: '双指针法：维护 leftMax 和 rightMax 记录左右两侧的最大高度。当 height[l] < height[r] 时，左侧是短板，雨水量取决于 leftMax - height[l]，然后 l++。反之同理。也可用单调栈法：维护递减栈，遇到更高的柱子时弹出栈顶计算凹槽雨水量。时间复杂度 O(n)。',
-    code: `def trap(height: List[int]) -> int:
-    l, r = 0, len(height) - 1
-    left_max = right_max = 0
-    ans = 0
-    while l < r:
-        left_max = max(left_max, height[l])
-        right_max = max(right_max, height[r])
-        if height[l] < height[r]:
-            ans += left_max - height[l]
-            l += 1
-        else:
-            ans += right_max - height[r]
-            r -= 1
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -227,15 +133,6 @@ def subarraySum(nums: List[int], k: int) -> int:
     tags: ['数组', '哈希表'],
     description: '给你一个未排序的整数数组 nums，请你找出其中没有出现的最小的正整数。必须实现时间复杂度 O(n) 且只使用常数级别额外空间的算法。',
     approach: '原地哈希法：将每个在 [1, n] 范围内的数放到正确的位置上（nums[i] 放在 nums[nums[i]-1]）。遍历交换直到当前位置的数不在范围内或已在正确位置。再次遍历，第一个 nums[i] != i+1 的位置对应缺失的正数。若全部正确则返回 n+1。时间复杂度 O(n)。',
-    code: `def firstMissingPositive(nums: List[int]) -> int:
-    n = len(nums)
-    for i in range(n):
-        while 1 <= nums[i] <= n and nums[nums[i] - 1] != nums[i]:
-            nums[nums[i] - 1], nums[i] = nums[i], nums[nums[i] - 1]
-    for i in range(n):
-        if nums[i] != i + 1:
-            return i + 1
-    return n + 1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -249,28 +146,6 @@ def subarraySum(nums: List[int], k: int) -> int:
     tags: ['数组', '矩阵', '哈希表'],
     description: '给定一个 m x n 的矩阵，如果一个元素为 0，则将其所在行和列的所有元素都设为 0。请使用原地算法。',
     approach: '使用矩阵的第一行和第一列作为标记位。先检查第一行和第一列本身是否包含 0。遍历其余元素，若 matrix[i][j] == 0，将 matrix[i][0] 和 matrix[0][j] 置零作为标记。根据标记将对应行和列置零。最后根据初始检查结果处理第一行和第一列。时间复杂度 O(mn)，空间 O(1)。',
-    code: `def setZeroes(matrix: List[List[int]]) -> None:
-    m, n = len(matrix), len(matrix[0])
-    row0 = any(matrix[0][j] == 0 for j in range(n))
-    col0 = any(matrix[i][0] == 0 for i in range(m))
-    for i in range(1, m):
-        for j in range(1, n):
-            if matrix[i][j] == 0:
-                matrix[i][0] = matrix[0][j] = 0
-    for i in range(1, m):
-        if matrix[i][0] == 0:
-            for j in range(n):
-                matrix[i][j] = 0
-    for j in range(1, n):
-        if matrix[0][j] == 0:
-            for i in range(m):
-                matrix[i][j] = 0
-    if row0:
-        for j in range(n):
-            matrix[0][j] = 0
-    if col0:
-        for i in range(m):
-            matrix[i][0] = 0`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -284,26 +159,6 @@ def subarraySum(nums: List[int], k: int) -> int:
     tags: ['数组', '矩阵', '模拟'],
     description: '给你一个 m 行 n 列的矩阵 matrix，请按照顺时针螺旋顺序返回矩阵中的所有元素。',
     approach: '定义四个边界 top、bottom、left、right，按顺时针方向：从左到右遍历上边界，然后 top++；从上到下遍历右边界，然后 right--；从右到左遍历下边界（需判断是否越界），然后 bottom--；从下到上遍历左边界，然后 left++。重复直到边界交错。时间复杂度 O(mn)。',
-    code: `def spiralOrder(matrix: List[List[int]]) -> List[int]:
-    res = []
-    top, bottom = 0, len(matrix) - 1
-    left, right = 0, len(matrix[0]) - 1
-    while top <= bottom and left <= right:
-        for j in range(left, right + 1):
-            res.append(matrix[top][j])
-        top += 1
-        for i in range(top, bottom + 1):
-            res.append(matrix[i][right])
-        right -= 1
-        if top <= bottom:
-            for j in range(right, left - 1, -1):
-                res.append(matrix[bottom][j])
-            bottom -= 1
-        if left <= right:
-            for i in range(bottom, top - 1, -1):
-                res.append(matrix[i][left])
-            left += 1
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -317,13 +172,6 @@ def subarraySum(nums: List[int], k: int) -> int:
     tags: ['数组', '矩阵', '数学'],
     description: '给定一个 n × n 的二维矩阵 matrix 表示一个图像，将图像顺时针旋转 90 度。必须原地旋转图像，即直接修改输入的二维矩阵。',
     approach: '先沿主对角线翻转（matrix[i][j] ↔ matrix[j][i]），再水平翻转每一行（每行 reverse）。等价于顺时针旋转 90 度。也可按层旋转：每次交换四个角位置的元素，从外向内逐层处理。时间复杂度 O(n²)。',
-    code: `def rotate(matrix: List[List[int]]) -> None:
-    n = len(matrix)
-    for i in range(n):
-        for j in range(i + 1, n):
-            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
-    for row in matrix:
-        row.reverse()`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -342,17 +190,6 @@ const twoPointers: LeetCodeCard[] = [  {
     tags: ['数组', '双指针', '排序'],
     description: '给你两个按非递减顺序排列的整数数组 nums1 和 nums2，另有两个整数 m 和 n 表示元素数量。请合并 nums2 到 nums1 中，使合并后的数组同样按非递减顺序排列。nums1 长度为 m+n，其中前 m 个元素为应合并的元素，后 n 个元素为 0 应忽略。',
     approach: '从后往前遍历。使用三个指针：p1 = m-1 指向 nums1 有效元素末尾，p2 = n-1 指向 nums2 末尾，p = m+n-1 指向合并后末尾。比较 nums1[p1] 和 nums2[p2]，将较大者放到 p 位置，对应指针前移。若 p2 先走完则剩余元素已在正确位置。时间复杂度 O(m+n)。',
-    code: `def merge(nums1: List[int], m: int, nums2: List[int], n: int) -> None:
-    p1, p2 = m - 1, n - 1
-    p = m + n - 1
-    while p2 >= 0:
-        if p1 >= 0 and nums1[p1] > nums2[p2]:
-            nums1[p] = nums1[p1]
-            p1 -= 1
-        else:
-            nums1[p] = nums2[p2]
-            p2 -= 1
-        p -= 1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -366,15 +203,6 @@ const twoPointers: LeetCodeCard[] = [  {
     tags: ['数组', '双指针'],
     description: '给你一个非严格递增排列的数组 nums，请你原地删除重复出现的元素，使每个元素只出现一次，返回删除后数组的新长度。元素的相对顺序保持一致。',
     approach: '使用快慢指针。slow 指向已去重部分的末尾，fast 遍历数组。当 nums[fast] != nums[slow] 时，将 nums[fast] 放到 slow+1 的位置，slow 右移。最终 slow+1 即为去重后长度。时间复杂度 O(n)。',
-    code: `def removeDuplicates(nums: List[int]) -> int:
-    if not nums:
-        return 0
-    slow = 0
-    for fast in range(1, len(nums)):
-        if nums[fast] != nums[slow]:
-            slow += 1
-            nums[slow] = nums[fast]
-    return slow + 1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -388,13 +216,6 @@ const twoPointers: LeetCodeCard[] = [  {
     tags: ['数组', '双指针'],
     description: '给你一个数组 nums 和一个值 val，你需要原地移除所有数值等于 val 的元素，并返回移除后数组的新长度。元素的顺序可以改变。',
     approach: '双指针：slow 指向当前有效位置。遍历数组，当 nums[fast] != val 时，将 nums[fast] 赋值给 nums[slow]，slow 右移。最终 slow 即为新长度。时间复杂度 O(n)，空间 O(1)。',
-    code: `def removeElement(nums: List[int], val: int) -> int:
-    slow = 0
-    for fast in range(len(nums)):
-        if nums[fast] != val:
-            nums[slow] = nums[fast]
-            slow += 1
-    return slow`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -408,17 +229,6 @@ const twoPointers: LeetCodeCard[] = [  {
     tags: ['数组', '双指针', '二分查找'],
     description: '给你一个下标从 1 开始、已按非递减顺序排列的整数数组 numbers，请找出两个数之和等于目标数 target。返回两个数的下标（1-indexed），且必须 1 <= index1 < index2 <= numbers.length。',
     approach: '双指针从两端向中间逼近。若 numbers[l] + numbers[r] == target 则返回；若和小于 target 则 l++；若和大于 target 则 r--。每次移动必定找到一个解，因为数组有序。时间复杂度 O(n)。',
-    code: `def twoSum(numbers: List[int], target: int) -> List[int]:
-    l, r = 0, len(numbers) - 1
-    while l < r:
-        s = numbers[l] + numbers[r]
-        if s == target:
-            return [l + 1, r + 1]
-        elif s < target:
-            l += 1
-        else:
-            r -= 1
-    return []`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -432,12 +242,6 @@ const twoPointers: LeetCodeCard[] = [  {
     tags: ['双指针', '字符串'],
     description: '编写一个函数，将输入的字符数组 s 原地反转。必须使用 O(1) 的额外空间。',
     approach: '双指针 l=0, r=len-1，交换 s[l] 和 s[r]，然后 l++, r--，直到 l >= r。时间复杂度 O(n)，空间 O(1)。',
-    code: `def reverseString(s: List[str]) -> None:
-    l, r = 0, len(s) - 1
-    while l < r:
-        s[l], s[r] = s[r], s[l]
-        l += 1
-        r -= 1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -451,24 +255,6 @@ const twoPointers: LeetCodeCard[] = [  {
     tags: ['字符串', '双指针', '动态规划'],
     description: '给你一个字符串 s，找到 s 中最长的回文子串。如果字符串的反序与原始字符串相同，则该字符串称为回文字符串。',
     approach: '中心扩展法：遍历每个字符作为回文中心，分别以单个字符（奇数长度）和两个相邻字符（偶数长度）为中心向两边扩展，更新最长回文子串的起始位置和长度。时间复杂度 O(n²)，空间 O(1)。',
-    code: `def longestPalindrome(s: str) -> str:
-    start, max_len = 0, 0
-    for i in range(len(s)):
-        l, r = i, i
-        while l >= 0 and r < len(s) and s[l] == s[r]:
-            if r - l + 1 > max_len:
-                max_len = r - l + 1
-                start = l
-            l -= 1
-            r += 1
-        l, r = i, i + 1
-        while l >= 0 and r < len(s) and s[l] == s[r]:
-            if r - l + 1 > max_len:
-                max_len = r - l + 1
-                start = l
-            l -= 1
-            r += 1
-    return s[start:start + max_len]`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -487,17 +273,6 @@ const slidingWindow: LeetCodeCard[] = [  {
     tags: ['字符串', '哈希表', '滑动窗口'],
     description: '给定一个字符串 s，请你找出其中不含有重复字符的最长子串的长度。',
     approach: '滑动窗口 + 哈希集合。右指针不断右移扩大窗口，若遇到重复字符，左指针右移缩小窗口直到无重复。用哈希集合存储窗口内字符，用变量维护最大长度。时间复杂度 O(n)。',
-    code: `def lengthOfLongestSubstring(s: str) -> int:
-    seen = set()
-    l = 0
-    ans = 0
-    for r in range(len(s)):
-        while s[r] in seen:
-            seen.remove(s[l])
-            l += 1
-        seen.add(s[r])
-        ans = max(ans, r - l + 1)
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -511,30 +286,6 @@ const slidingWindow: LeetCodeCard[] = [  {
     tags: ['字符串', '哈希表', '滑动窗口'],
     description: '给定两个字符串 s 和 p，找到 s 中所有 p 的异位词的子串，返回这些子串的起始索引。不考虑答案输出的顺序。',
     approach: '滑动窗口 + 字符计数。维护 p 的字符计数 need 和窗口的字符计数 window。定义 valid 变量表示窗口中满足 need 的字符种类数。窗口右移时增加计数，当窗口长度等于 p 的长度时，若 valid == len(need) 则记录起始索引。窗口左移时减少计数并更新 valid。时间复杂度 O(n)。',
-    code: `from collections import Counter
-
-def findAnagrams(s: str, p: str) -> List[int]:
-    need = Counter(p)
-    window = Counter()
-    l = 0
-    valid = 0
-    res = []
-    for r in range(len(s)):
-        c = s[r]
-        if c in need:
-            window[c] += 1
-            if window[c] == need[c]:
-                valid += 1
-        if r - l + 1 == len(p):
-            if valid == len(need):
-                res.append(l)
-            c = s[l]
-            if c in need:
-                if window[c] == need[c]:
-                    valid -= 1
-                window[c] -= 1
-            l += 1
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -548,32 +299,6 @@ def findAnagrams(s: str, p: str) -> List[int]:
     tags: ['字符串', '哈希表', '滑动窗口'],
     description: '给你一个字符串 s、一个字符串 t。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 ""。',
     approach: '滑动窗口 + 哈希表。用 need 记录 t 的字符需求，window 记录窗口内字符计数。valid 表示已满足种类的字符数。右指针扩展窗口，当 valid == len(need) 时尝试收缩左边界并更新最小窗口。时间复杂度 O(n)。',
-    code: `from collections import Counter
-
-def minWindow(s: str, t: str) -> str:
-    need = Counter(t)
-    window = Counter()
-    l = 0
-    valid = 0
-    start = 0
-    min_len = float('inf')
-    for r in range(len(s)):
-        c = s[r]
-        if c in need:
-            window[c] += 1
-            if window[c] == need[c]:
-                valid += 1
-        while valid == len(need):
-            if r - l + 1 < min_len:
-                min_len = r - l + 1
-                start = l
-            c = s[l]
-            if c in need:
-                if window[c] == need[c]:
-                    valid -= 1
-                window[c] -= 1
-            l += 1
-    return s[start:start + min_len] if min_len != float('inf') else '' `,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -587,20 +312,6 @@ def minWindow(s: str, t: str) -> str:
     tags: ['队列', '滑动窗口', '单调队列', '优先队列'],
     description: '给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到最右侧。你只可以看到滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。返回每个滑动窗口中的最大值。',
     approach: '单调递减队列。队列存储下标，且对应值单调递减。窗口滑动时：若队首下标越界则弹出；新元素入队前，弹出队尾比它小的元素（保证递减）；窗口形成后（r >= k-1），队首即为当前窗口最大值。时间复杂度 O(n)。',
-    code: `from collections import deque
-
-def maxSlidingWindow(nums: List[int], k: int) -> List[int]:
-    q = deque()
-    res = []
-    for r in range(len(nums)):
-        if q and q[0] < r - k + 1:
-            q.popleft()
-        while q and nums[q[-1]] < nums[r]:
-            q.pop()
-        q.append(r)
-        if r >= k - 1:
-            res.append(nums[q[0]])
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -614,29 +325,6 @@ def maxSlidingWindow(nums: List[int], k: int) -> List[int]:
     tags: ['字符串', '双指针', '滑动窗口'],
     description: '给你两个字符串 s1 和 s2，写一个函数来判断 s2 是否包含 s1 的排列。如果是返回 true；否则返回 false。换句话说，s1 的排列之一是 s2 的子串。',
     approach: '滑动窗口 + 字符计数。固定大小为 len(s1) 的窗口在 s2 上滑动，维护窗口内的字符计数。若窗口内的字符计数与 s1 的字符计数完全匹配，则返回 true。也可用数组代替哈希表加速。时间复杂度 O(n)。',
-    code: `from collections import Counter
-
-def checkInclusion(s1: str, s2: str) -> bool:
-    need = Counter(s1)
-    window = Counter()
-    l = 0
-    valid = 0
-    for r in range(len(s2)):
-        c = s2[r]
-        if c in need:
-            window[c] += 1
-            if window[c] == need[c]:
-                valid += 1
-        if r - l + 1 == len(s1):
-            if valid == len(need):
-                return True
-            c = s2[l]
-            if c in need:
-                if window[c] == need[c]:
-                    valid -= 1
-                window[c] -= 1
-            l += 1
-    return False`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -655,23 +343,6 @@ const binarySearch: LeetCodeCard[] = [  {
     tags: ['数组', '二分查找'],
     description: '整数数组 nums 按升序排列，数组中的值互不相同。在传递给函数之前，nums 在某个未知下标 k 上进行了旋转。给定旋转后的数组 nums 和一个整数 target，如果 nums 中存在 target 则返回下标，否则返回 -1。必须设计时间复杂度为 O(log n) 的算法。',
     approach: '二分查找。每次取 mid，判断哪一半有序：若 nums[l] <= nums[mid]，左半有序；否则右半有序。在有序的一半中判断 target 是否在范围内，若在则搜索该半，否则搜索另一半。时间复杂度 O(log n)。',
-    code: `def search(nums: List[int], target: int) -> int:
-    l, r = 0, len(nums) - 1
-    while l <= r:
-        mid = (l + r) // 2
-        if nums[mid] == target:
-            return mid
-        if nums[l] <= nums[mid]:
-            if nums[l] <= target < nums[mid]:
-                r = mid - 1
-            else:
-                l = mid + 1
-        else:
-            if nums[mid] < target <= nums[r]:
-                l = mid + 1
-            else:
-                r = mid - 1
-    return -1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -685,28 +356,6 @@ const binarySearch: LeetCodeCard[] = [  {
     tags: ['数组', '二分查找'],
     description: '给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请找出给定目标值在数组中的开始位置和结束位置。如果数组中不存在目标值 target 返回 [-1, -1]。必须设计时间复杂度为 O(log n) 的算法。',
     approach: '两次二分查找分别找左边界和右边界。找左边界时，当 nums[mid] >= target 时收缩右边界；找右边界时，当 nums[mid] <= target 时收缩左边界。注意边界检查防止越界。时间复杂度 O(log n)。',
-    code: `def searchRange(nums: List[int], target: int) -> List[int]:
-    def left_bound():
-        l, r = 0, len(nums) - 1
-        while l <= r:
-            mid = (l + r) // 2
-            if nums[mid] < target:
-                l = mid + 1
-            else:
-                r = mid - 1
-        return l if l < len(nums) and nums[l] == target else -1
-
-    def right_bound():
-        l, r = 0, len(nums) - 1
-        while l <= r:
-            mid = (l + r) // 2
-            if nums[mid] <= target:
-                l = mid + 1
-            else:
-                r = mid - 1
-        return r if r >= 0 and nums[r] == target else -1
-
-    return [left_bound(), right_bound()]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -720,19 +369,6 @@ const binarySearch: LeetCodeCard[] = [  {
     tags: ['数组', '二分查找', '矩阵'],
     description: '给你一个满足下述两条属性的 m x n 整数矩阵：每行中的整数从左到右按非严格递增顺序排列；每行的第一个整数大于前一行的最后一个整数。给你一个整数 target，如果 target 在矩阵中返回 true，否则返回 false。',
     approach: '将二维矩阵视为一维有序数组，进行二分查找。对于下标 mid，对应矩阵位置为 matrix[mid // n][mid % n]。时间复杂度 O(log(mn))。',
-    code: `def searchMatrix(matrix: List[List[int]], target: int) -> bool:
-    m, n = len(matrix), len(matrix[0])
-    l, r = 0, m * n - 1
-    while l <= r:
-        mid = (l + r) // 2
-        val = matrix[mid // n][mid % n]
-        if val == target:
-            return True
-        elif val < target:
-            l = mid + 1
-        else:
-            r = mid - 1
-    return False`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -746,15 +382,6 @@ const binarySearch: LeetCodeCard[] = [  {
     tags: ['数组', '二分查找'],
     description: '已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次旋转后得到输入数组。数组中的元素互不相同。请找出并返回数组中的最小元素。必须设计时间复杂度为 O(log n) 的算法。',
     approach: '二分查找。比较 nums[mid] 和 nums[r]：若 nums[mid] < nums[r]，最小值在左半（含 mid），r = mid；否则最小值在右半，l = mid + 1。最终 l 指向最小值。时间复杂度 O(log n)。',
-    code: `def findMin(nums: List[int]) -> int:
-    l, r = 0, len(nums) - 1
-    while l < r:
-        mid = (l + r) // 2
-        if nums[mid] < nums[r]:
-            r = mid
-        else:
-            l = mid + 1
-    return nums[l]`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -773,17 +400,6 @@ const stackQueue: LeetCodeCard[] = [  {
     tags: ['栈', '字符串'],
     description: '给定一个只包括 ( ) { } [ ] 的字符串 s，判断字符串是否有效。有效字符串需满足：左括号必须用相同类型的右括号闭合；左括号必须以正确的顺序闭合；每个右括号都有一个对应的相同类型的左括号。',
     approach: '使用栈模拟。遍历字符串，遇到左括号则入栈；遇到右括号则检查栈顶是否为匹配的左括号，不匹配则返回 false。最终栈为空则有效。时间复杂度 O(n)。',
-    code: `def isValid(s: str) -> bool:
-    stack = []
-    pairs = {')': '(', '}': '{', ']': '['}
-    for c in s:
-        if c in pairs:
-            if not stack or stack[-1] != pairs[c]:
-                return False
-            stack.pop()
-        else:
-            stack.append(c)
-    return len(stack) == 0`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -797,25 +413,6 @@ const stackQueue: LeetCodeCard[] = [  {
     tags: ['栈', '设计'],
     description: '设计一个支持 push、pop、top 操作，并能在常数时间内检索到最小元素的栈。实现 MinStack 类。',
     approach: '使用两个栈：主栈存储所有元素，辅助栈（最小栈）存储当前最小值。push 时，若辅助栈为空或新元素 ≤ 辅助栈顶，则也压入辅助栈。pop 时，若弹出元素等于辅助栈顶，辅助栈也弹出。getMin 返回辅助栈顶。时间复杂度 O(1)。',
-    code: `class MinStack:
-    def __init__(self):
-        self.stack = []
-        self.min_stack = []
-
-    def push(self, val: int) -> None:
-        self.stack.append(val)
-        if not self.min_stack or val <= self.min_stack[-1]:
-            self.min_stack.append(val)
-
-    def pop(self) -> None:
-        if self.stack.pop() == self.min_stack[-1]:
-            self.min_stack.pop()
-
-    def top(self) -> int:
-        return self.stack[-1]
-
-    def getMin(self) -> int:
-        return self.min_stack[-1]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -829,16 +426,6 @@ const stackQueue: LeetCodeCard[] = [  {
     tags: ['栈', '数组', '单调栈'],
     description: '给定一个整数数组 temperatures 表示每天的温度，返回一个数组 answer，其中 answer[i] 是指对于第 i 天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，则用 0 来代替。',
     approach: '单调递减栈。遍历数组，当栈非空且当前温度 > 栈顶索引对应温度时，弹出栈顶，answer[栈顶索引] = i - 栈顶索引。将当前索引入栈。栈中始终保留还未找到更高温度的天数（索引）。时间复杂度 O(n)。',
-    code: `def dailyTemperatures(temperatures: List[int]) -> List[int]:
-    n = len(temperatures)
-    ans = [0] * n
-    stack = []
-    for i, temp in enumerate(temperatures):
-        while stack and temp > temperatures[stack[-1]]:
-            prev = stack.pop()
-            ans[prev] = i - prev
-        stack.append(i)
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -852,26 +439,6 @@ const stackQueue: LeetCodeCard[] = [  {
     tags: ['栈', '递归', '字符串'],
     description: '给定一个经过编码的字符串，返回它解码后的字符串。编码规则为 k[encoded_string]，表示方括号内部的 encoded_string 正好重复 k 次。k 保证为正整数。可以认为输入字符串总是有效的。',
     approach: '使用两个栈：数字栈和字符串栈。遍历字符：遇到数字则累积（可能多位）；遇到 [ 则将当前数字和已累积的字符串分别入栈并重置；遇到 ] 则弹出数字和字符串，拼接为 前字符串 + 数字 × 当前字符串；其他字符直接拼入当前字符串。时间复杂度 O(n)。',
-    code: `def decodeString(s: str) -> str:
-    num_stack = []
-    str_stack = []
-    cur_str = ''
-    cur_num = 0
-    for c in s:
-        if c.isdigit():
-            cur_num = cur_num * 10 + int(c)
-        elif c == '[':
-            num_stack.append(cur_num)
-            str_stack.append(cur_str)
-            cur_num = 0
-            cur_str = ''
-        elif c == ']':
-            num = num_stack.pop()
-            prev_str = str_stack.pop()
-            cur_str = prev_str + num * cur_str
-        else:
-            cur_str += c
-    return cur_str`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -890,14 +457,6 @@ const linkedList: LeetCodeCard[] = [  {
     tags: ['链表', '双指针', '哈希表'],
     description: '给你一个链表的头节点 head，判断链表中是否有环。如果链表中有某个节点可以通过连续跟踪 next 指针再次到达，则链表中存在环。',
     approach: '快慢指针（Floyd 判圈算法）。slow 每次走一步，fast 每次走两步。若存在环则两指针必定相遇；若 fast 或 fast.next 为 None 则无环。时间复杂度 O(n)，空间 O(1)。',
-    code: `def hasCycle(head: Optional[ListNode]) -> bool:
-    slow = fast = head
-    while fast and fast.next:
-        slow = slow.next
-        fast = fast.next.next
-        if slow == fast:
-            return True
-    return False`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -911,15 +470,6 @@ const linkedList: LeetCodeCard[] = [  {
     tags: ['链表', '递归'],
     description: '给你单链表的头节点 head，请你反转链表，并返回反转后的链表。',
     approach: '迭代法：使用三个指针 prev=None、curr=head。遍历时保存 curr.next，将 curr.next 指向 prev，然后 prev 和 curr 顺序前移。最终 prev 即为反转后的头节点。递归法：递归到底后逐层反转指针。时间复杂度 O(n)。',
-    code: `def reverseList(head: Optional[ListNode]) -> Optional[ListNode]:
-    prev = None
-    curr = head
-    while curr:
-        nxt = curr.next
-        curr.next = prev
-        prev = curr
-        curr = nxt
-    return prev`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -933,12 +483,6 @@ const linkedList: LeetCodeCard[] = [  {
     tags: ['链表', '双指针', '哈希表'],
     description: '给你两个单链表的头节点 headA 和 headB，请你找出并返回两个单链表相交的起始节点。如果两个链表不存在相交节点，返回 null。',
     approach: '双指针法。pA 和 pB 分别从 headA 和 headB 出发，走到末尾后切换到对方的头节点继续走。若链表相交，两指针会在相交节点相遇；若不相交，两指针最终会同时为 None。两指针走过的总路程相等（A+B 和 B+A）。时间复杂度 O(m+n)，空间 O(1)。',
-    code: `def getIntersectionNode(headA: ListNode, headB: ListNode) -> Optional[ListNode]:
-    pA, pB = headA, headB
-    while pA != pB:
-        pA = pA.next if pA else headB
-        pB = pB.next if pB else headA
-    return pA`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -952,22 +496,6 @@ const linkedList: LeetCodeCard[] = [  {
     tags: ['链表', '分治', '堆', '归并排序'],
     description: '给你一个链表数组，每个链表都已经按升序排列。请将所有链表合并到一个升序链表中，返回合并后的链表。',
     approach: '使用最小堆（优先队列）。将每个链表的头节点放入堆中（按节点值排序）。每次弹出最小节点并加入结果链表，若弹出节点有后续节点则将其入堆。时间复杂度 O(N·logk)，N 为总节点数，k 为链表数。',
-    code: `import heapq
-
-def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
-    heap = []
-    for i, node in enumerate(lists):
-        if node:
-            heapq.heappush(heap, (node.val, i, node))
-    dummy = ListNode()
-    cur = dummy
-    while heap:
-        val, i, node = heapq.heappop(heap)
-        cur.next = node
-        cur = cur.next
-        if node.next:
-            heapq.heappush(heap, (node.next.val, i, node.next))
-    return dummy.next`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -981,20 +509,6 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     tags: ['链表', '数学', '递归'],
     description: '给你两个非空的链表，表示两个非负的整数。它们每位数字都是按照逆序的方式存储的，并且每个节点只能存储一位数字。请将两个数相加，并以相同形式返回一个表示和的链表。',
     approach: '模拟加法。遍历两个链表，维护进位 carry。每次将两节点值相加（节点为空则视为 0），加进位得到 sum。新节点值为 sum % 10，进位为 sum // 10。处理完所有节点后若进位为 1 则追加一个节点。时间复杂度 O(max(m,n))。',
-    code: `def addTwoNumbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
-    dummy = ListNode()
-    cur = dummy
-    carry = 0
-    while l1 or l2 or carry:
-        val1 = l1.val if l1 else 0
-        val2 = l2.val if l2 else 0
-        total = val1 + val2 + carry
-        carry = total // 10
-        cur.next = ListNode(total % 10)
-        cur = cur.next
-        l1 = l1.next if l1 else None
-        l2 = l2.next if l2 else None
-    return dummy.next`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1008,16 +522,6 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     tags: ['链表', '双指针'],
     description: '给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。',
     approach: '双指针：fast 先走 n 步，然后 slow 和 fast 同时移动直到 fast 到达末尾。此时 slow 指向待删除节点的前驱，修改 slow.next = slow.next.next。使用哑节点简化头节点删除的边界处理。时间复杂度 O(n)。',
-    code: `def removeNthFromEnd(head: Optional[ListNode], n: int) -> Optional[ListNode]:
-    dummy = ListNode(0, head)
-    slow = fast = dummy
-    for _ in range(n):
-        fast = fast.next
-    while fast.next:
-        slow = slow.next
-        fast = fast.next
-    slow.next = slow.next.next
-    return dummy.next`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1031,19 +535,6 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     tags: ['链表', '递归'],
     description: '将两个升序链表合并为一个新的升序链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。',
     approach: '迭代法：使用哑节点，比较两个链表的头节点，将较小的节点接在结果链表后面，该链表指针后移。重复直到其中一条链表为空，将剩余链表直接接入。时间复杂度 O(m+n)。',
-    code: `def mergeTwoLists(list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
-    dummy = ListNode()
-    cur = dummy
-    while list1 and list2:
-        if list1.val < list2.val:
-            cur.next = list1
-            list1 = list1.next
-        else:
-            cur.next = list2
-            list2 = list2.next
-        cur = cur.next
-    cur.next = list1 if list1 else list2
-    return dummy.next`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1057,24 +548,6 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     tags: ['链表', '双指针', '栈', '递归'],
     description: '给你一个单链表的头节点 head，请判断该链表是否为回文链表。如果是返回 true，否则返回 false。',
     approach: '快慢指针找到链表中点，反转后半部分链表，然后同时从前半部分的头部和后半部分反转后的头部开始比较。比较完成后可再次反转恢复链表（可选）。时间复杂度 O(n)，空间 O(1)。',
-    code: `def isPalindrome(head: Optional[ListNode]) -> bool:
-    slow = fast = head
-    while fast and fast.next:
-        slow = slow.next
-        fast = fast.next.next
-    prev = None
-    while slow:
-        nxt = slow.next
-        slow.next = prev
-        prev = slow
-        slow = nxt
-    left, right = head, prev
-    while right:
-        if left.val != right.val:
-            return False
-        left = left.next
-        right = right.next
-    return True`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -1093,18 +566,6 @@ const binaryTree: LeetCodeCard[] = [  {
     tags: ['树', '栈', '深度优先搜索', '二叉树'],
     description: '给定一个二叉树的根节点 root，返回它的中序遍历（左-根-右）。',
     approach: '迭代法：使用栈模拟递归。从根节点开始，沿左子树一路入栈。弹出栈顶访问后转向右子树。重复直到栈空且节点为空。也可用 Morris 遍历将空间复杂度降为 O(1)。时间复杂度 O(n)。',
-    code: `def inorderTraversal(root: Optional[TreeNode]) -> List[int]:
-    res = []
-    stack = []
-    cur = root
-    while cur or stack:
-        while cur:
-            stack.append(cur)
-            cur = cur.left
-        cur = stack.pop()
-        res.append(cur.val)
-        cur = cur.right
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1118,10 +579,6 @@ const binaryTree: LeetCodeCard[] = [  {
     tags: ['树', '深度优先搜索', '广度优先搜索', '二叉树'],
     description: '给定一个二叉树 root，返回其最大深度。二叉树的最大深度是指从根节点到最远叶子节点的最长路径上的节点数。',
     approach: '递归法：最大深度 = 1 + max(左子树深度, 右子树深度)，空节点深度为 0。BFS 法：层序遍历，每层深度加一。时间复杂度 O(n)。',
-    code: `def maxDepth(root: Optional[TreeNode]) -> int:
-    if not root:
-        return 0
-    return 1 + max(maxDepth(root.left), maxDepth(root.right))`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1135,13 +592,6 @@ const binaryTree: LeetCodeCard[] = [  {
     tags: ['树', '深度优先搜索', '广度优先搜索', '二叉树'],
     description: '给你一棵二叉树的根节点 root，翻转这棵二叉树，并返回其根节点。翻转即将每个节点的左右子树交换。',
     approach: '递归法：交换当前节点的左右子树，然后递归翻转左右子树。也可用 BFS/层序遍历迭代。时间复杂度 O(n)。',
-    code: `def invertTree(root: Optional[TreeNode]) -> Optional[TreeNode]:
-    if not root:
-        return None
-    root.left, root.right = root.right, root.left
-    invertTree(root.left)
-    invertTree(root.right)
-    return root`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1155,24 +605,6 @@ const binaryTree: LeetCodeCard[] = [  {
     tags: ['树', '广度优先搜索', '二叉树'],
     description: '给你二叉树的根节点 root，返回其节点值的层序遍历（即逐层地，从左到右访问所有节点）。',
     approach: 'BFS 使用队列。将根节点入队，每轮处理当前队列中的所有节点（即当前层）。记录每层的节点值列表，同时将子节点入队。时间复杂度 O(n)。',
-    code: `from collections import deque
-
-def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
-    if not root:
-        return []
-    res = []
-    q = deque([root])
-    while q:
-        level = []
-        for _ in range(len(q)):
-            node = q.popleft()
-            level.append(node.val)
-            if node.left:
-                q.append(node.left)
-            if node.right:
-                q.append(node.right)
-        res.append(level)
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1186,21 +618,6 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     tags: ['树', '数组', '哈希表', '分治', '二叉树'],
     description: '给定两个整数数组 preorder 和 inorder，其中 preorder 是二叉树的先序遍历，inorder 是同一棵树的中序遍历，请构造二叉树并返回其根节点。',
     approach: '递归法。先序遍历的第一个元素是根节点。在中序遍历中找到根节点位置，左侧为左子树（节点数 = inRootIdx - inStart），右侧为右子树。递归构建左右子树。可用哈希表存储 inorder 中值到下标的映射加速查找。时间复杂度 O(n)。',
-    code: `def buildTree(preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
-    in_map = {v: i for i, v in enumerate(inorder)}
-
-    def build(pre_start, pre_end, in_start, in_end):
-        if pre_start > pre_end:
-            return None
-        root_val = preorder[pre_start]
-        root = TreeNode(root_val)
-        in_root = in_map[root_val]
-        left_size = in_root - in_start
-        root.left = build(pre_start + 1, pre_start + left_size, in_start, in_root - 1)
-        root.right = build(pre_start + left_size + 1, pre_end, in_root + 1, in_end)
-        return root
-
-    return build(0, len(preorder) - 1, 0, len(inorder) - 1)`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1214,15 +631,6 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     tags: ['树', '深度优先搜索', '二叉搜索树', '二叉树'],
     description: '给你一个二叉树的根节点 root，判断其是否是一个有效的二叉搜索树。有效二叉搜索树定义：节点的左子树只包含小于当前节点的数；节点的右子树只包含大于当前节点的数；所有左子树和右子树自身必须也是二叉搜索树。',
     approach: '递归法：传入当前节点允许的取值范围 (low, high)。对于每个节点，检查其值是否在范围内，然后递归检查左右子树并更新范围。中序遍历法：BST 的中序遍历序列应严格递增，遍历时检查当前值是否大于前一个值。时间复杂度 O(n)。',
-    code: `def isValidBST(root: Optional[TreeNode]) -> bool:
-    def validate(node, low, high):
-        if not node:
-            return True
-        if node.val <= low or node.val >= high:
-            return False
-        return validate(node.left, low, node.val) and validate(node.right, node.val, high)
-
-    return validate(root, float('-inf'), float('inf'))`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1236,17 +644,6 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     tags: ['树', '深度优先搜索', '广度优先搜索', '二叉树'],
     description: '给你一个二叉树的根节点 root，检查它是否轴对称。',
     approach: '递归法：定义一个辅助函数 isMirror(left, right) 判断两棵子树是否镜像对称。两棵树镜像对称的条件：值相等，且 left.left 与 right.right 对称，left.right 与 right.left 对称。时间复杂度 O(n)。',
-    code: `def isSymmetric(root: Optional[TreeNode]) -> bool:
-    def isMirror(t1, t2):
-        if not t1 and not t2:
-            return True
-        if not t1 or not t2:
-            return False
-        return (t1.val == t2.val and
-                isMirror(t1.left, t2.right) and
-                isMirror(t1.right, t2.left))
-
-    return isMirror(root, root)`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1260,20 +657,6 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     tags: ['树', '深度优先搜索', '二叉树'],
     description: '给你一棵二叉树的根节点，返回该树的直径。二叉树的直径是指树中任意两个节点之间最长路径的长度。这条路径可能经过也可能不经过根节点 root。',
     approach: '后序遍历（DFS）。对于每个节点，计算其左右子树的深度。以当前节点为拐点的路径长度为 leftDepth + rightDepth，更新全局最大直径。返回当前节点为根的深度 = 1 + max(leftDepth, rightDepth)。时间复杂度 O(n)。',
-    code: `def diameterOfBinaryTree(root: Optional[TreeNode]) -> int:
-    ans = 0
-
-    def depth(node):
-        nonlocal ans
-        if not node:
-            return 0
-        left = depth(node.left)
-        right = depth(node.right)
-        ans = max(ans, left + right)
-        return 1 + max(left, right)
-
-    depth(root)
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1287,17 +670,6 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     tags: ['树', '栈', '深度优先搜索', '链表', '二叉树'],
     description: '给你二叉树的根结点 root，请你将它展开为一个单链表：展开后的单链表应该同样使用 TreeNode，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null。展开后的单链表应该与二叉树先序遍历顺序相同。',
     approach: 'Morris 式原地算法。对于当前节点 cur，若存在左子树，找到左子树的最右节点 predecessor。将 cur.right 接到 predecessor.right，然后 cur.right = cur.left，cur.left = None。cur 继续沿右指针移动。时间复杂度 O(n)，空间 O(1)。',
-    code: `def flatten(root: Optional[TreeNode]) -> None:
-    cur = root
-    while cur:
-        if cur.left:
-            pre = cur.left
-            while pre.right:
-                pre = pre.right
-            pre.right = cur.right
-            cur.right = cur.left
-            cur.left = None
-        cur = cur.right`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1311,14 +683,6 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     tags: ['树', '深度优先搜索', '二叉树'],
     description: '给定一个二叉树，找到该树中两个指定节点的最近公共祖先。最近公共祖先定义为：对于有根树 T 的两个节点 p、q，最近公共祖先表示为一个节点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大。',
     approach: '后序遍历递归。如果当前节点是 p 或 q 或空，则返回当前节点。递归搜索左右子树。若左右子树均返回非空，则当前节点为 LCA。若只有一侧返回非空，则该侧返回的节点即为 LCA。时间复杂度 O(n)。',
-    code: `def lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
-    if not root or root == p or root == q:
-        return root
-    left = lowestCommonAncestor(root.left, p, q)
-    right = lowestCommonAncestor(root.right, p, q)
-    if left and right:
-        return root
-    return left if left else right`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1332,20 +696,6 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     tags: ['树', '深度优先搜索', '动态规划', '二叉树'],
     description: '二叉树中的路径被定义为一条从树中任意节点出发，沿父节点-子节点连接，达到任意节点的序列。同一个节点在一条路径序列中至多出现一次。该路径至少包含一个节点，且不一定经过根节点。路径和是路径中各节点值的总和。给你一个二叉树的根节点 root，返回其最大路径和。',
     approach: '后序遍历 DFS。对于每个节点，计算以该节点为起点向下延伸的最大单边路径和：maxGain = node.val + max(0, 左子树maxGain, 右子树maxGain)。同时更新全局最大路径和：当前节点的最大路径和 = node.val + max(0, leftGain) + max(0, rightGain)。注意与 0 比较取最大值，因为负贡献的路径可以舍弃。时间复杂度 O(n)。',
-    code: `def maxPathSum(root: Optional[TreeNode]) -> int:
-    ans = float('-inf')
-
-    def maxGain(node):
-        nonlocal ans
-        if not node:
-            return 0
-        left = max(maxGain(node.left), 0)
-        right = max(maxGain(node.right), 0)
-        ans = max(ans, node.val + left + right)
-        return node.val + max(left, right)
-
-    maxGain(root)
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1359,25 +709,6 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     tags: ['树', '深度优先搜索', '哈希表', '二叉树'],
     description: '给定一个二叉树的根节点 root 和一个整数 targetSum，求该二叉树里节点值之和等于 targetSum 的路径的数目。路径不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。',
     approach: '前缀和 + 哈希表 + DFS。遍历过程中维护从根到当前节点的前缀和。若当前前缀和 - targetSum 在哈希表中存在，则存在从该祖先节点到当前节点的路径和为 targetSum。递归时更新哈希表，回溯时恢复。时间复杂度 O(n)。',
-    code: `def pathSum(root: Optional[TreeNode], targetSum: int) -> int:
-    from collections import defaultdict
-    prefix = defaultdict(int)
-    prefix[0] = 1
-    ans = 0
-
-    def dfs(node, cur_sum):
-        nonlocal ans
-        if not node:
-            return
-        cur_sum += node.val
-        ans += prefix[cur_sum - targetSum]
-        prefix[cur_sum] += 1
-        dfs(node.left, cur_sum)
-        dfs(node.right, cur_sum)
-        prefix[cur_sum] -= 1
-
-    dfs(root, 0)
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -1396,25 +727,6 @@ const graph: LeetCodeCard[] = [  {
     tags: ['深度优先搜索', '广度优先搜索', '并查集', '数组', '矩阵', '图'],
     description: '给你一个由 1（陆地）和 0（水）组成的二维网格，请你计算网格中岛屿的数量。岛屿总是被水包围，并且每座岛屿只能由水平方向和竖直方向上相邻的陆地连接形成。',
     approach: 'DFS/BFS 泛洪填充。遍历网格，遇到 1 则岛屿数 +1，然后 DFS/BFS 将该岛屿所有相连的陆地标记为已访问（如置 0 或 visited 数组）。并查集法：将相邻的陆地合并，最后统计不同根的数量。时间复杂度 O(mn)。',
-    code: `def numIslands(grid: List[List[str]]) -> int:
-    m, n = len(grid), len(grid[0])
-
-    def dfs(i, j):
-        if i < 0 or i >= m or j < 0 or j >= n or grid[i][j] == '0':
-            return
-        grid[i][j] = '0'
-        dfs(i + 1, j)
-        dfs(i - 1, j)
-        dfs(i, j + 1)
-        dfs(i, j - 1)
-
-    count = 0
-    for i in range(m):
-        for j in range(n):
-            if grid[i][j] == '1':
-                count += 1
-                dfs(i, j)
-    return count`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1428,24 +740,6 @@ const graph: LeetCodeCard[] = [  {
     tags: ['深度优先搜索', '广度优先搜索', '图', '拓扑排序'],
     description: '你这个学期必须选修 numCourses 门课程，记为 0 到 numCourses-1。在选修某些课程之前需要先修课程，先修课程按数组 prerequisites 给出。请判断是否可能完成所有课程的学习。',
     approach: '拓扑排序（BFS/Kahn 算法）。构建邻接表和入度数组。将所有入度为 0 的课程入队。每出队一门课，将其后继课程的入度减 1，若入度变为 0 则入队。若最终处理的课程数等于 numCourses 则无环，可以完成。时间复杂度 O(V+E)。',
-    code: `from collections import deque, defaultdict
-
-def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
-    graph = defaultdict(list)
-    indegree = [0] * numCourses
-    for a, b in prerequisites:
-        graph[b].append(a)
-        indegree[a] += 1
-    q = deque([i for i in range(numCourses) if indegree[i] == 0])
-    count = 0
-    while q:
-        course = q.popleft()
-        count += 1
-        for nxt in graph[course]:
-            indegree[nxt] -= 1
-            if indegree[nxt] == 0:
-                q.append(nxt)
-    return count == numCourses`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1459,34 +753,6 @@ def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
     tags: ['广度优先搜索', '数组', '矩阵', '图'],
     description: '在给定的 m x n 网格 grid 中，每个单元格可以有三个值之一：0 代表空单元格；1 代表新鲜橘子；2 代表腐烂的橘子。每分钟，腐烂的橘子周围 4 个方向上相邻的新鲜橘子都会腐烂。返回直到单元格中没有新鲜橘子为止所必须经过的最小分钟数。如果不可能则返回 -1。',
     approach: '多源 BFS。初始时将所有腐烂橘子的位置入队。BFS 每一层表示一分钟，将相邻的新鲜橘子变为腐烂并入队。同时统计新鲜橘子数量，每腐一个减一。BFS 结束后若新鲜橘子数为 0 则返回分钟数，否则返回 -1。时间复杂度 O(mn)。',
-    code: `from collections import deque
-
-def orangesRotting(grid: List[List[int]]) -> int:
-    m, n = len(grid), len(grid[0])
-    q = deque()
-    fresh = 0
-    for i in range(m):
-        for j in range(n):
-            if grid[i][j] == 2:
-                q.append((i, j))
-            elif grid[i][j] == 1:
-                fresh += 1
-    if fresh == 0:
-        return 0
-    minutes = 0
-    dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-    while q:
-        for _ in range(len(q)):
-            i, j = q.popleft()
-            for di, dj in dirs:
-                ni, nj = i + di, j + dj
-                if 0 <= ni < m and 0 <= nj < n and grid[ni][nj] == 1:
-                    grid[ni][nj] = 2
-                    fresh -= 1
-                    q.append((ni, nj))
-        if q:
-            minutes += 1
-    return minutes if fresh == 0 else -1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1500,38 +766,6 @@ def orangesRotting(grid: List[List[int]]) -> int:
     tags: ['设计', '字典树', '哈希表', '字符串', '图'],
     description: 'Trie（发音类似 "try"）或者说前缀树是一种树形数据结构，用于高效地存储和检索字符串数据集中的键。请实现 Trie 类：Trie() 初始化前缀树对象；void insert(String word) 向前缀树中插入字符串 word；boolean search(String word) 如果字符串 word 在前缀树中，返回 true；boolean startsWith(String prefix) 如果之前已经插入的字符串 word 的前缀之一为 prefix，返回 true。',
     approach: '每个 Trie 节点包含一个子节点字典和一个布尔标记 isEnd。插入时沿字符路径创建节点，最后标记 isEnd=True。搜索时沿路径走，若路径完整存在且终点 isEnd=True 则找到。前缀匹配仅需检查路径是否存在。时间复杂度 O(L)，L 为字符串长度。',
-    code: `class TrieNode:
-    def __init__(self):
-        self.children = {}
-        self.is_end = False
-
-class Trie:
-    def __init__(self):
-        self.root = TrieNode()
-
-    def insert(self, word: str) -> None:
-        node = self.root
-        for ch in word:
-            if ch not in node.children:
-                node.children[ch] = TrieNode()
-            node = node.children[ch]
-        node.is_end = True
-
-    def search(self, word: str) -> bool:
-        node = self.root
-        for ch in word:
-            if ch not in node.children:
-                return False
-            node = node.children[ch]
-        return node.is_end
-
-    def startsWith(self, prefix: str) -> bool:
-        node = self.root
-        for ch in prefix:
-            if ch not in node.children:
-                return False
-            node = node.children[ch]
-        return True`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -1550,24 +784,6 @@ const backtracking: LeetCodeCard[] = [  {
     tags: ['数组', '回溯'],
     description: '给定一个不含重复数字的数组 nums，返回其所有可能的全排列。你可以按任意顺序返回答案。',
     approach: '回溯法。维护一个 path 列表记录当前排列和 used 数组标记已使用的数字。递归时遍历 nums，若数字未使用则加入 path，递归进入下一层，回溯时移除并重置 used。当 path 长度等于 nums 长度时记录结果。时间复杂度 O(n·n!)。',
-    code: `def permute(nums: List[int]) -> List[List[int]]:
-    res = []
-    used = [False] * len(nums)
-
-    def backtrack(path):
-        if len(path) == len(nums):
-            res.append(path[:])
-            return
-        for i in range(len(nums)):
-            if not used[i]:
-                used[i] = True
-                path.append(nums[i])
-                backtrack(path)
-                path.pop()
-                used[i] = False
-
-    backtrack([])
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1581,18 +797,6 @@ const backtracking: LeetCodeCard[] = [  {
     tags: ['位运算', '数组', '回溯'],
     description: '给你一个整数数组 nums，数组中的元素互不相同。返回该数组所有可能的子集（幂集）。解集不能包含重复的子集。',
     approach: '回溯法：每个元素有选和不选两种选择。从下标 start 开始，选择当前元素后递归到下一层，回溯时撤销选择。每次递归都记录当前子集。也可用迭代法：初始为空集，遍历每个元素时将当前元素添加到已有子集中形成新子集。时间复杂度 O(n·2ⁿ)。',
-    code: `def subsets(nums: List[int]) -> List[List[int]]:
-    res = []
-
-    def backtrack(start, path):
-        res.append(path[:])
-        for i in range(start, len(nums)):
-            path.append(nums[i])
-            backtrack(i + 1, path)
-            path.pop()
-
-    backtrack(0, [])
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1606,28 +810,6 @@ const backtracking: LeetCodeCard[] = [  {
     tags: ['数组', '矩阵', '字符串', '回溯'],
     description: '给定一个 m x n 二维字符网格 board 和一个字符串单词 word。如果 word 存在于网格中返回 true；否则返回 false。单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中相邻单元格是水平相邻或垂直相邻的。同一个单元格内的字母不允许被重复使用。',
     approach: 'DFS + 回溯。遍历每个格子作为起点，DFS 搜索匹配单词的每个字符。标记已访问格子（如赋值为特殊字符），四个方向递归搜索。回溯时恢复格子值。时间复杂度 O(mn·3^L)，L 为单词长度。',
-    code: `def exist(board: List[List[str]], word: str) -> bool:
-    m, n = len(board), len(board[0])
-
-    def dfs(i, j, idx):
-        if idx == len(word):
-            return True
-        if i < 0 or i >= m or j < 0 or j >= n or board[i][j] != word[idx]:
-            return False
-        temp = board[i][j]
-        board[i][j] = '#'
-        found = (dfs(i + 1, j, idx + 1) or
-                 dfs(i - 1, j, idx + 1) or
-                 dfs(i, j + 1, idx + 1) or
-                 dfs(i, j - 1, idx + 1))
-        board[i][j] = temp
-        return found
-
-    for i in range(m):
-        for j in range(n):
-            if dfs(i, j, 0):
-                return True
-    return False`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1641,32 +823,6 @@ const backtracking: LeetCodeCard[] = [  {
     tags: ['数组', '回溯'],
     description: '按照国际象棋的规则，皇后可以攻击与之处在同一行或同一列或同一斜线上的棋子。n 皇后问题研究的是如何将 n 个皇后放置在 n×n 的棋盘上，并且使皇后彼此之间不能相互攻击。给你一个整数 n，返回所有不同的 n 皇后问题的解决方案。',
     approach: '回溯法。逐行放置皇后，用三个集合分别记录已占用的列、主对角线（row-col 为定值）和副对角线（row+col 为定值）。每行尝试所有列，若当前位置不受攻击则放置，递归下一行。回溯时移除并恢复。时间复杂度 O(n!)。',
-    code: `def solveNQueens(n: int) -> List[List[str]]:
-    res = []
-    board = [['.'] * n for _ in range(n)]
-    cols = set()
-    diag1 = set()
-    diag2 = set()
-
-    def backtrack(row):
-        if row == n:
-            res.append([''.join(r) for r in board])
-            return
-        for col in range(n):
-            if col in cols or (row - col) in diag1 or (row + col) in diag2:
-                continue
-            board[row][col] = 'Q'
-            cols.add(col)
-            diag1.add(row - col)
-            diag2.add(row + col)
-            backtrack(row + 1)
-            board[row][col] = '.'
-            cols.remove(col)
-            diag1.remove(row - col)
-            diag2.remove(row + col)
-
-    backtrack(0)
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1680,20 +836,6 @@ const backtracking: LeetCodeCard[] = [  {
     tags: ['字符串', '动态规划', '回溯'],
     description: '数字 n 代表生成括号的对数，请你设计一个函数，用于生成所有可能的并且有效的括号组合。',
     approach: '回溯法。维护左右括号的剩余数量。只要左括号还有剩余就可以添加 (；只有右括号剩余数大于左括号剩余数时才能添加 )（保证有效性）。当左右括号都用完时记录结果。时间复杂度 O(4ⁿ/√n)，即卡特兰数。',
-    code: `def generateParenthesis(n: int) -> List[str]:
-    res = []
-
-    def backtrack(s, left, right):
-        if left == 0 and right == 0:
-            res.append(s)
-            return
-        if left > 0:
-            backtrack(s + '(', left - 1, right)
-        if right > left:
-            backtrack(s + ')', left, right - 1)
-
-    backtrack('', n, n)
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1707,22 +849,6 @@ const backtracking: LeetCodeCard[] = [  {
     tags: ['数组', '回溯'],
     description: '给你一个无重复元素的整数数组 candidates 和一个目标整数 target，找出 candidates 中可以使数字和为目标数 target 的所有不同组合，并以列表形式返回。candidates 中的同一个数字可以无限制重复被选取。',
     approach: '回溯法。从 start 开始遍历，避免重复组合。每次选择 candidates[i]，将其加入路径并递归，target 减去该值。若 target == 0 记录结果；若 target < 0 剪枝返回。回溯时移除路径末尾元素。时间复杂度 O(2^target)。',
-    code: `def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
-    res = []
-
-    def backtrack(start, path, remain):
-        if remain == 0:
-            res.append(path[:])
-            return
-        if remain < 0:
-            return
-        for i in range(start, len(candidates)):
-            path.append(candidates[i])
-            backtrack(i, path, remain - candidates[i])
-            path.pop()
-
-    backtrack(0, [], target)
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -1741,13 +867,6 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     tags: ['记忆化搜索', '数学', '动态规划'],
     description: '假设你正在爬楼梯，需要 n 阶你才能到达楼顶。每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？',
     approach: '斐波那契数列。dp[i] = dp[i-1] + dp[i-2]，即到第 i 阶的方法数等于到前两阶的方法数之和。基础情况：dp[0]=1, dp[1]=1。可优化为两个变量滚动更新。时间复杂度 O(n)，空间 O(1)。',
-    code: `def climbStairs(n: int) -> int:
-    if n <= 2:
-        return n
-    a, b = 1, 2
-    for _ in range(3, n + 1):
-        a, b = b, a + b
-    return b`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1761,13 +880,6 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     tags: ['数组', '分治', '动态规划'],
     description: '给你一个整数数组 nums，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。',
     approach: 'Kadane 算法。dp[i] 表示以 i 结尾的最大子数组和，dp[i] = max(nums[i], dp[i-1] + nums[i])。可优化为单变量 curMax 滚动更新，同时维护全局最大值。时间复杂度 O(n)，空间 O(1)。',
-    code: `def maxSubArray(nums: List[int]) -> int:
-    cur_max = nums[0]
-    global_max = nums[0]
-    for i in range(1, len(nums)):
-        cur_max = max(nums[i], cur_max + nums[i])
-        global_max = max(global_max, cur_max)
-    return global_max`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1781,17 +893,6 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     tags: ['数组', '二分查找', '动态规划'],
     description: '给你一个整数数组 nums，找到其中最长严格递增子序列的长度。子序列是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。',
     approach: 'DP法：dp[i] = 以 i 结尾的 LIS 长度 = 1 + max(dp[j]) for j < i and nums[j] < nums[i]，O(n²)。贪心 + 二分优化：维护 tails 数组，tails[k] 存储长度为 k+1 的递增子序列的最小末尾值。遍历 nums，二分查找 tails 中第一个 ≥ nums[i] 的位置并替换。最终 tails 长度即为 LIS 长度。O(n log n)。',
-    code: `from bisect import bisect_left
-
-def lengthOfLIS(nums: List[int]) -> int:
-    tails = []
-    for x in nums:
-        idx = bisect_left(tails, x)
-        if idx == len(tails):
-            tails.append(x)
-        else:
-            tails[idx] = x
-    return len(tails)`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1805,14 +906,6 @@ def lengthOfLIS(nums: List[int]) -> int:
     tags: ['广度优先搜索', '数组', '动态规划'],
     description: '给你一个整数数组 coins 表示不同面额的硬币，另给一个整数 amount 表示总金额。计算并返回可以凑成总金额所需的最少的硬币个数。如果没有任何一种硬币组合能组成总金额返回 -1。每种硬币的数量是无限的。',
     approach: '完全背包问题。dp[i] 表示凑成金额 i 所需的最少硬币数，初始化为 amount+1（或无穷大）。dp[0] = 0。对于每个金额 i，遍历每种硬币 coin：dp[i] = min(dp[i], dp[i-coin] + 1)。时间复杂度 O(amount × len(coins))。',
-    code: `def coinChange(coins: List[int], amount: int) -> int:
-    dp = [amount + 1] * (amount + 1)
-    dp[0] = 0
-    for i in range(1, amount + 1):
-        for coin in coins:
-            if i >= coin:
-                dp[i] = min(dp[i], dp[i - coin] + 1)
-    return dp[amount] if dp[amount] != amount + 1 else -1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1826,16 +919,6 @@ def lengthOfLIS(nums: List[int]) -> int:
     tags: ['字符串', '动态规划'],
     description: '给定两个字符串 text1 和 text2，返回这两个字符串的最长公共子序列的长度。如果不存在公共子序列返回 0。子序列是由原字符串派生而来的序列，删除（或不删除）字符串中的字符而不改变其余字符的相对顺序。',
     approach: '二维 DP。dp[i][j] 表示 text1 前 i 个字符和 text2 前 j 个字符的 LCS 长度。若 text1[i-1] == text2[j-1]：dp[i][j] = dp[i-1][j-1] + 1；否则 dp[i][j] = max(dp[i-1][j], dp[i][j-1])。时间复杂度 O(mn)。',
-    code: `def longestCommonSubsequence(text1: str, text2: str) -> int:
-    m, n = len(text1), len(text2)
-    dp = [[0] * (n + 1) for _ in range(m + 1)]
-    for i in range(1, m + 1):
-        for j in range(1, n + 1):
-            if text1[i - 1] == text2[j - 1]:
-                dp[i][j] = dp[i - 1][j - 1] + 1
-            else:
-                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
-    return dp[m][n]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1849,18 +932,6 @@ def lengthOfLIS(nums: List[int]) -> int:
     tags: ['数组', '动态规划'],
     description: '你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。给定一个代表每个房屋存放金额的非负整数数组，计算你不触动警报装置的情况下，一夜之内能够偷窃到的最高金额。',
     approach: '一维 DP。dp[i] 表示偷到第 i 个房屋时的最大金额。对于第 i 个房屋，有两种选择：不偷（dp[i] = dp[i-1]）或偷（dp[i] = dp[i-2] + nums[i]）。取最大值。可优化为两个变量滚动。时间复杂度 O(n)，空间 O(1)。',
-    code: `def rob(nums: List[int]) -> int:
-    if not nums:
-        return 0
-    if len(nums) == 1:
-        return nums[0]
-    prev2 = nums[0]
-    prev1 = max(nums[0], nums[1])
-    for i in range(2, len(nums)):
-        cur = max(prev1, prev2 + nums[i])
-        prev2 = prev1
-        prev1 = cur
-    return prev1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1874,17 +945,6 @@ def lengthOfLIS(nums: List[int]) -> int:
     tags: ['广度优先搜索', '数学', '动态规划'],
     description: '给你一个整数 n，返回和为 n 的完全平方数的最少数量。完全平方数是一个整数，其值等于另一个整数的平方；换句话说，其值等于一个整数自乘的积。例如，1、4、9 和 16 都是完全平方数。',
     approach: 'DP 法：dp[i] 表示构成 i 所需的最少完全平方数个数。dp[i] = min(dp[i - j*j] + 1) for all j with j*j ≤ i。dp[0] = 0。四平方和定理：任何正整数最多由 4 个平方数和表示。可提前判断是否为完全平方数、是否为两个平方数之和等优化。时间复杂度 O(n·√n)。',
-    code: `import math
-
-def numSquares(n: int) -> int:
-    dp = [float('inf')] * (n + 1)
-    dp[0] = 0
-    for i in range(1, n + 1):
-        j = 1
-        while j * j <= i:
-            dp[i] = min(dp[i], dp[i - j * j] + 1)
-            j += 1
-    return dp[n]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1898,12 +958,6 @@ def numSquares(n: int) -> int:
     tags: ['数学', '动态规划', '组合数学'],
     description: '一个机器人位于一个 m x n 网格的左上角。机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角。问总共有多少条不同的路径？',
     approach: '二维 DP。dp[i][j] 表示到达 (i,j) 的路径数。dp[0][*] = 1, dp[*][0] = 1（第一行和第一列只有一条路径）。dp[i][j] = dp[i-1][j] + dp[i][j-1]。可优化为一维数组。组合数学法：总共 m+n-2 步中选 m-1 步向下，结果为 C(m+n-2, m-1)。时间复杂度 O(mn) 或 O(min(m,n))。',
-    code: `def uniquePaths(m: int, n: int) -> int:
-    dp = [1] * n
-    for i in range(1, m):
-        for j in range(1, n):
-            dp[j] += dp[j - 1]
-    return dp[-1]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1917,19 +971,6 @@ def numSquares(n: int) -> int:
     tags: ['数组', '动态规划', '矩阵'],
     description: '给定一个包含非负整数的 m x n 网格 grid，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。每次只能向下或者向右移动一步。',
     approach: '二维 DP。dp[i][j] 表示到达 (i,j) 的最小路径和。第一行和第一列只能单向累加。其余：dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])。可优化为一维数组或原地修改 grid。时间复杂度 O(mn)。',
-    code: `def minPathSum(grid: List[List[int]]) -> int:
-    m, n = len(grid), len(grid[0])
-    for i in range(m):
-        for j in range(n):
-            if i == 0 and j == 0:
-                continue
-            elif i == 0:
-                grid[i][j] += grid[i][j - 1]
-            elif j == 0:
-                grid[i][j] += grid[i - 1][j]
-            else:
-                grid[i][j] += min(grid[i - 1][j], grid[i][j - 1])
-    return grid[-1][-1]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1943,20 +984,6 @@ def numSquares(n: int) -> int:
     tags: ['字符串', '动态规划'],
     description: '给你两个单词 word1 和 word2，请返回将 word1 转换成 word2 所使用的最少操作数。你可以对一个单词进行如下三种操作：插入一个字符、删除一个字符、替换一个字符。',
     approach: '二维 DP。dp[i][j] 表示 word1 前 i 个字符转换为 word2 前 j 个字符的最小操作数。若 word1[i-1] == word2[j-1]：dp[i][j] = dp[i-1][j-1]；否则 dp[i][j] = 1 + min(dp[i-1][j]（删除）, dp[i][j-1]（插入）, dp[i-1][j-1]（替换）)。初始值 dp[i][0] = i, dp[0][j] = j。时间复杂度 O(mn)。',
-    code: `def minDistance(word1: str, word2: str) -> int:
-    m, n = len(word1), len(word2)
-    dp = [[0] * (n + 1) for _ in range(m + 1)]
-    for i in range(m + 1):
-        dp[i][0] = i
-    for j in range(n + 1):
-        dp[0][j] = j
-    for i in range(1, m + 1):
-        for j in range(1, n + 1):
-            if word1[i - 1] == word2[j - 1]:
-                dp[i][j] = dp[i - 1][j - 1]
-            else:
-                dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
-    return dp[m][n]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1970,17 +997,6 @@ def numSquares(n: int) -> int:
     tags: ['字典树', '记忆化搜索', '数组', '哈希表', '字符串', '动态规划'],
     description: '给你一个字符串 s 和一个字符串列表 wordDict 作为字典。如果可以利用字典中出现的一个或多个单词拼接出 s 则返回 true。注意：不要求字典中出现的单词全部都使用，并且字典中的单词可以重复使用。',
     approach: 'DP。dp[i] 表示 s 的前 i 个字符能否由字典中的单词拼接而成。dp[0] = True。dp[i] = True 如果存在 j < i 使得 dp[j] 为 True 且 s[j:i] 在字典中。可用哈希集合存储字典加速查询。时间复杂度 O(n²)，n 为 s 长度。',
-    code: `def wordBreak(s: str, wordDict: List[str]) -> bool:
-    word_set = set(wordDict)
-    n = len(s)
-    dp = [False] * (n + 1)
-    dp[0] = True
-    for i in range(1, n + 1):
-        for j in range(i):
-            if dp[j] and s[j:i] in word_set:
-                dp[i] = True
-                break
-    return dp[n]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -1994,14 +1010,6 @@ def numSquares(n: int) -> int:
     tags: ['数组', '动态规划'],
     description: '给你一个整数数组 nums，请你找出数组中乘积最大的非空连续子数组（该子数组中至少包含一个数字），并返回该子数组所对应的乘积。',
     approach: '动态规划。由于存在负数，最小乘积可能变最大值。同时维护以当前位置结尾的最大乘积 curMax 和最小乘积 curMin。curMax = max(num, num * curMax, num * curMin)，curMin = min(num, num * curMax, num * curMin)。更新全局最大值。时间复杂度 O(n)。',
-    code: `def maxProduct(nums: List[int]) -> int:
-    cur_max = cur_min = ans = nums[0]
-    for i in range(1, len(nums)):
-        candidates = (nums[i], nums[i] * cur_max, nums[i] * cur_min)
-        cur_max = max(candidates)
-        cur_min = min(candidates)
-        ans = max(ans, cur_max)
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2015,17 +1023,6 @@ def numSquares(n: int) -> int:
     tags: ['数组', '动态规划'],
     description: '给你一个只包含正整数的非空数组 nums。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。',
     approach: '转化为 0/1 背包问题。若总和为奇数则不可能。target = sum/2。dp[i] 表示是否能选出和为 i 的子集。dp[0] = True。遍历每个数 num，逆向更新：dp[i] = dp[i] or dp[i-num]（i 从 target 到 num）。若 dp[target] 为 True 则返回 True。时间复杂度 O(n·target)。',
-    code: `def canPartition(nums: List[int]) -> bool:
-    total = sum(nums)
-    if total % 2 != 0:
-        return False
-    target = total // 2
-    dp = [False] * (target + 1)
-    dp[0] = True
-    for num in nums:
-        for i in range(target, num - 1, -1):
-            dp[i] = dp[i] or dp[i - num]
-    return dp[target]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2039,19 +1036,6 @@ def numSquares(n: int) -> int:
     tags: ['栈', '字符串', '动态规划'],
     description: '给你一个只包含 ( 和 ) 的字符串，找出最长有效（格式正确且连续）括号子串的长度。',
     approach: 'DP 法：dp[i] 表示以 i 结尾的最长有效括号长度。若 s[i] == )：若 s[i-1] == (，dp[i] = dp[i-2] + 2；若 s[i-1] == ) 且 s[i-dp[i-1]-1] == (，则 dp[i] = dp[i-1] + 2 + dp[i-dp[i-1]-2]。栈方法更直观：栈存索引，遇到 ) 时弹出栈顶计算长度。时间复杂度 O(n)。',
-    code: `def longestValidParentheses(s: str) -> int:
-    stack = [-1]
-    ans = 0
-    for i, c in enumerate(s):
-        if c == '(':
-            stack.append(i)
-        else:
-            stack.pop()
-            if not stack:
-                stack.append(i)
-            else:
-                ans = max(ans, i - stack[-1])
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2065,17 +1049,6 @@ def numSquares(n: int) -> int:
     tags: ['数组', '动态规划'],
     description: '有 n 个气球编号为 0 到 n - 1，每个气球上都标有一个数字 nums[i]。戳破第 i 个气球可以获得 nums[i-1] * nums[i] * nums[i+1] 枚硬币。如果 i-1 或 i+1 超出了数组边界当作数字 1 处理。求能获得硬币的最大数量。',
     approach: '区间 DP。在两端添加虚拟气球 1，形成新数组 points[0..n+1]。dp[i][j] 表示戳破开区间 (i,j) 内所有气球的最大硬币数。枚举最后一个被戳破的气球 k，则 dp[i][j] = max(dp[i][k] + dp[k][j] + points[i] * points[k] * points[j])。最终答案 dp[0][n+1]。时间复杂度 O(n³)。',
-    code: `def maxCoins(nums: List[int]) -> int:
-    points = [1] + nums + [1]
-    n = len(points)
-    dp = [[0] * n for _ in range(n)]
-    for length in range(2, n):
-        for i in range(n - length):
-            j = i + length
-            for k in range(i + 1, j):
-                dp[i][j] = max(dp[i][j],
-                    dp[i][k] + dp[k][j] + points[i] * points[k] * points[j])
-    return dp[0][n - 1]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2089,23 +1062,6 @@ def numSquares(n: int) -> int:
     tags: ['递归', '字符串', '动态规划'],
     description: '给你一个字符串 s 和一个字符规律 p，请你来实现一个支持 . 和 * 的正则表达式匹配。. 匹配任意单个字符；* 匹配零个或多个前面的那一个元素。匹配应覆盖整个字符串 s。',
     approach: '二维 DP。dp[i][j] 表示 s 的前 i 个字符和 p 的前 j 个字符是否匹配。基础：dp[0][0]=True。转移：若 p[j-1] 不是 *，dp[i][j] = dp[i-1][j-1] 且 (s[i-1]==p[j-1] 或 p[j-1]==.)；若 p[j-1] 是 *，匹配 0 次 (dp[i][j-2]) 或匹配 1+ 次 (dp[i-1][j] 且当前字符匹配)。时间复杂度 O(mn)。',
-    code: `def isMatch(s: str, p: str) -> bool:
-    m, n = len(s), len(p)
-    dp = [[False] * (n + 1) for _ in range(m + 1)]
-    dp[0][0] = True
-    for j in range(2, n + 1):
-        if p[j - 1] == '*':
-            dp[0][j] = dp[0][j - 2]
-    for i in range(1, m + 1):
-        for j in range(1, n + 1):
-            if p[j - 1] != '*':
-                if p[j - 1] == '.' or s[i - 1] == p[j - 1]:
-                    dp[i][j] = dp[i - 1][j - 1]
-            else:
-                dp[i][j] = dp[i][j - 2]
-                if p[j - 2] == '.' or s[i - 1] == p[j - 2]:
-                    dp[i][j] = dp[i][j] or dp[i - 1][j]
-    return dp[m][n]`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -2124,13 +1080,6 @@ const greedy: LeetCodeCard[] = [  {
     tags: ['数组', '动态规划', '贪心'],
     description: '给定一个数组 prices，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。你只能选择某一天买入这只股票，并选择在未来的某一个不同的日子卖出该股票。设计一个算法来计算你所能获取的最大利润。返回你可以从这笔交易中获取的最大利润。',
     approach: '一次遍历。记录历史最低价格 minPrice，对于每天价格 prices[i]，计算当天卖出可获利润 prices[i] - minPrice，更新最大利润。时间复杂度 O(n)，空间 O(1)。',
-    code: `def maxProfit(prices: List[int]) -> int:
-    min_price = float('inf')
-    max_profit = 0
-    for price in prices:
-        min_price = min(min_price, price)
-        max_profit = max(max_profit, price - min_price)
-    return max_profit`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2144,15 +1093,6 @@ const greedy: LeetCodeCard[] = [  {
     tags: ['数组', '动态规划', '贪心'],
     description: '给你一个非负整数数组 nums，你最初位于数组的第一个下标。数组中的每个元素代表你在该位置可以跳跃的最大长度。判断你是否能够到达最后一个下标。',
     approach: '贪心法。维护最远可到达位置 maxReach。遍历每个位置 i，若 i > maxReach 则无法到达当前及后续位置，返回 false。更新 maxReach = max(maxReach, i + nums[i])。若 maxReach >= n-1 则可达。时间复杂度 O(n)。',
-    code: `def canJump(nums: List[int]) -> bool:
-    max_reach = 0
-    for i in range(len(nums)):
-        if i > max_reach:
-            return False
-        max_reach = max(max_reach, i + nums[i])
-        if max_reach >= len(nums) - 1:
-            return True
-    return True`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2166,19 +1106,6 @@ const greedy: LeetCodeCard[] = [  {
     tags: ['数组', '动态规划', '贪心'],
     description: '给定一个长度为 n 的 0 索引整数数组 nums。初始位置为 nums[0]。每个元素 nums[i] 表示从索引 i 向前跳转的最大长度。返回到达 nums[n-1] 的最小跳跃次数。生成的测试用例一定可以到达 nums[n-1]。',
     approach: '贪心法。维护当前覆盖范围 curEnd 和下一步最远覆盖范围 curFarthest。遍历数组（到 n-2），更新 curFarthest = max(curFarthest, i + nums[i])。当 i == curEnd 时，必须跳一步，跳跃数 +1，curEnd = curFarthest。时间复杂度 O(n)。',
-    code: `def jump(nums: List[int]) -> int:
-    n = len(nums)
-    if n == 1:
-        return 0
-    jumps = 0
-    cur_end = 0
-    cur_farthest = 0
-    for i in range(n - 1):
-        cur_farthest = max(cur_farthest, i + nums[i])
-        if i == cur_end:
-            jumps += 1
-            cur_end = cur_farthest
-    return jumps`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -2197,15 +1124,6 @@ const heap: LeetCodeCard[] = [  {
     tags: ['数组', '分治', '快速选择', '排序', '堆'],
     description: '给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。需要注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。',
     approach: '快速选择算法（QuickSelect）：类似快排的分治思想。随机选取 pivot 将数组分为大于、等于、小于三部分。若 k 落在大于部分，递归左半；若在等于部分，返回 pivot；否则递归右半。平均 O(n)，最坏 O(n²)。也可用大小为 k 的小根堆：遍历数组维护堆大小不超过 k，堆顶即为第 k 大。O(nlogk)。',
-    code: `import heapq
-
-def findKthLargest(nums: List[int], k: int) -> int:
-    heap = []
-    for num in nums:
-        heapq.heappush(heap, num)
-        if len(heap) > k:
-            heapq.heappop(heap)
-    return heap[0]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2219,17 +1137,6 @@ def findKthLargest(nums: List[int], k: int) -> int:
     tags: ['数组', '哈希表', '分治', '桶排序', '计数排序', '快速选择', '排序', '堆'],
     description: '给你一个整数数组 nums 和一个整数 k，请你返回其中出现频率前 k 高的元素。你可以按任意顺序返回答案。',
     approach: '先用哈希表统计频率。然后桶排序：以频率为索引建立桶数组，从高频到低频收集元素直到凑满 k 个。或用大小为 k 的小根堆：遍历（值，频率）对，堆中按频率排序，超过 k 则弹出最小。时间复杂度 O(nlogk) 或 O(n)。',
-    code: `from collections import Counter
-import heapq
-
-def topKFrequent(nums: List[int], k: int) -> List[int]:
-    freq = Counter(nums)
-    heap = []
-    for num, f in freq.items():
-        heapq.heappush(heap, (f, num))
-        if len(heap) > k:
-            heapq.heappop(heap)
-    return [num for f, num in heap]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2243,23 +1150,6 @@ def topKFrequent(nums: List[int], k: int) -> List[int]:
     tags: ['设计', '双指针', '数据流', '排序', '堆'],
     description: '中位数是有序整数列表的中间值。如果列表的大小是偶数，则中位数是中间两个数的平均值。实现 MedianFinder 类：MedianFinder() 初始化；void addNum(int num) 将数据流中的整数 num 添加到数据结构中；double findMedian() 返回到目前为止所有元素的中位数。',
     approach: '使用两个堆：大根堆存储较小的一半元素（使用负数取反模拟），小根堆存储较大的一半元素。添加元素时：先放入大根堆，再将大根堆堆顶移入小根堆，若小根堆大小超过大根堆则移一个回去。保持两个堆大小相等或差 1。中位数：若 size 相等则为两堆顶平均值，否则为大根堆堆顶。时间复杂度：addNum O(logn)，findMedian O(1)。',
-    code: `import heapq
-
-class MedianFinder:
-    def __init__(self):
-        self.small = []  # max heap (neg)
-        self.large = []  # min heap
-
-    def addNum(self, num: int) -> None:
-        heapq.heappush(self.small, -num)
-        heapq.heappush(self.large, -heapq.heappop(self.small))
-        if len(self.large) > len(self.small):
-            heapq.heappush(self.small, -heapq.heappop(self.large))
-
-    def findMedian(self) -> float:
-        if len(self.small) > len(self.large):
-            return -self.small[0]
-        return (-self.small[0] + self.large[0]) / 2`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -2278,15 +1168,6 @@ const sorting: LeetCodeCard[] = [  {
     tags: ['数组', '排序'],
     description: '以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi]。请你合并所有重叠的区间，并返回一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间。',
     approach: '先按区间起始位置排序。遍历排序后的区间，维护当前合并区间的 start 和 end。若当前区间起始 ≤ end，则合并（end = max(end, curEnd)）；否则将当前合并区间加入结果，开始新区间。时间复杂度 O(nlogn)，主要由排序决定。',
-    code: `def merge(intervals: List[List[int]]) -> List[List[int]]:
-    intervals.sort(key=lambda x: x[0])
-    res = []
-    for interval in intervals:
-        if not res or res[-1][1] < interval[0]:
-            res.append(interval)
-        else:
-            res[-1][1] = max(res[-1][1], interval[1])
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2300,18 +1181,6 @@ const sorting: LeetCodeCard[] = [  {
     tags: ['数组', '双指针', '排序'],
     description: '给定一个包含红色、白色和蓝色（分别用 0、1、2 表示）共 n 个元素的数组 nums，原地对它们进行排序，使得相同颜色的元素相邻并按照红色、白色、蓝色顺序排列。不能使用库中的 sort 函数。',
     approach: '荷兰国旗问题。三指针：p0 指向 0 的右边界，p2 指向 2 的左边界，cur 遍历。若 nums[cur] == 0，交换 p0 和 cur，p0++，cur++；若 nums[cur] == 2，交换 cur 和 p2，p2--（cur 不动因为交换过来的元素还需检查）；若 == 1，cur++。时间复杂度 O(n)。',
-    code: `def sortColors(nums: List[int]) -> None:
-    p0, cur, p2 = 0, 0, len(nums) - 1
-    while cur <= p2:
-        if nums[cur] == 0:
-            nums[p0], nums[cur] = nums[cur], nums[p0]
-            p0 += 1
-            cur += 1
-        elif nums[cur] == 2:
-            nums[cur], nums[p2] = nums[p2], nums[cur]
-            p2 -= 1
-        else:
-            cur += 1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2325,31 +1194,6 @@ const sorting: LeetCodeCard[] = [  {
     tags: ['链表', '双指针', '分治', '排序', '归并排序'],
     description: '给你链表的头结点 head，请将其按升序排列并返回。要求 O(n log n) 时间复杂度和 O(1) 空间复杂度。',
     approach: '归并排序（自底向上迭代）。先获取链表长度，然后从步长 1 开始，每次将链表分割成长度为 step 的子链表，两两合并。合并使用双指针归并。步长每次翻倍，直到 step >= 链表长度。时间复杂度 O(nlogn)，空间 O(1)。',
-    code: `def sortList(head: Optional[ListNode]) -> Optional[ListNode]:
-    if not head or not head.next:
-        return head
-    # 快慢指针找中点
-    slow, fast = head, head.next
-    while fast and fast.next:
-        slow = slow.next
-        fast = fast.next.next
-    mid = slow.next
-    slow.next = None
-    left = sortList(head)
-    right = sortList(mid)
-    # 合并
-    dummy = ListNode()
-    cur = dummy
-    while left and right:
-        if left.val < right.val:
-            cur.next = left
-            left = left.next
-        else:
-            cur.next = right
-            right = right.next
-        cur = cur.next
-    cur.next = left if left else right
-    return dummy.next`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -2368,56 +1212,6 @@ const design: LeetCodeCard[] = [  {
     tags: ['设计', '哈希表', '链表', '双向链表'],
     description: '请你设计并实现一个满足 LRU（最近最少使用）缓存约束的数据结构。实现 LRUCache 类：LRUCache(int capacity) 以正整数作为容量 capacity 初始化 LRU 缓存；int get(int key) 如果关键字 key 存在于缓存中，则返回关键字的值，否则返回 -1；void put(int key, int value) 如果关键字 key 已经存在，则变更其数据值 value；如果不存在，则向缓存中插入该组 key-value。如果插入操作导致关键字数量超过 capacity，则应该逐出最久未使用的关键字。函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。',
     approach: '哈希表 + 双向链表。哈希表存储 key → Node 的映射，双向链表维护使用顺序（头为最近使用，尾为最久未使用）。get 时：若 key 存在，将节点移到链表头部并返回值。put 时：若 key 存在，更新值并移到头部；若不存在，创建新节点加到头部，若容量超限则删除尾部节点。使用哑头尾节点简化操作。时间复杂度 O(1)。',
-    code: `class DNode:
-    def __init__(self, key=0, val=0):
-        self.key = key
-        self.val = val
-        self.prev = None
-        self.next = None
-
-class LRUCache:
-    def __init__(self, capacity: int):
-        self.cap = capacity
-        self.cache = {}
-        self.head = DNode()
-        self.tail = DNode()
-        self.head.next = self.tail
-        self.tail.prev = self.head
-
-    def _remove(self, node):
-        node.prev.next = node.next
-        node.next.prev = node.prev
-
-    def _add_to_head(self, node):
-        node.next = self.head.next
-        node.prev = self.head
-        self.head.next.prev = node
-        self.head.next = node
-
-    def _move_to_head(self, node):
-        self._remove(node)
-        self._add_to_head(node)
-
-    def get(self, key: int) -> int:
-        if key in self.cache:
-            node = self.cache[key]
-            self._move_to_head(node)
-            return node.val
-        return -1
-
-    def put(self, key: int, value: int) -> None:
-        if key in self.cache:
-            node = self.cache[key]
-            node.val = value
-            self._move_to_head(node)
-        else:
-            node = DNode(key, value)
-            self.cache[key] = node
-            self._add_to_head(node)
-            if len(self.cache) > self.cap:
-                tail = self.tail.prev
-                self._remove(tail)
-                del self.cache[tail.key]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2431,33 +1225,6 @@ class LRUCache:
     tags: ['设计', '数组', '哈希表', '数学', '随机化'],
     description: '实现 RandomizedSet 类：RandomizedSet() 初始化；bool insert(int val) 当元素 val 不存在时插入并返回 true，否则返回 false；bool remove(int val) 当元素 val 存在时删除并返回 true，否则返回 false；int getRandom() 随机返回现有集合中的一项，每个元素应有相同的概率被返回。',
     approach: '可变数组 + 哈希表。数组存储元素值，哈希表存储值 → 下标的映射。insert：若值存在返回 false，否则追加到数组末尾并记录下标。remove：若不存在返回 false，否则将数组最后元素移到被删位置（覆盖），更新哈希表中的下标映射，然后弹出数组末尾元素。getRandom：从数组中随机取一个。时间复杂度均为 O(1)。',
-    code: `import random
-
-class RandomizedSet:
-    def __init__(self):
-        self.nums = []
-        self.pos = {}
-
-    def insert(self, val: int) -> bool:
-        if val in self.pos:
-            return False
-        self.pos[val] = len(self.nums)
-        self.nums.append(val)
-        return True
-
-    def remove(self, val: int) -> bool:
-        if val not in self.pos:
-            return False
-        idx = self.pos[val]
-        last = self.nums[-1]
-        self.nums[idx] = last
-        self.pos[last] = idx
-        self.nums.pop()
-        del self.pos[val]
-        return True
-
-    def getRandom(self) -> int:
-        return random.choice(self.nums)`,
     sm2: defaultSM2,
     favorited: fav,
   }];
@@ -2476,11 +1243,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['位运算', '数组'],
     description: '给你一个非空整数数组 nums，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。必须设计并实现线性时间复杂度的算法且只使用常量额外空间。',
     approach: '位运算异或。a ^ a = 0，a ^ 0 = a，且异或满足交换律和结合律。将所有数字异或，出现两次的数字互相抵消为 0，最终结果即为只出现一次的数字。时间复杂度 O(n)，空间 O(1)。',
-    code: `def singleNumber(nums: List[int]) -> int:
-    res = 0
-    for num in nums:
-        res ^= num
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2494,14 +1256,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['数组', '哈希表', '分治', '计数', '排序'],
     description: '给定一个大小为 n 的数组 nums，返回其中的多数元素。多数元素是指在数组中出现次数大于 ⌊n/2⌋ 的元素。可以假设数组是非空的，并且给定的数组总是存在多数元素。',
     approach: 'Boyer-Moore 投票算法。维护候选元素 candidate 和计数器 count。遍历数组：若 count == 0，将当前元素设为 candidate；若当前元素 == candidate，count++；否则 count--。由于多数元素出现次数 > n/2，最终的 candidate 一定是多数元素。时间复杂度 O(n)，空间 O(1)。',
-    code: `def majorityElement(nums: List[int]) -> int:
-    candidate = None
-    count = 0
-    for num in nums:
-        if count == 0:
-            candidate = num
-        count += 1 if num == candidate else -1
-    return candidate`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2515,16 +1269,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['数组', '前缀和', '前缀积'],
     description: '给你一个整数数组 nums，返回数组 answer，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积。题目数据保证数组 nums 之中任意元素的全部前缀和后缀的乘积都在 32 位整数范围内。请不要使用除法，且在 O(n) 时间复杂度内完成此题。',
     approach: '前缀积 + 后缀积。第一遍从左到右，answer[i] 存储 nums[i] 左侧所有元素的乘积（answer[0] = 1）。第二遍从右到左，维护右侧乘积 suffix，answer[i] *= suffix，suffix *= nums[i]。相当于 answer[i] = 左侧积 × 右侧积。时间复杂度 O(n)，空间 O(1)（不计输出数组）。',
-    code: `def productExceptSelf(nums: List[int]) -> List[int]:
-    n = len(nums)
-    ans = [1] * n
-    for i in range(1, n):
-        ans[i] = ans[i - 1] * nums[i - 1]
-    suffix = 1
-    for i in range(n - 1, -1, -1):
-        ans[i] *= suffix
-        suffix *= nums[i]
-    return ans`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2538,21 +1282,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['数组', '双指针', '数学'],
     description: '整数数组的一个排列就是将其所有成员以序列或线性顺序排列。整数数组的下一个排列是指其整数的下一个字典序更大的排列。如果不存在下一个更大的排列，那么这个数组必须重排为字典序最小的排列（即其元素按升序排列）。必须原地修改，只允许使用额外常数空间。',
     approach: '从右向左找第一个升序对 (i, i+1)，即 nums[i] < nums[i+1]。然后从右向左找第一个大于 nums[i] 的数 nums[j]，交换 nums[i] 和 nums[j]。最后将 i+1 到末尾的部分反转（因为该部分为降序，反转后变为升序即最小排列）。时间复杂度 O(n)。',
-    code: `def nextPermutation(nums: List[int]) -> None:
-    n = len(nums)
-    i = n - 2
-    while i >= 0 and nums[i] >= nums[i + 1]:
-        i -= 1
-    if i >= 0:
-        j = n - 1
-        while nums[j] <= nums[i]:
-            j -= 1
-        nums[i], nums[j] = nums[j], nums[i]
-    l, r = i + 1, n - 1
-    while l < r:
-        nums[l], nums[r] = nums[r], nums[l]
-        l += 1
-        r -= 1`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2566,18 +1295,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['位运算', '数组', '双指针', '二分查找'],
     description: '给定一个包含 n + 1 个整数的数组 nums，其数字都在 [1, n] 范围内（包括 1 和 n），可知至少存在一个重复的整数。假设 nums 只有一个重复的整数，返回这个重复的数。必须不修改数组 nums 且只用常量级 O(1) 的额外空间。',
     approach: 'Floyd 判圈算法（快慢指针）。将数组视为链表，nums[i] 表示下一个节点索引。由于存在重复数，数组形成的链表必有环。slow = nums[slow]，fast = nums[nums[fast]]，相遇后 slow 回到起点，两指针同速移动，再次相遇点即为重复数（环入口）。时间复杂度 O(n)，空间 O(1)。',
-    code: `def findDuplicate(nums: List[int]) -> int:
-    slow = fast = nums[0]
-    while True:
-        slow = nums[slow]
-        fast = nums[nums[fast]]
-        if slow == fast:
-            break
-    slow = nums[0]
-    while slow != fast:
-        slow = nums[slow]
-        fast = nums[fast]
-    return slow`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2591,17 +1308,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['数组', '二分查找', '分治', '矩阵'],
     description: '编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target。该矩阵具有以下特性：每行的元素从左到右升序排列；每列的元素从上到下升序排列。',
     approach: '从右上角开始搜索。若当前值 > target，则该列下方的值都更大，左移一列；若当前值 < target，则该行左侧的值都更小，下移一行。每次排除一行或一列。时间复杂度 O(m+n)。',
-    code: `def searchMatrix(matrix: List[List[int]], target: int) -> bool:
-    m, n = len(matrix), len(matrix[0])
-    i, j = 0, n - 1
-    while i < m and j >= 0:
-        if matrix[i][j] == target:
-            return True
-        elif matrix[i][j] > target:
-            j -= 1
-        else:
-            i += 1
-    return False`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2615,19 +1321,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['数组', '数学', '双指针'],
     description: '给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。',
     approach: '三次反转法。先反转整个数组，然后反转前 k % n 个元素，最后反转剩余 n - k%n 个元素。等价于将后 k%n 个元素移到前面。也可用环状替换法。时间复杂度 O(n)，空间 O(1)。',
-    code: `def rotate(nums: List[int], k: int) -> None:
-    n = len(nums)
-    k %= n
-
-    def rev(l, r):
-        while l < r:
-            nums[l], nums[r] = nums[r], nums[l]
-            l += 1
-            r -= 1
-
-    rev(0, n - 1)
-    rev(0, k - 1)
-    rev(k, n - 1)`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2641,14 +1334,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['树', '二叉搜索树', '数组', '分治', '二叉树'],
     description: '给你一个整数数组 nums，其中元素已经按升序排列，请你将其转换为一棵平衡二叉搜索树。',
     approach: '递归法：取数组中间元素作为根节点，左半部分递归构建左子树，右半部分递归构建右子树。由于每次取中点，得到的是平衡的 BST。中序遍历结果就是升序数组。时间复杂度 O(n)。',
-    code: `def sortedArrayToBST(nums: List[int]) -> Optional[TreeNode]:
-    if not nums:
-        return None
-    mid = len(nums) // 2
-    root = TreeNode(nums[mid])
-    root.left = sortedArrayToBST(nums[:mid])
-    root.right = sortedArrayToBST(nums[mid + 1:])
-    return root`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2662,14 +1347,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['数组', '动态规划'],
     description: '给定一个非负整数 numRows，生成杨辉三角的前 numRows 行。在杨辉三角中，每个数是它左上方和右上方的数的和。',
     approach: '模拟法。每行的第一个和最后一个元素为 1。对于中间元素：row[j] = prev[j-1] + prev[j]（利用前一行的值计算）。逐行生成。时间复杂度 O(numRows²)。',
-    code: `def generate(numRows: int) -> List[List[int]]:
-    res = []
-    for i in range(numRows):
-        row = [1] * (i + 1)
-        for j in range(1, i):
-            row[j] = res[i - 1][j - 1] + res[i - 1][j]
-        res.append(row)
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2683,11 +1360,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['数组', '哈希表'],
     description: '给你一个含 n 个整数的数组 nums，其中 nums[i] 在区间 [1, n] 内。请你找出所有在 [1, n] 范围内但没有出现在 nums 中的数字，并以数组的形式返回结果。',
     approach: '原地哈希。遍历数组，对于每个值 nums[i]，将对应下标 nums[i]-1 位置的值标记为负数（表示该数出现过）。再次遍历，若 nums[i] 为正数则 i+1 未出现过。时间复杂度 O(n)，空间 O(1)。',
-    code: `def findDisappearedNumbers(nums: List[int]) -> List[int]:
-    for num in nums:
-        idx = abs(num) - 1
-        nums[idx] = -abs(nums[idx])
-    return [i + 1 for i in range(len(nums)) if nums[i] > 0]`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2701,26 +1373,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['哈希表', '字符串', '回溯'],
     description: '给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。数字到字母的映射与电话按键相同（2: abc, 3: def, 4: ghi, 5: jkl, 6: mno, 7: pqrs, 8: tuv, 9: wxyz）。注意 1 不对应任何字母。',
     approach: '回溯法。建立数字到字母的映射表。从第一个数字开始，对每个字母进行递归，拼接路径。当路径长度等于 digits 长度时记录结果。时间复杂度 O(3^m × 4^n)，m 为映射 3 个字母的数字个数，n 为映射 4 个字母的数字个数。',
-    code: `def letterCombinations(digits: str) -> List[str]:
-    if not digits:
-        return []
-    mapping = {
-        '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl',
-        '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'
-    }
-    res = []
-
-    def backtrack(idx, path):
-        if idx == len(digits):
-            res.append(''.join(path))
-            return
-        for ch in mapping[digits[idx]]:
-            path.append(ch)
-            backtrack(idx + 1, path)
-            path.pop()
-
-    backtrack(0, [])
-    return res`,
     sm2: defaultSM2,
     favorited: fav,
   },
@@ -2734,11 +1386,6 @@ const others: LeetCodeCard[] = [  {
     tags: ['位运算', '动态规划'],
     description: '给你一个整数 n，对于 0 <= i <= n 中的每个 i，计算其二进制表示中 1 的个数，返回一个长度为 n + 1 的数组 ans 作为答案。',
     approach: '动态规划 + 位运算。dp[i] = dp[i >> 1] + (i & 1)，即 i 中 1 的个数等于 i 右移一位后 1 的个数加上 i 的最低位。也可用 dp[i] = dp[i & (i-1)] + 1，每次消除最低位的 1。时间复杂度 O(n)。',
-    code: `def countBits(n: int) -> List[int]:
-    dp = [0] * (n + 1)
-    for i in range(1, n + 1):
-        dp[i] = dp[i >> 1] + (i & 1)
-    return dp`,
     sm2: defaultSM2,
     favorited: fav,
   }];

@@ -2,8 +2,8 @@
 // src/components/SubModulePicker.tsx — 子模块选择页面
 // ============================================================
 
-import { useMemo, useState, useRef, useEffect } from 'react';
-import { X, Plus, Settings, Trash2, FileText } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { X } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { SUB_MODULES, CATEGORIES, type SubModuleMeta } from '../constants';
 import ModulePageTemplate, { type ModuleTone, type ModuleTopicCardModel } from './ModulePageTemplate';
@@ -91,19 +91,10 @@ export default function SubModulePicker({ onBack }: Props) {
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newColor, setNewColor] = useState('bg-blue-500');
-  const [showMenu, setShowMenu] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ key: string; label: string } | null>(null);
   const [showBrowser, setShowBrowser] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!showMenu) return;
-    const on = (e: MouseEvent) => { if (menuRef.current && !menuRef.current.contains(e.target as Node)) setShowMenu(false); };
-    document.addEventListener('mousedown', on);
-    return () => document.removeEventListener('mousedown', on);
-  }, [showMenu]);
 
   const subModules = useMemo(() => [...builtInSubs, ...customTopics], [builtInSubs, customTopics]);
 
@@ -160,7 +151,7 @@ export default function SubModulePicker({ onBack }: Props) {
     const newTopic: SubModuleMeta = {
       key: `custom-${Date.now()}`,
       label: newName.trim(),
-      category: category as any,
+      category,
       subTopic: newName.trim(),
       color: newColor,
     };
@@ -182,7 +173,6 @@ export default function SubModulePicker({ onBack }: Props) {
     <>
       <ModulePageTemplate
         categoryLabel={catMeta?.label || category}
-        categoryIcon={catMeta?.icon}
         moduleDue={moduleDue}
         totalNewCards={totalNewCards}
         totalCards={totalCards}
@@ -190,6 +180,9 @@ export default function SubModulePicker({ onBack }: Props) {
         onBack={onBack}
         onStartReview={handleReviewAll}
         onShowStats={() => dispatch({ type: 'TOGGLE_STATS' })}
+        onOpenCardManager={() => setShowBrowser(true)}
+        onCreateTopic={() => setShowCreate(true)}
+        onEnterDeleteMode={() => setDeleteMode(true)}
         onTopicClick={handleStudyNew}
         onDeleteTopic={(topic) => { setDeleteTarget({ key: topic.key, label: topic.title }); }}
         deleteMode={deleteMode}
@@ -198,30 +191,6 @@ export default function SubModulePicker({ onBack }: Props) {
       <StatsDashboard category={category} />
       {showBrowser && <CardBrowser onEdit={(card) => { if (!card.id) setEditingCard(null); else setEditingCard(card); }} onClose={() => setShowBrowser(false)} />}
       {editingCard !== null && <CardEditor card={editingCard} onSave={() => { setEditingCard(null); dispatch({ type: 'SET_CATEGORY', payload: state.category }); }} onClose={() => setEditingCard(null)} />}
-
-      {/* Floating manage button */}
-      <div className="fixed bottom-6 right-6 z-30" ref={menuRef}>
-        {showMenu && (
-          <div className="absolute bottom-14 right-0 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 py-1.5 min-w-[140px]">
-            <button onClick={() => { setShowMenu(false); setShowBrowser(true); }}
-              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-              <FileText className="w-4 h-4" /> 卡片管理
-            </button>
-            <button onClick={() => { setShowMenu(false); setShowCreate(true); }}
-              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-              <Plus className="w-4 h-4" /> 新增专题
-            </button>
-            <button onClick={() => { setShowMenu(false); setDeleteMode(true); }}
-              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
-              <Trash2 className="w-4 h-4" /> 删除专题
-            </button>
-          </div>
-        )}
-        <button onClick={() => setShowMenu(!showMenu)}
-          className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 shadow-lg hover:shadow-xl transition-all active:scale-95">
-          <Settings className="w-5 h-5" />
-        </button>
-      </div>
 
       {/* Create topic dialog */}
       {showCreate && (

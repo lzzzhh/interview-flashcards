@@ -45,9 +45,51 @@ export interface LeetCodeCard {
   tags: string[];
   description: string;
   approach: string;
-  code: string;
+  // 多语言代码不再内联于卡片，改为从 solutions/ 模块按 cardId 获取
+  // 向后兼容：导入时临时保留在卡片对象上
+  code?: string;
+  codes?: Record<string, string>;
+  defaultLanguage?: string;
   sm2: SM2Record;
   favorited: boolean;
+  userNotes?: string;
+}
+
+/** 离线存储 / 导出的卡片快照 */
+export interface ExportCard {
+  id: string;
+  category: Category;
+  tags: string[];
+  difficulty: Difficulty | '';
+  sm2: SM2Record;
+  favorited: boolean;
+  userNotes?: string;
+  // LeetCode 专属
+  number?: number;
+  title?: string;
+  titleCn?: string;
+  description?: string;
+  approach?: string;
+  codes?: Record<string, string>;
+  // QA 专属
+  question?: string;
+  answer?: string;
+  subTopic?: string;
+  source?: string;
+}
+
+/** 统一导出格式 v2 */
+export interface ExportData {
+  version: 2;
+  exportedAt: string;
+  cards: ExportCard[];
+  reviewLogs: ReviewLog[];
+  settings: AppSettings;
+}
+
+export interface AppSettings {
+  isDark: boolean;
+  lastCategory: Category;
 }
 
 /** 通用问答卡片（统计学/ML/大模型/黑话/话术） */
@@ -62,6 +104,7 @@ export interface QACard {
   source?: string;
   sm2: SM2Record;
   favorited: boolean;
+  userNotes?: string;
 }
 
 export type FlashCard = LeetCodeCard | QACard;
