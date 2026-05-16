@@ -34,7 +34,10 @@ export default function SyncPanel({ onClose }: Props) {
           <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-3"><Link className="w-4 h-4" />作为客户端</h3>
             <input type="text" value={peerIp} onChange={(e) => setPeerIp(e.target.value)} placeholder="输入对端 IP，如 192.168.1.10" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 text-sm mb-2" />
-            <button onClick={() => connectAndSync(peerIp.trim(), parseInt(port) || 9876)} disabled={syncing || !peerIp.trim()} className="w-full py-2.5 rounded-lg bg-green-500 text-white text-sm font-medium disabled:opacity-30">
+            <button onClick={() => {
+              const ip = peerIp.trim().split(':')[0];
+              connectAndSync(ip, parseInt(port) || 9876);
+            }} disabled={syncing || !peerIp.trim()} className="w-full py-2.5 rounded-lg bg-green-500 text-white text-sm font-medium disabled:opacity-30">
               {syncing ? <><Loader2 className="w-4 h-4 animate-spin inline mr-1" />同步中...</> : '连接并同步'}
             </button>
           </div>
