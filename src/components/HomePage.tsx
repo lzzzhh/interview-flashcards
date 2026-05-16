@@ -184,7 +184,7 @@ export default function HomePage({ onEnterStudy }: Props) {
         </button>
 
         {/* Header */}
-        <div className="homepage-header flex items-center justify-center gap-3">
+        <div className="homepage-header -mt-1 flex items-center justify-center gap-3">
           <img src={appIcon} alt="面经闪卡" className="h-[52px] w-[52px] shrink-0 rounded-2xl shadow-sm" />
           <div className="min-w-0">
             <h1 className="text-[25px] font-extrabold tracking-normal text-gray-950 dark:text-gray-50">

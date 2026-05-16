@@ -42,7 +42,7 @@ export default function RecommendBar() {
   }, [state.cardsById]);
 
   return (
-    <div className="w-full rounded-2xl bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800 p-4 shadow-sm">
+    <div className="w-full rounded-2xl border border-white/40 bg-white/25 backdrop-blur-lg p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
       <h3 className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2">推荐复习</h3>
       {recommendations.length === 0 ? (
         <p className="text-xs text-gray-400 dark:text-gray-500">暂无待复习卡片</p>
