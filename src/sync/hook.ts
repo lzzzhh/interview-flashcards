@@ -20,6 +20,19 @@ async function tauriInvoke<T>(cmd: string, args?: Record<string, unknown>): Prom
 async function appendOpToFile(op: SyncOp) { if (isTauri()) await tauriInvoke('sync_append_op', { opJson: JSON.stringify(op) }); }
 async function readSeenOps(): Promise<SeenOps> { return isTauri() ? tauriInvoke<SeenOps>('sync_read_seen_ops') : {} as SeenOps; }
 
+async function readMyOps(): Promise<SyncOp[]> {
+  if (!isTauri()) return [];
+  const files: Record<string, string> = await tauriInvoke('sync_read_all_ops');
+  const ops: SyncOp[] = [];
+  for (const content of Object.values(files)) {
+    for (const line of content.split('\n')) {
+      const t = line.trim(); if (!t) continue;
+      try { ops.push(JSON.parse(t)); } catch {}
+    }
+  }
+  return ops;
+}
+
 export function useSync() {
   const { state, dispatch } = useAppContext();
   const [syncState, setSyncState] = useState<SyncState>({ syncing: false, lastResult: null, error: null, serverRunning: false, serverAddress: '' });
@@ -49,7 +62,9 @@ export function useSync() {
       }
       const seen = await readSeenOps();
       const fromTs = Object.values(seen).reduce((max, v) => Math.max(max, v), 0);
-      const result = await doSync(ip, port, fromTs, deviceId, deviceName);
+      // Read client's own ops to send to server
+      const myOps = await readMyOps();
+      const result = await doSync(ip, port, fromTs, deviceId, deviceName, myOps);
       if (result.ops.length === 0) {
         setSyncState((s) => ({ ...s, syncing: false, lastResult: '已是最新，无需同步' }));
         return;

@@ -81,6 +81,12 @@ pub fn start_server(port: u16) -> Result<String, String> {
           let p: serde_json::Value = serde_json::from_str(&body).unwrap_or_default();
           let from_ts = p.get("fromTs").and_then(|t| t.as_u64()).unwrap_or(0);
           let peer = p.get("deviceId").and_then(|t| t.as_str()).unwrap_or("").to_string();
+
+          // Save client's ops to our oplog
+          if let Some(client_ops) = p.get("ops").and_then(|v| v.as_array()) {
+            for op in client_ops { let _ = append_op(&op.to_string()); }
+          }
+
           let ops: Vec<serde_json::Value> = scan_ops(from_ts).iter().filter_map(|l| serde_json::from_str(l).ok()).collect();
           let max_ts = ops.iter().filter_map(|o| o.get("ts").and_then(|t| t.as_u64())).max().unwrap_or(0);
           if !peer.is_empty() && max_ts > 0 { let _ = update_seen(&peer, max_ts); }
