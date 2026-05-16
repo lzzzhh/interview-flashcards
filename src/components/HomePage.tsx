@@ -171,7 +171,7 @@ export default function HomePage({ onEnterStudy }: Props) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F6F8FB] transition-colors dark:bg-gray-950">
+    <div className="homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
       <div className="homepage-shell relative w-full max-w-md select-none px-4 py-8" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
 
         {/* Stats button — top right */}

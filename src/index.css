@@ -112,16 +112,43 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
     inset 0 -1px 0 rgba(255, 255, 255, 0.06);
 }
 
-.homepage-shell {
-  min-height: 100svh;
-  display: grid;
-  grid-template-rows: 5.25rem auto minmax(23.5rem, 1fr) 3rem;
-  align-content: center;
-  row-gap: 0.875rem;
+/* 多彩渐变背景 — 衬托毛玻璃卡片 */
+.homepage-glass-stage {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 120, 180, 0.35), transparent 45%),
+    radial-gradient(circle at 80% 15%, rgba(100, 180, 255, 0.30), transparent 45%),
+    radial-gradient(circle at 50% 55%, rgba(160, 100, 255, 0.24), transparent 50%),
+    radial-gradient(circle at 10% 85%, rgba(80, 200, 180, 0.26), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(255, 180, 80, 0.22), transparent 40%),
+    linear-gradient(160deg, #f0f4ff 0%, #fdf2f8 30%, #f0f9ff 60%, #f5f3ff 100%);
 }
 
-.homepage-header {
-  align-self: end;
+.homepage-glass-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 35% 15%, rgba(255, 255, 255, 0.25), transparent 30%),
+    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.18), transparent 35%);
+}
+
+.dark .homepage-glass-stage {
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 80, 140, 0.20), transparent 45%),
+    radial-gradient(circle at 75% 15%, rgba(80, 150, 255, 0.18), transparent 45%),
+    radial-gradient(circle at 50% 55%, rgba(140, 80, 255, 0.15), transparent 50%),
+    radial-gradient(circle at 15% 80%, rgba(60, 180, 160, 0.14), transparent 40%),
+    radial-gradient(circle at 80% 85%, rgba(255, 150, 60, 0.12), transparent 40%),
+    linear-gradient(160deg, #0f172a 0%, #1a1025 30%, #0f1f2e 60%, #12102a 100%);
+}
+
+.dark .homepage-glass-stage::before {
+  background:
+    radial-gradient(circle at 35% 15%, rgba(255, 255, 255, 0.05), transparent 30%),
+    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.03), transparent 35%);
 }
 
 .homepage-module-grid {
