@@ -115,7 +115,7 @@ export default function HomePage({ onEnterStudy }: Props) {
         <div className="flex items-center gap-3 mb-6">
           <img src={appIcon} alt="" className="h-[52px] w-[52px] shrink-0 rounded-2xl" />
           <div className="min-w-0">
-            <h1 className="text-[28px] font-bold leading-tight" style={{ color: TEXT_PRIMARY }}>面经闪卡</h1>
+            <h1 className="text-[20px] font-bold leading-tight" style={{ color: TEXT_PRIMARY }}>面经闪卡</h1>
             <p className="text-[13px] mt-0.5" style={{ color: TEXT_SECONDARY }}>
               已连续 <span style={{ color: BLUE, fontWeight: 600 }}>{streak}</span> 天
             </p>
@@ -133,7 +133,7 @@ export default function HomePage({ onEnterStudy }: Props) {
         <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-[3px] h-5 rounded-full" style={{ backgroundColor: BLUE }} />
-            <h2 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>今日待完成</h2>
+            <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>今日待完成</h2>
           </div>
           <div className="grid grid-cols-3 gap-3 mb-5">
             <StatBlock label="复习" value={todayDue} color={ORANGE} />
@@ -142,7 +142,7 @@ export default function HomePage({ onEnterStudy }: Props) {
           </div>
           <button
             onClick={handleStartToday}
-            className="w-full py-3 rounded-xl text-[16px] font-bold text-white"
+            className="w-full py-2 rounded-xl text-[15px] font-bold text-white"
             style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
           >
             开始今日学习
@@ -241,8 +241,8 @@ export default function HomePage({ onEnterStudy }: Props) {
 function StatBlock({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div className="text-center">
-      <div className="text-[13px] mb-1.5" style={{ color }}>{label}</div>
-      <div className="text-[36px] font-bold leading-none" style={{ color }}>{value}</div>
+      <div className="text-[11px] mb-1" style={{ color }}>{label}</div>
+      <div className="text-[15px] font-bold leading-none" style={{ color }}>{value}</div>
     </div>
   );
 }
