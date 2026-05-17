@@ -150,12 +150,15 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         {/* 推荐学习 */}
-        {recModule !== null && (
-          <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-            <div className="flex items-center gap-2 mb-4">
-              <h2 className="text-[17px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
-              <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ color: TEXT_SECONDARY, backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
-            </div>
+        <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-[17px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
+            <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ color: TEXT_SECONDARY, backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
+          </div>
+          {recModule === null ? (
+            <p className="text-[13px]" style={{ color: TEXT_MUTED }}>暂无待复习卡片</p>
+          ) : (
+          <>
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.moduleName}</h3>
@@ -178,8 +181,9 @@ export default function HomePage({ onEnterStudy }: Props) {
                 换一个
               </button>
             </div>
-          </div>
-        )}
+            </>
+          )}
+        </div>
 
         {/* 我的牌组 */}
         <div>
