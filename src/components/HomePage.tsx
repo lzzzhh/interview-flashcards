@@ -1,309 +1,248 @@
 // ============================================================
-// src/components/HomePage.tsx — 首页模块选择
+// src/components/HomePage.tsx — 首页重设计
 // ============================================================
 
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { X, BarChart3, ChevronRight, Plus } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
+import { ChevronRight } from 'lucide-react';
 import appIcon from '../../icon.png';
-import { CATEGORIES } from '../constants';
 import { useAppContext } from '../context/AppContext';
-import { loadCustomDecks, createCustomDeck, setModuleDailyLimit, getModuleDailyLimit, deleteCustomDeck, type CustomDeck } from '../utils/customDecks';
+import { CATEGORIES } from '../constants';
+import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
+import { getModuleDailyLimit } from '../utils/customDecks';
 import StatsDashboard from './StatsDashboard';
-import RecommendBar from './RecommendBar';
 import type { Category } from '../types';
+
+interface Props {
+  onEnterStudy: (category: Category) => void;
+}
 
 const TOTAL_MAP: Record<string, number> = {
   leetcode: 100, statistics: 199, 'machine-learning': 171, 'deep-learning': 32,
   llm: 37, agent: 26, jargon: 45, workplace: 76,
 };
 
-interface Props {
-  onEnterStudy: (category: Category) => void;
-}
+const TEXT_PRIMARY = '#F8FAFC';
+const TEXT_SECONDARY = 'rgba(226,232,240,0.65)';
+const TEXT_MUTED = 'rgba(226,232,240,0.55)';
+const TEXT_INACTIVE = 'rgba(203,213,225,0.45)';
+const BLUE = '#409CFF';
+const ORANGE = '#FF9A2E';
+const CARD_BG = 'rgba(255,255,255,0.06)';
+const CARD_BORDER = 'rgba(255,255,255,0.10)';
 
-interface ModuleSlot {
-  key: string;
-  label: string;
-  isCustom?: boolean;
-  isCreate?: boolean;
-  isPlaceholder?: boolean;
-}
-
-interface HomeModuleCardProps {
-  label: string;
-  total?: number;
-  due?: number;
-  limit?: number;
-  isCustom?: boolean;
-  onClick: () => void;
-  onDelete?: () => void;
-}
-
-function HomeModuleCard({ label, total = 0, due = 0, limit = 0, isCustom, onClick, onDelete }: HomeModuleCardProps) {
-  return (
-    <button
-      onClick={onClick}
-      className="homepage-module-card group text-left"
-    >
-      {onDelete && (
-        <span
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-300 opacity-0 shadow-sm transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-red-900/60 dark:hover:bg-red-950/30"
-          title="删除模块"
-        >
-          <X className="h-3.5 w-3.5" />
-        </span>
-      )}
-
-      <div className="flex w-full items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="truncate text-[15px] font-semibold leading-tight text-gray-900 dark:text-gray-100">{label}</h3>
-          <p className="mt-1 truncate text-[11px] font-medium text-gray-400 dark:text-gray-300">
-            {isCustom ? '自定义题库' : `共 ${total} 张卡片`}
-          </p>
-        </div>
-        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-gray-300 transition-colors group-hover:text-blue-500 dark:text-gray-600" />
-      </div>
-
-      <div className="mt-auto grid w-full grid-cols-2 gap-2 pt-3 text-[11px]">
-        <div className="rounded-lg bg-blue-50 px-2 py-1.5 text-blue-600 dark:bg-blue-950/30 dark:text-blue-300">
-          <span className="block text-[10px] text-blue-400 dark:text-blue-500">新卡</span>
-          <span className="font-semibold tabular-nums">{isCustom ? '--' : limit}</span>
-        </div>
-        <div className="rounded-lg bg-orange-50 px-2 py-1.5 text-orange-600 dark:bg-orange-950/30 dark:text-orange-300">
-          <span className="block text-[10px] text-orange-400 dark:text-orange-500">复习</span>
-          <span className="font-semibold tabular-nums">{isCustom ? '--' : due}</span>
-        </div>
-      </div>
-    </button>
-  );
-}
+const TABS = [
+  { label: '首页', icon: '🏠', active: true },
+  { label: '牌组', icon: '📚' },
+  { label: '统计', icon: '📊' },
+  { label: '我的', icon: '👤' },
+];
 
 export default function HomePage({ onEnterStudy }: Props) {
-  const { dispatch, dueCountByCategory } = useAppContext();
-  const [customDecks, setCustomDecks] = useState<CustomDeck[]>(() => loadCustomDecks());
-  const [showCreate, setShowCreate] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newLimit, setNewLimit] = useState(20);
-  const [page, setPage] = useState(0);
-  const [pageDirection, setPageDirection] = useState<1 | -1>(1);
+  const { state, dispatch, dueCountByCategory } = useAppContext();
 
-  const allModules = useMemo<ModuleSlot[]>(() => {
-    const builtIn = CATEGORIES.map((cat) => ({ key: cat.key, label: cat.label, isCustom: false }));
-    const custom = customDecks.map((d) => ({ key: d.id, label: d.name, isCustom: true }));
-    return [...builtIn, ...custom];
-  }, [customDecks]);
+  const streak = useMemo(() => {
+    const logs = loadReviewLogs();
+    const allLogs = Object.values(logs).flat();
+    return getStreak(allLogs);
+  }, []);
 
-  const PER_PAGE = 6;
-  const moduleSlots = useMemo<ModuleSlot[]>(
-    () => [...allModules, { key: 'create-module', label: '新建模块', isCreate: true }],
-    [allModules],
-  );
-  const totalPages = Math.ceil(moduleSlots.length / PER_PAGE);
-  const pageModules = moduleSlots.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
-  const slots = [...pageModules];
-  while (slots.length < PER_PAGE) {
-    slots.push({ key: `placeholder-${page}-${slots.length}`, label: '', isPlaceholder: true });
-  }
-
-  const touchStartX = useRef(0);
-  const lastWheelAt = useRef(0);
-
-  const goToPage = useCallback((nextPage: number) => {
-    const clamped = Math.max(0, Math.min(totalPages - 1, nextPage));
-    if (clamped === page) return;
-    setPageDirection(clamped > page ? 1 : -1);
-    setPage(clamped);
-  }, [page, totalPages]);
-
-  const goNext = useCallback(() => goToPage(page + 1), [goToPage, page]);
-  const goPrev = useCallback(() => goToPage(page - 1), [goToPage, page]);
-
-  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) { if (diff > 0) goNext(); else goPrev(); }
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    const primaryDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.shiftKey ? e.deltaY : 0;
-    if (Math.abs(primaryDelta) > 28) {
-      const now = Date.now();
-      if (now - lastWheelAt.current < 460) return;
-      lastWheelAt.current = now;
-      if (primaryDelta > 0) goNext(); else goPrev();
+  // 推荐模块
+  const [recIndex, setRecIndex] = useState(0);
+  const recommendations = useMemo(() => {
+    const now = Date.now();
+    const all: { id: string; label: string; category: string; score: number }[] = [];
+    for (const card of Object.values(state.cardsById)) {
+      const sm2 = card.sm2;
+      if (!sm2 || sm2.state === 'new') continue;
+      const overdue = (now - sm2.nextReview) / 86400000;
+      if (overdue < 0) continue;
+      const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
+      const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
+      all.push({
+        id: card.id,
+        label: card.category === 'leetcode' ? `#${card.number} ${card.titleCn}` : card.question.slice(0, 20),
+        category: card.category,
+        score,
+      });
     }
-  };
+    return all.sort((a, b) => b.score - a.score);
+  }, [state.cardsById]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') goPrev();
-      if (e.key === 'ArrowRight') goNext();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [goNext, goPrev]);
+  const recModule = useMemo(() => {
+    if (recommendations.length === 0) return null;
+    const rec = recommendations[recIndex % Math.max(recommendations.length, 1)];
+    const cat = CATEGORIES.find((c) => c.key === rec.category);
+    return { ...rec, moduleName: cat?.label || rec.category };
+  }, [recommendations, recIndex]);
 
-  const dragRef = useRef({ down: false, startX: 0, lastOffset: 0 });
-  const handleMouseDown = (e: React.MouseEvent) => { dragRef.current = { down: true, startX: e.clientX, lastOffset: 0 }; };
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!dragRef.current.down) return;
-    const diff = e.clientX - dragRef.current.startX;
-    if (Math.abs(diff) > 5 && Math.abs(diff - dragRef.current.lastOffset) > 2) {
-      dragRef.current.lastOffset = diff;
-      if (diff < -60) { dragRef.current.down = false; goNext(); }
-      else if (diff > 60) { dragRef.current.down = false; goPrev(); }
+  // 今日待完成
+  const todayDue = useMemo(() => {
+    let total = 0;
+    for (const cat of CATEGORIES) total += dueCountByCategory[cat.key] ?? 0;
+    return total;
+  }, [dueCountByCategory]);
+
+  const todayNewAllowance = useMemo(() => {
+    let total = 0;
+    for (const cat of CATEGORIES) total += getModuleDailyLimit(cat.key);
+    return total;
+  }, []);
+
+  const learningCount = useMemo(() => {
+    let count = 0;
+    for (const card of Object.values(state.cardsById)) {
+      if (card.sm2?.state === 'learning') count++;
     }
-  };
-  const handleMouseUp = () => { dragRef.current.down = false; };
+    return count;
+  }, [state.cardsById]);
 
-  const handleCreate = () => {
-    if (!newName.trim()) return;
-    const deck = createCustomDeck(newName.trim(), '');
-    setModuleDailyLimit(deck.id, newLimit);
-    setCustomDecks(loadCustomDecks());
-    setShowCreate(false);
-    setNewName('');
-    setNewLimit(20);
-  };
+  const handleStartToday = useCallback(() => {
+    const firstDue = CATEGORIES.find((c) => (dueCountByCategory[c.key] ?? 0) > 0);
+    if (firstDue) onEnterStudy(firstDue.key);
+  }, [dueCountByCategory, onEnterStudy]);
+
+  const handleRecStudy = useCallback(() => {
+    if (!recModule) return;
+    dispatch({ type: 'JUMP_TO_CARD', payload: { category: recModule.category as Category, cardId: recModule.id } });
+    onEnterStudy(recModule.category as Category);
+  }, [recModule, dispatch, onEnterStudy]);
 
   return (
     <div className="homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
-      <div className="homepage-shell relative w-full max-w-md select-none px-4 py-8" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onWheel={handleWheel} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
-
-        {/* Stats button — top right */}
-        <button
-          onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-900/60"
-          title="学习统计"
-        >
-          <BarChart3 size={18} />
-        </button>
+      <div className="w-full max-w-md px-5 py-8 pb-24">
 
         {/* Header */}
-        <div className="homepage-header -mt-1 flex items-center justify-center gap-3">
-          <img src={appIcon} alt="面经闪卡" className="h-[52px] w-[52px] shrink-0 rounded-2xl shadow-sm" />
+        <div className="flex items-center gap-3 mb-6">
+          <img src={appIcon} alt="" className="h-[52px] w-[52px] shrink-0 rounded-2xl" />
           <div className="min-w-0">
-            <h1 className="text-[25px] font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
-              面经闪卡
-            </h1>
-            <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-300">
-              都是同龄人我原本没想高效学习
+            <h1 className="text-[34px] font-bold leading-tight" style={{ color: TEXT_PRIMARY }}>面经闪卡</h1>
+            <p className="text-[15px] mt-0.5" style={{ color: TEXT_SECONDARY }}>
+              已连续 <span style={{ color: BLUE, fontWeight: 600 }}>{streak}</span> 天
             </p>
           </div>
+          <button
+            onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
+            className="ml-auto flex h-9 w-9 items-center justify-center rounded-xl border"
+            style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={TEXT_SECONDARY} strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          </button>
         </div>
 
-        <div className="-mt-2">
-          <RecommendBar onJumpToCard={(cardId, category) => {
-          dispatch({ type: 'JUMP_TO_CARD', payload: { category: category as Category, cardId } });
-          onEnterStudy(category as Category);
-        }} />
+        {/* 今日待完成 */}
+        <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-[3px] h-5 rounded-full" style={{ backgroundColor: BLUE }} />
+            <h2 className="text-[22px] font-bold" style={{ color: TEXT_PRIMARY }}>今日待完成</h2>
+          </div>
+          <div className="grid grid-cols-3 gap-3 mb-5">
+            <StatBlock label="复习" value={todayDue} color={ORANGE} />
+            <StatBlock label="新卡" value={todayNewAllowance} color={BLUE} />
+            <StatBlock label="学习中" value={learningCount} color="#CBD5E1" />
+          </div>
+          <button
+            onClick={handleStartToday}
+            className="w-full py-3.5 rounded-xl text-[18px] font-bold text-white"
+            style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
+          >
+            开始今日学习
+          </button>
         </div>
 
-        {/* Module list */}
-        <div
-          key={page}
-          className={`homepage-module-grid homepage-page ${
-            pageDirection > 0 ? 'homepage-page-next' : 'homepage-page-prev'
-          }`}
-        >
-          {slots.map((mod) => {
-            if (mod.isPlaceholder) {
-              return <div key={mod.key} className="homepage-module-card homepage-module-card-empty" aria-hidden="true" />;
-            }
-
-            if (mod.isCreate) {
-              return (
-                <button
-                  key={mod.key}
-                  onClick={() => setShowCreate(true)}
-                  className="homepage-module-card-dashed"
-                >
-                  <Plus className="mb-2 h-5 w-5 text-gray-400" />
-                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-300">新建模块</span>
-                  <span className="mt-1 text-[11px] text-gray-400">导入或记录新题库</span>
-                </button>
-              );
-            }
-
-            if (mod.isCustom) {
-              return (
-                <HomeModuleCard
-                  key={mod.key}
-                  label={mod.label}
-                  isCustom
-                  onClick={() => onEnterStudy(mod.key)}
-                  onDelete={() => {
-                    deleteCustomDeck(mod.key);
-                    setCustomDecks(loadCustomDecks());
-                  }}
-                />
-              );
-            }
-
-            const cat = CATEGORIES.find((c) => c.key === mod.key as Category)!;
-            const due = dueCountByCategory[cat.key] ?? 0;
-            const limit = getModuleDailyLimit(cat.key);
-            const total = TOTAL_MAP[cat.key] ?? 0;
-
-            return (
-              <HomeModuleCard
-                key={cat.key}
-                label={cat.label}
-                total={total}
-                due={due}
-                limit={limit}
-                onClick={() => onEnterStudy(cat.key)}
-              />
-            );
-          })}
-        </div>
-
-        {/* Pagination */}
-        <div className="homepage-pagination flex items-center justify-center gap-3">
-          <button onClick={goPrev} disabled={page === 0} className="flex h-7 w-7 items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-white hover:text-gray-500 disabled:opacity-20 dark:text-gray-600 dark:hover:bg-gray-900">‹</button>
-          {Array.from({ length: totalPages }).map((_, i) => (
-            <button key={i} onClick={() => goToPage(i)}
-              className={`h-2 rounded-full transition-all ${i === page ? 'w-5 bg-blue-500' : 'w-2 bg-gray-300 dark:bg-gray-700'}`}
-            />
-          ))}
-          <button onClick={goNext} disabled={page >= totalPages - 1} className="flex h-7 w-7 items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-white hover:text-gray-500 disabled:opacity-20 dark:text-gray-600 dark:hover:bg-gray-900">›</button>
-        </div>
-      </div>
-
-      {/* Create dialog */}
-      {showCreate && (
-        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-5 w-full max-w-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold dark:text-gray-100">新建模块</h3>
-              <button onClick={() => setShowCreate(false)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><X className="w-5 h-5" /></button>
+        {/* 推荐学习 */}
+        {recModule !== null && (
+          <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
+              <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ color: TEXT_SECONDARY, backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
             </div>
-            <div className="space-y-3">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <label className="text-xs text-gray-500">模块名称</label>
-                <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="例如：风控算法面试"
-                  className="w-full mt-0.5 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 text-sm"
-                  onKeyDown={(e) => e.key === 'Enter' && handleCreate()} autoFocus />
+                <h3 className="text-[24px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.moduleName}</h3>
+                <p className="text-[14px] mt-0.5" style={{ color: 'rgba(226,232,240,0.60)' }}>高优先级 · 复习薄弱点</p>
               </div>
-              <div>
-                <label className="text-xs text-gray-500">每日新卡上限</label>
-                <input type="number" min="1" max="100" value={newLimit} onChange={(e) => setNewLimit(Number(e.target.value))}
-                  className="w-full mt-0.5 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 text-sm" />
-              </div>
-              <button onClick={handleCreate} disabled={!newName.trim()}
-                className="w-full py-2.5 rounded-xl bg-blue-500 text-white font-medium disabled:opacity-30 hover:bg-blue-600 transition-colors">
-                创建模块
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleRecStudy}
+                className="flex-1 py-3 rounded-xl text-[16px] font-semibold text-white"
+                style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
+              >
+                开始推荐学习
+              </button>
+              <button
+                onClick={() => setRecIndex((i) => i + 1)}
+                className="px-4 py-3 rounded-xl text-[14px] border"
+                style={{ color: TEXT_MUTED, borderColor: 'rgba(255,255,255,0.15)' }}
+              >
+                换一个
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
+        {/* 我的牌组 */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>我的牌组</h2>
+            <span className="text-[14px]" style={{ color: TEXT_MUTED }}>全部</span>
+          </div>
+          <div className="space-y-2">
+            {CATEGORIES.map((cat) => {
+              const newCount = getModuleDailyLimit(cat.key);
+              const dueCount = dueCountByCategory[cat.key] ?? 0;
+              return (
+                <button
+                  key={cat.key}
+                  onClick={() => onEnterStudy(cat.key)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left border transition-colors"
+                  style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold" style={{ backgroundColor: 'rgba(64,156,255,0.15)', color: BLUE }}>
+                    {cat.label.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[18px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
+                    <p className="text-[13px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {TOTAL_MAP[cat.key] ?? '--'} 张卡片</p>
+                  </div>
+                  <div className="flex gap-4 text-right">
+                    <div>
+                      <div className="text-[13px]" style={{ color: TEXT_MUTED }}>复习</div>
+                      <div className="text-[16px] font-semibold" style={{ color: ORANGE }}>{dueCount}</div>
+                    </div>
+                    <div>
+                      <div className="text-[13px]" style={{ color: TEXT_MUTED }}>新卡</div>
+                      <div className="text-[16px] font-semibold" style={{ color: BLUE }}>{newCount}</div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4" style={{ color: 'rgba(203,213,225,0.3)' }} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Tab Bar */}
+        <div className="fixed bottom-0 left-0 right-0 flex justify-around py-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(20px)' }}>
+          {TABS.map((tab) => (
+            <button key={tab.label} className="flex flex-col items-center gap-0.5">
+              <span className="text-lg">{tab.icon}</span>
+              <span className="text-[13px] font-semibold" style={{ color: tab.active ? BLUE : TEXT_INACTIVE }}>{tab.label}</span>
+            </button>
+          ))}
+        </div>
+
+      </div>
       <StatsDashboard />
+    </div>
+  );
+}
+
+function StatBlock({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className="text-center">
+      <div className="text-[15px] mb-2" style={{ color }}>{label}</div>
+      <div className="text-[44px] font-bold leading-none" style={{ color }}>{value}</div>
     </div>
   );
 }
