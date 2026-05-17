@@ -15,6 +15,7 @@ import type { Category } from '../types';
 
 interface Props {
   onEnterStudy: (category: Category) => void;
+  onShowDecks: () => void;
 }
 
 const TOTAL_MAP: Record<string, number> = {
@@ -23,22 +24,22 @@ const TOTAL_MAP: Record<string, number> = {
 };
 
 const TEXT_PRIMARY = '#F8FAFC';
-const TEXT_SECONDARY = 'rgba(226,232,240,0.65)';
+const TEXT_SECONDARY = 'rgba(226,232,240,0.75)';
 const TEXT_MUTED = 'rgba(226,232,240,0.55)';
 const TEXT_INACTIVE = 'rgba(203,213,225,0.45)';
-const BLUE = '#409CFF';
+const BLUE = '#2882d7';
 const ORANGE = '#FF9A2E';
-const CARD_BG = 'rgba(255,255,255,0.06)';
-const CARD_BORDER = 'rgba(255,255,255,0.10)';
+const CARD_BG = 'rgba(255,255,255,0.15)';
+const CARD_BORDER = 'rgba(255,255,255,0.3)';
 
 const TABS = [
   { label: '首页', icon: Home, active: true },
-  { label: '牌组', icon: Layers },
-  { label: '统计', icon: BarChart3 },
+  { label: '牌组', icon: Layers, action: 'decks' as const },
+  { label: '统计', icon: BarChart3, action: 'stats' as const },
   { label: '我的', icon: User },
 ];
 
-export default function HomePage({ onEnterStudy }: Props) {
+export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
   const { state, dispatch, dueCountByCategory } = useAppContext();
 
   const streak = useMemo(() => {
@@ -136,19 +137,19 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         {/* 今日待完成 */}
-        <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-[3px] h-5 rounded-full" style={{ backgroundColor: BLUE }} />
             <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>今日待完成</h2>
           </div>
-          <div className="grid grid-cols-3 gap-3 mb-5">
+          <div className="grid grid-cols-3 gap-3 mb-3">
             <StatBlock label="复习" value={todayDue} color={ORANGE} />
             <StatBlock label="新卡" value={todayNewAllowance} color={BLUE} />
             <StatBlock label="学习中" value={learningCount} color="#CBD5E1" />
           </div>
           <button
             onClick={handleStartToday}
-            className="w-full py-2 rounded-xl text-[15px] font-bold text-white"
+            className="w-full py-1 rounded-xl text-[14px] font-bold text-white"
             style={{ background: `linear-gradient(135deg, ${BLUE}, #2f6bed)` }}
           >
             开始今日学习
@@ -156,10 +157,10 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         {/* 推荐学习 */}
-        <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+        <div className="rounded-2xl p-4 mb-3 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
-            <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ color: TEXT_SECONDARY, backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
+            <span className="text-[12px] px-2 py-0.5 rounded-full" style={{ color: TEXT_SECONDARY, backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
           </div>
           {recModule === null ? (
             <p className="text-[13px]" style={{ color: TEXT_MUTED }}>暂无待复习卡片</p>
@@ -192,20 +193,20 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         {/* 我的牌组 */}
-        <div>
+        <div className="rounded-2xl p-5 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>我的牌组</h2>
-            <span className="text-[14px]" style={{ color: TEXT_MUTED }}>全部牌组</span>
+            <button onClick={onShowDecks} className="text-[14px]" style={{ color: TEXT_MUTED }}>全部牌组</button>
           </div>
           <div className="space-y-2">
-            {CATEGORIES.map((cat) => {
+            {CATEGORIES.slice(0, 6).map((cat) => {
               const newCount = getModuleDailyLimit(cat.key);
               const dueCount = dueCountByCategory[cat.key] ?? 0;
               return (
                 <button
                   key={cat.key}
                   onClick={() => onEnterStudy(cat.key)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left border transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-left border transition-colors"
                   style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}
                 >
                   <div className="flex-1 min-w-0">
@@ -222,7 +223,7 @@ export default function HomePage({ onEnterStudy }: Props) {
                       <div className="text-[13px] font-semibold" style={{ color: BLUE }}>{newCount}</div>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4" style={{ color: 'rgba(203,213,225,0.3)' }} />
+                  <ChevronRight className="w-4 h-4" style={{ color: 'rgba(203,213,225,0.7)' }} />
                 </button>
               );
             })}
@@ -230,9 +231,16 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         {/* Tab Bar */}
-        <div className="fixed bottom-0 left-0 right-0 flex justify-around py-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(20px)' }}>
+        <div className="fixed bottom-0 left-0 right-0 flex justify-around py-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(15,23,42,0.06)', backdropFilter: 'blur(20px)' }}>
           {TABS.map((tab) => (
-            <button key={tab.label} className="flex flex-col items-center gap-0.5">
+            <button
+              key={tab.label}
+              onClick={() => {
+                if (tab.action === 'decks') onShowDecks();
+                else if (tab.action === 'stats') dispatch({ type: 'TOGGLE_STATS' });
+              }}
+              className="flex flex-col items-center gap-0.5"
+            >
               <tab.icon className="w-5 h-5" style={{ color: tab.active ? BLUE : TEXT_INACTIVE }} />
               <span className="text-[13px] font-semibold" style={{ color: tab.active ? BLUE : TEXT_INACTIVE }}>{tab.label}</span>
             </button>
