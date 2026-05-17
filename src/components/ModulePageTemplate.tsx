@@ -34,7 +34,7 @@ interface Props {
 
 export default function ModulePageTemplate({
   categoryLabel, moduleDue, totalNewCards, totalCards, topics,
-  onBack, onStartReview, onTopicClick, onDeleteTopic, deleteMode,
+  onBack, onStartReview, onTopicClick, onDeleteTopic,
 }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
