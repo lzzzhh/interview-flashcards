@@ -61,7 +61,7 @@ function HomeModuleCard({ label, total = 0, due = 0, limit = 0, isCustom, onClic
       <div className="flex w-full items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="truncate text-[15px] font-semibold leading-tight text-gray-900 dark:text-gray-100">{label}</h3>
-          <p className="mt-1 truncate text-[11px] font-medium text-gray-400 dark:text-gray-400">
+          <p className="mt-1 truncate text-[11px] font-medium text-gray-400 dark:text-gray-300">
             {isCustom ? '自定义题库' : `共 ${total} 张卡片`}
           </p>
         </div>
