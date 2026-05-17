@@ -115,8 +115,8 @@ export default function HomePage({ onEnterStudy }: Props) {
         <div className="flex items-center gap-3 mb-6">
           <img src={appIcon} alt="" className="h-[52px] w-[52px] shrink-0 rounded-2xl" />
           <div className="min-w-0">
-            <h1 className="text-[34px] font-bold leading-tight" style={{ color: TEXT_PRIMARY }}>面经闪卡</h1>
-            <p className="text-[15px] mt-0.5" style={{ color: TEXT_SECONDARY }}>
+            <h1 className="text-[28px] font-bold leading-tight" style={{ color: TEXT_PRIMARY }}>面经闪卡</h1>
+            <p className="text-[13px] mt-0.5" style={{ color: TEXT_SECONDARY }}>
               已连续 <span style={{ color: BLUE, fontWeight: 600 }}>{streak}</span> 天
             </p>
           </div>
@@ -133,7 +133,7 @@ export default function HomePage({ onEnterStudy }: Props) {
         <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-[3px] h-5 rounded-full" style={{ backgroundColor: BLUE }} />
-            <h2 className="text-[22px] font-bold" style={{ color: TEXT_PRIMARY }}>今日待完成</h2>
+            <h2 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>今日待完成</h2>
           </div>
           <div className="grid grid-cols-3 gap-3 mb-5">
             <StatBlock label="复习" value={todayDue} color={ORANGE} />
@@ -142,7 +142,7 @@ export default function HomePage({ onEnterStudy }: Props) {
           </div>
           <button
             onClick={handleStartToday}
-            className="w-full py-3.5 rounded-xl text-[18px] font-bold text-white"
+            className="w-full py-3 rounded-xl text-[16px] font-bold text-white"
             style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
           >
             开始今日学习
@@ -153,19 +153,19 @@ export default function HomePage({ onEnterStudy }: Props) {
         {recModule !== null && (
           <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
             <div className="flex items-center gap-2 mb-4">
-              <h2 className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
+              <h2 className="text-[17px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
               <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ color: TEXT_SECONDARY, backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
             </div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-[24px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.moduleName}</h3>
-                <p className="text-[14px] mt-0.5" style={{ color: 'rgba(226,232,240,0.60)' }}>高优先级 · 复习薄弱点</p>
+                <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.moduleName}</h3>
+                <p className="text-[12px] mt-0.5" style={{ color: 'rgba(226,232,240,0.60)' }}>高优先级 · 复习薄弱点</p>
               </div>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={handleRecStudy}
-                className="flex-1 py-3 rounded-xl text-[16px] font-semibold text-white"
+                className="flex-1 py-2.5 rounded-xl text-[14px] font-semibold text-white"
                 style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
               >
                 开始推荐学习
@@ -184,7 +184,7 @@ export default function HomePage({ onEnterStudy }: Props) {
         {/* 我的牌组 */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>我的牌组</h2>
+            <h2 className="text-[17px] font-bold" style={{ color: TEXT_PRIMARY }}>我的牌组</h2>
             <span className="text-[14px]" style={{ color: TEXT_MUTED }}>全部</span>
           </div>
           <div className="space-y-2">
@@ -202,17 +202,17 @@ export default function HomePage({ onEnterStudy }: Props) {
                     {cat.label.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[18px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
-                    <p className="text-[13px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {TOTAL_MAP[cat.key] ?? '--'} 张卡片</p>
+                    <h3 className="text-[15px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
+                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {TOTAL_MAP[cat.key] ?? '--'} 张卡片</p>
                   </div>
                   <div className="flex gap-4 text-right">
                     <div>
-                      <div className="text-[13px]" style={{ color: TEXT_MUTED }}>复习</div>
-                      <div className="text-[16px] font-semibold" style={{ color: ORANGE }}>{dueCount}</div>
+                      <div className="text-[11px]" style={{ color: TEXT_MUTED }}>复习</div>
+                      <div className="text-[14px] font-semibold" style={{ color: ORANGE }}>{dueCount}</div>
                     </div>
                     <div>
-                      <div className="text-[13px]" style={{ color: TEXT_MUTED }}>新卡</div>
-                      <div className="text-[16px] font-semibold" style={{ color: BLUE }}>{newCount}</div>
+                      <div className="text-[11px]" style={{ color: TEXT_MUTED }}>新卡</div>
+                      <div className="text-[14px] font-semibold" style={{ color: BLUE }}>{newCount}</div>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4" style={{ color: 'rgba(203,213,225,0.3)' }} />
@@ -241,8 +241,8 @@ export default function HomePage({ onEnterStudy }: Props) {
 function StatBlock({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div className="text-center">
-      <div className="text-[15px] mb-2" style={{ color }}>{label}</div>
-      <div className="text-[44px] font-bold leading-none" style={{ color }}>{value}</div>
+      <div className="text-[13px] mb-1.5" style={{ color }}>{label}</div>
+      <div className="text-[36px] font-bold leading-none" style={{ color }}>{value}</div>
     </div>
   );
 }
