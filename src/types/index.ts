@@ -2,7 +2,7 @@
 // src/types/index.ts — 所有类型定义
 // ============================================================
 
-export type Category = 'leetcode' | 'statistics' | 'machine-learning' | 'deep-learning' | 'llm' | 'agent' | 'jargon' | 'workplace' | string;
+export type Category = 'leetcode' | 'statistics' | 'machine-learning' | 'deep-learning' | 'llm' | 'agent' | 'jargon' | 'workplace' | 'vibe-coding' | string;
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type CardState = 'new' | 'learning' | 'review' | 'relearning';
 export type StudyMode = 'choose' | 'new' | 'review';
@@ -95,7 +95,7 @@ export interface AppSettings {
 /** 通用问答卡片（统计学/ML/大模型/黑话/话术） */
 export interface QACard {
   id: string;
-  category: 'statistics' | 'machine-learning' | 'deep-learning' | 'llm' | 'agent' | 'jargon' | 'workplace';
+  category: 'statistics' | 'machine-learning' | 'deep-learning' | 'llm' | 'agent' | 'jargon' | 'workplace' | 'vibe-coding';
   question: string;
   answer: string;
   tags?: string[];
@@ -182,6 +182,7 @@ export const STORAGE_KEYS = {
   AGENT_PROGRESS: 'fc-agent-progress',
   JARGON_PROGRESS: 'fc-jargon-progress',
   WORKPLACE_PROGRESS: 'fc-workplace-progress',
+  VIBE_CODING_PROGRESS: 'fc-vibe-coding-progress',
   SETTINGS: 'fc-settings',
   STATS: 'fc-stats',
 } as const;

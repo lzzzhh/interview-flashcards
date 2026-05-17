@@ -29,6 +29,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { key: 'agent', label: 'Agent', icon: Bot },
   { key: 'jargon', label: '黑话', icon: MessageSquare },
   { key: 'workplace', label: '职场', icon: Briefcase },
+  { key: 'vibe-coding', label: 'Vibe Coding', icon: Bot },
 ];
 
 export const DIFFICULTY_LABEL: Record<Difficulty, string> = {

@@ -30,6 +30,7 @@ import { llmCards } from '../data/llm';
 import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
+import { vibeCodingCards } from '../data/vibe-coding';
 import { scheduleReview, createDefaultSM2 } from '../utils/sm2';
 import { loadProgress, saveSettings } from '../utils/storage';
 import { loadAppData, saveAppData } from '../utils/nativeStorage';
@@ -55,6 +56,7 @@ const CARD_DATA: Partial<Record<Category, FlashCard[]>> = {
   agent: agentCards as FlashCard[],
   jargon: jargonCards as FlashCard[],
   workplace: workplaceCards as FlashCard[],
+  'vibe-coding': vibeCodingCards as FlashCard[],
 };
 
 const progressKeyMap: Record<Category, string> = {
@@ -66,6 +68,7 @@ const progressKeyMap: Record<Category, string> = {
   agent: 'fc-agent-progress',
   jargon: 'fc-jargon-progress',
   workplace: 'fc-workplace-progress',
+  'vibe-coding': 'fc-vibe-coding-progress',
 };
 
 // ---- 合并 progress → cardsById ----

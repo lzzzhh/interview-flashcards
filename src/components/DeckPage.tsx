@@ -15,7 +15,7 @@ interface Props {
 
 const TOTAL_MAP: Record<string, number> = {
   leetcode: 100, statistics: 199, 'machine-learning': 171, 'deep-learning': 32,
-  llm: 37, agent: 26, jargon: 45, workplace: 76,
+  llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
 };
 
 const TEXT_PRIMARY = '#F8FAFC';

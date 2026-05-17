@@ -18,6 +18,7 @@ import { llmCards } from '../data/llm';
 import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
+import { vibeCodingCards } from '../data/vibe-coding';
 import StatsDashboard from './StatsDashboard';
 import type { Category, FlashCard } from '../types';
 
@@ -28,7 +29,7 @@ interface Props {
 
 const TOTAL_MAP: Record<string, number> = {
   leetcode: 100, statistics: 199, 'machine-learning': 171, 'deep-learning': 32,
-  llm: 37, agent: 26, jargon: 45, workplace: 76,
+  llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
 };
 
 const TEXT_PRIMARY = '#F8FAFC';
@@ -43,7 +44,7 @@ const DECK_CARD_BG = 'rgba(255,255,255,0.15)';
 const DECK_ITEM_BG = 'rgba(255,255,255,0.2)';
 
 const ALL_CARDS: Record<string, FlashCard> = {};
-for (const cards of [leetcodeHot100, statisticsCards, machineLearningCards, deepLearningCards, llmCards, agentCards, jargonCards, workplaceCards]) {
+for (const cards of [leetcodeHot100, statisticsCards, machineLearningCards, deepLearningCards, llmCards, agentCards, jargonCards, workplaceCards, vibeCodingCards]) {
   for (const c of cards as FlashCard[]) {
     ALL_CARDS[c.id] = c;
   }
