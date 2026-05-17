@@ -61,7 +61,7 @@ function HomeModuleCard({ label, total = 0, due = 0, limit = 0, isCustom, onClic
       <div className="flex w-full items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="truncate text-[15px] font-semibold leading-tight text-gray-900 dark:text-gray-100">{label}</h3>
-          <p className="mt-1 truncate text-[11px] font-medium text-gray-400 dark:text-gray-500">
+          <p className="mt-1 truncate text-[11px] font-medium text-gray-400 dark:text-gray-400">
             {isCustom ? '自定义题库' : `共 ${total} 张卡片`}
           </p>
         </div>
@@ -223,7 +223,7 @@ export default function HomePage({ onEnterStudy }: Props) {
                   className="homepage-module-card-dashed"
                 >
                   <Plus className="mb-2 h-5 w-5 text-gray-400" />
-                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">新建模块</span>
+                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-300">新建模块</span>
                   <span className="mt-1 text-[11px] text-gray-400">导入或记录新题库</span>
                 </button>
               );
