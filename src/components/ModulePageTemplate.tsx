@@ -1,4 +1,4 @@
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export interface ModuleTopicCardModel {
   key: string;
