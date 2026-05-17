@@ -173,6 +173,7 @@ export default function SubModulePicker({ onBack }: Props) {
         onOpenCardManager={() => setShowBrowser(true)}
         onCreateTopic={() => setShowCreate(true)}
         onDeleteTopic={(topic) => { setDeleteTarget({ key: topic.key, label: topic.title }); }}
+        onEnterDeleteMode={() => setDeleteMode(true)}
         deleteMode={deleteMode}
       />
       <StatsDashboard category={category} />

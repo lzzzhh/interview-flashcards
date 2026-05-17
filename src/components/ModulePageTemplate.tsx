@@ -24,6 +24,7 @@ interface Props {
   onOpenCardManager?: () => void;
   onCreateTopic?: () => void;
   onDeleteTopic?: (topic: ModuleTopicCardModel) => void;
+  onEnterDeleteMode?: () => void;
   deleteMode?: boolean;
 }
 
@@ -36,7 +37,7 @@ const CARD_BORDER = 'rgba(255,255,255,0.3)';
 
 export default function ModulePageTemplate({
   categoryLabel, moduleDue, totalNewCards, totalCards, topics,
-  onBack, onStartReview, onTopicClick, onOpenCardManager, onCreateTopic, onDeleteTopic, deleteMode,
+  onBack, onStartReview, onTopicClick, onOpenCardManager, onCreateTopic, onDeleteTopic, onEnterDeleteMode, deleteMode,
 }: Props) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -80,7 +81,7 @@ export default function ModulePageTemplate({
                     </button>
                   )}
                   {onDeleteTopic && (
-                    <button onClick={() => { setShowMenu(false); onDeleteTopic(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: '#EF4444' }}>
+                    <button onClick={() => { setShowMenu(false); onEnterDeleteMode?.(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: '#EF4444' }}>
                       <Trash2 className="w-4 h-4" />删除专题
                     </button>
                   )}
@@ -110,7 +111,7 @@ export default function ModulePageTemplate({
         {deleteMode && (
           <div className="mb-3 flex items-center justify-between rounded-xl border px-3 py-2" style={{ borderColor: 'rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.1)' }}>
             <span className="text-[12px] font-medium" style={{ color: '#EF4444' }}>点击专题卡片上的删除按钮</span>
-            <button onClick={() => onDeleteTopic?.(topics[0])} className="text-[12px] font-semibold" style={{ color: '#EF4444' }}>取消</button>
+            <button onClick={() => onEnterDeleteMode?.()} className="text-[12px] font-semibold" style={{ color: '#EF4444' }}>取消</button>
           </div>
         )}
 
