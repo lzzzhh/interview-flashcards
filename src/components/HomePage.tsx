@@ -31,10 +31,10 @@ const CARD_BG = 'rgba(255,255,255,0.06)';
 const CARD_BORDER = 'rgba(255,255,255,0.10)';
 
 const TABS = [
-  { label: '首页', icon: '🏠', active: true },
-  { label: '牌组', icon: '📚' },
-  { label: '统计', icon: '📊' },
-  { label: '我的', icon: '👤' },
+  { label: '首页', active: true },
+  { label: '牌组' },
+  { label: '统计'},
+  { label: '我的' },
 ];
 
 export default function HomePage({ onEnterStudy }: Props) {
@@ -184,8 +184,8 @@ export default function HomePage({ onEnterStudy }: Props) {
         {/* 我的牌组 */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[17px] font-bold" style={{ color: TEXT_PRIMARY }}>我的牌组</h2>
-            <span className="text-[14px]" style={{ color: TEXT_MUTED }}>全部</span>
+            <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>我的牌组</h2>
+            <span className="text-[15px]" style={{ color: TEXT_MUTED }}>全部</span>
           </div>
           <div className="space-y-2">
             {CATEGORIES.map((cat) => {
@@ -241,8 +241,8 @@ export default function HomePage({ onEnterStudy }: Props) {
 function StatBlock({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div className="text-center">
-      <div className="text-[11px] mb-1" style={{ color }}>{label}</div>
-      <div className="text-[15px] font-bold leading-none" style={{ color }}>{value}</div>
+      <div className="text-[13px] mb-1" style={{ color }}>{label}</div>
+      <div className="text-[16px] font-bold leading-none" style={{ color }}>{value}</div>
     </div>
   );
 }
