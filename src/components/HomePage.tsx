@@ -24,13 +24,15 @@ const TOTAL_MAP: Record<string, number> = {
 };
 
 const TEXT_PRIMARY = '#F8FAFC';
-const TEXT_SECONDARY = 'rgba(226,232,240,0.75)';
-const TEXT_MUTED = 'rgba(226,232,240,0.55)';
-const TEXT_INACTIVE = 'rgba(203,213,225,0.45)';
+const TEXT_SECONDARY = 'rgba(226,232,240,0.98)';
+const TEXT_MUTED = 'rgba(226,232,240,0.85)';
+const TEXT_INACTIVE = 'rgba(203,213,225,0.75)';
 const BLUE = '#2882d7';
 const ORANGE = '#FF9A2E';
 const CARD_BG = 'rgba(255,255,255,0.15)';
 const CARD_BORDER = 'rgba(255,255,255,0.3)';
+const DECK_CARD_BG = 'rgba(255,255,255,0.15)';
+const DECK_ITEM_BG = 'rgba(255,255,255,0.05)';
 
 const TABS = [
   { label: '首页', icon: Home, active: true },
@@ -193,7 +195,7 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
         </div>
 
         {/* 我的牌组 */}
-        <div className="rounded-2xl p-5 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+        <div className="rounded-2xl p-3 border" style={{ backgroundColor: DECK_CARD_BG, borderColor: CARD_BORDER }}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>我的牌组</h2>
             <button onClick={onShowDecks} className="text-[14px]" style={{ color: TEXT_MUTED }}>全部牌组</button>
@@ -207,7 +209,7 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
                   key={cat.key}
                   onClick={() => onEnterStudy(cat.key)}
                   className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-left border transition-colors"
-                  style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}
+                  style={{ borderColor: CARD_BORDER, backgroundColor: DECK_ITEM_BG }}
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>

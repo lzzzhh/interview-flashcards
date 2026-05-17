@@ -19,11 +19,12 @@ const TOTAL_MAP: Record<string, number> = {
 };
 
 const TEXT_PRIMARY = '#F8FAFC';
-const TEXT_MUTED = 'rgba(226,232,240,0.55)';
+const TEXT_MUTED = 'rgba(226,232,240,0.85)';
 const BLUE = '#409CFF';
 const ORANGE = '#FF9A2E';
 const CARD_BG = 'rgba(255,255,255,0.06)';
 const CARD_BORDER = 'rgba(255,255,255,0.10)';
+const DECK_ITEM_BG = 'rgba(255,255,255,0.03)';
 
 export default function DeckPage({ onEnterStudy, onBack }: Props) {
   const { dueCountByCategory } = useAppContext();
@@ -51,7 +52,7 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
                   key={cat.key}
                   onClick={() => onEnterStudy(cat.key)}
                   className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-left border transition-colors"
-                  style={{ borderColor: CARD_BORDER, backgroundColor: 'rgba(255,255,255,0.03)' }}
+                  style={{ borderColor: CARD_BORDER, backgroundColor: DECK_ITEM_BG }}
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
