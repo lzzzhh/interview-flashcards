@@ -22,6 +22,8 @@ type SubModuleWithStats = SubModuleMeta & {
   total: number;
 };
 
+type ModuleTone = { bg: string; fg: string; bar: string; label: string; glow: string; };
+
 const COLOR_TONES: Record<string, Omit<ModuleTone, 'label'>> = {
   'bg-blue-500': { bg: 'from-[#2F86FF] to-[#1267EE]', fg: '#2378f4', bar: '#2378f4', glow: 'rgba(35,120,244,0.28)' },
   'bg-green-500': { bg: 'from-[#20D452] to-[#0EB442]', fg: '#14b83f', bar: '#14b83f', glow: 'rgba(20,184,63,0.26)' },
@@ -44,18 +46,6 @@ const COLOR_TONES: Record<string, Omit<ModuleTone, 'label'>> = {
 };
 
 const COLOR_OPTIONS = Object.keys(COLOR_TONES);
-
-const LABEL_OVERRIDES: Record<string, string> = {
-  'lc-array': '数', 'lc-twopointer': '双', 'lc-binary': '二', 'lc-linkedlist': '链',
-  'lc-stack': '栈', 'lc-tree': '二', 'lc-dp': '动', 'lc-backtrack': '回',
-  'lc-bfs': '图', 'lc-greedy': '贪', 'lc-heap': '堆', 'lc-other': '其',
-};
-
-const FALLBACK_TONE = COLOR_TONES['bg-gray-400'];
-
-function getTone(sm: Pick<SubModuleMeta, 'key' | 'label' | 'color'>): ModuleTone {
-  return { ...(COLOR_TONES[sm.color] || FALLBACK_TONE), label: LABEL_OVERRIDES[sm.key] || sm.label.charAt(0) };
-}
 
 function getTopicModel(sm: SubModuleWithStats): ModuleTopicCardModel {
   const completed = Math.max(0, sm.total - sm.newCount);
