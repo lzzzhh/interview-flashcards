@@ -198,8 +198,8 @@ export default function HomePage({ onEnterStudy }: Props) {
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left border transition-colors"
                   style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}
                 >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold" style={{ backgroundColor: 'rgba(64,156,255,0.15)', color: BLUE }}>
-                    {cat.label.charAt(0)}
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ color: BLUE }}>
+                    <cat.icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[15px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
