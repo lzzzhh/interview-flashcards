@@ -2,8 +2,8 @@
 // src/components/HomePage.tsx — 首页重设计
 // ============================================================
 
-import { useState, useMemo, useCallback } from 'react';
-import { ChevronRight, Home, Layers, BarChart3, User } from 'lucide-react';
+import { useState, useMemo, useCallback, useRef } from 'react';
+import { ChevronRight, Home, Layers, BarChart3, User, ChevronLeft } from 'lucide-react';
 import appIcon from '../../icon.png';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
@@ -74,6 +74,7 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
 
   // 推荐模块
   const [recIndex, setRecIndex] = useState(0);
+  const touchStartX = useRef(0);
   const recommendations = useMemo(() => {
     const now = Date.now();
     const all: { id: string; label: string; category: string; score: number }[] = [];
@@ -176,23 +177,32 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
           {recModule === null ? (
             <p className="text-[13px]" style={{ color: TEXT_MUTED }}>暂无待复习卡片</p>
           ) : (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.label}</h3>
-                <p className="text-[12px] mt-0.5" style={{ color: 'rgba(226,232,240,0.60)' }}>高优先级 · 复习薄弱点</p>
+            <div
+              onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+              onTouchEnd={(e) => {
+                const diff = touchStartX.current - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 50) setRecIndex((i) => i + (diff > 0 ? 1 : -1));
+              }}
+              className="overflow-hidden"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.label}</h3>
+                  <p className="text-[12px] mt-0.5" style={{ color: 'rgba(226,232,240,0.60)' }}>高优先级 · 复习薄弱点</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>
+                    {recIndex + 1} / {recommendations.length}
+                  </p>
+                </div>
+                <div className="flex gap-1">
+                  <button onClick={() => setRecIndex((i) => i - 1)} className="p-1" style={{ color: TEXT_MUTED }}>
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => setRecIndex((i) => i + 1)} className="p-1" style={{ color: TEXT_MUTED }}>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setRecIndex((i) => i + 1)}
-                className="px-4 py-2 rounded-xl text-[14px] border"
-                style={{ color: TEXT_MUTED, borderColor: 'rgba(255,255,255,0.15)' }}
-              >
-                换一个
-              </button>
-            </div>
-            </>
           )}
         </div>
 
