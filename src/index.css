@@ -137,18 +137,27 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
 
 .dark .homepage-glass-stage {
   background:
-    radial-gradient(circle at 20% 10%, rgba(255, 80, 140, 0.20), transparent 45%),
-    radial-gradient(circle at 75% 15%, rgba(80, 150, 255, 0.18), transparent 45%),
-    radial-gradient(circle at 50% 55%, rgba(140, 80, 255, 0.15), transparent 50%),
-    radial-gradient(circle at 15% 80%, rgba(60, 180, 160, 0.14), transparent 40%),
-    radial-gradient(circle at 80% 85%, rgba(255, 150, 60, 0.12), transparent 40%),
-    linear-gradient(160deg, #0f172a 0%, #1a1025 30%, #0f1f2e 60%, #12102a 100%);
+    linear-gradient(180deg, rgba(2, 6, 23, 0.55), rgba(15, 23, 42, 0.35)),
+    url('/backgrounds/dark-bg.jpg') center / cover no-repeat;
+  filter: blur(0);
 }
 
 .dark .homepage-glass-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   background:
-    radial-gradient(circle at 35% 15%, rgba(255, 255, 255, 0.05), transparent 30%),
-    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.03), transparent 35%);
+    radial-gradient(circle at 35% 15%, rgba(255, 255, 255, 0.04), transparent 30%),
+    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.02), transparent 35%);
+}
+
+/* 学习页暗色背景 */
+.dark .study-bg {
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.6), rgba(15, 23, 42, 0.4)),
+    url('/backgrounds/dark-bg.jpg') center / cover no-repeat;
+  background-attachment: fixed;
 }
 
 .homepage-shell {
