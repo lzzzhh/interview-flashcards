@@ -3,7 +3,7 @@
 // ============================================================
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload } from 'lucide-react';
+import { X, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload, ChevronDown } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
 import { useAppContext } from '../context/AppContext';
 import { DIFFICULTY_LABEL, CATEGORIES } from '../constants';
@@ -166,6 +166,7 @@ function getTodayNewAllowance(cards: FlashCard[], category?: string) {
 
 export default function StatsDashboard({ category }: Props) {
   const { state, dispatch } = useAppContext();
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const cardVersion = Object.values(state.cardsById)
     .map((card) => `${card.id}:${card.sm2.state}:${card.sm2.interval}:${card.sm2.lapses}:${card.sm2.nextReview}`)
     .join('|');
@@ -370,9 +371,16 @@ export default function StatsDashboard({ category }: Props) {
           </div>
           {/* Settings */}
           <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              每日新卡上限
-            </h3>
+            <button
+              onClick={() => setSettingsOpen(!settingsOpen)}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                每日新卡上限
+              </h3>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${settingsOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {settingsOpen && (<>
             {category ? (
               <ModuleLimitSlider moduleId={category} label={CATEGORIES.find((cat) => cat.key === category)?.label || loadCustomDecks().find((d) => d.id === category)?.name || category} />
             ) : (
@@ -388,6 +396,7 @@ export default function StatsDashboard({ category }: Props) {
             <p className="text-[10px] text-gray-400">
               {category ? '当前模块独立设置，学习新卡时生效' : '首页统计可调整每个模块的新卡上限'}
             </p>
+            </>)}
           </div>
 
           {/* Import / Export */}
