@@ -179,14 +179,9 @@ export default function SubModulePicker({ onBack }: Props) {
         topics={topics}
         onBack={onBack}
         onStartReview={handleReviewAll}
-        onShowStats={() => dispatch({ type: 'TOGGLE_STATS' })}
-        onOpenCardManager={() => setShowBrowser(true)}
-        onCreateTopic={() => setShowCreate(true)}
-        onEnterDeleteMode={() => setDeleteMode(true)}
         onTopicClick={handleStudyNew}
         onDeleteTopic={(topic) => { setDeleteTarget({ key: topic.key, label: topic.title }); }}
         deleteMode={deleteMode}
-        onExitDeleteMode={() => setDeleteMode(false)}
       />
       <StatsDashboard category={category} />
       {showBrowser && <CardBrowser onEdit={(card) => { if (!card.id) setEditingCard(null); else setEditingCard(card); }} onClose={() => setShowBrowser(false)} />}
