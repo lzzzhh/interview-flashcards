@@ -28,21 +28,38 @@ export default function RecommendBar({ onJumpToCard }: Props) {
     for (const card of Object.values(state.cardsById)) {
       const sm2 = card.sm2;
       if (!sm2 || sm2.state === 'new') continue;
-      
-      const overdue = (now - sm2.nextReview) / 86400000; // days
-      if (overdue < 0) continue; // not due yet
-      
+
+      const overdue = (now - sm2.nextReview) / 86400000;
+      if (overdue < 0) continue;
+
       let label = '';
       if (card.category === 'leetcode') {
         label = `#${card.number} ${card.titleCn}`;
       } else {
         label = card.question.slice(0, 30);
       }
-      
-      all.push({ id: card.id, label, reason: overdue > 3 ? '严重逾期' : overdue > 1 ? '逾期' : '到期', category: card.category, overdue });
+
+      const reason = overdue > 7 ? '严重逾期' : overdue > 3 ? '逾期' : overdue > 1 ? '到期' : '刚到期';
+
+      all.push({ id: card.id, label, reason, category: card.category, overdue });
     }
-    
-    all.sort((a, b) => b.overdue - a.overdue);
+
+    all.sort((a, b) => {
+      // sort by recommendation score descending
+      const scoreA = (() => {
+        const c = state.cardsById[a.id];
+        const s = c?.sm2; if (!s) return 0;
+        const R = Math.pow(2, -a.overdue / Math.max(s.interval, 1));
+        return (1 - R) * (1 + s.lapses) * (s.easeFactor > 0 ? 2.5 / s.easeFactor : 1);
+      })();
+      const scoreB = (() => {
+        const c = state.cardsById[b.id];
+        const s = c?.sm2; if (!s) return 0;
+        const R = Math.pow(2, -b.overdue / Math.max(s.interval, 1));
+        return (1 - R) * (1 + s.lapses) * (s.easeFactor > 0 ? 2.5 / s.easeFactor : 1);
+      })();
+      return scoreB - scoreA;
+    });
     return all.slice(0, 5);
   }, [state.cardsById]);
 
