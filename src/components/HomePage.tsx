@@ -132,12 +132,6 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
     if (firstDue) onEnterStudy(firstDue.key);
   }, [dueCountByCategory, onEnterStudy]);
 
-  const handleRecStudy = useCallback(() => {
-    if (!recModule) return;
-    dispatch({ type: 'JUMP_TO_CARD', payload: { category: recModule.category as Category, cardId: recModule.id } });
-    onEnterStudy(recModule.category as Category);
-  }, [recModule, dispatch, onEnterStudy]);
-
   return (
     <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
       <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
