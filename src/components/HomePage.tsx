@@ -32,7 +32,7 @@ const ORANGE = '#FF9A2E';
 const CARD_BG = 'rgba(255,255,255,0.15)';
 const CARD_BORDER = 'rgba(255,255,255,0.3)';
 const DECK_CARD_BG = 'rgba(255,255,255,0.15)';
-const DECK_ITEM_BG = 'rgba(255,255,255,0.05)';
+const DECK_ITEM_BG = 'rgba(255,255,255,0.2)';
 
 const TABS = [
   { label: '首页', icon: Home, active: true },
@@ -117,8 +117,8 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
   }, [recModule, dispatch, onEnterStudy]);
 
   return (
-    <div className="homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
-      <div className="w-full max-w-md px-5 py-8 pb-24">
+    <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
+      <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">

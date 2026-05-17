@@ -137,7 +137,7 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
 
 .dark .homepage-glass-stage {
   background:
-    linear-gradient(180deg, rgba(2, 6, 23, 0.55), rgba(15, 23, 42, 0.35)),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.75), rgba(15, 23, 42, 0.55)),
     url('/backgrounds/dark-bg.jpg') center / cover no-repeat;
   filter: blur(0);
 }
@@ -152,12 +152,30 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
     radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.02), transparent 35%);
 }
 
-/* 学习页暗色背景 */
-.dark .study-bg {
-  background:
-    linear-gradient(180deg, rgba(2, 6, 23, 0.6), rgba(15, 23, 42, 0.4)),
-    url('/backgrounds/dark-bg.jpg') center / cover no-repeat;
-  background-attachment: fixed;
+/* 全局暗色背景 */
+.dark-bg {
+  position: relative;
+}
+.dark .dark-bg {
+  background: transparent;
+}
+.dark .dark-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url('/backgrounds/dark-bg.jpg') center / cover no-repeat;
+  filter: blur(12px) brightness(0.6);
+  transform: scale(1.05);
+}
+.dark .dark-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.7), rgba(15, 23, 42, 0.5));
 }
 
 .homepage-shell {

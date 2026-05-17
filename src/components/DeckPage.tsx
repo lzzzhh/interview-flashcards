@@ -30,8 +30,8 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
   const { dueCountByCategory } = useAppContext();
 
   return (
-    <div className="homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
-      <div className="w-full max-w-md px-5 py-8 pb-24">
+    <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
+      <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">

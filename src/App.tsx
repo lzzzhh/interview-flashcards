@@ -37,8 +37,8 @@ function StudyPage({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="study-bg h-dvh flex flex-col overflow-hidden text-gray-900 dark:text-gray-100 transition-colors">
-      <div className="max-w-md mx-auto w-full px-3 sm:px-4 flex flex-col flex-1 min-h-0">
+    <div className="dark-bg h-dvh flex flex-col overflow-hidden text-gray-900 dark:text-gray-100 transition-colors">
+      <div className="relative z-10 max-w-md mx-auto w-full px-3 sm:px-4 flex flex-col flex-1 min-h-0">
 
         {/* Top bar — fixed height */}
         <div className="shrink-0 py-3 flex items-center justify-between">
