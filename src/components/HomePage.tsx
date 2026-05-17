@@ -10,8 +10,16 @@ import { CATEGORIES } from '../constants';
 import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit } from '../utils/customDecks';
 import { loadProgress } from '../utils/storage';
+import { leetcodeHot100 } from '../data/leetcode-hot100';
+import { statisticsCards } from '../data/statistics';
+import { machineLearningCards } from '../data/machine-learning';
+import { deepLearningCards } from '../data/deep-learning';
+import { llmCards } from '../data/llm';
+import { agentCards } from '../data/agent';
+import { jargonCards } from '../data/jargon';
+import { workplaceCards } from '../data/workplace';
 import StatsDashboard from './StatsDashboard';
-import type { Category } from '../types';
+import type { Category, FlashCard } from '../types';
 
 interface Props {
   onEnterStudy: (category: Category) => void;
@@ -33,6 +41,20 @@ const CARD_BG = 'rgba(255,255,255,0.15)';
 const CARD_BORDER = 'rgba(255,255,255,0.3)';
 const DECK_CARD_BG = 'rgba(255,255,255,0.15)';
 const DECK_ITEM_BG = 'rgba(255,255,255,0.2)';
+
+const ALL_CARDS: Record<string, FlashCard> = {};
+for (const cards of [leetcodeHot100, statisticsCards, machineLearningCards, deepLearningCards, llmCards, agentCards, jargonCards, workplaceCards]) {
+  for (const c of cards as FlashCard[]) {
+    ALL_CARDS[c.id] = c;
+  }
+}
+
+function getCardLabel(cardId: string): string {
+  const card = ALL_CARDS[cardId];
+  if (!card) return cardId;
+  if (card.category === 'leetcode') return `#${card.number} ${card.titleCn}`;
+  return card.question.slice(0, 25);
+}
 
 const TABS = [
   { label: '首页', icon: Home, active: true },
@@ -67,7 +89,7 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
         const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
         all.push({
           id: cardId,
-          label: cardId,
+          label: getCardLabel(cardId),
           category: cat.key,
           score,
         });
@@ -129,13 +151,6 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
               已连续 <span style={{ color: BLUE, fontWeight: 600 }}>{streak}</span> 天
             </p>
           </div>
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-            className="ml-auto flex h-9 w-9 items-center justify-center rounded-xl border"
-            style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={TEXT_SECONDARY} strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-          </button>
         </div>
 
         {/* 今日待完成 */}
@@ -170,21 +185,14 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
           <>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.moduleName}</h3>
+                <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.label}</h3>
                 <p className="text-[12px] mt-0.5" style={{ color: 'rgba(226,232,240,0.60)' }}>高优先级 · 复习薄弱点</p>
               </div>
             </div>
-            <div className="flex gap-3">
-              <button
-                onClick={handleRecStudy}
-                className="flex-1 py-2.5 rounded-xl text-[14px] font-semibold text-white"
-                style={{ background: `linear-gradient(135deg, ${BLUE}, #2f6bed)` }}
-              >
-                开始推荐学习
-              </button>
+            <div className="flex justify-end">
               <button
                 onClick={() => setRecIndex((i) => i + 1)}
-                className="px-4 py-3 rounded-xl text-[14px] border"
+                className="px-4 py-2 rounded-xl text-[14px] border"
                 style={{ color: TEXT_MUTED, borderColor: 'rgba(255,255,255,0.15)' }}
               >
                 换一个
