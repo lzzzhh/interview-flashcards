@@ -9,6 +9,7 @@ import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit } from '../utils/customDecks';
+import { loadProgress } from '../utils/storage';
 import StatsDashboard from './StatsDashboard';
 import type { Category } from '../types';
 
@@ -51,22 +52,27 @@ export default function HomePage({ onEnterStudy }: Props) {
   const recommendations = useMemo(() => {
     const now = Date.now();
     const all: { id: string; label: string; category: string; score: number }[] = [];
-    for (const card of Object.values(state.cardsById)) {
-      const sm2 = card.sm2;
-      if (!sm2 || sm2.state === 'new') continue;
-      const overdue = (now - sm2.nextReview) / 86400000;
-      if (overdue < 0) continue;
-      const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
-      const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
-      all.push({
-        id: card.id,
-        label: card.category === 'leetcode' ? `#${card.number} ${card.titleCn}` : card.question.slice(0, 20),
-        category: card.category,
-        score,
-      });
+
+    for (const cat of CATEGORIES) {
+      const progress = loadProgress(cat.key);
+      const sm2Map = progress.sm2;
+      for (const [cardId, sm2] of Object.entries(sm2Map)) {
+        if (!sm2 || sm2.state === 'new') continue;
+        const overdue = (now - sm2.nextReview) / 86400000;
+        if (overdue < 0) continue;
+        const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
+        const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
+        all.push({
+          id: cardId,
+          label: cardId,
+          category: cat.key,
+          score,
+        });
+      }
     }
+
     return all.sort((a, b) => b.score - a.score);
-  }, [state.cardsById]);
+  }, []);
 
   const recModule = useMemo(() => {
     if (recommendations.length === 0) return null;
@@ -143,7 +149,7 @@ export default function HomePage({ onEnterStudy }: Props) {
           <button
             onClick={handleStartToday}
             className="w-full py-2 rounded-xl text-[15px] font-bold text-white"
-            style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
+            style={{ background: `linear-gradient(135deg, ${BLUE}, #2f6bed)` }}
           >
             开始今日学习
           </button>
@@ -152,7 +158,7 @@ export default function HomePage({ onEnterStudy }: Props) {
         {/* 推荐学习 */}
         <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-[17px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
+            <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
             <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ color: TEXT_SECONDARY, backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
           </div>
           {recModule === null ? (
@@ -169,7 +175,7 @@ export default function HomePage({ onEnterStudy }: Props) {
               <button
                 onClick={handleRecStudy}
                 className="flex-1 py-2.5 rounded-xl text-[14px] font-semibold text-white"
-                style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
+                style={{ background: `linear-gradient(135deg, ${BLUE}, #2f6bed)` }}
               >
                 开始推荐学习
               </button>
@@ -188,8 +194,8 @@ export default function HomePage({ onEnterStudy }: Props) {
         {/* 我的牌组 */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>我的牌组</h2>
-            <span className="text-[15px]" style={{ color: TEXT_MUTED }}>全部</span>
+            <h2 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>我的牌组</h2>
+            <span className="text-[14px]" style={{ color: TEXT_MUTED }}>全部牌组</span>
           </div>
           <div className="space-y-2">
             {CATEGORIES.map((cat) => {
@@ -203,17 +209,17 @@ export default function HomePage({ onEnterStudy }: Props) {
                   style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}
                 >
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[15px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
+                    <h3 className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
                     <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {TOTAL_MAP[cat.key] ?? '--'} 张卡片</p>
                   </div>
                   <div className="flex gap-4 text-right">
                     <div>
                       <div className="text-[11px]" style={{ color: TEXT_MUTED }}>复习</div>
-                      <div className="text-[14px] font-semibold" style={{ color: ORANGE }}>{dueCount}</div>
+                      <div className="text-[13px] font-semibold" style={{ color: ORANGE }}>{dueCount}</div>
                     </div>
                     <div>
                       <div className="text-[11px]" style={{ color: TEXT_MUTED }}>新卡</div>
-                      <div className="text-[14px] font-semibold" style={{ color: BLUE }}>{newCount}</div>
+                      <div className="text-[13px] font-semibold" style={{ color: BLUE }}>{newCount}</div>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4" style={{ color: 'rgba(203,213,225,0.3)' }} />
