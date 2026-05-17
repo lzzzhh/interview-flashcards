@@ -81,7 +81,6 @@ export default function SubModulePicker({ onBack }: Props) {
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newColor, setNewColor] = useState('bg-blue-500');
-  const [deleteMode, setDeleteMode] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ key: string; label: string } | null>(null);
   const [showBrowser, setShowBrowser] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
@@ -133,7 +132,6 @@ export default function SubModulePicker({ onBack }: Props) {
       saveDeletedTopic(category, deleteTarget.key);
     }
     setDeleteTarget(null);
-    setDeleteMode(false);
   };
 
   const handleCreate = () => {
