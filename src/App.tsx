@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
@@ -24,6 +24,13 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
   const cardCount = state.visibleCardIds.length;
 
+  // 复习完毕自动返回首页
+  useEffect(() => {
+    if (state.studyMode === 'review' && (dueCountByCategory[state.category] ?? 0) === 0) {
+      onBack();
+    }
+  }, [state.studyMode, state.category, dueCountByCategory, onBack]);
+
   if (state.studyMode === 'choose') {
     return <SubModulePicker onBack={onBack} />;
   }
@@ -46,9 +53,6 @@ function StudyPage({ onBack }: { onBack: () => void }) {
         </div>
 
         {/* Status messages */}
-        {state.studyMode === 'review' && (dueCountByCategory[state.category] ?? 0) === 0 && (
-          <div className="shrink-0 text-center py-8 text-gray-400">🎉 全部复习完毕！</div>
-        )}
         {state.studyMode === 'new' && totalNew === 0 && (
           <div className="shrink-0 text-center py-8 text-gray-400">🎉 所有卡片都已学过！<button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button></div>
         )}
