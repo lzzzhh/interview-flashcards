@@ -31,10 +31,10 @@ const CARD_BG = 'rgba(255,255,255,0.06)';
 const CARD_BORDER = 'rgba(255,255,255,0.10)';
 
 const TABS = [
-  { label: '首页', active: true },
-  { label: '牌组' },
-  { label: '统计'},
-  { label: '我的' },
+  { label: '首页', icon: '🏠', active: true },
+  { label: '牌组', icon: '📚' },
+  { label: '统计', icon: '📊' },
+  { label: '我的', icon: '👤' },
 ];
 
 export default function HomePage({ onEnterStudy }: Props) {
