@@ -3,7 +3,7 @@
 // ============================================================
 
 import { useState, useMemo, useCallback } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Home, Layers, BarChart3, User } from 'lucide-react';
 import appIcon from '../../icon.png';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
@@ -31,10 +31,10 @@ const CARD_BG = 'rgba(255,255,255,0.06)';
 const CARD_BORDER = 'rgba(255,255,255,0.10)';
 
 const TABS = [
-  { label: '首页', icon: '🏠', active: true },
-  { label: '牌组', icon: '📚' },
-  { label: '统计', icon: '📊' },
-  { label: '我的', icon: '👤' },
+  { label: '首页', icon: Home, active: true },
+  { label: '牌组', icon: Layers },
+  { label: '统计', icon: BarChart3 },
+  { label: '我的', icon: User },
 ];
 
 export default function HomePage({ onEnterStudy }: Props) {
@@ -226,7 +226,7 @@ export default function HomePage({ onEnterStudy }: Props) {
         <div className="fixed bottom-0 left-0 right-0 flex justify-around py-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(20px)' }}>
           {TABS.map((tab) => (
             <button key={tab.label} className="flex flex-col items-center gap-0.5">
-              <span className="text-lg">{tab.icon}</span>
+              <tab.icon className="w-5 h-5" style={{ color: tab.active ? BLUE : TEXT_INACTIVE }} />
               <span className="text-[13px] font-semibold" style={{ color: tab.active ? BLUE : TEXT_INACTIVE }}>{tab.label}</span>
             </button>
           ))}
