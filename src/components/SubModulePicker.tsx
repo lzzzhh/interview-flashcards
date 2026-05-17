@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { SUB_MODULES, CATEGORIES, type SubModuleMeta } from '../constants';
-import ModulePageTemplate, { type ModuleTone, type ModuleTopicCardModel } from './ModulePageTemplate';
+import ModulePageTemplate, { type ModuleTopicCardModel } from './ModulePageTemplate';
 import CardBrowser from './CardBrowser';
 import CardEditor from './CardEditor';
 import StatsDashboard from './StatsDashboard';
@@ -60,7 +60,7 @@ function getTone(sm: Pick<SubModuleMeta, 'key' | 'label' | 'color'>): ModuleTone
 function getTopicModel(sm: SubModuleWithStats): ModuleTopicCardModel {
   const completed = Math.max(0, sm.total - sm.newCount);
   const progress = sm.total > 0 ? Math.round((completed / sm.total) * 100) : 0;
-  return { key: sm.key, title: sm.label, tone: getTone(sm), newCount: sm.newCount, dueCount: sm.dueCount, total: sm.total, completed, progress, isCustom: sm.key.startsWith('custom-') };
+  return { key: sm.key, title: sm.label, newCount: sm.newCount, dueCount: sm.dueCount, total: sm.total, completed, progress, isCustom: sm.key.startsWith('custom-') };
 }
 
 function loadCustomTopics(category: string): SubModuleMeta[] {
