@@ -4,6 +4,7 @@
 
 import { useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
+import MathText from './MathText';
 
 interface Props {
   onJumpToCard: (cardId: string, category: string) => void;
@@ -58,7 +59,7 @@ export default function RecommendBar({ onJumpToCard }: Props) {
             onClick={() => onJumpToCard(rec.id, rec.category)}
             className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 w-full text-left hover:bg-white/40 rounded-lg px-2 py-1 -mx-2 transition-colors"
           >
-            <span className="truncate flex-1">{rec.label}</span>
+            <span className="truncate flex-1 text-xs"><MathText text={rec.label} /></span>
             <span className={`ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${
               rec.overdue > 3 ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
               rec.overdue > 1 ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
