@@ -190,7 +190,7 @@ export default function HomePage({ onEnterStudy }: Props) {
             <h1 className="text-[25px] font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
               面经闪卡
             </h1>
-            <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+            <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-300">
               都是同龄人我原本没想高效学习
             </p>
           </div>
