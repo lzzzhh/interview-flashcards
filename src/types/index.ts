@@ -164,6 +164,7 @@ export type AppAction =
   | { type: 'RESET_ORDER' }
   | { type: 'ADD_CARD'; payload: FlashCard }
   | { type: 'UPDATE_CARD'; payload: FlashCard }
+  | { type: 'JUMP_TO_CARD'; payload: { category: Category; cardId: string } }
   | { type: 'DELETE_CARD'; payload: string }
   | { type: 'SET_DAILY_NEW_LIMIT'; payload: number }
   | { type: 'SET_STUDY_MODE'; payload: StudyMode }

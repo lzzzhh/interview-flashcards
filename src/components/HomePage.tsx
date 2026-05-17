@@ -197,7 +197,10 @@ export default function HomePage({ onEnterStudy }: Props) {
         </div>
 
         <div className="-mt-2">
-          <RecommendBar />
+          <RecommendBar onJumpToCard={(cardId, category) => {
+          dispatch({ type: 'JUMP_TO_CARD', payload: { category: category as Category, cardId } });
+          onEnterStudy(category as Category);
+        }} />
         </div>
 
         {/* Module list */}

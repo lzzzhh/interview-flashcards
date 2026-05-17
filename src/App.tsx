@@ -47,7 +47,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
         {/* Status messages */}
         {state.studyMode === 'review' && (dueCountByCategory[state.category] ?? 0) === 0 && (
-          <div className="shrink-0 text-center py-8 text-gray-400">🎉 没有到期卡片！</div>
+          <div className="shrink-0 text-center py-8 text-gray-400">🎉 全部复习完毕！</div>
         )}
         {state.studyMode === 'new' && totalNew === 0 && (
           <div className="shrink-0 text-center py-8 text-gray-400">🎉 所有卡片都已学过！<button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button></div>

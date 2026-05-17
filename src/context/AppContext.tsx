@@ -403,6 +403,32 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
     }
 
+    case 'JUMP_TO_CARD': {
+      const { category: cat, cardId } = action.payload;
+      const cardsById = buildCardsById(cat);
+      const nextState: AppState = {
+        ...state,
+        category: cat,
+        cardsById,
+        showApproach: false,
+        showCode: false,
+        qaAnswerVisible: false,
+        filterDifficulty: 'all' as const,
+        filterSubTopic: 'all' as const,
+        searchQuery: '',
+        shuffled: false,
+        reviewMode: false,
+        studyMode: 'review' as const,
+      };
+      const visibleIds = computeVisibleIds(nextState);
+      const idx = visibleIds.indexOf(cardId);
+      return {
+        ...nextState,
+        visibleCardIds: visibleIds,
+        currentVisibleIndex: idx >= 0 ? idx : 0,
+      };
+    }
+
     default:
       return state;
   }

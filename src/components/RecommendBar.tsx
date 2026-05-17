@@ -5,6 +5,10 @@
 import { useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
 
+interface Props {
+  onJumpToCard: (cardId: string, category: string) => void;
+}
+
 interface RecCard {
   id: string;
   label: string;
@@ -13,7 +17,7 @@ interface RecCard {
   overdue: number;
 }
 
-export default function RecommendBar() {
+export default function RecommendBar({ onJumpToCard }: Props) {
   const { state } = useAppContext();
 
   const recommendations = useMemo<RecCard[]>(() => {
@@ -49,7 +53,11 @@ export default function RecommendBar() {
       ) : (
       <div className="space-y-1.5">
         {recommendations.map((rec) => (
-          <div key={rec.id} className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+          <button
+            key={rec.id}
+            onClick={() => onJumpToCard(rec.id, rec.category)}
+            className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 w-full text-left hover:bg-white/40 rounded-lg px-2 py-1 -mx-2 transition-colors"
+          >
             <span className="truncate flex-1">{rec.label}</span>
             <span className={`ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${
               rec.overdue > 3 ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
@@ -58,7 +66,7 @@ export default function RecommendBar() {
             }`}>
               {rec.reason}
             </span>
-          </div>
+          </button>
         ))}
       </div>
       )}
