@@ -82,6 +82,7 @@ export default function SubModulePicker({ onBack }: Props) {
   const [newName, setNewName] = useState('');
   const [newColor, setNewColor] = useState('bg-blue-500');
   const [deleteTarget, setDeleteTarget] = useState<{ key: string; label: string } | null>(null);
+  const [deleteMode, setDeleteMode] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
 
@@ -132,6 +133,7 @@ export default function SubModulePicker({ onBack }: Props) {
       saveDeletedTopic(category, deleteTarget.key);
     }
     setDeleteTarget(null);
+    setDeleteMode(false);
   };
 
   const handleCreate = () => {
@@ -168,6 +170,10 @@ export default function SubModulePicker({ onBack }: Props) {
         onBack={onBack}
         onStartReview={handleReviewAll}
         onTopicClick={handleStudyNew}
+        onOpenCardManager={() => setShowBrowser(true)}
+        onCreateTopic={() => setShowCreate(true)}
+        onDeleteTopic={(topic) => { setDeleteTarget({ key: topic.key, label: topic.title }); }}
+        deleteMode={deleteMode}
       />
       <StatsDashboard category={category} />
       {showBrowser && <CardBrowser onEdit={(card) => { if (!card.id) setEditingCard(null); else setEditingCard(card); }} onClose={() => setShowBrowser(false)} />}

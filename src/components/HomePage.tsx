@@ -170,7 +170,7 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
         </div>
 
         {/* 推荐学习 */}
-        <div className="rounded-2xl p-4 mb-3 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+        <div className="rounded-2xl p-4 mb-3 border min-h-[140px]" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
             <span className="text-[12px] px-2 py-0.5 rounded-full" style={{ color: TEXT_SECONDARY, backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
