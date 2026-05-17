@@ -170,8 +170,6 @@ export default function SubModulePicker({ onBack }: Props) {
         onBack={onBack}
         onStartReview={handleReviewAll}
         onTopicClick={handleStudyNew}
-        onDeleteTopic={(topic) => { setDeleteTarget({ key: topic.key, label: topic.title }); }}
-        deleteMode={deleteMode}
       />
       <StatsDashboard category={category} />
       {showBrowser && <CardBrowser onEdit={(card) => { if (!card.id) setEditingCard(null); else setEditingCard(card); }} onClose={() => setShowBrowser(false)} />}

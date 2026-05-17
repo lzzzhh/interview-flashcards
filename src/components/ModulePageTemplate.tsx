@@ -28,13 +28,11 @@ interface Props {
   onBack: () => void;
   onStartReview: () => void;
   onTopicClick: (topic: ModuleTopicCardModel) => void;
-  onDeleteTopic?: (topic: ModuleTopicCardModel) => void;
-  deleteMode?: boolean;
 }
 
 export default function ModulePageTemplate({
   categoryLabel, moduleDue, totalNewCards, totalCards, topics,
-  onBack, onStartReview, onTopicClick, onDeleteTopic,
+  onBack, onStartReview, onTopicClick,
 }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
