@@ -63,13 +63,13 @@ export default function StatsPage({ onBack }: Props) {
             <StatBox icon={<Clock className="w-4 h-4" />} label="待复习" value={dueCount} color={ORANGE} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl px-3 py-2" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
+            <div className="rounded-xl px-3 py-2 text-center" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
               <span className="text-[11px]" style={{ color: TEXT_MUTED }}>连续学习</span>
-              <p className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>{streak}<span className="text-[13px] font-normal" style={{ color: TEXT_MUTED }}>天</span></p>
+              <p className="text-[16px] font-bold mt-0.5" style={{ color: TEXT_PRIMARY }}>{streak}<span className="text-[11px] font-normal ml-0.5" style={{ color: TEXT_MUTED }}>天</span></p>
             </div>
-            <div className="rounded-xl px-3 py-2" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
+            <div className="rounded-xl px-3 py-2 text-center" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
               <span className="text-[11px]" style={{ color: TEXT_MUTED }}>今日已学</span>
-               <p className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>{todayCount}<span className="text-[13px] font-normal" style={{ color: TEXT_MUTED }}>张</span></p>
+              <p className="text-[16px] font-bold mt-0.5" style={{ color: TEXT_PRIMARY }}>{todayCount}<span className="text-[11px] font-normal ml-0.5" style={{ color: TEXT_MUTED }}>张</span></p>
             </div>
           </div>
         </div>
