@@ -11,7 +11,26 @@ import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit } from '../utils/customDecks';
 import { useDeckTotals } from '../repositories/useDeckStats';
 import { loadProgress } from '../utils/storage';
-import type { Category } from '../types';
+import { leetcodeHot100 } from '../data/leetcode-hot100';
+import { statisticsCards } from '../data/statistics';
+import { machineLearningCards } from '../data/machine-learning';
+import { deepLearningCards } from '../data/deep-learning';
+import { llmCards } from '../data/llm';
+import { agentCards } from '../data/agent';
+import { jargonCards } from '../data/jargon';
+import { workplaceCards } from '../data/workplace';
+import { vibeCodingCards } from '../data/vibe-coding';
+import type { Category, FlashCard } from '../types';
+
+// 全量卡片标签查找（仅用于推荐展示，统计来自数据库）
+const CARD_LABELS: Record<string, string> = {};
+for (const cards of [leetcodeHot100, statisticsCards, machineLearningCards, deepLearningCards, llmCards, agentCards, jargonCards, workplaceCards, vibeCodingCards]) {
+  for (const c of cards as FlashCard[]) {
+    if (c.category === 'leetcode' && 'number' in c) CARD_LABELS[c.id] = `#${c.number} ${c.titleCn}`;
+    else if ('question' in c) CARD_LABELS[c.id] = c.question.slice(0, 25);
+    else CARD_LABELS[c.id] = c.id;
+  }
+}
 
 interface Props {
   onEnterStudy: (category: Category) => void;
@@ -83,8 +102,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
         if (overdue < 0) continue;
         const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
         const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
-        const card = state.cardsById[cardId];
-        const label = card ? (card.category === 'leetcode' && 'number' in card ? `#${card.number} ${card.titleCn}` : ('question' in card ? card.question.slice(0, 25) : cardId)) : cardId;
+        const label = CARD_LABELS[cardId] || cardId;
         all.push({ id: cardId, label, category: cat.key, score });
       }
     }
