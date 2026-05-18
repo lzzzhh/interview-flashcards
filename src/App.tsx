@@ -92,7 +92,7 @@ function AppInner() {
   const [studyCategory, setStudyCategory] = useState<string | null>(null);
   const [showDecks, setShowDecks] = useState(false);
   const { dispatch } = useAppContext();
-  const handleEnterStudy = (category: Category) => { setStudyCategory(category); dispatch({ type: 'SET_CATEGORY', payload: category }); };
+  const handleEnterStudy = (category: Category) => { setStudyCategory(category); setShowDecks(false); dispatch({ type: 'SET_CATEGORY', payload: category }); };
 
   if (showDecks) {
     return <DeckPage onEnterStudy={handleEnterStudy} onBack={() => setShowDecks(false)} />;
