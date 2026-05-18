@@ -99,10 +99,9 @@ export default function StatsPage({ onBack, category }: Props) {
             </div>
             <div className="rounded-xl px-3 py-2" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
               <span className="text-[11px]" style={{ color: TEXT_MUTED }}>今日已学</span>
-              <p className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>{todayCount}<span className="text-[13px] font-normal" style={{ color: TEXT_MUTED }}>张</span></p>
-        </div>
-      </div>
-    </div>
+               <p className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>{todayCount}<span className="text-[13px] font-normal" style={{ color: TEXT_MUTED }}>张</span></p>
+            </div>
+          </div>
         </div>
 
         {/* Accuracy */}
