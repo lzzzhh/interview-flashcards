@@ -55,7 +55,7 @@ export default function StatsPage({ onBack, category }: Props) {
   const logs = loadReviewLogs();
   const allLogs = Object.values(logs).flat();
   const streak = getStreak(allLogs);
-  const todayCount = getTodayReviewed();
+  const todayCount = getTodayReviewed(allLogs);
   const accuracy = getRecentAccuracy(allLogs, 30);
 
   // Per-module breakdown
