@@ -52,7 +52,7 @@ export default function ProfilePage({ onBack }: Props) {
           <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>设置</h2>
           <div className="space-y-1">
             <SettingRow label="深色模式" right={
-              <button onClick={() => dispatch({ type: 'TOGGLE_DARK' })} className="w-11 h-6 rounded-full relative transition-colors" style={{ backgroundColor: state.isDark ? BLUE : 'rgba(255,255,255,0.2)' }}>
+              <button onClick={() => dispatch({ type: 'TOGGLE_DARK' })} className="w-11 h-6 rounded-full relative transition-colors" style={{ backgroundColor: state.isDark ? BLUE : '#CBD5E1' }}>
                 <div className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ left: state.isDark ? '22px' : '2px' }} />
               </button>
             } />
@@ -68,7 +68,7 @@ export default function ProfilePage({ onBack }: Props) {
 
 function SettingRow({ label, right }: { label: string; right: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between py-2.5 border-b last:border-b-0" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+    <div className="flex items-center justify-between py-2.5 border-b last:border-b-0" style={{ borderColor: 'var(--card-border)' }}>
       <span className="text-[13px]" style={{ color: TEXT_PRIMARY }}>{label}</span>
       {right}
     </div>
