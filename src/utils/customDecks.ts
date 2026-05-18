@@ -139,3 +139,28 @@ export function getModuleDailyLimit(moduleId: string): number {
 export function setModuleDailyLimit(moduleId: string, limit: number): void {
   localStorage.setItem(`fc-limit-${moduleId}`, String(Math.max(1, Math.min(100, limit))));
 }
+
+/** 获取所有模块的每日新卡上限 */
+export function getAllModuleLimits(): Record<string, number> {
+  const result: Record<string, number> = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith('fc-limit-')) {
+      result[key.replace('fc-limit-', '')] = Number(localStorage.getItem(key)) || 20;
+    }
+  }
+  return result;
+}
+
+/** 加载所有自定义牌组的卡片 */
+export function loadAllCustomCards(): Record<string, QACard[]> {
+  const decks = loadCustomDecks();
+  const result: Record<string, QACard[]> = {};
+  for (const deck of decks) {
+    try {
+      const raw = localStorage.getItem(`fc-cards-${deck.id}`);
+      result[deck.id] = raw ? JSON.parse(raw) : [];
+    } catch { result[deck.id] = []; }
+  }
+  return result;
+}

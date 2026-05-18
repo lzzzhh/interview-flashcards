@@ -39,6 +39,7 @@ import { shuffle } from '../utils/shuffle';
 import { loadCustomCards } from '../utils/customDecks';
 import { getModuleDailyLimit } from '../utils/customDecks';
 import { SUB_MODULES } from '../constants';
+import { loadCustomDecks, getAllModuleLimits, loadAllCustomCards } from '../utils/customDecks';
 
 // ---- Undo support ----
 let lastRating: { cardId: string; previousSm2: any } | null = null;
@@ -81,8 +82,14 @@ function buildCardsById(category: Category): Record<string, FlashCard> {
     for (const card of rawCards) {
       const sm2 = progress.sm2[card.id]
         ? { ...card.sm2, ...progress.sm2[card.id] }
-        : { ...card.sm2, nextReview: now }; // 新卡片 nextReview 用当前时间
+        : { ...card.sm2, nextReview: now };
       result[card.id] = { ...card, sm2, favorited: progress.favorited.includes(card.id) };
+    }
+    // 合并用户新增到内置模块的卡片
+    const userCards = loadUserCards(category);
+    for (const [id, card] of Object.entries(userCards)) {
+      const sm2 = progress.sm2[id] ? { ...card.sm2, ...progress.sm2[id] } : card.sm2;
+      result[id] = { ...card, sm2, favorited: progress.favorited.includes(id) };
     }
     return result;
   }
@@ -91,9 +98,16 @@ function buildCardsById(category: Category): Record<string, FlashCard> {
   const customCards = loadCustomCards(category as string);
   const result: Record<string, FlashCard> = {};
   for (const card of customCards) {
-    result[card.id] = { ...card, sm2: { ...card.sm2, nextReview: now } };
+    result[card.id] = { ...card, sm2: { ...card.sm2, nextReview: card.sm2.nextReview || now } };
   }
   return result;
+}
+
+function loadUserCards(category: string): Record<string, FlashCard> {
+  try {
+    const raw = localStorage.getItem(`fc-user-cards-${category}`);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
 }
 
 function isLeetCodeCard(card: FlashCard): card is LeetCodeCard {
@@ -308,11 +322,11 @@ function appReducer(state: AppState, action: AppAction): AppState {
         },
         qaAnswerVisible: false,
       };
-      // 复习模式下重算可见卡片（已评分的不再到期）
+      // 复习模式下重算可见卡片并前进
       if (state.studyMode === 'review') {
         const visibleIds = computeVisibleIds(updated);
-        const curIdx = Math.min(state.currentVisibleIndex, visibleIds.length - 1);
-        return { ...updated, visibleCardIds: visibleIds, currentVisibleIndex: curIdx };
+        const curIdx = Math.min(state.currentVisibleIndex + 1, visibleIds.length - 1);
+        return { ...updated, visibleCardIds: visibleIds, currentVisibleIndex: Math.max(0, curIdx) };
       }
       return updated;
     }
@@ -359,6 +373,14 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'ADD_CARD': {
       const card = action.payload;
+      // 持久化到内置模块的用户卡片区
+      const isBuiltIn = Object.keys(CARD_DATA).includes(card.category);
+      if (isBuiltIn) {
+        const key = `fc-user-cards-${card.category}`;
+        const existing = loadUserCards(card.category);
+        existing[card.id] = card;
+        try { localStorage.setItem(key, JSON.stringify(existing)); } catch {}
+      }
       return {
         ...state,
         cardsById: { ...state.cardsById, [card.id]: card },
@@ -367,6 +389,13 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'UPDATE_CARD': {
       const card = action.payload;
+      const isBuiltIn = Object.keys(CARD_DATA).includes(card.category);
+      if (isBuiltIn) {
+        const key = `fc-user-cards-${card.category}`;
+        const existing = loadUserCards(card.category);
+        existing[card.id] = card;
+        try { localStorage.setItem(key, JSON.stringify(existing)); } catch {}
+      }
       return {
         ...state,
         cardsById: { ...state.cardsById, [card.id]: card },
@@ -375,7 +404,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'DELETE_CARD': {
       const newCards = { ...state.cardsById };
-      delete newCards[action.payload];
+      const removed = newCards[action.payload];
+      if (removed) {
+        const isBuiltIn = Object.keys(CARD_DATA).includes(removed.category);
+        if (isBuiltIn) {
+          const key = `fc-user-cards-${removed.category}`;
+          const existing = loadUserCards(removed.category);
+          delete existing[action.payload];
+          try { localStorage.setItem(key, JSON.stringify(existing)); } catch {}
+        }
+        delete newCards[action.payload];
+      }
       return {
         ...state,
         cardsById: newCards,
@@ -529,14 +568,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     saveProgressToLS(state.category, progress);
 
-    // Tauri 文件存储
+    // Tauri 文件存储（v2 schema）
     const allData = loadAllProgress();
+    const allLimits = getAllModuleLimits() as Record<string, number>;
     saveAppData({
-      schemaVersion: 1,
+      schemaVersion: 2,
       progress: allData,
       reviewLogs: {},
       settings: { isDark: state.isDark, lastCategory: state.category },
       stats: { sessions: [] },
+      customDecks: loadCustomDecks().map((d: any) => ({ id: d.id, name: d.name, description: d.description || '' })),
+      customCards: loadAllCustomCards(),
+      moduleDailyLimits: allLimits,
     } as any);
   }, [state.cardsById, state.category, state.isDark]);
 

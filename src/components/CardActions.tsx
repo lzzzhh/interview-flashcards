@@ -2,7 +2,7 @@
 // src/components/CardActions.tsx — 适配新 state（cardId 操作）
 // ============================================================
 
-import { ChevronLeft, ChevronRight, Flame, Star, Shuffle, FlaskConical, Undo2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flame, Star, Shuffle, Undo2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { previewSchedule } from '../utils/sm2';
 
@@ -49,18 +49,6 @@ export default function CardActions() {
         </button>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_REVIEW_MODE' })}
-            className={`p-2 rounded-lg transition-colors ${
-              state.reviewMode
-                ? 'bg-primary text-white'
-                : 'bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12'
-            }`}
-            title={state.reviewMode ? '退出复习模式' : '进入复习模式'}
-          >
-            <FlaskConical className="w-4 h-4" />
-          </button>
-
           <button
             onClick={() => dispatch({ type: 'TOGGLE_MASTERED', payload: currentCard.id })}
             className={`p-2 rounded-lg transition-colors ${
@@ -121,7 +109,7 @@ export default function CardActions() {
               key={quality}
               onClick={() => {
                 dispatch({ type: 'RATE_CARD', payload: { cardId: currentCard.id, rating: quality } });
-                dispatch({ type: 'NEXT' });
+                if (state.studyMode !== 'review') dispatch({ type: 'NEXT' });
               }}
               className={`flex-1 flex flex-col items-center py-2 sm:py-2.5 px-0.5 rounded-xl ${color} ${textColor} transition-all active:scale-95`}
               title={`${desc} → 下次间隔: ${interval}`}
