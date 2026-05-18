@@ -2,10 +2,9 @@ import { useMemo } from 'react';
 import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
-import { getModuleDailyLimit } from '../utils/customDecks';
-import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy, getAverageRating } from '../utils/reviewLogs';
+import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
 import { loadProgress } from '../utils/storage';
-import type { Category, FlashCard } from '../types';
+import type { FlashCard } from '../types';
 
 interface Props {
   onBack: () => void;
@@ -58,14 +57,12 @@ export default function StatsPage({ onBack, category }: Props) {
   const streak = getStreak(allLogs);
   const todayCount = getTodayReviewed();
   const accuracy = getRecentAccuracy(allLogs, 30);
-  const avgRating = getAverageRating(allLogs);
 
   // Per-module breakdown
   const moduleStats = useMemo(() => {
     const cats = category ? [CATEGORIES.find(c => c.key === category)!] : CATEGORIES;
     return cats.filter(Boolean).map(cat => {
       const total = TOTAL_MAP[cat.key] ?? 0;
-      const progress = loadProgress(cat.key);
       const due = allCards.filter(c => {
         if (c.category !== cat.key) return false;
         const s = c.sm2;
