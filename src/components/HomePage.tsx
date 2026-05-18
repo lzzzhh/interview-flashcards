@@ -25,6 +25,7 @@ interface Props {
   onEnterStudy: (category: Category) => void;
   onShowDecks: () => void;
   onShowStats: () => void;
+  onShowProfile: () => void;
 }
 
 const TOTAL_MAP: Record<string, number> = {
@@ -61,10 +62,10 @@ const TABS = [
   { label: '首页', icon: Home, active: true },
   { label: '牌组', icon: Layers, action: 'decks' as const },
   { label: '统计', icon: BarChart3, action: 'stats' as const },
-  { label: '我的', icon: User },
+  { label: '我的', icon: User, action: 'profile' as const },
 ];
 
-export default function HomePage({ onEnterStudy, onShowDecks, onShowStats }: Props) {
+export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile }: Props) {
   const { state, dueCountByCategory } = useAppContext();
 
   const streak = useMemo(() => {
@@ -253,6 +254,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats }: Pro
               onClick={() => {
                 if (tab.action === 'decks') onShowDecks();
                 else if (tab.action === 'stats') onShowStats();
+                else if (tab.action === 'profile') onShowProfile();
               }}
               className="flex flex-col items-center gap-0.5"
             >
