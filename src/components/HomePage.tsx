@@ -20,15 +20,16 @@ import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
-import type { Category, FlashCard } from '../types';
+import type { Category } from '../types';
 
 // 全量卡片标签查找（仅用于推荐展示，统计来自数据库）
 const CARD_LABELS: Record<string, string> = {};
 for (const cards of [leetcodeHot100, statisticsCards, machineLearningCards, deepLearningCards, llmCards, agentCards, jargonCards, workplaceCards, vibeCodingCards]) {
-  for (const c of cards as FlashCard[]) {
-    if (c.category === 'leetcode' && 'number' in c) CARD_LABELS[c.id] = `#${c.number} ${c.titleCn}`;
-    else if ('question' in c) CARD_LABELS[c.id] = c.question.slice(0, 25);
-    else CARD_LABELS[c.id] = c.id;
+  for (const c of cards) {
+    const anyC = c as any;
+    if (anyC.category === 'leetcode') CARD_LABELS[anyC.id] = `#${anyC.number} ${anyC.titleCn}`;
+    else if (anyC.question) CARD_LABELS[anyC.id] = anyC.question.slice(0, 25);
+    else CARD_LABELS[anyC.id] = anyC.id;
   }
 }
 
