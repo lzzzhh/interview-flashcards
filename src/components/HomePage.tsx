@@ -160,7 +160,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
         </div>
 
         {/* 推荐学习 */}
-        <div className="rounded-2xl p-4 mb-3 border min-h-[140px]" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+        <div className="rounded-2xl p-4 mb-3 border flex flex-col" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER, minHeight: '140px', height: '140px' }}>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
             <span className="text-[12px] px-2 py-0.5 rounded-full" style={{ color: 'var(--text-secondary)', backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
@@ -187,6 +187,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
               onMouseLeave={() => { isDragging.current = false; }}
               className="overflow-hidden cursor-grab active:cursor-grabbing"
             >
+              <div key={recModule.index} className="card-slide-in">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.label}</h3>
@@ -203,6 +204,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
+              </div>
               </div>
             </div>
           )}
