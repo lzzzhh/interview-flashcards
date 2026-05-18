@@ -174,7 +174,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
         <div className="rounded-2xl p-4 mb-3 border min-h-[140px]" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
-            <span className="text-[12px] px-2 py-0.5 rounded-full" style={{ color: TEXT_SECONDARY, backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
+            <span className="text-[12px] px-2 py-0.5 rounded-full" style={{ color: 'var(--text-secondary)', backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
           </div>
           {recModule === null ? (
             <p className="text-[13px]" style={{ color: TEXT_MUTED }}>暂无待复习卡片</p>
@@ -190,7 +190,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.label}</h3>
-                  <p className="text-[12px] mt-0.5" style={{ color: 'rgba(226,232,240,0.60)' }}>高优先级 · 复习薄弱点</p>
+                  <p className="text-[12px] mt-0.5" style={{ color: 'var(--text-muted)' }}>高优先级 · 复习薄弱点</p>
                   <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>
                     {recIndex + 1} / {recommendations.length}
                   </p>
@@ -247,7 +247,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
         </div>
 
         {/* Tab Bar */}
-        <div className="fixed bottom-0 left-0 right-0 flex justify-around py-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(15,23,42,0.06)', backdropFilter: 'blur(20px)' }}>
+        <div className="fixed bottom-0 left-0 right-0 flex justify-around py-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)' }}>
           {TABS.map((tab) => (
             <button
               key={tab.label}
