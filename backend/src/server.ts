@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import { deckRoutes } from './routes/decks';
 import { dashboardRoutes } from './routes/dashboard';
 import { reviewRoutes } from './routes/reviews';
+import { studyRoutes } from './routes/study';
 
 const app = Fastify({ logger: true });
 const PORT = parseInt(process.env.PORT || '3001', 10);
@@ -12,6 +13,7 @@ async function start() {
   await app.register(deckRoutes);
   await app.register(dashboardRoutes);
   await app.register(reviewRoutes);
+  await app.register(studyRoutes);
 
   app.get('/api/health', async () => ({ ok: true }));
 
