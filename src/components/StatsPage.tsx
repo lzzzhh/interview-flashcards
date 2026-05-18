@@ -86,16 +86,22 @@ export default function StatsPage({ onBack }: Props) {
         {/* Module Breakdown */}
         <div className="rounded-2xl p-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>模块分布</h2>
-          <div className="space-y-1.5">
-            {moduleStats.map(m => (
-              <div key={m.key} className="flex items-center justify-between py-1.5">
-                <span className="text-[13px]" style={{ color: TEXT_PRIMARY }}>{m.label}</span>
-                <div className="flex gap-4 text-right">
-                  <span className="text-[12px]" style={{ color: TEXT_MUTED }}>共 {m.total}</span>
-                  {m.due > 0 && <span className="text-[13px] font-semibold" style={{ color: ORANGE }}>{m.due} 待复习</span>}
+          <div className="space-y-2">
+            {moduleStats.map(m => {
+              const started = m.total - (decks.find(d => d.id === m.key)?.stats.newCount ?? 0);
+              const pct = m.total > 0 ? Math.round((started / m.total) * 100) : 0;
+              return (
+                <div key={m.key}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[13px]" style={{ color: TEXT_PRIMARY }}>{m.label}</span>
+                    <span className="text-[11px]" style={{ color: TEXT_MUTED }}>{started}/{m.total}</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
+                    <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: BLUE }} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
