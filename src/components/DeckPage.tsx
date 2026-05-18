@@ -25,7 +25,7 @@ const CARD_BORDER = 'rgba(255,255,255,0.3)';
 const DECK_ITEM_BG = 'rgba(255,255,255,0.05)';
 
 export default function DeckPage({ onEnterStudy, onBack }: Props) {
-  const { state, dispatch, dueCountByCategory } = useAppContext();
+  const { dispatch, dueCountByCategory } = useAppContext();
   const [showBrowser, setShowBrowser] = useState(false);
 
   const handleEditCards = (cat: Category) => {
