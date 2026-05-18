@@ -22,7 +22,7 @@ interface DeckItem {
 
 interface DecksResponse { decks: DeckItem[]; }
 
-export function useDeckTotals(): { totals: Record<string, number>; decks: DeckItem[]; loading: boolean } {
+export function useDeckStats(): { totals: Record<string, number>; decks: DeckItem[]; loading: boolean } {
   const [totals, setTotals] = useState<Record<string, number>>({});
   const [decks, setDecks] = useState<DeckItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,3 +41,6 @@ export function useDeckTotals(): { totals: Record<string, number>; decks: DeckIt
 
   return { totals, decks, loading };
 }
+
+/** @deprecated 使用 useDeckStats */
+export const useDeckTotals = useDeckStats;

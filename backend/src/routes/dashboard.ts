@@ -16,7 +16,8 @@ export async function dashboardRoutes(app: FastifyInstance) {
       const total = await prisma.card.count({ where: { deckId: d.id } });
       totalCards += total;
       const progressCards = await prisma.cardProgress.findMany({ where: { card: { deckId: d.id }, userId: USER_ID } });
-      newCount += Math.max(0, total - progressCards.length);
+      const studiedCount = progressCards.filter(p => p.state !== 'new').length;
+      newCount += Math.max(0, total - studiedCount);
       todayDue += progressCards.filter(p => p.state !== 'new' && p.nextReview <= new Date()).length;
       learningCount += progressCards.filter(p => p.state === 'learning').length;
     }
