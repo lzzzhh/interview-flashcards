@@ -90,6 +90,5 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
       )}
       </div>
       </div>
-    </div>
   );
 }
