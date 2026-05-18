@@ -118,20 +118,19 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
         />
       )}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="rounded-2xl p-5 w-full max-w-sm shadow-xl" style={{ backgroundColor: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(15,23,42,0.1)' }}>
-            <div className="dark" style={{ display: 'none' }} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="rounded-2xl p-5 w-full max-w-sm shadow-xl" style={{ backgroundColor: 'rgba(30,41,59,0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[16px] font-bold text-gray-900">新建牌组</h3>
-              <button onClick={() => setShowCreate(false)} className="p-1"><X className="w-5 h-5 text-gray-500" /></button>
+              <h3 className="text-[16px] font-bold" style={{ color: 'var(--text-primary)' }}>新建牌组</h3>
+              <button onClick={() => setShowCreate(false)} className="p-1"><X className="w-5 h-5" style={{ color: 'var(--text-muted)' }} /></button>
             </div>
             <div className="space-y-3">
-              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="牌组名称" className="w-full px-3 py-2 rounded-lg border text-sm text-gray-900 border-gray-200" onKeyDown={(e) => e.key === 'Enter' && handleCreate()} autoFocus />
+              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="牌组名称" className="w-full px-3 py-2 rounded-lg border text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'var(--text-primary)', borderColor: 'rgba(255,255,255,0.1)' }} onKeyDown={(e) => e.key === 'Enter' && handleCreate()} autoFocus />
               <div className="flex items-center justify-between">
-                <span className="text-[12px] text-gray-500">每日新卡上限</span>
-                <input type="number" min="1" max="100" value={newLimit} onChange={(e) => setNewLimit(Number(e.target.value))} className="w-16 px-2 py-1 rounded-lg border text-sm text-center text-gray-900" />
+                <span className="text-[12px]" style={{ color: 'var(--text-muted)' }}>每日新卡上限</span>
+                <input type="number" min="1" max="100" value={newLimit} onChange={(e) => setNewLimit(Number(e.target.value))} className="w-16 px-2 py-1 rounded-lg border text-sm text-center" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'var(--text-primary)', borderColor: 'rgba(255,255,255,0.1)' }} />
               </div>
-              <button onClick={handleCreate} disabled={!newName.trim()} className="w-full py-2.5 rounded-xl text-[14px] font-bold text-white disabled:opacity-30" style={{ background: `linear-gradient(135deg, #2563EB, #1D4ED8)` }}>
+              <button onClick={handleCreate} disabled={!newName.trim()} className="w-full py-2.5 rounded-xl text-[14px] font-bold text-white disabled:opacity-30" style={{ background: `linear-gradient(135deg, var(--blue), #1D4ED8)` }}>
                 创建
               </button>
             </div>
