@@ -85,7 +85,7 @@ export default function ModulePageTemplate({
           </div>
         )}
       </div>
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex justify-center">
         <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
         {/* Stats Card */}
