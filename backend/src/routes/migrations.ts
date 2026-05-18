@@ -70,8 +70,10 @@ export async function migrationRoutes(app: FastifyInstance) {
       for (const [key, logs] of Object.entries(body.reviewLogs)) {
         for (const log of logs as any[]) {
           if (log.cardId) {
-            await prisma.reviewLog.create({
-              data: {
+            await prisma.reviewLog.upsert({
+              where: { id: log.id || `mig-${Date.now()}-${Math.random().toString(36).slice(2, 6)}` },
+              update: {},
+              create: {
                 id: log.id || `mig-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
                 userId: USER_ID, cardId: log.cardId,
                 reviewedAt: new Date(log.reviewedAt || Date.now()),

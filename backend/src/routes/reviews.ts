@@ -25,44 +25,44 @@ export async function reviewRoutes(app: FastifyInstance) {
 
     const result = scheduleReview(cardId, sm2Record, rating);
 
-    // upsert progress
-    progress = await prisma.cardProgress.upsert({
-      where: { userId_cardId: { userId: USER_ID, cardId } },
-      update: {
-        state: result.sm2.state, easeFactor: result.sm2.easeFactor,
-        intervalDays: result.sm2.intervalDays, repetitions: result.sm2.repetitions,
-        lapses: result.sm2.lapses, nextReview: result.sm2.nextReview,
-        lastReviewedAt: result.sm2.lastReviewedAt || new Date(),
-      },
-      create: {
-        userId: USER_ID, cardId,
-        state: result.sm2.state, easeFactor: result.sm2.easeFactor,
-        intervalDays: result.sm2.intervalDays, repetitions: result.sm2.repetitions,
-        lapses: result.sm2.lapses, nextReview: result.sm2.nextReview,
-        lastReviewedAt: result.sm2.lastReviewedAt || new Date(),
-      },
-    });
-
-    // insert review log
-    await prisma.reviewLog.create({
-      data: {
-        id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-        userId: USER_ID, cardId,
-        reviewedAt: result.log.reviewedAt, rating: result.log.rating,
-        stateBefore: result.log.stateBefore, stateAfter: result.log.stateAfter,
-        intervalBefore: result.log.intervalBefore, intervalAfter: result.log.intervalAfter,
-        easeBefore: result.log.easeBefore, easeAfter: result.log.easeAfter,
-        elapsedDays: result.log.elapsedDays, scheduledDays: result.log.scheduledDays,
-      },
-    });
+    // 事务：progress + log 原子性
+    const [updated] = await prisma.$transaction([
+      prisma.cardProgress.upsert({
+        where: { userId_cardId: { userId: USER_ID, cardId } },
+        update: {
+          state: result.sm2.state, easeFactor: result.sm2.easeFactor,
+          intervalDays: result.sm2.intervalDays, repetitions: result.sm2.repetitions,
+          lapses: result.sm2.lapses, nextReview: result.sm2.nextReview,
+          lastReviewedAt: result.sm2.lastReviewedAt || new Date(),
+        },
+        create: {
+          userId: USER_ID, cardId,
+          state: result.sm2.state, easeFactor: result.sm2.easeFactor,
+          intervalDays: result.sm2.intervalDays, repetitions: result.sm2.repetitions,
+          lapses: result.sm2.lapses, nextReview: result.sm2.nextReview,
+          lastReviewedAt: result.sm2.lastReviewedAt || new Date(),
+        },
+      }),
+      prisma.reviewLog.create({
+        data: {
+          id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          userId: USER_ID, cardId,
+          reviewedAt: result.log.reviewedAt, rating: result.log.rating,
+          stateBefore: result.log.stateBefore, stateAfter: result.log.stateAfter,
+          intervalBefore: result.log.intervalBefore, intervalAfter: result.log.intervalAfter,
+          easeBefore: result.log.easeBefore, easeAfter: result.log.easeAfter,
+          elapsedDays: result.log.elapsedDays, scheduledDays: result.log.scheduledDays,
+        },
+      }),
+    ]);
 
     return {
       cardId,
-      progress: {
-        state: progress.state, easeFactor: progress.easeFactor,
-        intervalDays: progress.intervalDays, repetitions: progress.repetitions,
-        lapses: progress.lapses, nextReview: progress.nextReview,
-      },
+      progress: updated ? {
+        state: updated.state, easeFactor: updated.easeFactor,
+        intervalDays: updated.intervalDays, repetitions: updated.repetitions,
+        lapses: updated.lapses, nextReview: updated.nextReview,
+      } : null,
     };
   });
 }

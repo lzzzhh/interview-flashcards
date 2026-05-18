@@ -1,25 +1,46 @@
-// 牌组总数 — 优先 API，fallback 硬编码
+// 牌组总数 — hook 方式，从 API 获取，无硬编码 fallback
 
-import { getDecks } from '../api/decks';
+import { useState, useEffect } from 'react';
+import { apiGet } from '../api/client';
 
-let cached: Record<string, number> | null = null;
+interface DeckStats {
+  total: number;
+  newCount: number;
+  dueCount: number;
+  dailyLimit: number;
+  learningCount: number;
+}
 
-const FALLBACK: Record<string, number> = {
-  leetcode: 100, statistics: 199, 'machine-learning': 171, 'deep-learning': 32,
-  llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
-};
+interface DeckResponse {
+  id: string;
+  name: string;
+  type: string;
+  sortOrder: number;
+  stats: DeckStats;
+}
+
+interface DecksResponse {
+  decks: DeckResponse[];
+}
+
+export function useDeckTotals(): { totals: Record<string, number>; loading: boolean } {
+  const [totals, setTotals] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    apiGet<DecksResponse>('/decks')
+      .then((data) => {
+        const next: Record<string, number> = {};
+        for (const d of data.decks) next[d.id] = d.stats.total;
+        setTotals(next);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { totals, loading };
+}
 
 export function getDeckTotals(): Record<string, number> {
-  return cached || FALLBACK;
+  return {};
 }
-
-export async function loadDeckTotals(): Promise<void> {
-  try {
-    const data = await getDecks();
-    cached = {};
-    for (const d of data) cached[d.id] = d.total;
-  } catch { /* use fallback */ }
-}
-
-// 立即尝试加载
-loadDeckTotals();

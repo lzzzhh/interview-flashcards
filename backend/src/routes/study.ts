@@ -27,19 +27,20 @@ export async function studyRoutes(app: FastifyInstance) {
     }
 
     if (mode === 'new') {
-      // 新卡片：没有 progress 或 progress.state = new
       const limit = await prisma.deckDailyLimit.findUnique({
         where: { userId_deckId: { userId: USER_ID, deckId } },
       });
       const dailyLimit = limit?.dailyLimit || 20;
 
-      const progressedCardIds = (await prisma.cardProgress.findMany({
-        where: { userId: USER_ID, card: { deckId } },
+      // 已经学过的卡（state != new 的 progress）
+      const studiedIds = (await prisma.cardProgress.findMany({
+        where: { userId: USER_ID, card: { deckId }, state: { not: 'new' } },
         select: { cardId: true },
       })).map(p => p.cardId);
 
+      // 新卡：没有 progress 或 progress.state === 'new'，且不在 studiedIds 中
       const cards = await prisma.card.findMany({
-        where: { deckId, id: { notIn: progressedCardIds } },
+        where: { deckId, id: { notIn: studiedIds } },
         take: dailyLimit,
         orderBy: { id: 'asc' },
       });

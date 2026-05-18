@@ -3,16 +3,9 @@ import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp } from 'lucide
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
-import { loadProgress } from '../utils/storage';
 import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
-import { getDeckTotals } from '../repositories/useDeckStats';
-import type { FlashCard } from '../types';
+import { getDeckTotals, useDeckTotals } from '../repositories/useDeckStats';
 import type { Category } from '../types';
-
-interface Props {
-  onBack: () => void;
-  category?: Category;
-}
 
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
@@ -22,32 +15,26 @@ const GREEN = '#22C55E';
 const CARD_BG = 'var(--card-bg)';
 const CARD_BORDER = 'var(--card-border)';
 
+interface Props {
+  onBack: () => void;
+  category?: Category;
+}
+
 export default function StatsPage({ onBack, category }: Props) {
-  const { state } = useAppContext();
+  const { state, dueCountByCategory } = useAppContext();
+  const { totals } = useDeckTotals();
 
-  const allCards = useMemo(() => {
-    const result: FlashCard[] = [];
-    for (const cat of (category ? [CATEGORIES.find(c => c.key === category)!] : CATEGORIES)) {
-      if (!cat) continue;
-      const progress = loadProgress(cat.key);
-      const cards = state.cardsById;
-      for (const card of Object.values(cards)) {
-        if (card.category !== cat.key) continue;
-        const sm2 = progress.sm2[card.id] ? { ...card.sm2, ...progress.sm2[card.id] } : card.sm2;
-        result.push({ ...card, sm2, favorited: progress.favorited.includes(card.id) });
-      }
-    }
-    return result;
-  }, [state.cardsById, category]);
+  const totalCards = Object.values(totals).reduce((a, b) => a + b, 0) || Object.keys(state.cardsById).length;
+  const newCards = Object.values(state.cardsById).filter(c => !c.sm2 || c.sm2.state === 'new').length;
+  const learning = Object.values(state.cardsById).filter(c => c.sm2?.state === 'learning').length;
+  const mastered = Object.values(state.cardsById).filter(c => c.sm2?.state === 'review' && c.sm2?.interval >= 21).length;
+  const relearningCount = Object.values(state.cardsById).filter(c => c.sm2?.state === 'relearning').length;
 
-  const totalCards = allCards.length;
-  const mastered = allCards.filter(c => c.sm2?.state === 'review' && c.sm2?.interval >= 21).length;
-  const dueCount = allCards.filter(c => {
-    const s = c.sm2;
-    return s && s.state !== 'new' && s.nextReview <= Date.now();
-  }).length;
-  const newCards = allCards.filter(c => !c.sm2 || c.sm2.state === 'new').length;
-  const learning = allCards.filter(c => c.sm2?.state === 'learning').length;
+  const dueCount = useMemo(() => {
+    let t = 0;
+    for (const cat of CATEGORIES) t += dueCountByCategory[cat.key] ?? 0;
+    return t;
+  }, [dueCountByCategory]);
 
   const logs = loadReviewLogs();
   const allLogs = Object.values(logs).flat();
@@ -58,16 +45,12 @@ export default function StatsPage({ onBack, category }: Props) {
   // Per-module breakdown
   const moduleStats = useMemo(() => {
     const cats = category ? [CATEGORIES.find(c => c.key === category)!] : CATEGORIES;
-    return cats.filter(Boolean).map(cat => {
-      const total = getDeckTotals()[cat.key] ?? 0;
-      const due = allCards.filter(c => {
-        if (c.category !== cat.key) return false;
-        const s = c.sm2;
-        return s && s.state !== 'new' && s.nextReview <= Date.now();
-      }).length;
-      return { key: cat!.key, label: cat!.label, total, due };
-    });
-  }, [allCards, category]);
+    return cats.filter(Boolean).map(cat => ({
+      key: cat!.key, label: cat!.label,
+      total: totals[cat!.key] ?? getDeckTotals()[cat!.key] ?? 0,
+      due: dueCountByCategory[cat!.key] ?? 0,
+    }));
+  }, [totals, dueCountByCategory, category]);
 
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
@@ -151,7 +134,7 @@ export default function StatsPage({ onBack, category }: Props) {
             <StageBadge label="新学" count={newCards} color={BLUE} />
             <StageBadge label="学习中" count={learning} color={ORANGE} />
             <StageBadge label="复习" count={mastered} color={GREEN} />
-            <StageBadge label="重学" count={allCards.filter(c => c.sm2?.state === 'relearning').length} color="#EF4444" />
+            <StageBadge label="重学" count={relearningCount} color="#EF4444" />
           </div>
         </div>
 

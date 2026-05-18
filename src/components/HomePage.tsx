@@ -10,17 +10,7 @@ import { CATEGORIES } from '../constants';
 import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit } from '../utils/customDecks';
 import { getDeckTotals } from '../repositories/useDeckStats';
-import { loadProgress } from '../utils/storage';
-import { leetcodeHot100 } from '../data/leetcode-hot100';
-import { statisticsCards } from '../data/statistics';
-import { machineLearningCards } from '../data/machine-learning';
-import { deepLearningCards } from '../data/deep-learning';
-import { llmCards } from '../data/llm';
-import { agentCards } from '../data/agent';
-import { jargonCards } from '../data/jargon';
-import { workplaceCards } from '../data/workplace';
-import { vibeCodingCards } from '../data/vibe-coding';
-import type { Category, FlashCard } from '../types';
+import type { Category } from '../types';
 
 interface Props {
   onEnterStudy: (category: Category) => void;
@@ -40,20 +30,6 @@ const CARD_BORDER = 'var(--card-border)';
 const DECK_CARD_BG = 'var(--card-bg)';
 const DECK_ITEM_BG = 'rgba(255,255,255,0.03)';
 
-const ALL_CARDS: Record<string, FlashCard> = {};
-for (const cards of [leetcodeHot100, statisticsCards, machineLearningCards, deepLearningCards, llmCards, agentCards, jargonCards, workplaceCards, vibeCodingCards]) {
-  for (const c of cards as FlashCard[]) {
-    ALL_CARDS[c.id] = c;
-  }
-}
-
-function getCardLabel(cardId: string): string {
-  const card = ALL_CARDS[cardId];
-  if (!card) return cardId;
-  if (card.category === 'leetcode') return `#${card.number} ${card.titleCn}`;
-  return card.question.slice(0, 25);
-}
-
 const TABS = [
   { label: '首页', icon: Home, active: true },
   { label: '牌组', icon: Layers, action: 'decks' as const },
@@ -70,39 +46,20 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
     return getStreak(allLogs);
   }, []);
 
-  // 推荐模块
+  // 推荐模块：按到期数排序
   const [recIndex, setRecIndex] = useState(0);
   const touchStartX = useRef(0);
   const recommendations = useMemo(() => {
-    const now = Date.now();
-    const all: { id: string; label: string; category: string; score: number }[] = [];
-
-    for (const cat of CATEGORIES) {
-      const progress = loadProgress(cat.key);
-      const sm2Map = progress.sm2;
-      for (const [cardId, sm2] of Object.entries(sm2Map)) {
-        if (!sm2 || sm2.state === 'new') continue;
-        const overdue = (now - sm2.nextReview) / 86400000;
-        if (overdue < 0) continue;
-        const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
-        const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
-        all.push({
-          id: cardId,
-          label: getCardLabel(cardId),
-          category: cat.key,
-          score,
-        });
-      }
-    }
-
-    return all.sort((a, b) => b.score - a.score);
-  }, []);
+    return CATEGORIES
+      .filter(c => (dueCountByCategory[c.key] ?? 0) > 0)
+      .map(c => ({ id: c.key, label: c.label, category: c.key, score: dueCountByCategory[c.key] ?? 0 }))
+      .sort((a, b) => b.score - a.score);
+  }, [dueCountByCategory]);
 
   const recModule = useMemo(() => {
     if (recommendations.length === 0) return null;
     const rec = recommendations[recIndex % Math.max(recommendations.length, 1)];
-    const cat = CATEGORIES.find((c) => c.key === rec.category);
-    return { ...rec, moduleName: cat?.label || rec.category };
+    return { label: `${rec.label} · ${rec.score} 张到期`, category: rec.category, moduleName: rec.label };
   }, [recommendations, recIndex]);
 
   // 今日待完成

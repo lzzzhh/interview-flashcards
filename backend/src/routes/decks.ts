@@ -13,7 +13,8 @@ export async function deckRoutes(app: FastifyInstance) {
       const limit = await prisma.deckDailyLimit.findUnique({ where: { userId_deckId: { userId: USER_ID, deckId: d.id } } });
       const progressCards = await prisma.cardProgress.findMany({ where: { card: { deckId: d.id }, userId: USER_ID } });
 
-      const newCount = total - progressCards.length;
+      const studiedCount = progressCards.filter(p => p.state !== 'new').length;
+      const newCount = total - studiedCount;
       const dueCount = progressCards.filter(p => p.state !== 'new' && p.nextReview <= new Date()).length;
       const learningCount = progressCards.filter(p => p.state === 'learning').length;
       const reviewCount = progressCards.filter(p => p.state === 'review').length;

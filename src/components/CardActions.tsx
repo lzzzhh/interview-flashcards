@@ -5,6 +5,11 @@
 import { ChevronLeft, ChevronRight, Flame, Star, Shuffle, Undo2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { previewSchedule } from '../utils/sm2';
+import { apiPost } from '../api/client';
+
+async function submitReview(cardId: string, rating: number) {
+  try { await apiPost('/reviews', { cardId, rating }); } catch {}
+}
 
 function previewInterval(card: { sm2: { easeFactor: number; interval: number; repetitions: number } }, quality: number): string {
   const result = previewSchedule(card.sm2 as any, quality);
@@ -109,6 +114,7 @@ export default function CardActions() {
               key={quality}
               onClick={() => {
                 dispatch({ type: 'RATE_CARD', payload: { cardId: currentCard.id, rating: quality } });
+                submitReview(currentCard.id, quality);
                 if (state.studyMode !== 'review') dispatch({ type: 'NEXT' });
               }}
               className={`flex-1 flex flex-col items-center py-2 sm:py-2.5 px-0.5 rounded-xl ${color} ${textColor} transition-all active:scale-95`}
