@@ -28,8 +28,13 @@ const FALLBACK_TOTALS: Record<string, number> = {
 };
 
 function buildFallbackDecks(): DeckItem[] {
+  const names: Record<string, string> = {
+    leetcode: '力扣', statistics: '统计学', 'machine-learning': '机器学习',
+    'deep-learning': '深度学习', llm: '大模型', agent: 'Agent', jargon: '黑话',
+    workplace: '职场', 'vibe-coding': 'Vibe Coding',
+  };
   return Object.entries(FALLBACK_TOTALS).map(([id, total]) => ({
-    id, name: id, type: 'builtin', sortOrder: 0,
+    id, name: names[id] || id, type: 'builtin', sortOrder: 0,
     stats: { total, newCount: total, dueCount: 0, dailyLimit: 20, learningCount: 0, reviewCount: 0, relearningCount: 0, favoritedCount: 0 },
   }));
 }
