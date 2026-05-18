@@ -28,12 +28,12 @@ interface Props {
   deleteMode?: boolean;
 }
 
-const TEXT_PRIMARY = '#F8FAFC';
-const TEXT_MUTED = 'rgba(226,232,240,0.85)';
-const BLUE = '#2882d7';
-const ORANGE = '#FF9A2E';
-const CARD_BG = 'rgba(255,255,255,0.15)';
-const CARD_BORDER = 'rgba(255,255,255,0.3)';
+const TEXT_PRIMARY = 'var(--text-primary)';
+const TEXT_MUTED = 'var(--text-muted)';
+const BLUE = 'var(--blue)';
+const ORANGE = 'var(--orange)';
+const CARD_BG = 'var(--card-bg)';
+const CARD_BORDER = 'var(--card-border)';
 
 export default function ModulePageTemplate({
   categoryLabel, moduleDue, totalNewCards, totalCards, topics,

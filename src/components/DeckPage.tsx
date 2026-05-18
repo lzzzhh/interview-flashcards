@@ -16,13 +16,13 @@ const TOTAL_MAP: Record<string, number> = {
   llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
 };
 
-const TEXT_PRIMARY = '#F8FAFC';
-const TEXT_MUTED = 'rgba(226,232,240,0.85)';
-const BLUE = '#409CFF';
-const ORANGE = '#FF9A2E';
-const CARD_BG = 'rgba(255,255,255,0.15)';
-const CARD_BORDER = 'rgba(255,255,255,0.3)';
-const DECK_ITEM_BG = 'rgba(255,255,255,0.05)';
+const TEXT_PRIMARY = 'var(--text-primary)';
+const TEXT_MUTED = 'var(--text-muted)';
+const BLUE = 'var(--blue)';
+const ORANGE = 'var(--orange)';
+const CARD_BG = 'var(--card-bg)';
+const CARD_BORDER = 'var(--card-border)';
+const DECK_ITEM_BG = 'rgba(255,255,255,0.03)';
 
 export default function DeckPage({ onEnterStudy, onBack }: Props) {
   const { dispatch, dueCountByCategory } = useAppContext();

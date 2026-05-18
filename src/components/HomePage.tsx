@@ -33,16 +33,16 @@ const TOTAL_MAP: Record<string, number> = {
   llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
 };
 
-const TEXT_PRIMARY = '#F8FAFC';
-const TEXT_SECONDARY = 'rgba(226,232,240,0.98)';
-const TEXT_MUTED = 'rgba(226,232,240,0.85)';
-const TEXT_INACTIVE = 'rgba(203,213,225,0.75)';
-const BLUE = '#2882d7';
-const ORANGE = '#FF9A2E';
-const CARD_BG = 'rgba(255,255,255,0.15)';
-const CARD_BORDER = 'rgba(255,255,255,0.3)';
-const DECK_CARD_BG = 'rgba(255,255,255,0.15)';
-const DECK_ITEM_BG = 'rgba(255,255,255,0.2)';
+const TEXT_PRIMARY = 'var(--text-primary)';
+const TEXT_SECONDARY = 'var(--text-secondary)';
+const TEXT_MUTED = 'var(--text-muted)';
+const TEXT_INACTIVE = 'var(--text-inactive)';
+const BLUE = 'var(--blue)';
+const ORANGE = 'var(--orange)';
+const CARD_BG = 'var(--card-bg)';
+const CARD_BORDER = 'var(--card-border)';
+const DECK_CARD_BG = 'var(--card-bg)';
+const DECK_ITEM_BG = 'rgba(255,255,255,0.03)';
 
 const ALL_CARDS: Record<string, FlashCard> = {};
 for (const cards of [leetcodeHot100, statisticsCards, machineLearningCards, deepLearningCards, llmCards, agentCards, jargonCards, workplaceCards, vibeCodingCards]) {
