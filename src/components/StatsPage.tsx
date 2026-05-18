@@ -5,6 +5,7 @@ import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
 import { loadProgress } from '../utils/storage';
 import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
+import { getDeckTotals } from '../repositories/useDeckStats';
 import type { FlashCard } from '../types';
 import type { Category } from '../types';
 
@@ -12,11 +13,6 @@ interface Props {
   onBack: () => void;
   category?: Category;
 }
-
-const TOTAL_MAP: Record<string, number> = {
-  leetcode: 100, statistics: 199, 'machine-learning': 171, 'deep-learning': 32,
-  llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
-};
 
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
@@ -63,7 +59,7 @@ export default function StatsPage({ onBack, category }: Props) {
   const moduleStats = useMemo(() => {
     const cats = category ? [CATEGORIES.find(c => c.key === category)!] : CATEGORIES;
     return cats.filter(Boolean).map(cat => {
-      const total = TOTAL_MAP[cat.key] ?? 0;
+      const total = getDeckTotals()[cat.key] ?? 0;
       const due = allCards.filter(c => {
         if (c.category !== cat.key) return false;
         const s = c.sm2;

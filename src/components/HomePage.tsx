@@ -9,6 +9,7 @@ import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit } from '../utils/customDecks';
+import { getDeckTotals } from '../repositories/useDeckStats';
 import { loadProgress } from '../utils/storage';
 import { leetcodeHot100 } from '../data/leetcode-hot100';
 import { statisticsCards } from '../data/statistics';
@@ -27,11 +28,6 @@ interface Props {
   onShowStats: () => void;
   onShowProfile: () => void;
 }
-
-const TOTAL_MAP: Record<string, number> = {
-  leetcode: 100, statistics: 199, 'machine-learning': 171, 'deep-learning': 32,
-  llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
-};
 
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_SECONDARY = 'var(--text-secondary)';
@@ -227,7 +223,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
-                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {TOTAL_MAP[cat.key] ?? '--'} 张卡片</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {getDeckTotals()[cat.key] ?? '--'} 张卡片</p>
                   </div>
                   <div className="flex gap-4 text-right">
                     <div>
