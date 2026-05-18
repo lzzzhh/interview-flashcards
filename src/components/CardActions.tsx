@@ -7,8 +7,10 @@ import { useAppContext } from '../context/AppContext';
 import { previewSchedule } from '../utils/sm2';
 import { apiPost } from '../api/client';
 
-async function submitReview(cardId: string, rating: number) {
-  try { await apiPost('/reviews', { cardId, rating }); } catch {}
+async function submitReview(cardId: string, rating: number): Promise<void> {
+  try { await apiPost('/reviews', { cardId, rating }); } catch {
+    console.warn('Backend sync failed for', cardId);
+  }
 }
 
 function previewInterval(card: { sm2: { easeFactor: number; interval: number; repetitions: number } }, quality: number): string {

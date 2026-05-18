@@ -9,7 +9,7 @@ import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit } from '../utils/customDecks';
-import { getDeckTotals } from '../repositories/useDeckStats';
+import { useDeckTotals } from '../repositories/useDeckStats';
 import type { Category } from '../types';
 
 interface Props {
@@ -39,6 +39,7 @@ const TABS = [
 
 export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile }: Props) {
   const { state, dueCountByCategory } = useAppContext();
+  const { totals } = useDeckTotals();
 
   const streak = useMemo(() => {
     const logs = loadReviewLogs();
@@ -180,7 +181,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
-                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {getDeckTotals()[cat.key] ?? '--'} 张卡片</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {totals[cat.key] ?? '--'} 张卡片</p>
                   </div>
                   <div className="flex gap-4 text-right">
                     <div>

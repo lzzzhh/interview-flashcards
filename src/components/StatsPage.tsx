@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
 import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
-import { getDeckTotals, useDeckTotals } from '../repositories/useDeckStats';
+import { useDeckTotals } from '../repositories/useDeckStats';
 import type { Category } from '../types';
 
 const TEXT_PRIMARY = 'var(--text-primary)';
@@ -47,7 +47,7 @@ export default function StatsPage({ onBack, category }: Props) {
     const cats = category ? [CATEGORIES.find(c => c.key === category)!] : CATEGORIES;
     return cats.filter(Boolean).map(cat => ({
       key: cat!.key, label: cat!.label,
-      total: totals[cat!.key] ?? getDeckTotals()[cat!.key] ?? 0,
+      total: totals[cat!.key] ?? 0,
       due: dueCountByCategory[cat!.key] ?? 0,
     }));
   }, [totals, dueCountByCategory, category]);
