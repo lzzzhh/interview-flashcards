@@ -112,6 +112,10 @@ curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/in
 
 ## 架构
 
+<p align="center">
+  <img src="docs/assets/architecture.png" alt="面经闪卡项目架构图" width="920">
+</p>
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │                    Tauri 桌面壳                       │
