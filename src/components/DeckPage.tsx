@@ -38,11 +38,11 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
       <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
         {/* Header */}
-        <div className="sticky top-0 z-20 flex items-center gap-3 mb-4 py-2 backdrop-blur-lg bg-white/30 dark:bg-transparent">
-          <button onClick={onBack} className="p-2 -ml-2">
-            <ArrowLeft className="w-4 h-4" style={{ color: TEXT_PRIMARY }} />
+        <div className="nav-bar -mx-5 px-5">
+          <button onClick={onBack} className="p-1 -ml-1">
+            <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
           </button>
-          <h1 className="text-[16px] font-bold flex-1" style={{ color: TEXT_PRIMARY }}>全部牌组</h1>
+          <h1 className="nav-title">全部牌组</h1>
         </div>
 
         {/* Deck List */}

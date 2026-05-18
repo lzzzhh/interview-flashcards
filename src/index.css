@@ -218,6 +218,35 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
   background: linear-gradient(180deg, rgba(2, 6, 23, 0.7), rgba(15, 23, 42, 0.5));
 }
 
+/* 顶部导航栏 — 毛玻璃效果 */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 56px;
+  padding: 0 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.nav-bar .nav-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0F172A;
+  flex: 1;
+}
+.dark .nav-bar {
+  background: rgba(15, 23, 42, 0.75);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.dark .nav-bar .nav-title {
+  color: #F8FAFC;
+}
+
 .homepage-shell {
   min-height: 100svh;
   display: grid;
