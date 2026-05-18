@@ -1,5 +1,7 @@
-import { ArrowLeft, Moon, Sun, User } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { ArrowLeft, Moon, Sun, User, Download, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { exportProgress, importProgress } from '../utils/backup';
 
 interface Props {
   onBack: () => void;
@@ -13,6 +15,20 @@ const CARD_BORDER = 'var(--card-border)';
 
 export default function ProfilePage({ onBack }: Props) {
   const { state, dispatch } = useAppContext();
+  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = async () => {
+    try { await exportProgress(); setMsg({ type: 'success', text: '导出成功' }); }
+    catch { setMsg({ type: 'error', text: '导出失败' }); }
+  };
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const result = await importProgress(file);
+    setMsg({ type: result.success ? 'success' : 'error', text: result.message });
+    if (fileRef.current) fileRef.current.value = '';
+  };
 
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
@@ -53,6 +69,21 @@ export default function ProfilePage({ onBack }: Props) {
             <SettingRow label="版本" right={<span className="text-[13px]" style={{ color: TEXT_MUTED }}>0.3.6</span>} />
             <SettingRow label="数据存储路径" right={<span className="text-[11px] text-right max-w-[180px] truncate" style={{ color: TEXT_MUTED }}>~/Documents/interview-flashcards/</span>} />
           </div>
+        </div>
+
+        {/* 数据存储 */}
+        <div className="rounded-2xl p-5 mt-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>数据存储</h2>
+          <div className="flex gap-2">
+            <button onClick={handleExport} className="flex-1 py-2 rounded-xl text-[13px] font-medium flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(40,130,215,0.2)', color: BLUE }}>
+              <Download className="w-4 h-4" />导出
+            </button>
+            <button onClick={() => fileRef.current?.click()} className="flex-1 py-2 rounded-xl text-[13px] font-medium flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: TEXT_MUTED }}>
+              <Upload className="w-4 h-4" />导入
+            </button>
+            <input ref={fileRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
+          </div>
+          {msg && <p className="text-[11px] mt-2" style={{ color: msg.type === 'success' ? '#22C55E' : '#EF4444' }}>{msg.text}</p>}
         </div>
 
       </div>

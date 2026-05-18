@@ -142,84 +142,35 @@ export default function StatsPage({ onBack, category }: Props) {
           </div>
         </div>
 
-        {/* 数据存储 */}
-        <DataStorageSection />
+        {/* 掌握率 & 复习阶段 */}
+        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>掌握率</h2>
+          <div className="w-full h-3 rounded-full mb-1" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${totalCards > 0 ? Math.round((mastered / totalCards) * 100) : 0}%`, backgroundColor: GREEN }} />
+          </div>
+          <p className="text-[11px]" style={{ color: TEXT_MUTED }}>
+            已掌握 {mastered} / {totalCards} · {totalCards > 0 ? Math.round((mastered / totalCards) * 100) : 0}%
+          </p>
+          <h2 className="text-[14px] font-bold mt-4 mb-2" style={{ color: TEXT_PRIMARY }}>复习阶段</h2>
+          <div className="grid grid-cols-4 gap-2 text-center">
+            <StageBadge label="新学" count={newCards} color={BLUE} />
+            <StageBadge label="学习中" count={learning} color={ORANGE} />
+            <StageBadge label="复习" count={mastered} color={GREEN} />
+            <StageBadge label="重学" count={allCards.filter(c => c.sm2?.state === 'relearning').length} color="#EF4444" />
+          </div>
+        </div>
 
-      </div>
-      </div>
-    </div>
-  );
-}
-
-function StatBox({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
-  return (
-    <div className="text-center">
-      <div className="flex justify-center mb-1" style={{ color }}>{icon}</div>
-      <div className="text-[11px] mb-0.5" style={{ color }}>{label}</div>
-      <div className="text-[24px] font-bold" style={{ color }}>{value}</div>
-    </div>
-  );
-}
-
-function StatBoxSmall({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) {
-  return (
-    <div className="text-center">
-      <div className="flex justify-center mb-1" style={{ color }}>{icon}</div>
-      <div className="text-[11px] mb-0.5" style={{ color: TEXT_MUTED }}>{label}</div>
-      <div className="text-[18px] font-bold" style={{ color }}>{value}</div>
-    </div>
-  );
-}
-
-function ModuleLimitRow({ id, label }: { id: string; label: string }) {
-  const [limit, setLimit] = useState(() => getModuleDailyLimit(id));
-  return (
-    <div className="flex items-center justify-between py-1">
-      <span className="text-[12px] truncate flex-1" style={{ color: TEXT_MUTED }}>{label}</span>
-      <div className="flex items-center gap-2">
-        <input type="range" min="1" max="100" value={limit}
-          onChange={(e) => { const v = Number(e.target.value); setLimit(v); setModuleDailyLimit(id, v); }}
-          className="w-20 h-1.5 accent-[#2882d7]" />
-        <span className="text-[13px] font-bold w-6 text-right" style={{ color: BLUE }}>{limit}</span>
-      </div>
-    </div>
-  );
-}
-
-function DataStorageSection() {
-  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const handleExport = async () => {
-    try {
-      await exportProgress();
-      setMsg({ type: 'success', text: '导出成功' });
-    } catch { setMsg({ type: 'error', text: '导出失败' }); }
-  };
-
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const result = await importProgress(file);
-    setMsg({ type: result.success ? 'success' : 'error', text: result.message });
-    if (fileRef.current) fileRef.current.value = '';
-  };
-
-  return (
-    <div className="rounded-2xl p-4 mt-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-      <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>数据存储</h2>
-      <div className="flex gap-2">
-        <button onClick={handleExport} className="flex-1 py-2 rounded-xl text-[13px] font-medium flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(40,130,215,0.2)', color: BLUE }}>
-          <Download className="w-4 h-4" />导出
-        </button>
-        <button onClick={() => fileRef.current?.click()} className="flex-1 py-2 rounded-xl text-[13px] font-medium flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: TEXT_MUTED }}>
-          <Upload className="w-4 h-4" />导入
-        </button>
-        <input ref={fileRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
-      </div>
-      {msg && (
-        <p className={`text-[11px] mt-2 ${msg.type === 'success' ? '' : ''}`} style={{ color: msg.type === 'success' ? '#22C55E' : '#EF4444' }}>{msg.text}</p>
-      )}
-    </div>
+        {/* 每日新卡上限 */}
+        <div className="rounded-2xl p-4 mt-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>每日新卡上限</h2>
+          <div className="space-y-2">
+            {CATEGORIES.map((cat) => (
+              <ModuleLimitRow key={cat.key} id={cat.key} label={cat.label} />
+            ))}
+            {loadCustomDecks().map((d) => (
+              <ModuleLimitRow key={d.id} id={d.id} label={d.name} />
+            ))}
+          </div>
+        </div>
   );
 }
