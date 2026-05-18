@@ -5,6 +5,7 @@ import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
 import { loadProgress } from '../utils/storage';
 import type { FlashCard } from '../types';
+import type { Category } from '../types';
 
 interface Props {
   onBack: () => void;
