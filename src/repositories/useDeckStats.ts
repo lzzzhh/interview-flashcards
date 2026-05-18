@@ -27,9 +27,16 @@ const FALLBACK_TOTALS: Record<string, number> = {
   llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
 };
 
+function buildFallbackDecks(): DeckItem[] {
+  return Object.entries(FALLBACK_TOTALS).map(([id, total]) => ({
+    id, name: id, type: 'builtin', sortOrder: 0,
+    stats: { total, newCount: total, dueCount: 0, dailyLimit: 20, learningCount: 0, reviewCount: 0, relearningCount: 0, favoritedCount: 0 },
+  }));
+}
+
 export function useDeckStats(): { totals: Record<string, number>; decks: DeckItem[]; loading: boolean } {
   const [totals, setTotals] = useState<Record<string, number>>(FALLBACK_TOTALS);
-  const [decks, setDecks] = useState<DeckItem[]>([]);
+  const [decks, setDecks] = useState<DeckItem[]>(buildFallbackDecks);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
