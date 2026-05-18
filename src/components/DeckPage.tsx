@@ -27,11 +27,9 @@ const DECK_ITEM_BG = 'rgba(255,255,255,0.05)';
 export default function DeckPage({ onEnterStudy, onBack }: Props) {
   const { state, dispatch, dueCountByCategory } = useAppContext();
   const [showBrowser, setShowBrowser] = useState(false);
-  const [editCategory, setEditCategory] = useState<Category | null>(null);
 
   const handleEditCards = (cat: Category) => {
     dispatch({ type: 'SET_CATEGORY', payload: cat });
-    setEditCategory(cat);
     setShowBrowser(true);
   };
 
@@ -88,7 +86,7 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
       {showBrowser && (
         <CardBrowser
           onEdit={(card) => card.id && dispatch({ type: 'SET_CATEGORY', payload: card.category as Category })}
-          onClose={() => { setShowBrowser(false); setEditCategory(null); }}
+          onClose={() => setShowBrowser(false)}
         />
       )}
     </div>
