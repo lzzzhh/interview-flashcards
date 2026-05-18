@@ -157,7 +157,7 @@ export default function SubModulePicker({ onBack }: Props) {
   const handleReviewAll = () => dispatch({ type: 'SET_STUDY_MODE', payload: 'review' });
   const moduleDue = dueCountByCategory[category] ?? 0;
   const totalNewCards = subStats.reduce((s, sm) => s + sm.newCount, 0);
-  const totalCards = subStats.reduce((s, sm) => s + sm.total, 0);
+  const totalCards = Object.keys(state.cardsById).length;
 
   return (
     <>
