@@ -178,3 +178,47 @@ export default function StatsPage({ onBack, category }: Props) {
     </div>
   );
 }
+
+function StatBox({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+  return (
+    <div className="text-center">
+      <div className="flex justify-center mb-1" style={{ color }}>{icon}</div>
+      <div className="text-[11px] mb-0.5" style={{ color }}>{label}</div>
+      <div className="text-[24px] font-bold" style={{ color }}>{value}</div>
+    </div>
+  );
+}
+
+function StatBoxSmall({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) {
+  return (
+    <div className="text-center">
+      <div className="flex justify-center mb-1" style={{ color }}>{icon}</div>
+      <div className="text-[11px] mb-0.5" style={{ color: TEXT_MUTED }}>{label}</div>
+      <div className="text-[18px] font-bold" style={{ color }}>{value}</div>
+    </div>
+  );
+}
+
+function StageBadge({ label, count, color }: { label: string; count: number; color: string }) {
+  return (
+    <div>
+      <div className="text-[20px] font-bold" style={{ color }}>{count}</div>
+      <div className="text-[11px]" style={{ color: TEXT_MUTED }}>{label}</div>
+    </div>
+  );
+}
+
+function ModuleLimitRow({ id, label }: { id: string; label: string }) {
+  const [limit, setLimit] = useState(() => getModuleDailyLimit(id));
+  return (
+    <div className="flex items-center justify-between py-1">
+      <span className="text-[12px] truncate flex-1" style={{ color: TEXT_MUTED }}>{label}</span>
+      <div className="flex items-center gap-2">
+        <input type="range" min="1" max="100" value={limit}
+          onChange={(e) => { const v = Number(e.target.value); setLimit(v); setModuleDailyLimit(id, v); }}
+          className="w-20 h-1.5 accent-[#2882d7]" />
+        <span className="text-[13px] font-bold w-6 text-right" style={{ color: BLUE }}>{limit}</span>
+      </div>
+    </div>
+  );
+}
