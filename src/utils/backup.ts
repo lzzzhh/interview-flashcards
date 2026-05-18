@@ -8,9 +8,13 @@ import type { StoredProgress, StoredSettings, StoredStats } from '../types';
 /** 导出所有进度为 JSON 文件并下载（v2 格式，包含自定义牌组） */
 export function exportProgress(): void {
   const progress: Record<string, StoredProgress> = {};
-  const keys = Object.values(STORAGE_KEYS).filter((k): k is string =>
-    typeof k === 'string' && k.startsWith('fc-') && k.endsWith('-progress'),
-  ) as string[];
+  const keys = [
+    STORAGE_KEYS.LEETCODE_PROGRESS, STORAGE_KEYS.STATISTICS_PROGRESS,
+    STORAGE_KEYS.ML_PROGRESS, STORAGE_KEYS.DEEP_LEARNING_PROGRESS,
+    STORAGE_KEYS.LLM_PROGRESS, STORAGE_KEYS.AGENT_PROGRESS,
+    STORAGE_KEYS.JARGON_PROGRESS, STORAGE_KEYS.WORKPLACE_PROGRESS,
+    STORAGE_KEYS.VIBE_CODING_PROGRESS,
+  ];
 
   for (const key of keys) {
     try {
