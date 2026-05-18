@@ -42,43 +42,13 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
   const { state, dueCountByCategory } = useAppContext();
   const { totals } = useDeckTotals();
 
+  // Streak from local logs (API /dashboard doesn't have streak yet)
   const streak = useMemo(() => {
     const logs = loadReviewLogs();
-    const allLogs = Object.values(logs).flat();
-    return getStreak(allLogs);
+    return getStreak(Object.values(logs).flat());
   }, []);
 
-  // 推荐：扫描所有模块进度，按 SM2 评分排序
-  const [recIndex, setRecIndex] = useState(0);
-  const touchStartX = useRef(0);
-  const recommendations = useMemo(() => {
-    const now = Date.now();
-    const all: { id: string; label: string; category: string; score: number }[] = [];
-    for (const cat of CATEGORIES) {
-      const progress = loadProgress(cat.key);
-      for (const [cardId, sm2] of Object.entries(progress.sm2)) {
-        if (!sm2 || sm2.state === 'new') continue;
-        const overdue = (now - sm2.nextReview) / 86400000;
-        if (overdue < 0) continue;
-        const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
-        const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
-        // 用 state.cardsById 获取标签，没有则用 cardId
-        const card = state.cardsById[cardId];
-        const label = card ? (card.category === 'leetcode' && 'number' in card ? `#${card.number} ${card.titleCn}` : ('question' in card ? card.question.slice(0, 25) : cardId)) : cardId;
-        all.push({ id: cardId, label, category: cat.key, score });
-      }
-    }
-    return all.sort((a, b) => b.score - a.score);
-  }, [state.cardsById]);
-
-  const recModule = useMemo(() => {
-    if (recommendations.length === 0) return null;
-    const idx = ((recIndex % recommendations.length) + recommendations.length) % recommendations.length;
-    const rec = recommendations[idx];
-    return { ...rec, index: idx, total: recommendations.length, moduleName: CATEGORIES.find(c => c.key === rec.category)?.label || rec.category };
-  }, [recommendations, recIndex]);
-
-  // 今日待完成
+  // Today's stats: use dueCountByCategory (AppContext has real-time counts)
   const todayDue = useMemo(() => {
     let total = 0;
     for (const cat of CATEGORIES) total += dueCountByCategory[cat.key] ?? 0;
@@ -98,6 +68,35 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
     }
     return count;
   }, [state.cardsById]);
+
+  // 推荐
+  const [recIndex, setRecIndex] = useState(0);
+  const touchStartX = useRef(0);
+  const recommendations = useMemo(() => {
+    const now = Date.now();
+    const all: { id: string; label: string; category: string; score: number }[] = [];
+    for (const cat of CATEGORIES) {
+      const progress = loadProgress(cat.key);
+      for (const [cardId, sm2] of Object.entries(progress.sm2)) {
+        if (!sm2 || sm2.state === 'new') continue;
+        const overdue = (now - sm2.nextReview) / 86400000;
+        if (overdue < 0) continue;
+        const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
+        const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
+        const card = state.cardsById[cardId];
+        const label = card ? (card.category === 'leetcode' && 'number' in card ? `#${card.number} ${card.titleCn}` : ('question' in card ? card.question.slice(0, 25) : cardId)) : cardId;
+        all.push({ id: cardId, label, category: cat.key, score });
+      }
+    }
+    return all.sort((a, b) => b.score - a.score);
+  }, [state.cardsById]);
+
+  const recModule = useMemo(() => {
+    if (recommendations.length === 0) return null;
+    const idx = ((recIndex % recommendations.length) + recommendations.length) % recommendations.length;
+    const rec = recommendations[idx];
+    return { ...rec, index: idx, total: recommendations.length, moduleName: CATEGORIES.find(c => c.key === rec.category)?.label || rec.category };
+  }, [recommendations, recIndex]);
 
   const handleStartToday = useCallback(() => {
     const firstDue = CATEGORIES.find((c) => (dueCountByCategory[c.key] ?? 0) > 0);

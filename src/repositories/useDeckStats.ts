@@ -1,5 +1,3 @@
-// 牌组总数 — hook 方式，从 API 获取，无硬编码 fallback
-
 import { useState, useEffect } from 'react';
 import { apiGet } from '../api/client';
 
@@ -9,9 +7,12 @@ interface DeckStats {
   dueCount: number;
   dailyLimit: number;
   learningCount: number;
+  reviewCount: number;
+  relearningCount: number;
+  favoritedCount: number;
 }
 
-interface DeckResponse {
+interface DeckItem {
   id: string;
   name: string;
   type: string;
@@ -19,17 +20,17 @@ interface DeckResponse {
   stats: DeckStats;
 }
 
-interface DecksResponse {
-  decks: DeckResponse[];
-}
+interface DecksResponse { decks: DeckItem[]; }
 
-export function useDeckTotals(): { totals: Record<string, number>; loading: boolean } {
+export function useDeckTotals(): { totals: Record<string, number>; decks: DeckItem[]; loading: boolean } {
   const [totals, setTotals] = useState<Record<string, number>>({});
+  const [decks, setDecks] = useState<DeckItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     apiGet<DecksResponse>('/decks')
       .then((data) => {
+        setDecks(data.decks);
         const next: Record<string, number> = {};
         for (const d of data.decks) next[d.id] = d.stats.total;
         setTotals(next);
@@ -38,9 +39,5 @@ export function useDeckTotals(): { totals: Record<string, number>; loading: bool
       .finally(() => setLoading(false));
   }, []);
 
-  return { totals, loading };
-}
-
-export function getDeckTotals(): Record<string, number> {
-  return {};
+  return { totals, decks, loading };
 }

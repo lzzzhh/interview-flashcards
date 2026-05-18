@@ -2,15 +2,14 @@
 // src/components/CardActions.tsx — 适配新 state（cardId 操作）
 // ============================================================
 
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Flame, Star, Shuffle, Undo2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { previewSchedule } from '../utils/sm2';
 import { apiPost } from '../api/client';
 
-async function submitReview(cardId: string, rating: number): Promise<void> {
-  try { await apiPost('/reviews', { cardId, rating }); } catch {
-    console.warn('Backend sync failed for', cardId);
-  }
+async function submitReview(cardId: string, rating: number): Promise<boolean> {
+  try { await apiPost('/reviews', { cardId, rating }); return true; } catch { return false; }
 }
 
 function previewInterval(card: { sm2: { easeFactor: number; interval: number; repetitions: number } }, quality: number): string {
@@ -34,6 +33,7 @@ const ANKI_BUTTONS = [
 
 export default function CardActions() {
   const { state, dispatch, visibleCards, currentCard, masteredIds, favoritedIds } = useAppContext();
+  const [syncError, setSyncError] = useState(false);
 
   if (!currentCard) return null;
 
@@ -114,9 +114,10 @@ export default function CardActions() {
           return (
             <button
               key={quality}
-              onClick={() => {
+              onClick={async () => {
                 dispatch({ type: 'RATE_CARD', payload: { cardId: currentCard.id, rating: quality } });
-                submitReview(currentCard.id, quality);
+                const ok = await submitReview(currentCard.id, quality);
+                if (!ok) setSyncError(true);
                 if (state.studyMode !== 'review') dispatch({ type: 'NEXT' });
               }}
               className={`flex-1 flex flex-col items-center py-2 sm:py-2.5 px-0.5 rounded-xl ${color} ${textColor} transition-all active:scale-95`}
@@ -128,6 +129,12 @@ export default function CardActions() {
           );
         })}
       </div>
+
+      {syncError && (
+        <div className="text-center text-[10px] text-amber-500 cursor-pointer" onClick={() => setSyncError(false)}>
+          ⚠ 同步失败，评分已保存在本地
+        </div>
+      )}
 
       <div className="text-center text-[10px] text-gray-400 dark:text-gray-600 leading-relaxed">
         ← → 翻页 &nbsp; Space 答案/思路 &nbsp; S 代码 &nbsp; M 掌握 &nbsp; F 收藏 &nbsp; 1-5 评分 &nbsp; D 深色

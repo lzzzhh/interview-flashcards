@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
 import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
@@ -20,21 +19,15 @@ interface Props {
   category?: Category;
 }
 
-export default function StatsPage({ onBack, category }: Props) {
-  const { state, dueCountByCategory } = useAppContext();
-  const { totals } = useDeckTotals();
+export default function StatsPage({ onBack }: Props) {
+  const { decks } = useDeckTotals();
 
-  const totalCards = Object.values(totals).reduce((a, b) => a + b, 0) || Object.keys(state.cardsById).length;
-  const newCards = Object.values(state.cardsById).filter(c => !c.sm2 || c.sm2.state === 'new').length;
-  const learning = Object.values(state.cardsById).filter(c => c.sm2?.state === 'learning').length;
-  const mastered = Object.values(state.cardsById).filter(c => c.sm2?.state === 'review' && c.sm2?.interval >= 21).length;
-  const relearningCount = Object.values(state.cardsById).filter(c => c.sm2?.state === 'relearning').length;
-
-  const dueCount = useMemo(() => {
-    let t = 0;
-    for (const cat of CATEGORIES) t += dueCountByCategory[cat.key] ?? 0;
-    return t;
-  }, [dueCountByCategory]);
+  const totalCards = decks.reduce((a, d) => a + d.stats.total, 0);
+  const newCards = decks.reduce((a, d) => a + d.stats.newCount, 0);
+  const learning = decks.reduce((a, d) => a + d.stats.learningCount, 0);
+  const mastered = decks.reduce((a, d) => a + d.stats.reviewCount, 0);
+  const relearningCount = decks.reduce((a, d) => a + d.stats.relearningCount, 0);
+  const dueCount = decks.reduce((a, d) => a + d.stats.dueCount, 0);
 
   const logs = loadReviewLogs();
   const allLogs = Object.values(logs).flat();
@@ -44,13 +37,12 @@ export default function StatsPage({ onBack, category }: Props) {
 
   // Per-module breakdown
   const moduleStats = useMemo(() => {
-    const cats = category ? [CATEGORIES.find(c => c.key === category)!] : CATEGORIES;
-    return cats.filter(Boolean).map(cat => ({
-      key: cat!.key, label: cat!.label,
-      total: totals[cat!.key] ?? 0,
-      due: dueCountByCategory[cat!.key] ?? 0,
+    return decks.map(d => ({
+      key: d.id, label: d.name,
+      total: d.stats.total,
+      due: d.stats.dueCount,
     }));
-  }, [totals, dueCountByCategory, category]);
+  }, [decks]);
 
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
