@@ -18,7 +18,6 @@ const TOTAL_MAP: Record<string, number> = {
 
 const TEXT_PRIMARY = '#F8FAFC';
 const TEXT_MUTED = 'rgba(226,232,240,0.85)';
-const TEXT_SECONDARY = 'rgba(226,232,240,0.98)';
 const BLUE = '#2882d7';
 const ORANGE = '#FF9A2E';
 const GREEN = '#22C55E';
