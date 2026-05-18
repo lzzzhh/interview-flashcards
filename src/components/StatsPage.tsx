@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import StatsDashboardContent from './StatsDashboard';
+import { useAppContext } from '../context/AppContext';
+import StatsDashboard from './StatsDashboard';
 import type { Category } from '../types';
 
 interface Props {
@@ -10,6 +12,13 @@ interface Props {
 const TEXT_PRIMARY = '#F8FAFC';
 
 export default function StatsPage({ onBack, category }: Props) {
+  const { dispatch } = useAppContext();
+
+  useEffect(() => {
+    dispatch({ type: 'TOGGLE_STATS' });
+    return () => { dispatch({ type: 'TOGGLE_STATS' }); };
+  }, [dispatch]);
+
   return (
     <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
       <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
@@ -21,7 +30,7 @@ export default function StatsPage({ onBack, category }: Props) {
           <h1 className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>学习统计</h1>
         </div>
 
-        <StatsDashboardContent fullPage category={category} />
+        <StatsDashboard category={category} />
       </div>
     </div>
   );

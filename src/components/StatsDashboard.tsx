@@ -137,7 +137,6 @@ function ReviewDistribution({ cards }: { cards: { sm2: { interval: number; repet
 
 interface Props {
   category?: string;
-  fullPage?: boolean;
 }
 
 function getNewCount(cards: FlashCard[]) {
@@ -165,7 +164,7 @@ function getTodayNewAllowance(cards: FlashCard[], category?: string) {
   return total;
 }
 
-export default function StatsDashboard({ category, fullPage }: Props) {
+export default function StatsDashboard({ category }: Props) {
   const { state, dispatch } = useAppContext();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const cardVersion = Object.values(state.cardsById)
@@ -203,37 +202,38 @@ export default function StatsDashboard({ category, fullPage }: Props) {
     };
   }, [cardVersion, category]); // re-evaluate when cardsById changes (triggered by any rating)
 
-  if (!fullPage && !state.showStats) return null;
+  if (!state.showStats) return null;
 
   return (
-    <div className={fullPage ? '' : 'fixed inset-0 z-50 flex justify-end'}>
-      {!fullPage && (
-        <div
-          className="absolute inset-0 bg-black/30"
-          onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-        />
-      )}
+    <div className="fixed inset-0 z-50 flex justify-end">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/30"
+        onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
+      />
 
       {/* Panel */}
-      <div className={`${fullPage ? '' : 'relative w-full max-w-sm bg-white dark:bg-gray-800 h-full overflow-y-auto shadow-xl animate-fadeIn'}`}>
-        {!fullPage && (
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-              学习统计
-            </h2>
-            <div className="flex items-center gap-1">
-              <DarkModeToggle />
-              <button
-                onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
+      <div className="relative w-full max-w-sm bg-white dark:bg-gray-800 h-full overflow-y-auto shadow-xl animate-fadeIn">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            学习统计
+          </h2>
+          <div className="flex items-center gap-1">
+            <DarkModeToggle />
+            <button
+              onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
+              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
           </div>
-        )}
+        </div>
 
-        <div className={fullPage ? '' : 'p-4 space-y-6'}>
+        {/* Content */}
+        <div className="p-4 space-y-6">
+          {/* Overview cards */}
+          <div className="grid grid-cols-3 gap-2">
             <StatBox
               icon={<BookOpen className="w-4 h-4" />}
               label="总卡片"
