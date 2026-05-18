@@ -89,7 +89,7 @@ export default function ModulePageTemplate({
         <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
         {/* Stats Card */}
-        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+        <div className="rounded-2xl p-4 mb-4 border flex flex-col" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER, height: '120px' }}>
           <div className="grid grid-cols-3 gap-3 mb-4">
             <StatBlock label="待复习" value={moduleDue} color={ORANGE} />
             <StatBlock label="新卡" value={totalNewCards} color={BLUE} />
