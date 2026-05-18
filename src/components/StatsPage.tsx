@@ -172,5 +172,9 @@ export default function StatsPage({ onBack, category }: Props) {
             ))}
           </div>
         </div>
+
+      </div>
+      </div>
+    </div>
   );
 }
