@@ -16,6 +16,7 @@ const progressKeyMap: Record<Category, string> = {
   agent: STORAGE_KEYS.AGENT_PROGRESS,
   jargon: STORAGE_KEYS.JARGON_PROGRESS,
   workplace: STORAGE_KEYS.WORKPLACE_PROGRESS,
+  'vibe-coding': STORAGE_KEYS.VIBE_CODING_PROGRESS,
 };
 
 function getProgressKey(category: Category): string {

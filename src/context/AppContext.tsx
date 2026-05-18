@@ -306,7 +306,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         prev.sm2[cardId] = result.sm2;
         localStorage.setItem(key, JSON.stringify(prev));
       } catch {}
-      return {
+      const updated = {
         ...state,
         cardsById: {
           ...state.cardsById,
@@ -314,6 +314,13 @@ function appReducer(state: AppState, action: AppAction): AppState {
         },
         qaAnswerVisible: false,
       };
+      // 复习模式下重算可见卡片（已评分的不再到期）
+      if (state.studyMode === 'review') {
+        const visibleIds = computeVisibleIds(updated);
+        const curIdx = Math.min(state.currentVisibleIndex, visibleIds.length - 1);
+        return { ...updated, visibleCardIds: visibleIds, currentVisibleIndex: curIdx };
+      }
+      return updated;
     }
 
     case 'SET_FILTER_DIFFICULTY': {

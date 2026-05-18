@@ -4,11 +4,11 @@
 
 import { ChevronLeft, ChevronRight, Flame, Star, Shuffle, FlaskConical, Undo2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import { scheduleReview } from '../utils/sm2';
+import { previewSchedule } from '../utils/sm2';
 
 function previewInterval(card: { sm2: { easeFactor: number; interval: number; repetitions: number } }, quality: number): string {
-  const result = scheduleReview('preview', card.sm2 as any, quality);
-  const days = result.sm2.interval;
+  const result = previewSchedule(card.sm2 as any, quality);
+  const days = result.interval;
   if (days === 0) return '<1天';
   if (days === 1) return '1天';
   if (days < 7) return `${days}天`;

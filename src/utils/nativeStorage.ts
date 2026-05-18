@@ -3,12 +3,34 @@
 // Tauri 原生文件 → localStorage fallback → File System API
 // ============================================================
 
-import type { StoredProgress, StoredSettings, StoredStats } from '../types';
+import type { StoredProgress, StoredSettings, StoredStats, QACard } from '../types';
+
+export interface CustomDeckInfo {
+  id: string;
+  name: string;
+  description: string;
+}
 
 export interface AppData {
+  schemaVersion: number;
   progress: Record<string, StoredProgress>;
   settings: StoredSettings;
   stats: StoredStats;
+  customDecks: CustomDeckInfo[];
+  customCards: Record<string, QACard[]>;
+  moduleDailyLimits: Record<string, number>;
+}
+
+function emptyAppData(): AppData {
+  return {
+    schemaVersion: 2,
+    progress: {},
+    settings: { isDark: false, lastCategory: 'leetcode' },
+    stats: { sessions: [] },
+    customDecks: [],
+    customCards: {},
+    moduleDailyLimits: {},
+  };
 }
 
 /** 检测是否运行在 Tauri 环境中 */
@@ -22,7 +44,12 @@ async function tauriRead(): Promise<AppData | null> {
     const { invoke } = await import('@tauri-apps/api/core');
     const json = await invoke<string>('read_data');
     if (!json || json === '{}') return null;
-    return JSON.parse(json) as AppData;
+    const raw = JSON.parse(json);
+    // 旧格式迁移
+    if (!raw.schemaVersion || raw.schemaVersion < 2) {
+      return { ...emptyAppData(), ...raw, schemaVersion: 2 };
+    }
+    return raw as AppData;
   } catch {
     return null;
   }
@@ -49,13 +76,13 @@ async function tauriGetPath(): Promise<string> {
 
 // ---- localStorage fallback ----
 function lsRead(): AppData {
-  const keys = [
+  const progressKeys = [
     'fc-leetcode-progress', 'fc-stats-progress', 'fc-ml-progress',
     'fc-deep-learning-progress', 'fc-llm-progress', 'fc-agent-progress',
-    'fc-jargon-progress', 'fc-workplace-progress',
+    'fc-jargon-progress', 'fc-workplace-progress', 'fc-vibe-coding-progress',
   ];
   const progress: Record<string, StoredProgress> = {};
-  for (const key of keys) {
+  for (const key of progressKeys) {
     try {
       progress[key] = JSON.parse(localStorage.getItem(key) || '{"sm2":{},"mastered":[],"favorited":[]}');
     } catch {
@@ -66,7 +93,18 @@ function lsRead(): AppData {
   try { settings = JSON.parse(localStorage.getItem('fc-settings') || JSON.stringify(settings)); } catch {}
   let stats: StoredStats = { sessions: [] };
   try { stats = JSON.parse(localStorage.getItem('fc-stats') || JSON.stringify(stats)); } catch {}
-  return { progress, settings, stats };
+  let customDecks: CustomDeckInfo[] = [];
+  try { customDecks = JSON.parse(localStorage.getItem('fc-custom-decks') || '[]'); } catch {}
+  let customCards: Record<string, QACard[]> = {};
+  try { customCards = JSON.parse(localStorage.getItem('fc-custom-cards') || '{}'); } catch {}
+  let moduleDailyLimits: Record<string, number> = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith('fc-limit-')) {
+      moduleDailyLimits[k.replace('fc-limit-', '')] = Number(localStorage.getItem(k)) || 20;
+    }
+  }
+  return { schemaVersion: 2, progress, settings, stats, customDecks, customCards, moduleDailyLimits };
 }
 
 function lsWrite(data: AppData): void {
@@ -75,6 +113,13 @@ function lsWrite(data: AppData): void {
   }
   localStorage.setItem('fc-settings', JSON.stringify(data.settings));
   localStorage.setItem('fc-stats', JSON.stringify(data.stats));
+  if (data.customDecks) localStorage.setItem('fc-custom-decks', JSON.stringify(data.customDecks));
+  if (data.customCards) localStorage.setItem('fc-custom-cards', JSON.stringify(data.customCards));
+  if (data.moduleDailyLimits) {
+    for (const [id, limit] of Object.entries(data.moduleDailyLimits)) {
+      localStorage.setItem(`fc-limit-${id}`, String(limit));
+    }
+  }
 }
 
 // ---- Public API ----
@@ -83,11 +128,7 @@ function lsWrite(data: AppData): void {
 export async function loadAppData(): Promise<AppData> {
   if (isTauri()) {
     const data = await tauriRead();
-    if (data) {
-      // 同步到 localStorage 以便 fallback 和快速访问
-      lsWrite(data);
-      return data;
-    }
+    if (data) { lsWrite(data); return data; }
   }
   return lsRead();
 }
