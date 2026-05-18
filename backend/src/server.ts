@@ -4,6 +4,8 @@ import { deckRoutes } from './routes/decks';
 import { dashboardRoutes } from './routes/dashboard';
 import { reviewRoutes } from './routes/reviews';
 import { studyRoutes } from './routes/study';
+import { cardRoutes } from './routes/cards';
+import { migrationRoutes } from './routes/migrations';
 
 const app = Fastify({ logger: true });
 const PORT = parseInt(process.env.PORT || '3001', 10);
@@ -14,6 +16,8 @@ async function start() {
   await app.register(dashboardRoutes);
   await app.register(reviewRoutes);
   await app.register(studyRoutes);
+  await app.register(cardRoutes);
+  await app.register(migrationRoutes);
 
   app.get('/api/health', async () => ({ ok: true }));
 
