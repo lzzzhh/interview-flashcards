@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "面经闪卡",
-  "version": "0.3.6",
+  "version": "0.4.1",
   "identifier": "com.flashcards.interview",
   "build": {
     "frontendDist": "../dist",
