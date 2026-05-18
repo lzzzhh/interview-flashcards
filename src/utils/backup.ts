@@ -3,14 +3,14 @@
 // ============================================================
 
 import { STORAGE_KEYS } from '../types';
-import type { StoredSettings, StoredStats } from '../types';
+import type { StoredProgress, StoredSettings, StoredStats } from '../types';
 
 /** 导出所有进度为 JSON 文件并下载（v2 格式，包含自定义牌组） */
 export function exportProgress(): void {
   const progress: Record<string, StoredProgress> = {};
   const keys = Object.values(STORAGE_KEYS).filter((k): k is string =>
     typeof k === 'string' && k.startsWith('fc-') && k.endsWith('-progress'),
-  );
+  ) as string[];
 
   for (const key of keys) {
     try {
@@ -90,8 +90,9 @@ export function importProgress(file: File): Promise<{ success: boolean; message:
 
         let count = 0;
         for (const [key, value] of Object.entries(data.progress)) {
-          if (typeof value === 'object' && value.sm2) {
-            localStorage.setItem(key, JSON.stringify(value));
+          const v = value as any;
+          if (v && v.sm2) {
+            localStorage.setItem(key, JSON.stringify(v));
             count++;
           }
         }
