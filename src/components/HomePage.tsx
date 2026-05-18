@@ -92,6 +92,8 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
   // 推荐
   const [recIndex, setRecIndex] = useState(0);
   const touchStartX = useRef(0);
+  const mouseDownX = useRef(0);
+  const isDragging = useRef(false);
   const recommendations = useMemo(() => {
     const now = Date.now();
     const all: { id: string; label: string; category: string; score: number }[] = [];
@@ -172,7 +174,18 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                 const diff = touchStartX.current - e.changedTouches[0].clientX;
                 if (Math.abs(diff) > 50) setRecIndex((i) => i + (diff > 0 ? 1 : -1));
               }}
-              className="overflow-hidden"
+              onMouseDown={(e) => { isDragging.current = true; mouseDownX.current = e.clientX; }}
+              onMouseMove={(e) => {
+                if (!isDragging.current) return;
+                const diff = mouseDownX.current - e.clientX;
+                if (Math.abs(diff) > 60) {
+                  setRecIndex((i) => i + (diff > 0 ? 1 : -1));
+                  isDragging.current = false;
+                }
+              }}
+              onMouseUp={() => { isDragging.current = false; }}
+              onMouseLeave={() => { isDragging.current = false; }}
+              className="overflow-hidden cursor-grab active:cursor-grabbing"
             >
               <div className="flex items-center justify-between">
                 <div>
