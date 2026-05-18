@@ -75,8 +75,15 @@ export default function StatsPage({ onBack, category }: Props) {
   }, [allCards, category]);
 
   return (
-    <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
-      <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
+    <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
+      <div className="nav-bar sticky top-0 z-20 flex items-center">
+        <button onClick={onBack} className="p-1 -ml-1">
+          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+        </button>
+        <h1 className="nav-title">学习统计</h1>
+      </div>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
         {/* Header */}
         <div className="nav-bar -mx-5 px-5">
@@ -101,8 +108,9 @@ export default function StatsPage({ onBack, category }: Props) {
             <div className="rounded-xl px-3 py-2" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
               <span className="text-[11px]" style={{ color: TEXT_MUTED }}>今日已学</span>
               <p className="text-[20px] font-bold" style={{ color: TEXT_PRIMARY }}>{todayCount}<span className="text-[13px] font-normal" style={{ color: TEXT_MUTED }}>张</span></p>
-            </div>
-          </div>
+        </div>
+      </div>
+    </div>
         </div>
 
         {/* Accuracy */}

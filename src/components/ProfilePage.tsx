@@ -16,23 +16,18 @@ export default function ProfilePage({ onBack }: Props) {
   const { state, dispatch } = useAppContext();
 
   return (
-    <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
-      <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
-
-        {/* Header */}
-        <div className="nav-bar -mx-5 px-5">
-          <button onClick={onBack} className="p-1 -ml-1">
-            <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-          </button>
-          <h1 className="nav-title">我的</h1>
-          <button onClick={() => dispatch({ type: 'TOGGLE_DARK' })} className="p-2">
-            {state.isDark ? (
-              <Sun className="w-5 h-5" style={{ color: '#FBBF24' }} />
-            ) : (
-              <Moon className="w-5 h-5" style={{ color: TEXT_SECONDARY }} />
-            )}
-          </button>
-        </div>
+    <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
+      <div className="nav-bar sticky top-0 z-20 flex items-center">
+        <button onClick={onBack} className="p-1 -ml-1">
+          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+        </button>
+        <h1 className="nav-title">我的</h1>
+        <button onClick={() => dispatch({ type: 'TOGGLE_DARK' })} className="p-1">
+          {state.isDark ? <Sun className="w-5 h-5" style={{ color: '#FBBF24' }} /> : <Moon className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />}
+        </button>
+      </div>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
         {/* Profile Card */}
         <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
@@ -61,6 +56,7 @@ export default function ProfilePage({ onBack }: Props) {
           </div>
         </div>
 
+      </div>
       </div>
     </div>
   );

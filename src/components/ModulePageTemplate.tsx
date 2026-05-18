@@ -52,40 +52,41 @@ export default function ModulePageTemplate({
   }, [showMenu]);
 
   return (
-    <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
-      <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
-
-        {/* Header */}
-        <div className="nav-bar -mx-5 px-5">
-          <button onClick={onBack} className="p-1 -ml-1">
-            <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-          </button>
-          <h1 className="nav-title">{categoryLabel}</h1>
-
-          {/* Gear Menu */}
-          {(onOpenCardManager || onCreateTopic || onDeleteTopic) && (
-            <div className="relative" ref={menuRef}>
-              <button onClick={() => setShowMenu(!showMenu)} className="p-2">
-                <Settings className="w-5 h-5" style={{ color: TEXT_MUTED }} />
-              </button>
-              {showMenu && (
-                <div className="absolute right-0 top-10 z-30 min-w-[140px] rounded-xl border py-1.5 shadow-xl" style={{ borderColor: CARD_BORDER, backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(20px)' }}>
-                  {onOpenCardManager && (
-                    <button onClick={() => { setShowMenu(false); onOpenCardManager(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: TEXT_PRIMARY }}>
-                      <FileText className="w-4 h-4" />卡片管理
-                    </button>
-                  )}
-                  {onCreateTopic && (
-                    <button onClick={() => { setShowMenu(false); onCreateTopic(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: TEXT_PRIMARY }}>
-                      <Plus className="w-4 h-4" />新增专题
-                    </button>
-                  )}
-                  {onDeleteTopic && (
-                    <button onClick={() => { setShowMenu(false); onEnterDeleteMode?.(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: '#EF4444' }}>
-                      <Trash2 className="w-4 h-4" />删除专题
-                    </button>
-                  )}
-                </div>
+    <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
+      <div className="nav-bar sticky top-0 z-20 flex items-center">
+        <button onClick={onBack} className="p-1 -ml-1">
+          <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
+        </button>
+        <h1 className="nav-title">{categoryLabel}</h1>
+        {(onOpenCardManager || onCreateTopic || onDeleteTopic) && (
+          <div className="relative" ref={menuRef}>
+            <button onClick={() => setShowMenu(!showMenu)} className="p-1">
+              <Settings className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+            </button>
+            {showMenu && (
+              <div className="absolute right-0 top-10 z-30 min-w-[140px] rounded-xl border py-1.5 shadow-xl" style={{ borderColor: CARD_BORDER, backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(20px)' }}>
+                {onOpenCardManager && (
+                  <button onClick={() => { setShowMenu(false); onOpenCardManager(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: TEXT_PRIMARY }}>
+                    <FileText className="w-4 h-4" />卡片管理
+                  </button>
+                )}
+                {onCreateTopic && (
+                  <button onClick={() => { setShowMenu(false); onCreateTopic(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: TEXT_PRIMARY }}>
+                    <Plus className="w-4 h-4" />新增专题
+                  </button>
+                )}
+                {onDeleteTopic && (
+                  <button onClick={() => { setShowMenu(false); onEnterDeleteMode?.(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: '#EF4444' }}>
+                    <Trash2 className="w-4 h-4" />删除专题
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
               )}
             </div>
           )}
@@ -148,6 +149,7 @@ export default function ModulePageTemplate({
           ))}
         </div>
 
+      </div>
       </div>
     </div>
   );

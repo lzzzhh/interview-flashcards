@@ -34,16 +34,15 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
   };
 
   return (
-    <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
-      <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
-
-        {/* Header */}
-        <div className="nav-bar -mx-5 px-5">
-          <button onClick={onBack} className="p-1 -ml-1">
-            <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-          </button>
-          <h1 className="nav-title">全部牌组</h1>
-        </div>
+    <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
+      <div className="nav-bar sticky top-0 z-20 flex items-center">
+        <button onClick={onBack} className="p-1 -ml-1">
+          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+        </button>
+        <h1 className="nav-title">全部牌组</h1>
+      </div>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
         {/* Deck List */}
         <div className="rounded-2xl p-5 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
@@ -89,6 +88,7 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
           onClose={() => setShowBrowser(false)}
         />
       )}
+      </div>
+      </div>
     </div>
-  );
 }
