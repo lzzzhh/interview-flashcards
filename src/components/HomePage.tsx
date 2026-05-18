@@ -185,28 +185,27 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
               }}
               onMouseUp={() => { isDragging.current = false; }}
               onMouseLeave={() => { isDragging.current = false; }}
-              className="overflow-hidden cursor-grab active:cursor-grabbing"
+              className="overflow-hidden cursor-grab active:cursor-grabbing flex flex-col h-full"
             >
-              <div key={recModule.index} className="card-slide-in">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.label}</h3>
-                  <p className="text-[12px] mt-0.5" style={{ color: 'var(--text-muted)' }}>高优先级 · 复习薄弱点</p>
-                  <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>
-                    {recModule.index + 1} / {recModule.total}
-                  </p>
+              <div key={recModule.index} className="card-slide-in flex flex-col h-full">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-[16px] font-bold flex-1 truncate mr-2" style={{ color: TEXT_PRIMARY }}>{recModule.label}</h3>
+                  <div className="flex gap-1 shrink-0">
+                    <button onClick={() => setRecIndex((i) => i - 1)} className="p-1" style={{ color: TEXT_MUTED }}>
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setRecIndex((i) => i + 1)} className="p-1" style={{ color: TEXT_MUTED }}>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  <button onClick={() => setRecIndex((i) => i - 1)} className="p-1" style={{ color: TEXT_MUTED }}>
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => setRecIndex((i) => i + 1)} className="p-1" style={{ color: TEXT_MUTED }}>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                <div className="flex-1 min-h-0 overflow-y-auto my-1">
+                  <p className="text-[12px]" style={{ color: 'var(--text-muted)' }}>高优先级 · 复习薄弱点</p>
                 </div>
+                <p className="text-[11px] text-right" style={{ color: TEXT_MUTED }}>
+                  {recModule.index + 1} / {recModule.total}
+                </p>
               </div>
-              </div>
-            </div>
           )}
         </div>
 
