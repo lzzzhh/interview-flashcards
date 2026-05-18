@@ -85,14 +85,6 @@ export default function StatsPage({ onBack, category }: Props) {
       <div className="flex-1 flex items-center justify-center">
         <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
-        {/* Header */}
-        <div className="nav-bar -mx-5 px-5">
-          <button onClick={onBack} className="p-1 -ml-1">
-            <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-          </button>
-          <h1 className="nav-title">学习统计</h1>
-        </div>
-
         {/* Overview */}
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="grid grid-cols-3 gap-3 mb-4">
@@ -154,6 +146,7 @@ export default function StatsPage({ onBack, category }: Props) {
         {/* 数据存储 */}
         <DataStorageSection />
 
+      </div>
       </div>
     </div>
   );
