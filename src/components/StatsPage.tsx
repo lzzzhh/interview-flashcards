@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
