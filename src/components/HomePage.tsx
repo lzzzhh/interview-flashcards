@@ -59,7 +59,7 @@ const TABS = [
 ];
 
 export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile }: Props) {
-  const { state, dueCountByCategory } = useAppContext();
+  const { state, dueCountByCategory, dispatch } = useAppContext();
   const { totals } = useDeckTotals();
 
   // Streak from local logs (API /dashboard doesn't have streak yet)
@@ -160,7 +160,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
         </div>
 
         {/* 推荐学习 */}
-        <div className="rounded-2xl p-4 mb-3 border flex flex-col" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER, minHeight: '140px', height: '140px' }}>
+        <div className="rounded-2xl p-4 mb-3 border flex flex-col" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER, height: '120px' }}>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
             <span className="text-[12px] px-2 py-0.5 rounded-full" style={{ color: 'var(--text-secondary)', backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
@@ -187,10 +187,13 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
               onMouseLeave={() => { isDragging.current = false; }}
               className="overflow-hidden cursor-grab active:cursor-grabbing flex flex-col h-full"
             >
-              <div key={recModule.index} className="card-slide-in flex flex-col h-full">
+              <div key={recModule.index} className="card-slide-in flex flex-col h-full cursor-pointer" onClick={() => {
+                dispatch({ type: 'JUMP_TO_CARD', payload: { category: recModule.category as Category, cardId: recModule.id } });
+                onEnterStudy(recModule.category as Category);
+              }}>
                 <div className="flex items-center justify-between">
                   <h3 className="text-[16px] font-bold flex-1 truncate mr-2" style={{ color: TEXT_PRIMARY }}>{recModule.label}</h3>
-                  <div className="flex gap-1 shrink-0">
+                  <div className="flex gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                     <button onClick={() => setRecIndex((i) => i - 1)} className="p-1" style={{ color: TEXT_MUTED }}>
                       <ChevronLeft className="w-4 h-4" />
                     </button>
