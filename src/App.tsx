@@ -12,6 +12,7 @@ import CardBrowser from './components/CardBrowser';
 import CardEditor from './components/CardEditor';
 import SubModulePicker from './components/SubModulePicker';
 import DeckPage from './components/DeckPage';
+import StatsPage from './components/StatsPage';
 import type { Category, FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
@@ -91,6 +92,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 function AppInner() {
   const [studyCategory, setStudyCategory] = useState<string | null>(null);
   const [showDecks, setShowDecks] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   const { dispatch } = useAppContext();
   const handleEnterStudy = (category: Category) => { setStudyCategory(category); setShowDecks(false); dispatch({ type: 'SET_CATEGORY', payload: category }); };
 
@@ -98,10 +100,14 @@ function AppInner() {
     return <DeckPage onEnterStudy={handleEnterStudy} onBack={() => setShowDecks(false)} />;
   }
 
+  if (showStats) {
+    return <StatsPage onBack={() => setShowStats(false)} />;
+  }
+
   return (
     <>
       <div className={studyCategory ? 'hidden' : ''}>
-        <HomePage onEnterStudy={handleEnterStudy} onShowDecks={() => setShowDecks(true)} />
+        <HomePage onEnterStudy={handleEnterStudy} onShowDecks={() => setShowDecks(true)} onShowStats={() => setShowStats(true)} />
       </div>
       {studyCategory && (
         <div className="page-enter" key={studyCategory}>

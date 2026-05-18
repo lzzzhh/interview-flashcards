@@ -19,12 +19,12 @@ import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
-import StatsDashboard from './StatsDashboard';
 import type { Category, FlashCard } from '../types';
 
 interface Props {
   onEnterStudy: (category: Category) => void;
   onShowDecks: () => void;
+  onShowStats: () => void;
 }
 
 const TOTAL_MAP: Record<string, number> = {
@@ -64,8 +64,8 @@ const TABS = [
   { label: '我的', icon: User },
 ];
 
-export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
-  const { state, dispatch, dueCountByCategory } = useAppContext();
+export default function HomePage({ onEnterStudy, onShowDecks, onShowStats }: Props) {
+  const { state, dueCountByCategory } = useAppContext();
 
   const streak = useMemo(() => {
     const logs = loadReviewLogs();
@@ -252,7 +252,7 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
               key={tab.label}
               onClick={() => {
                 if (tab.action === 'decks') onShowDecks();
-                else if (tab.action === 'stats') dispatch({ type: 'TOGGLE_STATS' });
+                else if (tab.action === 'stats') onShowStats();
               }}
               className="flex flex-col items-center gap-0.5"
             >
@@ -263,7 +263,6 @@ export default function HomePage({ onEnterStudy, onShowDecks }: Props) {
         </div>
 
       </div>
-      <StatsDashboard />
     </div>
   );
 }
