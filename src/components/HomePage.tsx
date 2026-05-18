@@ -10,6 +10,7 @@ import { CATEGORIES } from '../constants';
 import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit } from '../utils/customDecks';
 import { useDeckTotals } from '../repositories/useDeckStats';
+import { loadProgress } from '../utils/storage';
 import type { Category } from '../types';
 
 interface Props {
@@ -47,20 +48,34 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
     return getStreak(allLogs);
   }, []);
 
-  // 推荐模块：按到期数排序
+  // 推荐：扫描所有模块进度，按 SM2 评分排序
   const [recIndex, setRecIndex] = useState(0);
   const touchStartX = useRef(0);
   const recommendations = useMemo(() => {
-    return CATEGORIES
-      .filter(c => (dueCountByCategory[c.key] ?? 0) > 0)
-      .map(c => ({ id: c.key, label: c.label, category: c.key, score: dueCountByCategory[c.key] ?? 0 }))
-      .sort((a, b) => b.score - a.score);
-  }, [dueCountByCategory]);
+    const now = Date.now();
+    const all: { id: string; label: string; category: string; score: number }[] = [];
+    for (const cat of CATEGORIES) {
+      const progress = loadProgress(cat.key);
+      for (const [cardId, sm2] of Object.entries(progress.sm2)) {
+        if (!sm2 || sm2.state === 'new') continue;
+        const overdue = (now - sm2.nextReview) / 86400000;
+        if (overdue < 0) continue;
+        const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
+        const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
+        // 用 state.cardsById 获取标签，没有则用 cardId
+        const card = state.cardsById[cardId];
+        const label = card ? (card.category === 'leetcode' && 'number' in card ? `#${card.number} ${card.titleCn}` : ('question' in card ? card.question.slice(0, 25) : cardId)) : cardId;
+        all.push({ id: cardId, label, category: cat.key, score });
+      }
+    }
+    return all.sort((a, b) => b.score - a.score);
+  }, [state.cardsById]);
 
   const recModule = useMemo(() => {
     if (recommendations.length === 0) return null;
-    const rec = recommendations[recIndex % Math.max(recommendations.length, 1)];
-    return { label: `${rec.label} · ${rec.score} 张到期`, category: rec.category, moduleName: rec.label };
+    const idx = ((recIndex % recommendations.length) + recommendations.length) % recommendations.length;
+    const rec = recommendations[idx];
+    return { ...rec, index: idx, total: recommendations.length, moduleName: CATEGORIES.find(c => c.key === rec.category)?.label || rec.category };
   }, [recommendations, recIndex]);
 
   // 今日待完成
@@ -146,7 +161,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                   <h3 className="text-[18px] font-bold" style={{ color: TEXT_PRIMARY }}>{recModule.label}</h3>
                   <p className="text-[12px] mt-0.5" style={{ color: 'var(--text-muted)' }}>高优先级 · 复习薄弱点</p>
                   <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>
-                    {recIndex + 1} / {recommendations.length}
+                    {recModule.index + 1} / {recModule.total}
                   </p>
                 </div>
                 <div className="flex gap-1">
