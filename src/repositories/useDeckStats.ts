@@ -22,8 +22,13 @@ interface DeckItem {
 
 interface DecksResponse { decks: DeckItem[]; }
 
+const FALLBACK_TOTALS: Record<string, number> = {
+  leetcode: 100, statistics: 199, 'machine-learning': 171, 'deep-learning': 32,
+  llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
+};
+
 export function useDeckStats(): { totals: Record<string, number>; decks: DeckItem[]; loading: boolean } {
-  const [totals, setTotals] = useState<Record<string, number>>({});
+  const [totals, setTotals] = useState<Record<string, number>>(FALLBACK_TOTALS);
   const [decks, setDecks] = useState<DeckItem[]>([]);
   const [loading, setLoading] = useState(true);
 
