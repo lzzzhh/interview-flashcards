@@ -7,7 +7,6 @@ interface Props {
 
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
-const TEXT_SECONDARY = 'var(--text-secondary)';
 const BLUE = 'var(--blue)';
 const CARD_BG = 'var(--card-bg)';
 const CARD_BORDER = 'var(--card-border)';
