@@ -206,6 +206,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                   {recModule.index + 1} / {recModule.total}
                 </p>
               </div>
+            </div>
           )}
         </div>
 
