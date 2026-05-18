@@ -39,7 +39,6 @@ import { shuffle } from '../utils/shuffle';
 import { loadCustomCards } from '../utils/customDecks';
 import { getModuleDailyLimit } from '../utils/customDecks';
 import { SUB_MODULES } from '../constants';
-import { logSyncOp } from '../sync/hook';
 
 // ---- Undo support ----
 let lastRating: { cardId: string; previousSm2: any } | null = null;
@@ -293,11 +292,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
       setLastRating({ cardId, previousSm2: { ...card.sm2 } });
       const result = scheduleReview(cardId, card.sm2, rating);
       appendReviewLog(result.log);
-      // 写入同步 oplog
-      logSyncOp({
-        op: 'rate', cardId, ts: Date.now(), deviceId: 'local', seq: Date.now(),
-        data: { rating, sm2: result.sm2, reviewLog: result.log },
-      });
       // 持久化评分进度到 localStorage
       const key = progressKeyMap[card.category] ?? `fc-progress-${card.category}`;
       try {
