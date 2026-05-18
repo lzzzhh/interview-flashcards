@@ -159,19 +159,6 @@ export default function StatsPage({ onBack, category }: Props) {
           </div>
         </div>
 
-        {/* 每日新卡上限 */}
-        <div className="rounded-2xl p-4 mt-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-          <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>每日新卡上限</h2>
-          <div className="space-y-2">
-            {CATEGORIES.map((cat) => (
-              <ModuleLimitRow key={cat.key} id={cat.key} label={cat.label} />
-            ))}
-            {loadCustomDecks().map((d) => (
-              <ModuleLimitRow key={d.id} id={d.id} label={d.name} />
-            ))}
-          </div>
-        </div>
-
       </div>
       </div>
     </div>
