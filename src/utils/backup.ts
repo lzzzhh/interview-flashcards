@@ -3,29 +3,14 @@
 // ============================================================
 
 import { STORAGE_KEYS } from '../types';
-import type { StoredProgress, StoredSettings, StoredStats } from '../types';
+import type { StoredSettings, StoredStats } from '../types';
 
-/** 备份数据结构 */
-export interface BackupData {
-  version: 1;
-  exportedAt: string; // ISO timestamp
-  cardCounts: Record<string, number>;
-  progress: Record<string, StoredProgress>;
-  settings: StoredSettings;
-  stats: StoredStats;
-}
-
-/** 导出所有进度为 JSON 文件并下载 */
+/** 导出所有进度为 JSON 文件并下载（v2 格式，包含自定义牌组） */
 export function exportProgress(): void {
   const progress: Record<string, StoredProgress> = {};
-  const keys = [
-    STORAGE_KEYS.LEETCODE_PROGRESS,
-    STORAGE_KEYS.STATISTICS_PROGRESS,
-    STORAGE_KEYS.ML_PROGRESS,
-    STORAGE_KEYS.LLM_PROGRESS,
-    STORAGE_KEYS.JARGON_PROGRESS,
-    STORAGE_KEYS.WORKPLACE_PROGRESS,
-  ];
+  const keys = Object.values(STORAGE_KEYS).filter((k): k is string =>
+    typeof k === 'string' && k.startsWith('fc-') && k.endsWith('-progress'),
+  );
 
   for (const key of keys) {
     try {
@@ -48,20 +33,34 @@ export function exportProgress(): void {
     if (raw) stats = JSON.parse(raw);
   } catch { /* use default */ }
 
-  // Count mastered cards per category
+  // 导出自定义牌组
+  let customDecks: any[] = [];
+  let customCards: Record<string, any[]> = {};
+  let moduleDailyLimits: Record<string, number> = {};
+  try {
+    customDecks = JSON.parse(localStorage.getItem('fc-custom-decks') || '[]');
+  } catch {}
+  for (const deck of customDecks) {
+    try { customCards[deck.id] = JSON.parse(localStorage.getItem(`fc-cards-${deck.id}`) || '[]'); } catch { customCards[deck.id] = []; }
+  }
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith('fc-limit-')) {
+      moduleDailyLimits[k.replace('fc-limit-', '')] = Number(localStorage.getItem(k)) || 20;
+    }
+  }
+
   const cardCounts: Record<string, number> = {};
   for (const [key, p] of Object.entries(progress)) {
     const short = key.replace('fc-', '').replace('-progress', '');
     cardCounts[short] = p.mastered?.length ?? 0;
   }
 
-  const backup: BackupData = {
-    version: 1,
+  const backup = {
+    version: 2,
     exportedAt: new Date().toISOString(),
-    cardCounts,
-    progress,
-    settings,
-    stats,
+    progress, settings, stats, cardCounts,
+    customDecks, customCards, moduleDailyLimits,
   };
 
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
@@ -75,17 +74,16 @@ export function exportProgress(): void {
   URL.revokeObjectURL(url);
 }
 
-/** 从 JSON 文件导入进度 */
+/** 从 JSON 文件导入进度（兼容 v1 和 v2） */
 export function importProgress(file: File): Promise<{ success: boolean; message: string }> {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const text = e.target?.result as string;
-        const data: BackupData = JSON.parse(text);
+        const data = JSON.parse(text);
 
-        // Validate
-        if (!data.version || !data.progress) {
+        if (!data.progress) {
           resolve({ success: false, message: '无效的备份文件格式' });
           return;
         }
@@ -101,9 +99,24 @@ export function importProgress(file: File): Promise<{ success: boolean; message:
         if (data.settings) {
           localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(data.settings));
         }
-
         if (data.stats) {
           localStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(data.stats));
+        }
+
+        // v2: 导入自定义牌组
+        if (data.customDecks) {
+          localStorage.setItem('fc-custom-decks', JSON.stringify(data.customDecks));
+          count++;
+        }
+        if (data.customCards) {
+          for (const [deckId, cards] of Object.entries(data.customCards)) {
+            localStorage.setItem(`fc-cards-${deckId}`, JSON.stringify(cards));
+          }
+        }
+        if (data.moduleDailyLimits) {
+          for (const [id, limit] of Object.entries(data.moduleDailyLimits)) {
+            localStorage.setItem(`fc-limit-${id}`, String(limit));
+          }
         }
 
         const exportedDate = data.exportedAt
