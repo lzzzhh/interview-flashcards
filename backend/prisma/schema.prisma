@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Deck {
+  id          String   @id
+  name        String
+  type        String   @default("builtin")  // builtin | custom
+  icon        String?
+  description String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cards  Card[]
+  limits DeckDailyLimit[]
+}
+
+model Card {
+  id          String   @id
+  deckId      String
+  type        String   @default("qa")  // leetcode | qa
+  number      Int?
+  title       String?
+  titleCn     String?
+  question    String?
+  answer      String?
+  description String?
+  approach    String?
+  difficulty  String?
+  tags        String?  // JSON array as string
+  subTopic    String?
+  source      String?
+  codes       String?  // JSON object as string
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  deck     Deck           @relation(fields: [deckId], references: [id])
+  progress CardProgress[]
+  logs     ReviewLog[]
+}
+
+model CardProgress {
+  userId         String
+  cardId         String
+  state          String   @default("new")
+  easeFactor     Float    @default(2.5)
+  intervalDays   Int      @default(0)
+  repetitions    Int      @default(0)
+  lapses         Int      @default(0)
+  nextReview     DateTime @default(now())
+  lastReviewedAt DateTime?
+  favorited      Boolean  @default(false)
+  userNotes      String?
+
+  card Card @relation(fields: [cardId], references: [id])
+
+  @@id([userId, cardId])
+}
+
+model ReviewLog {
+  id             String   @id
+  userId         String
+  cardId         String
+  reviewedAt     DateTime
+  rating         Int
+  stateBefore    String
+  stateAfter     String
+  intervalBefore Int
+  intervalAfter  Int
+  easeBefore     Float
+  easeAfter      Float
+  elapsedDays    Float
+  scheduledDays  Int
+
+  card Card @relation(fields: [cardId], references: [id])
+}
+
+model DeckDailyLimit {
+  userId     String
+  deckId     String
+  dailyLimit Int    @default(20)
+
+  deck Deck @relation(fields: [deckId], references: [id])
+
+  @@id([userId, deckId])
+}
