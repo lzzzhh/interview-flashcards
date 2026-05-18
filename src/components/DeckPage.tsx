@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { ChevronRight, ArrowLeft, Settings, FileText } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Settings } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { getModuleDailyLimit } from '../utils/customDecks';
 import CardBrowser from './CardBrowser';
-import type { Category, FlashCard } from '../types';
+import type { Category } from '../types';
 
 interface Props {
   onEnterStudy: (category: Category) => void;
