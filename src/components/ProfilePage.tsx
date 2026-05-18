@@ -20,7 +20,7 @@ export default function ProfilePage({ onBack }: Props) {
       <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
 
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="sticky top-0 z-20 flex items-center gap-3 mb-6 py-3 backdrop-blur-lg bg-white/60 dark:bg-gray-900/60">
           <button onClick={onBack} className="p-2 -ml-2">
             <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
           </button>

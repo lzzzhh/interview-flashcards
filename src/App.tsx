@@ -39,11 +39,11 @@ function StudyPage({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="light-bg dark-bg h-dvh flex flex-col overflow-hidden text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="dark-bg light-bg h-dvh flex flex-col overflow-hidden text-gray-900 dark:text-gray-100 transition-colors">
       <div className="relative z-10 max-w-md mx-auto w-full px-3 sm:px-4 flex flex-col flex-1 min-h-0">
 
         {/* Top bar — fixed height */}
-        <div className="shrink-0 py-3 flex items-center justify-between">
+        <div className="sticky top-0 z-20 shrink-0 py-3 flex items-center justify-between bg-white/60 dark:bg-gray-900/60 backdrop-blur-lg -mx-3 sm:-mx-4 px-3 sm:px-4">
           <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm">
             <ArrowLeft className="w-4 h-4" /> 返回
           </button>
