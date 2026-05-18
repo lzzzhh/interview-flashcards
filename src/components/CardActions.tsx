@@ -42,7 +42,7 @@ export default function CardActions() {
         <button
           onClick={() => dispatch({ type: 'PREV' })}
           disabled={idx === 0}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-white/8 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/12 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="hidden sm:inline">上一张</span>
@@ -54,7 +54,7 @@ export default function CardActions() {
             className={`p-2 rounded-lg transition-colors ${
               state.reviewMode
                 ? 'bg-primary text-white'
-                : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'
+                : 'bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12'
             }`}
             title={state.reviewMode ? '退出复习模式' : '进入复习模式'}
           >
@@ -66,7 +66,7 @@ export default function CardActions() {
             className={`p-2 rounded-lg transition-colors ${
               isMastered
                 ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400'
-                : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'
+                : 'bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12'
             }`}
             title={isMastered ? '取消掌握' : '标记掌握'}
           >
@@ -78,7 +78,7 @@ export default function CardActions() {
             className={`p-2 rounded-lg transition-colors ${
               isFavorited
                 ? 'bg-amber-100 text-amber-500 dark:bg-amber-900 dark:text-amber-400'
-                : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'
+                : 'bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12'
             }`}
             title={isFavorited ? '取消收藏' : '收藏'}
           >
@@ -87,7 +87,7 @@ export default function CardActions() {
 
           <button
             onClick={() => dispatch({ type: 'SHUFFLE' })}
-            className="p-2 rounded-lg bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-lg bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12 transition-colors"
             title="随机顺序"
           >
             <Shuffle className="w-4 h-4" />
@@ -95,7 +95,7 @@ export default function CardActions() {
 
           <button
             onClick={() => dispatch({ type: 'UNDO_LAST_RATING' })}
-            className="p-2 rounded-lg bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-lg bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12 transition-colors"
             title="撤回上次评分 (Ctrl+Z)"
           >
             <Undo2 className="w-4 h-4" />
@@ -105,7 +105,7 @@ export default function CardActions() {
         <button
           onClick={() => dispatch({ type: 'NEXT' })}
           disabled={idx >= total - 1}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-white/8 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/12 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           <span className="hidden sm:inline">下一张</span>
           <ChevronRight className="w-4 h-4" />
