@@ -97,7 +97,7 @@ export default function ModulePageTemplate({
           </div>
           <button
             onClick={onStartReview}
-            className="w-full py-2.5 rounded-xl text-[15px] font-bold text-white"
+            className="w-full py-1 rounded-xl text-[14px] font-bold text-white"
             style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
           >
             开始复习
