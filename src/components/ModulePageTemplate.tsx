@@ -87,10 +87,6 @@ export default function ModulePageTemplate({
       </div>
       <div className="flex-1 flex items-center justify-center">
         <div className="relative z-10 w-full max-w-md px-5 py-8 pb-24">
-              )}
-            </div>
-          )}
-        </div>
 
         {/* Stats Card */}
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
