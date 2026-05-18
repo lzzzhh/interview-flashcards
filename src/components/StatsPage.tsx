@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp, ChevronDown } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
 import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
@@ -21,6 +21,7 @@ interface Props {
 
 export default function StatsPage({ onBack }: Props) {
   const { decks } = useDeckTotals();
+  const [limitsOpen, setLimitsOpen] = useState(false);
 
   const totalCards = decks.reduce((a, d) => a + d.stats.total, 0);
   const newCards = decks.reduce((a, d) => a + d.stats.newCount, 0);
@@ -83,8 +84,26 @@ export default function StatsPage({ onBack }: Props) {
           </div>
         </div>
 
+        {/* 掌握率 */}
+        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>掌握率</h2>
+          <div className="w-full h-3 rounded-full mb-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${totalCards > 0 ? Math.round((mastered / totalCards) * 100) : 0}%`, backgroundColor: GREEN }} />
+          </div>
+          <p className="text-[11px]" style={{ color: TEXT_MUTED }}>
+            已掌握 {mastered} / {totalCards} · {totalCards > 0 ? Math.round((mastered / totalCards) * 100) : 0}%
+          </p>
+          <h2 className="text-[14px] font-bold mt-4 mb-2" style={{ color: TEXT_PRIMARY }}>复习阶段</h2>
+          <div className="grid grid-cols-4 gap-2 text-center">
+            <StageBadge label="新学" count={newCards} color={BLUE} />
+            <StageBadge label="学习中" count={learning} color={ORANGE} />
+            <StageBadge label="复习" count={mastered} color={GREEN} />
+            <StageBadge label="重学" count={relearningCount} color="#EF4444" />
+          </div>
+        </div>
+
         {/* Module Breakdown */}
-        <div className="rounded-2xl p-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>模块分布</h2>
           <div className="space-y-2">
             {moduleStats.map(m => {
@@ -107,33 +126,20 @@ export default function StatsPage({ onBack }: Props) {
 
         {/* 每日新卡上限 */}
         <div className="rounded-2xl p-4 mt-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-          <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>每日新卡上限</h2>
-          <div className="space-y-2">
-            {CATEGORIES.map((cat) => (
-              <ModuleLimitRow key={cat.key} id={cat.key} label={cat.label} />
-            ))}
-            {loadCustomDecks().map((d) => (
-              <ModuleLimitRow key={d.id} id={d.id} label={d.name} />
-            ))}
-          </div>
-        </div>
-
-        {/* 掌握率 & 复习阶段 */}
-        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-          <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>掌握率</h2>
-          <div className="w-full h-3 rounded-full mb-1" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
-            <div className="h-full rounded-full transition-all" style={{ width: `${totalCards > 0 ? Math.round((mastered / totalCards) * 100) : 0}%`, backgroundColor: GREEN }} />
-          </div>
-          <p className="text-[11px]" style={{ color: TEXT_MUTED }}>
-            已掌握 {mastered} / {totalCards} · {totalCards > 0 ? Math.round((mastered / totalCards) * 100) : 0}%
-          </p>
-          <h2 className="text-[14px] font-bold mt-4 mb-2" style={{ color: TEXT_PRIMARY }}>复习阶段</h2>
-          <div className="grid grid-cols-4 gap-2 text-center">
-            <StageBadge label="新学" count={newCards} color={BLUE} />
-            <StageBadge label="学习中" count={learning} color={ORANGE} />
-            <StageBadge label="复习" count={mastered} color={GREEN} />
-            <StageBadge label="重学" count={relearningCount} color="#EF4444" />
-          </div>
+          <button onClick={() => setLimitsOpen(!limitsOpen)} className="flex items-center justify-between w-full text-left">
+            <h2 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>每日新卡上限</h2>
+            <ChevronDown className={`w-4 h-4 transition-transform`} style={{ color: TEXT_MUTED, transform: limitsOpen ? 'rotate(180deg)' : '' }} />
+          </button>
+          {limitsOpen && (
+            <div className="space-y-2 mt-3">
+              {CATEGORIES.map((cat) => (
+                <ModuleLimitRow key={cat.key} id={cat.key} label={cat.label} />
+              ))}
+              {loadCustomDecks().map((d) => (
+                <ModuleLimitRow key={d.id} id={d.id} label={d.name} />
+              ))}
+            </div>
+          )}
         </div>
 
       </div>
