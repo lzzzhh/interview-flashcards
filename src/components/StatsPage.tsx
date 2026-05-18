@@ -1,11 +1,10 @@
-import { useState, useRef, useMemo } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp, Download, Upload } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
 import { loadProgress } from '../utils/storage';
 import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
-import { exportProgress, importProgress } from '../utils/backup';
 import type { FlashCard } from '../types';
 import type { Category } from '../types';
 
