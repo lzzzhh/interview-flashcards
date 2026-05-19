@@ -47,6 +47,12 @@ export default function StatsPage({ onBack }: Props) {
     }));
   }, [decks]);
 
+  // 本地统计（不依赖后端 API）
+  const learning = Object.values(state.cardsById).filter(c => c.sm2?.state === 'learning').length;
+  const localMastered = Object.values(state.cardsById).filter(c => c.sm2?.state === 'review' && c.sm2?.interval >= 21).length;
+  const localNewCards = Object.values(state.cardsById).filter(c => !c.sm2 || c.sm2.state === 'new').length;
+  const localRelearning = Object.values(state.cardsById).filter(c => c.sm2?.state === 'relearning').length;
+
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center">
