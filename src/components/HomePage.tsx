@@ -3,7 +3,7 @@
 // ============================================================
 
 import { useState, useMemo, useCallback, useRef } from 'react';
-import { ChevronRight, Home, Layers, BarChart3, User, ChevronLeft } from 'lucide-react';
+import { ChevronRight, Home, Layers, BarChart3, User, ChevronLeft, Search } from 'lucide-react';
 import appIcon from '../../icon.png';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
@@ -59,7 +59,7 @@ const TABS = [
   { label: '我的', icon: User, action: 'profile' as const },
 ];
 
-export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile, onShowSearch: _onShowSearch }: Props) {
+export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile, onShowSearch }: Props) {
   const { state, dueCountByCategory, dispatch } = useAppContext();
   const { totals } = useDeckTotals();
 
@@ -201,8 +201,11 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                     <button onClick={() => setRecIndex((i) => i + 1)} className="p-1" style={{ color: TEXT_MUTED }}>
                       <ChevronRight className="w-4 h-4" />
                     </button>
-                  </div>
-                </div>
+          </div>
+          <button onClick={_onShowSearch} className="ml-auto p-2 rounded-xl border" style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}>
+            <Search className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+          </button>
+        </div>
                 <div className="flex-1 min-h-0 overflow-y-auto my-1">
                   <p className="text-[12px]" style={{ color: 'var(--text-muted)' }}>高优先级 · 复习薄弱点</p>
                 </div>
