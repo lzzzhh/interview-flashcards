@@ -52,10 +52,10 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const ftsResults = await fts5Search(input.query, input.topK);
   for (const r of ftsResults) {
     if (!results.find(x => x.cardId === r.cardId)) {
-      results.push({ cardId: r.cardId, title: '', deckId: '', tags: [], score: 1 / (1 + r.rank), matchType: 'keyword', reason: '关键词匹配' });
+      results.push({ cardId: r.cardId, title: '', deckId: '', tags: [], score: 1 / (1 + Number(r.rank)), matchType: 'keyword', reason: '关键词匹配' });
     } else {
       const existing = results.find(x => x.cardId === r.cardId)!;
-      existing.score += 1 / (1 + r.rank);
+      existing.score += 1 / (1 + Number(r.rank));
       existing.matchType = 'hybrid';
       existing.reason = '语义+关键词匹配';
     }

@@ -53,7 +53,18 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     }
 
     const rows = await prisma.$queryRawUnsafe(sql, ...params) as any[];
-    return (rows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'fts5' }));
+    const results = (rows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'fts5' }));
+
+    // Fallback: SQLite LIKE for Chinese text (FTS5 unicode61 doesn't handle CJK well)
+    if (results.length === 0 && /[\u4e00-\u9fff]/.test(escaped)) {
+      const likeRows = await prisma.$queryRawUnsafe(
+        'SELECT id as cardId, 10 as rank FROM Card WHERE question LIKE ?1 OR titleCn LIKE ?1 OR title LIKE ?1 LIMIT ?2',
+        `%${escaped}%`, limit,
+      ) as any[];
+      return (likeRows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'like' }));
+    }
+
+    return results;
   } catch (e) {
     console.error('FTS5 search error:', e);
     return [];
