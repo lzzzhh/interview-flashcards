@@ -9,6 +9,7 @@ import { migrationRoutes } from './routes/migrations';
 import { ingestRoutes } from './routes/ingest';
 import { searchRoutes } from './routes/search';
 import { cardDraftRoutes } from './routes/card-drafts';
+import { jobPrepRoutes } from './routes/job-prep';
 import { initFTS5 } from './services/search/fts5-search';
 
 const app = Fastify({ logger: true });
@@ -25,6 +26,7 @@ async function start() {
   await app.register(ingestRoutes);
   await app.register(searchRoutes);
   await app.register(cardDraftRoutes);
+  await app.register(jobPrepRoutes);
 
   // 初始化 FTS5 索引
   initFTS5().catch(() => {});

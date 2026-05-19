@@ -38,6 +38,7 @@ interface Props {
   onShowDecks: () => void;
   onShowStats: () => void;
   onShowProfile: () => void;
+  onShowSearch: () => void;
 }
 
 const TEXT_PRIMARY = 'var(--text-primary)';
@@ -58,7 +59,7 @@ const TABS = [
   { label: '我的', icon: User, action: 'profile' as const },
 ];
 
-export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile }: Props) {
+export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile, onShowSearch: _onShowSearch }: Props) {
   const { state, dueCountByCategory, dispatch } = useAppContext();
   const { totals } = useDeckTotals();
 
