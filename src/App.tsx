@@ -98,7 +98,11 @@ function AppInner() {
   const [showProfile, setShowProfile] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const { dispatch } = useAppContext();
-  const handleEnterStudy = (category: Category) => { setStudyCategory(category); setShowDecks(false); dispatch({ type: 'SET_CATEGORY', payload: category }); };
+  const handleEnterStudy = (category: Category, cardId?: string) => {
+    setStudyCategory(category); setShowDecks(false);
+    dispatch({ type: 'SET_CATEGORY', payload: category });
+    if (cardId) dispatch({ type: 'JUMP_TO_CARD', payload: { category, cardId } });
+  };
 
   if (showDecks) {
     return <DeckPage onEnterStudy={handleEnterStudy} onBack={() => setShowDecks(false)} />;

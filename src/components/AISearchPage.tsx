@@ -39,6 +39,9 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
     onEnterStudy(card.deckId as Category);
   };
 
+  // Don't need dispatch at all
+  const { state } = useAppContext();
+
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
