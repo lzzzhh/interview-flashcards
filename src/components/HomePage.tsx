@@ -202,7 +202,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                       <ChevronRight className="w-4 h-4" />
                     </button>
           </div>
-          <button onClick={_onShowSearch} className="ml-auto p-2 rounded-xl border" style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}>
+          <button onClick={onShowSearch} className="ml-auto p-2 rounded-xl border" style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}>
             <Search className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
           </button>
         </div>
