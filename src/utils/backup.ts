@@ -142,3 +142,77 @@ export function importProgress(file: File): Promise<{ success: boolean; message:
     reader.readAsText(file);
   });
 }
+
+/** 导出所有卡片为 CSV（兼容 Excel） */
+export function exportProgressCSV(): void {
+  const rows: string[][] = [['cardId', 'category', 'state', 'interval', 'repetitions', 'lapses', 'easeFactor', 'nextReview', 'favorited']];
+  const keys = [
+    STORAGE_KEYS.LEETCODE_PROGRESS, STORAGE_KEYS.STATISTICS_PROGRESS,
+    STORAGE_KEYS.ML_PROGRESS, STORAGE_KEYS.DEEP_LEARNING_PROGRESS,
+    STORAGE_KEYS.LLM_PROGRESS, STORAGE_KEYS.AGENT_PROGRESS,
+    STORAGE_KEYS.JARGON_PROGRESS, STORAGE_KEYS.WORKPLACE_PROGRESS,
+    STORAGE_KEYS.VIBE_CODING_PROGRESS,
+  ];
+  for (const key of keys) {
+    const cat = key.replace('fc-', '').replace('-progress', '');
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const p = JSON.parse(raw);
+      if (p.sm2) {
+        for (const [cardId, sm2] of Object.entries(p.sm2)) {
+          const s = sm2 as any;
+          rows.push([cardId, cat, s.state || '', String(s.interval || 0), String(s.repetitions || 0), String(s.lapses || 0), String(s.easeFactor || 2.5), String(s.nextReview || ''), p.favorited?.includes(cardId) ? '1' : '0']);
+        }
+      }
+    } catch {}
+  }
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `flashcards-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/** 从 CSV 导入进度 */
+export function importProgressCSV(file: File): Promise<{ success: boolean; message: string }> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        const lines = text.split('\n').filter(l => l.trim());
+        if (lines.length < 2) { resolve({ success: false, message: 'CSV 文件为空' }); return; }
+        const header = lines[0].toLowerCase();
+        if (!header.includes('cardid')) { resolve({ success: false, message: 'CSV 格式不正确' }); return; }
+
+        const collected: Record<string, any> = {};
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          if (cols.length < 9) continue;
+          const [cardId, category, state, interval, repetitions, lapses, easeFactor, nextReview, favorited] = cols;
+          const key = `fc-${category}-progress`;
+          if (!collected[key]) collected[key] = { sm2: {}, mastered: [], favorited: [] };
+          collected[key].sm2[cardId] = {
+            state, interval: parseInt(interval) || 0, repetitions: parseInt(repetitions) || 0,
+            lapses: parseInt(lapses) || 0, easeFactor: parseFloat(easeFactor) || 2.5, nextReview: parseInt(nextReview) || Date.now(),
+          };
+          if (favorited === '1') collected[key].favorited.push(cardId);
+        }
+        let count = 0;
+        for (const [key, value] of Object.entries(collected)) {
+          localStorage.setItem(key, JSON.stringify(value));
+          count++;
+        }
+        resolve({ success: true, message: `从 CSV 导入 ${count} 个模块的进度` });
+      } catch { resolve({ success: false, message: 'CSV 解析失败' }); }
+    };
+    reader.onerror = () => resolve({ success: false, message: '文件读取失败' });
+    reader.readAsText(file);
+  });
+}
