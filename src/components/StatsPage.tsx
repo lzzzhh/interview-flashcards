@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp, ChevronDown } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
 import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export default function StatsPage({ onBack }: Props) {
+  const { dueCountByCategory } = useAppContext();
   const { decks } = useDeckTotals();
   const [limitsOpen, setLimitsOpen] = useState(false);
 
@@ -28,7 +30,11 @@ export default function StatsPage({ onBack }: Props) {
   const learning = decks.reduce((a, d) => a + d.stats.learningCount, 0);
   const mastered = decks.reduce((a, d) => a + d.stats.reviewCount, 0);
   const relearningCount = decks.reduce((a, d) => a + d.stats.relearningCount, 0);
-  const dueCount = decks.reduce((a, d) => a + d.stats.dueCount, 0);
+  const dueCount = useMemo(() => {
+    let t = 0;
+    for (const cat of CATEGORIES) t += dueCountByCategory[cat.key] ?? 0;
+    return t;
+  }, [dueCountByCategory]);
 
   const logs = loadReviewLogs();
   const allLogs = Object.values(logs).flat();
