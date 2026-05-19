@@ -10,7 +10,7 @@ datasource db {
 model Deck {
   id          String   @id
   name        String
-  type        String   @default("builtin")  // builtin | custom
+  type        String   @default("builtin")
   icon        String?
   description String?
   sortOrder   Int      @default(0)
@@ -24,7 +24,7 @@ model Deck {
 model Card {
   id          String   @id
   deckId      String
-  type        String   @default("qa")  // leetcode | qa
+  type        String   @default("qa")
   number      Int?
   title       String?
   titleCn     String?
@@ -33,10 +33,10 @@ model Card {
   description String?
   approach    String?
   difficulty  String?
-  tags        String?  // JSON array as string
+  tags        String?
   subTopic    String?
   source      String?
-  codes       String?  // JSON object as string
+  codes       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -89,4 +89,89 @@ model DeckDailyLimit {
   deck Deck @relation(fields: [deckId], references: [id])
 
   @@id([userId, deckId])
+}
+
+// ============ Phase 2: Agent 相关新增表 ============
+
+model CardDraft {
+  id           String   @id
+  sourceId     String?
+  deckId       String
+  type         String   @default("qa")
+  question     String
+  answer       String
+  tags         String?
+  difficulty   String?
+  subTopic     String?
+  reason       String?
+  qualityScore Float?
+  status       String   @default("draft")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SourceDocument {
+  id         String   @id
+  fileName   String?
+  sourceType String
+  parser     String
+  fullText   String
+  metadata   String?
+  textHash   String
+  createdAt  DateTime @default(now())
+  chunks     SourceChunk[]
+}
+
+model SourceChunk {
+  id         String   @id
+  sourceId   String
+  chunkIndex Int
+  text       String
+  tokenCount Int?
+  hash       String
+  source     SourceDocument @relation(fields: [sourceId], references: [id])
+}
+
+model JobPrepSession {
+  id           String   @id
+  state        String   @default("awaiting_company")
+  company      String?
+  role         String?
+  location     String?
+  targetDays   Int?
+  dailyMinutes Int?
+  jdSource     String?
+  jdText       String?
+  jdSourceUrl  String?
+  jobProfile   String?
+  cardMatches  String?
+  studyPlan    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model StudyQueue {
+  id        String   @id
+  source    String   @default("normal")
+  title     String
+  cardIds   String
+  planId    String?
+  createdAt DateTime @default(now())
+}
+
+model EmbeddingRecord {
+  id          String   @id
+  objectType  String
+  objectId    String
+  provider    String
+  model       String
+  dimension   Int
+  vectorStore String   @default("sqlite-vec")
+  vectorTable String
+  vectorRowId Int
+  status      String   @default("active")
+  textHash    String
+  createdAt   DateTime @default(now())
+
+  @@unique([objectType, objectId, model])
 }

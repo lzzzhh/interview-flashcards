@@ -6,6 +6,7 @@ import { reviewRoutes } from './routes/reviews';
 import { studyRoutes } from './routes/study';
 import { cardRoutes } from './routes/cards';
 import { migrationRoutes } from './routes/migrations';
+import { ingestRoutes } from './routes/ingest';
 
 const app = Fastify({ logger: true });
 const PORT = parseInt(process.env.PORT || '3001', 10);
@@ -18,6 +19,7 @@ async function start() {
   await app.register(studyRoutes);
   await app.register(cardRoutes);
   await app.register(migrationRoutes);
+  await app.register(ingestRoutes);
 
   app.get('/api/health', async () => ({ ok: true }));
 
