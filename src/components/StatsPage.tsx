@@ -183,7 +183,7 @@ function ModuleLimitRow({ id, label }: { id: string; label: string }) {
     <div className="flex items-center justify-between py-1">
       <span className="text-[12px] truncate flex-1" style={{ color: TEXT_MUTED }}>{label}</span>
       <div className="flex items-center gap-2">
-        <input type="range" min="1" max="100" value={limit}
+        <input type="range" min="0" max="100" value={limit}
           onChange={(e) => { const v = Number(e.target.value); setLimit(v); setModuleDailyLimit(id, v); }}
           className="w-20 h-1.5 accent-[#2882d7]" />
         <span className="text-[13px] font-bold w-6 text-right" style={{ color: BLUE }}>{limit}</span>

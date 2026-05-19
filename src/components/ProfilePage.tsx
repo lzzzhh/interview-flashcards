@@ -73,7 +73,7 @@ export default function ProfilePage({ onBack }: Props) {
                 <div className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ left: state.isDark ? '22px' : '2px' }} />
               </button>
             } />
-            <SettingRow label="版本" right={<span className="text-[13px]" style={{ color: TEXT_MUTED }}>0.3.6</span>} />
+            <SettingRow label="版本" right={<span className="text-[13px]" style={{ color: TEXT_MUTED }}>0.5.0</span>} />
             <SettingRow label="数据存储路径" right={<span className="text-[11px] text-right max-w-[180px] truncate" style={{ color: TEXT_MUTED }}>~/Documents/interview-flashcards/</span>} />
           </div>
         </div>
