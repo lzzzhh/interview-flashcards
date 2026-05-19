@@ -21,15 +21,11 @@ interface Props {
 }
 
 export default function StatsPage({ onBack }: Props) {
-  const { dueCountByCategory } = useAppContext();
+  const { dueCountByCategory, state } = useAppContext();
   const { decks } = useDeckTotals();
   const [limitsOpen, setLimitsOpen] = useState(false);
 
   const totalCards = decks.reduce((a, d) => a + d.stats.total, 0);
-  const newCards = decks.reduce((a, d) => a + d.stats.newCount, 0);
-  const learning = decks.reduce((a, d) => a + d.stats.learningCount, 0);
-  const mastered = decks.reduce((a, d) => a + d.stats.reviewCount, 0);
-  const relearningCount = decks.reduce((a, d) => a + d.stats.relearningCount, 0);
   const dueCount = useMemo(() => {
     let t = 0;
     for (const cat of CATEGORIES) t += dueCountByCategory[cat.key] ?? 0;
@@ -66,7 +62,7 @@ export default function StatsPage({ onBack }: Props) {
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="grid grid-cols-3 gap-3 mb-4">
             <StatBox icon={<BookOpen className="w-4 h-4" />} label="总卡片" value={totalCards} color={BLUE} />
-            <StatBox icon={<CheckCircle className="w-4 h-4" />} label="已掌握" value={mastered} color={GREEN} />
+            <StatBox icon={<CheckCircle className="w-4 h-4" />} label="已掌握" value={localMastered} color={GREEN} />
             <StatBox icon={<Clock className="w-4 h-4" />} label="待复习" value={dueCount} color={ORANGE} />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -84,7 +80,7 @@ export default function StatsPage({ onBack }: Props) {
         {/* Accuracy */}
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="grid grid-cols-3 gap-3">
-            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="新卡数" value={newCards} color={BLUE} />
+            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="新卡数" value={localNewCards} color={BLUE} />
             <StatBoxSmall icon={<TrendingUp className="w-4 h-4" />} label="正确率" value={`${accuracy}%`} color={GREEN} />
             <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="学习中的" value={learning} color="#CBD5E1" />
           </div>
@@ -94,17 +90,17 @@ export default function StatsPage({ onBack }: Props) {
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>掌握率</h2>
           <div className="w-full h-3 rounded-full mb-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
-            <div className="h-full rounded-full transition-all" style={{ width: `${totalCards > 0 ? Math.round((mastered / totalCards) * 100) : 0}%`, backgroundColor: GREEN }} />
+            <div className="h-full rounded-full transition-all" style={{ width: `${totalCards > 0 ? Math.round((localMastered / totalCards) * 100) : 0}%`, backgroundColor: GREEN }} />
           </div>
           <p className="text-[11px]" style={{ color: TEXT_MUTED }}>
-            已掌握 {mastered} / {totalCards} · {totalCards > 0 ? Math.round((mastered / totalCards) * 100) : 0}%
+            已掌握 {localMastered} / {totalCards} · {totalCards > 0 ? Math.round((localMastered / totalCards) * 100) : 0}%
           </p>
           <h2 className="text-[14px] font-bold mt-4 mb-2" style={{ color: TEXT_PRIMARY }}>复习阶段</h2>
           <div className="grid grid-cols-4 gap-2 text-center">
-            <StageBadge label="新学" count={newCards} color={BLUE} />
+            <StageBadge label="新学" count={localNewCards} color={BLUE} />
             <StageBadge label="学习中" count={learning} color={ORANGE} />
-            <StageBadge label="复习" count={mastered} color={GREEN} />
-            <StageBadge label="重学" count={relearningCount} color="#EF4444" />
+            <StageBadge label="复习" count={localMastered} color={GREEN} />
+            <StageBadge label="重学" count={localRelearning} color="#EF4444" />
           </div>
         </div>
 
