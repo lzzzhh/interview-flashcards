@@ -15,6 +15,9 @@ import DeckPage from './components/DeckPage';
 import StatsPage from './components/StatsPage';
 import ProfilePage from './components/ProfilePage';
 import AISearchPage from './components/AISearchPage';
+import AgentHubPage from './components/AgentHubPage';
+import DraftReviewPage from './components/DraftReviewPage';
+import JobPrepPage from './components/JobPrepPage';
 import type { Category, FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
@@ -97,6 +100,7 @@ function AppInner() {
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [agentPage, setAgentPage] = useState<string | null>(null);
   const { dispatch } = useAppContext();
   const handleEnterStudy = (category: Category, cardId?: string) => {
     setStudyCategory(category); setShowDecks(false);
@@ -117,7 +121,10 @@ function AppInner() {
   }
 
   if (showSearch) {
-    return <AISearchPage onBack={() => setShowSearch(false)} onEnterStudy={handleEnterStudy} />;
+    if (agentPage === 'search') return <AISearchPage onBack={() => setAgentPage(null)} onEnterStudy={handleEnterStudy} />;
+    if (agentPage === 'drafts') return <DraftReviewPage onBack={() => setAgentPage(null)} />;
+    if (agentPage === 'jobprep') return <JobPrepPage onBack={() => setAgentPage(null)} />;
+    return <AgentHubPage onBack={() => setShowSearch(false)} onNavigate={setAgentPage} />;
   }
 
   return (
