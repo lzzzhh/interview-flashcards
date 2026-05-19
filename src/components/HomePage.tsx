@@ -3,7 +3,7 @@
 // ============================================================
 
 import { useState, useMemo, useCallback, useRef } from 'react';
-import { ChevronRight, Home, Layers, BarChart3, User, ChevronLeft, Search } from 'lucide-react';
+import { ChevronRight, Home, Layers, BarChart3, User, ChevronLeft, Bot } from 'lucide-react';
 import appIcon from '../../icon.png';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
@@ -56,6 +56,7 @@ const TABS = [
   { label: '首页', icon: Home, active: true },
   { label: '牌组', icon: Layers, action: 'decks' as const },
   { label: '统计', icon: BarChart3, action: 'stats' as const },
+  { label: 'Agent', icon: Bot, action: 'agent' as const },
   { label: '我的', icon: User, action: 'profile' as const },
 ];
 
@@ -202,9 +203,6 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                       <ChevronRight className="w-4 h-4" />
                     </button>
           </div>
-          <button onClick={onShowSearch} className="ml-auto p-2 rounded-xl border" style={{ borderColor: CARD_BORDER, backgroundColor: CARD_BG }}>
-            <Search className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-          </button>
         </div>
                 <div className="flex-1 min-h-0 overflow-y-auto my-1">
                   <p className="text-[12px]" style={{ color: 'var(--text-muted)' }}>高优先级 · 复习薄弱点</p>
@@ -263,6 +261,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
               onClick={() => {
                 if (tab.action === 'decks') onShowDecks();
                 else if (tab.action === 'stats') onShowStats();
+                else if (tab.action === 'agent') onShowSearch();
                 else if (tab.action === 'profile') onShowProfile();
               }}
               className="flex flex-col items-center gap-0.5"
