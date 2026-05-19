@@ -18,29 +18,6 @@ const CARD_BORDER = 'var(--card-border)';
 
 export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const { dispatch } = useAppContext();
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
-
-  const handleSearch = async () => {
-    if (!query.trim()) return;
-    setLoading(true);
-    try {
-      const res = await hybridSearch(query.trim(), 15);
-      setResults(res.results);
-      setSearched(true);
-    } catch { setResults([]); }
-    setLoading(false);
-  };
-
-  const handleCardClick = (card: SearchResult) => {
-    dispatch({ type: 'JUMP_TO_CARD', payload: { category: card.deckId as Category, cardId: card.cardId } });
-    onEnterStudy(card.deckId as Category);
-  };
-
-  // Don't need dispatch at all
-  const { state } = useAppContext();
 
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
