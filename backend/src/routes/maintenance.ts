@@ -29,10 +29,27 @@ export async function maintenanceRoutes(app: FastifyInstance) {
 
   // 全量同步所有卡片 embedding
   app.post('/api/maintenance/sync-all-embeddings', async () => {
-    const cards = await prisma.card.findMany({ select: { id: true } });
-    const cardIds = cards.map(c => c.id);
-    const count = await syncCardEmbeddings(cardIds);
-    return { success: true, totalCards: cardIds.length, syncedCount: count };
+    try {
+      const cards = await prisma.card.findMany({ select: { id: true } });
+      const cardIds = cards.map(c => c.id);
+      const count = await syncCardEmbeddings(cardIds);
+      return { success: true, totalCards: cardIds.length, syncedCount: count };
+    } catch (err) {
+      return { success: false, totalCards: 0, syncedCount: 0, error: (err as Error).message };
+    }
+  });
+
+  // 检查 embedding 服务状态
+  app.get('/api/maintenance/embedding-status', async () => {
+    const { getEmbeddingProvider } = await import('../services/embedding-provider');
+    const provider = getEmbeddingProvider();
+    if (!provider) return { available: false, reason: 'Embedding provider not configured' };
+    try {
+      const res = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts: ['test'] });
+      return { available: true, dimension: res.dimension, provider: provider.name };
+    } catch (err) {
+      return { available: false, reason: `Embedding API error: ${(err as Error).message}`, provider: provider.name };
+    }
   });
 
   // 查看向量存储状态
