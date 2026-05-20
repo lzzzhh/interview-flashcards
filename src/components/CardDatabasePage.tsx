@@ -16,6 +16,7 @@ import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
 import { createDefaultSM2 } from '../utils/sm2';
 import { validateExportCards } from '../utils/backup';
+import { parseMarkdownCards } from '../utils/markdownImporter';
 import type { Category, FlashCard, QACard, LeetCodeCard } from '../types';
 
 interface Props {
@@ -269,6 +270,7 @@ export default function CardDatabasePage({ onBack }: Props) {
       try {
         const text = ev.target?.result as string;
         if (file.name.endsWith('.csv')) importCSV(text);
+        else if (file.name.endsWith('.md')) importMarkdown(text);
         else importJSON(text);
       } catch (err) { setImportMsg(`导入失败：${(err as Error).message}`); }
     };
@@ -321,6 +323,13 @@ export default function CardDatabasePage({ onBack }: Props) {
       if (card.question || card.title) items.push(card);
     }
     importCards(items);
+  }
+
+  function importMarkdown(text: string) {
+    const cards = parseMarkdownCards(text);
+    if (cards.length === 0) { setImportMsg('未找到有效的卡片数据，请检查 Markdown 格式。'); return; }
+    setImportMsg(`从 Markdown 解析到 ${cards.length} 张卡片`);
+    importCards(cards);
   }
 
   function importCards(items: ExportCard[]) {
@@ -431,7 +440,7 @@ export default function CardDatabasePage({ onBack }: Props) {
               >
                 <Upload className="w-4 h-4" />导入
               </button>
-              <input ref={fileRef} type="file" accept=".csv,.json" onChange={handleImport} className="hidden" />
+              <input ref={fileRef} type="file" accept=".csv,.json,.md" onChange={handleImport} className="hidden" />
             </div>
             {/* 导入说明 */}
             <p className="text-[10px] leading-relaxed" style={{ color: TEXT_MUTED }}>

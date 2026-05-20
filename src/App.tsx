@@ -24,6 +24,8 @@ import JobPrepPage from './components/JobPrepPage';
 import IngestPage from './components/IngestPage';
 import ApiSettingsPage from './components/ApiSettingsPage';
 import TagManagerPage from './components/TagManagerPage';
+import MockInterviewPage from './components/MockInterviewPage';
+import ResumeProjectPage from './components/ResumeProjectPage';
 import type { Category, FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
@@ -140,6 +142,8 @@ function AppInner() {
     if (profileSubPage === 'card-database') return <CardDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'vector-database') return <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'tag-manager') return <TagManagerPage onBack={() => setProfileSubPage(null)} />;
+    if (profileSubPage === 'mock-interview') return <MockInterviewPage onBack={() => setProfileSubPage(null)} />;
+    if (profileSubPage === 'resume-project') return <ResumeProjectPage onBack={() => setProfileSubPage(null)} />;
     return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
   }
 

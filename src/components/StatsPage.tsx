@@ -5,6 +5,7 @@ import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy, getDifficultCards } from '../utils/reviewLogs';
 import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks, getModuleDailyReviewLimit, setModuleDailyReviewLimit } from '../utils/customDecks';
 import { useDecks, deriveGlobalStats } from '../repositories/useDeckStats';
+import { calculateCountdownPlan } from '../utils/countdown';
 import type { Category } from '../types';
 
 const TEXT_PRIMARY = 'var(--text-primary)';
@@ -25,6 +26,11 @@ export default function StatsPage({ onBack }: Props) {
   const { decks } = useDecks();
   const [limitsOpen, setLimitsOpen] = useState(false);
   const [reviewLimitsOpen, setReviewLimitsOpen] = useState(false);
+  const [countdownDate, setCountdownDate] = useState(() => {
+    // 默认秋招日期：当年 9 月 1 日
+    const now = new Date();
+    return `${now.getFullYear()}-09-01`;
+  });
 
   const globalStats = useMemo(() => deriveGlobalStats(decks), [decks]);
   const dueCount = useMemo(() => {
@@ -115,6 +121,39 @@ export default function StatsPage({ onBack }: Props) {
             <StatBoxSmall icon={<TrendingUp className="w-4 h-4" />} label="正确率" value={`${accuracy}%`} color={GREEN} />
             <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="学习中的" value={globalStats.learningCount} color="#CBD5E1" />
           </div>
+        </div>
+
+        {/* 秋招倒计时 */}
+        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>秋招倒计时</h2>
+          <div className="flex items-center gap-2 mb-3">
+            <input
+              type="date"
+              value={countdownDate}
+              onChange={e => setCountdownDate(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-xl border text-[13px] bg-transparent"
+              style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}
+            />
+          </div>
+          {(() => {
+            const plan = calculateCountdownPlan(countdownDate, useAppContext().state.cardsById);
+            return (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center">
+                  <div className="text-[22px] font-bold" style={{ color: ORANGE }}>{plan.daysLeft}</div>
+                  <div className="text-[11px]" style={{ color: TEXT_MUTED }}>剩余天数</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[22px] font-bold" style={{ color: BLUE }}>{plan.dailyTarget}</div>
+                  <div className="text-[11px]" style={{ color: TEXT_MUTED }}>每日目标</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[22px] font-bold" style={{ color: '#EF4444' }}>{plan.dueCards}</div>
+                  <div className="text-[11px]" style={{ color: TEXT_MUTED }}>待复习</div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* 掌握率 */}

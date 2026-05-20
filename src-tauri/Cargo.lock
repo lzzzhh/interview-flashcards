@@ -1654,6 +1654,7 @@ name = "interview-flashcards"
 version = "0.1.0"
 dependencies = [
  "dirs-next",
+ "libc",
  "log",
  "serde",
  "serde_json",
