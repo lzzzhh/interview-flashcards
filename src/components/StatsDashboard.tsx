@@ -28,6 +28,7 @@ import { llmCards } from '../data/llm';
 import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
+import { vibeCodingCards } from '../data/vibe-coding';
 import { loadProgress } from '../utils/storage';
 import type { Category, FlashCard } from '../types';
 
@@ -42,6 +43,7 @@ function loadAllCards(): FlashCard[] {
     ['agent', agentCards as FlashCard[]],
     ['jargon', jargonCards as FlashCard[]],
     ['workplace', workplaceCards as FlashCard[]],
+    ['vibe-coding', vibeCodingCards as FlashCard[]],
   ];
   const allCards: FlashCard[] = [];
   for (const [category, cards] of sources) {

@@ -3,9 +3,18 @@ import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp, ChevronDown }
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
-import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
-import { useDeckTotals } from '../repositories/useDeckStats';
-import type { Category } from '../types';
+import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks, loadCustomCards } from '../utils/customDecks';
+import { loadProgress } from '../utils/storage';
+import { leetcodeHot100 } from '../data/leetcode-hot100';
+import { statisticsCards } from '../data/statistics';
+import { machineLearningCards } from '../data/machine-learning';
+import { deepLearningCards } from '../data/deep-learning';
+import { llmCards } from '../data/llm';
+import { agentCards } from '../data/agent';
+import { jargonCards } from '../data/jargon';
+import { workplaceCards } from '../data/workplace';
+import { vibeCodingCards } from '../data/vibe-coding';
+import type { Category, FlashCard } from '../types';
 
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
@@ -22,10 +31,88 @@ interface Props {
 
 export default function StatsPage({ onBack }: Props) {
   const { dueCountByCategory, state } = useAppContext();
-  const { decks } = useDeckTotals();
   const [limitsOpen, setLimitsOpen] = useState(false);
 
-  const totalCards = decks.reduce((a, d) => a + d.stats.total, 0);
+  // 全局统计：遍历所有内置模块 + 自定义牌组，从 localStorage 读取真实进度
+  const globalStats = useMemo(() => {
+    const builtinSources: [Category, FlashCard[]][] = [
+      ['leetcode', leetcodeHot100 as FlashCard[]],
+      ['statistics', statisticsCards as FlashCard[]],
+      ['machine-learning', machineLearningCards as FlashCard[]],
+      ['deep-learning', deepLearningCards as FlashCard[]],
+      ['llm', llmCards as FlashCard[]],
+      ['agent', agentCards as FlashCard[]],
+      ['jargon', jargonCards as FlashCard[]],
+      ['workplace', workplaceCards as FlashCard[]],
+      ['vibe-coding', vibeCodingCards as FlashCard[]],
+    ];
+
+    let totalCards = 0;
+    let newCards = 0;
+    let mastered = 0;
+    let learningCount = 0;
+    let relearning = 0;
+    const moduleTotals: Record<string, number> = {};
+    const moduleNew: Record<string, number> = {};
+
+    for (const [cat, cards] of builtinSources) {
+      const progress = loadProgress(cat);
+      const catNew = cards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return !sm2 || sm2.state === 'new';
+      }).length;
+      const catMastered = cards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return sm2 && sm2.state === 'review' && sm2.interval >= 21;
+      }).length;
+      const catLearning = cards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return sm2?.state === 'learning';
+      }).length;
+      const catRelearning = cards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return sm2?.state === 'relearning';
+      }).length;
+      totalCards += cards.length;
+      newCards += catNew;
+      mastered += catMastered;
+      learningCount += catLearning;
+      relearning += catRelearning;
+      moduleTotals[cat] = cards.length;
+      moduleNew[cat] = catNew;
+    }
+
+    // 自定义牌组
+    for (const deck of loadCustomDecks()) {
+      const customCards = loadCustomCards(deck.id);
+      const progress = loadProgress(deck.id as Category);
+      const catNew = customCards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return !sm2 || sm2.state === 'new';
+      }).length;
+      const catMastered = customCards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return sm2 && sm2.state === 'review' && sm2.interval >= 21;
+      }).length;
+      const catLearning = customCards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return sm2?.state === 'learning';
+      }).length;
+      const catRelearning = customCards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return sm2?.state === 'relearning';
+      }).length;
+      totalCards += customCards.length;
+      newCards += catNew;
+      mastered += catMastered;
+      learningCount += catLearning;
+      relearning += catRelearning;
+      moduleTotals[deck.id] = customCards.length;
+      moduleNew[deck.id] = catNew;
+    }
+
+    return { totalCards, newCards, mastered, learningCount, relearning, moduleTotals, moduleNew };
+  }, [state.cardsById]);
   const dueCount = useMemo(() => {
     let t = 0;
     for (const cat of CATEGORIES) t += dueCountByCategory[cat.key] ?? 0;
@@ -40,18 +127,12 @@ export default function StatsPage({ onBack }: Props) {
 
   // Per-module breakdown
   const moduleStats = useMemo(() => {
-    return decks.map(d => ({
-      key: d.id, label: d.name,
-      total: d.stats.total,
-      due: d.stats.dueCount,
+    return CATEGORIES.map(cat => ({
+      key: cat.key, label: cat.label,
+      total: globalStats.moduleTotals[cat.key] ?? 0,
+      started: (globalStats.moduleTotals[cat.key] ?? 0) - (globalStats.moduleNew[cat.key] ?? 0),
     }));
-  }, [decks]);
-
-  // 本地统计（不依赖后端 API）
-  const learning = Object.values(state.cardsById).filter(c => c.sm2?.state === 'learning').length;
-  const localMastered = Object.values(state.cardsById).filter(c => c.sm2?.state === 'review' && c.sm2?.interval >= 21).length;
-  const localNewCards = Object.values(state.cardsById).filter(c => !c.sm2 || c.sm2.state === 'new').length;
-  const localRelearning = Object.values(state.cardsById).filter(c => c.sm2?.state === 'relearning').length;
+  }, [globalStats]);
 
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
@@ -67,8 +148,8 @@ export default function StatsPage({ onBack }: Props) {
         {/* Overview */}
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="grid grid-cols-3 gap-3 mb-4">
-            <StatBox icon={<BookOpen className="w-4 h-4" />} label="总卡片" value={totalCards} color={BLUE} />
-            <StatBox icon={<CheckCircle className="w-4 h-4" />} label="已掌握" value={localMastered} color={GREEN} />
+            <StatBox icon={<BookOpen className="w-4 h-4" />} label="总卡片" value={globalStats.totalCards} color={BLUE} />
+            <StatBox icon={<CheckCircle className="w-4 h-4" />} label="已掌握" value={globalStats.mastered} color={GREEN} />
             <StatBox icon={<Clock className="w-4 h-4" />} label="待复习" value={dueCount} color={ORANGE} />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -86,9 +167,9 @@ export default function StatsPage({ onBack }: Props) {
         {/* Accuracy */}
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="grid grid-cols-3 gap-3">
-            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="新卡数" value={localNewCards} color={BLUE} />
+            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="新卡数" value={globalStats.newCards} color={BLUE} />
             <StatBoxSmall icon={<TrendingUp className="w-4 h-4" />} label="正确率" value={`${accuracy}%`} color={GREEN} />
-            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="学习中的" value={learning} color="#CBD5E1" />
+            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="学习中的" value={globalStats.learningCount} color="#CBD5E1" />
           </div>
         </div>
 
@@ -96,17 +177,17 @@ export default function StatsPage({ onBack }: Props) {
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>掌握率</h2>
           <div className="w-full h-3 rounded-full mb-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
-            <div className="h-full rounded-full transition-all" style={{ width: `${totalCards > 0 ? Math.round((localMastered / totalCards) * 100) : 0}%`, backgroundColor: GREEN }} />
+            <div className="h-full rounded-full transition-all"               style={{ width: `${globalStats.totalCards > 0 ? Math.round((globalStats.mastered / globalStats.totalCards) * 100) : 0}%`, backgroundColor: GREEN }} />
           </div>
           <p className="text-[11px]" style={{ color: TEXT_MUTED }}>
-            已掌握 {localMastered} / {totalCards} · {totalCards > 0 ? Math.round((localMastered / totalCards) * 100) : 0}%
+            已掌握 {globalStats.mastered} / {globalStats.totalCards} · {globalStats.totalCards > 0 ? Math.round((globalStats.mastered / globalStats.totalCards) * 100) : 0}%
           </p>
           <h2 className="text-[14px] font-bold mt-4 mb-2" style={{ color: TEXT_PRIMARY }}>复习阶段</h2>
           <div className="grid grid-cols-4 gap-2 text-center">
-            <StageBadge label="新学" count={localNewCards} color={BLUE} />
-            <StageBadge label="学习中" count={learning} color={ORANGE} />
-            <StageBadge label="复习" count={localMastered} color={GREEN} />
-            <StageBadge label="重学" count={localRelearning} color="#EF4444" />
+            <StageBadge label="新学" count={globalStats.newCards} color={BLUE} />
+            <StageBadge label="学习中" count={globalStats.learningCount} color={ORANGE} />
+            <StageBadge label="复习" count={globalStats.mastered} color={GREEN} />
+            <StageBadge label="重学" count={globalStats.relearning} color="#EF4444" />
           </div>
         </div>
 
@@ -115,13 +196,12 @@ export default function StatsPage({ onBack }: Props) {
           <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>模块分布</h2>
           <div className="space-y-2">
             {moduleStats.map(m => {
-              const started = m.total - (decks.find(d => d.id === m.key)?.stats.newCount ?? 0);
-              const pct = m.total > 0 ? Math.round((started / m.total) * 100) : 0;
+              const pct = m.total > 0 ? Math.round((m.started / m.total) * 100) : 0;
               return (
                 <div key={m.key}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[13px]" style={{ color: TEXT_PRIMARY }}>{m.label}</span>
-                    <span className="text-[11px]" style={{ color: TEXT_MUTED }}>{started}/{m.total}</span>
+                    <span className="text-[11px]" style={{ color: TEXT_MUTED }}>{m.started}/{m.total}</span>
                   </div>
                   <div className="w-full h-2 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
                     <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: BLUE }} />

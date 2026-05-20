@@ -70,10 +70,10 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     let sql = '';
     const params: any[] = [];
     if (deckId) {
-      sql = 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ?1 AND deckId = ?2 ORDER BY rank LIMIT ?3';
+      sql = 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? AND deckId = ? ORDER BY rank LIMIT ?';
       params.push(escaped, deckId, limit);
     } else {
-      sql = 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ?1 ORDER BY rank LIMIT ?2';
+      sql = 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? ORDER BY rank LIMIT ?';
       params.push(escaped, limit);
     }
 
@@ -83,8 +83,8 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     // Fallback: SQLite LIKE for Chinese text
     if (results.length === 0 && /[\u4e00-\u9fff]/.test(escaped)) {
       const likeRows = await prisma.$queryRawUnsafe(
-        'SELECT id as cardId, 10 as rank FROM Card WHERE question LIKE ?1 OR titleCn LIKE ?1 OR title LIKE ?1 LIMIT ?2',
-        `%${escaped}%`, limit,
+        'SELECT id as cardId, 10 as rank FROM Card WHERE question LIKE ? OR titleCn LIKE ? OR title LIKE ? LIMIT ?',
+        `%${escaped}%`, `%${escaped}%`, `%${escaped}%`, limit,
       ) as any[];
       return (likeRows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'like' }));
     }
@@ -105,10 +105,10 @@ export async function sourceChunkSearch(query: string, limit: number = 10, sourc
     let sql: string;
     const params: any[] = [];
     if (sourceId) {
-      sql = `SELECT chunkId, sourceId, rank, snippet(source_chunk_fts, 2, '<mark>', '</mark>', '...', 32) as snippet FROM source_chunk_fts WHERE source_chunk_fts MATCH ?1 AND sourceId = ?2 ORDER BY rank LIMIT ?3`;
+      sql = `SELECT chunkId, sourceId, rank, snippet(source_chunk_fts, 2, '<mark>', '</mark>', '...', 32) as snippet FROM source_chunk_fts WHERE source_chunk_fts MATCH ? AND sourceId = ? ORDER BY rank LIMIT ?`;
       params.push(escaped, sourceId, limit);
     } else {
-      sql = `SELECT chunkId, sourceId, rank, snippet(source_chunk_fts, 2, '<mark>', '</mark>', '...', 32) as snippet FROM source_chunk_fts WHERE source_chunk_fts MATCH ?1 ORDER BY rank LIMIT ?2`;
+      sql = `SELECT chunkId, sourceId, rank, snippet(source_chunk_fts, 2, '<mark>', '</mark>', '...', 32) as snippet FROM source_chunk_fts WHERE source_chunk_fts MATCH ? ORDER BY rank LIMIT ?`;
       params.push(escaped, limit);
     }
 

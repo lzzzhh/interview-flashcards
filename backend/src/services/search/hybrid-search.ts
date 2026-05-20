@@ -53,11 +53,12 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   // 2. FTS5 keyword search
   const ftsResults = await fts5Search(input.query, input.topK);
   for (const r of ftsResults) {
+    const baseScore = Math.max(0.1, 1 / (1 + Math.abs(Number(r.rank || 0)) * 0.01));
     if (!results.find(x => x.cardId === r.cardId)) {
-      results.push({ cardId: r.cardId, title: '', deckId: '', tags: [], score: 1 / (1 + Number(r.rank)), matchType: 'keyword', reason: '关键词匹配' });
+      results.push({ cardId: r.cardId, title: '', deckId: '', tags: [], score: baseScore, matchType: 'keyword', reason: '关键词匹配' });
     } else {
       const existing = results.find(x => x.cardId === r.cardId)!;
-      existing.score += 1 / (1 + Number(r.rank));
+      existing.score += baseScore;
       existing.matchType = 'hybrid';
       existing.reason = '语义+关键词匹配';
     }

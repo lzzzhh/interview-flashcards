@@ -9,7 +9,6 @@ import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit } from '../utils/customDecks';
-import { useDeckTotals } from '../repositories/useDeckStats';
 import { loadProgress } from '../utils/storage';
 import { leetcodeHot100 } from '../data/leetcode-hot100';
 import { statisticsCards } from '../data/statistics';
@@ -20,7 +19,23 @@ import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
-import type { Category } from '../types';
+import type { Category, FlashCard } from '../types';
+
+// 从源数据直接读取各模块卡片总数，不依赖后端 API
+const CARD_TOTALS: Record<string, number> = {};
+for (const [key, cards] of Object.entries({
+  leetcode: leetcodeHot100,
+  statistics: statisticsCards,
+  'machine-learning': machineLearningCards,
+  'deep-learning': deepLearningCards,
+  llm: llmCards,
+  agent: agentCards,
+  jargon: jargonCards,
+  workplace: workplaceCards,
+  'vibe-coding': vibeCodingCards,
+})) {
+  CARD_TOTALS[key] = (cards as any[]).length;
+}
 
 // 全量卡片标签查找（仅用于推荐展示，统计来自数据库）
 const CARD_LABELS: Record<string, string> = {};
@@ -62,7 +77,6 @@ const TABS = [
 
 export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile, onShowSearch }: Props) {
   const { state, dueCountByCategory, dispatch } = useAppContext();
-  const { totals } = useDeckTotals();
 
   // Streak from local logs (API /dashboard doesn't have streak yet)
   const streak = useMemo(() => {
@@ -83,10 +97,26 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
     return total;
   }, []);
 
+  // 全局学习中卡片数（跨所有模块）
   const learningCount = useMemo(() => {
+    const sources: [Category, FlashCard[]][] = [
+      ['leetcode', leetcodeHot100 as FlashCard[]],
+      ['statistics', statisticsCards as FlashCard[]],
+      ['machine-learning', machineLearningCards as FlashCard[]],
+      ['deep-learning', deepLearningCards as FlashCard[]],
+      ['llm', llmCards as FlashCard[]],
+      ['agent', agentCards as FlashCard[]],
+      ['jargon', jargonCards as FlashCard[]],
+      ['workplace', workplaceCards as FlashCard[]],
+      ['vibe-coding', vibeCodingCards as FlashCard[]],
+    ];
     let count = 0;
-    for (const card of Object.values(state.cardsById)) {
-      if (card.sm2?.state === 'learning') count++;
+    for (const [cat, cards] of sources) {
+      const progress = loadProgress(cat);
+      count += cards.filter((c) => {
+        const sm2 = progress.sm2[c.id];
+        return sm2?.state === 'learning';
+      }).length;
     }
     return count;
   }, [state.cardsById]);
@@ -234,7 +264,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
-                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {totals[cat.key] ?? '--'} 张卡片</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {CARD_TOTALS[cat.key] ?? '--'} 张卡片</p>
                   </div>
                   <div className="flex gap-4 text-right">
                     <div>

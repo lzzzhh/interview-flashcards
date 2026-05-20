@@ -10,6 +10,8 @@ import DarkModeToggle from './components/DarkModeToggle';
 import EmptyState from './components/EmptyState';
 import CardBrowser from './components/CardBrowser';
 import CardEditor from './components/CardEditor';
+import CardDatabasePage from './components/CardDatabasePage';
+import VectorDatabasePage from './components/VectorDatabasePage';
 import SubModulePicker from './components/SubModulePicker';
 import DeckPage from './components/DeckPage';
 import StatsPage from './components/StatsPage';
@@ -101,6 +103,7 @@ function AppInner() {
   const [showDecks, setShowDecks] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [profileSubPage, setProfileSubPage] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [agentPage, setAgentPage] = useState<string | null>(null);
   const { dispatch } = useAppContext();
@@ -119,7 +122,9 @@ function AppInner() {
   }
 
   if (showProfile) {
-    return <ProfilePage onBack={() => setShowProfile(false)} />;
+    if (profileSubPage === 'card-database') return <CardDatabasePage onBack={() => setProfileSubPage(null)} />;
+    if (profileSubPage === 'vector-database') return <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
+    return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
   }
 
   if (showSearch) {
