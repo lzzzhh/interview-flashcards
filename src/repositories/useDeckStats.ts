@@ -39,17 +39,40 @@ export function useDecks(): { decks: DeckDTO[]; totals: Record<string, number>; 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const applyFallback = () => {
+      setTotals(FALLBACK_TOTALS);
+      setDecks(
+        Object.entries(FALLBACK_TOTALS).map(([id, total]) => ({
+          id,
+          name: id,
+          type: 'builtin' as const,
+          sortOrder: 0,
+          stats: {
+            total,
+            newCount: total,
+            learningCount: 0,
+            reviewCount: 0,
+            relearningCount: 0,
+            dueCount: 0,
+            favoritedCount: 0,
+            dailyLimit: 20,
+          },
+        }))
+      );
+    };
+
     apiGet<DecksResponse>('/decks')
       .then((data) => {
+        if (!data.decks || data.decks.length === 0) {
+          applyFallback();
+          return;
+        }
         setDecks(data.decks);
         const next: Record<string, number> = {};
         for (const d of data.decks) next[d.id] = d.stats.total;
         setTotals(next);
       })
-      .catch(() => {
-        // 离线时用硬编码 fallback
-        setTotals(FALLBACK_TOTALS);
-      })
+      .catch(() => applyFallback())
       .finally(() => setLoading(false));
   }, []);
 

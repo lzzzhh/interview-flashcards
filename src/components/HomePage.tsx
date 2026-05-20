@@ -12,6 +12,40 @@ import { getModuleDailyLimit } from '../utils/customDecks';
 import { useDecks, deriveGlobalStats } from '../repositories/useDeckStats';
 import { loadProgress } from '../utils/storage';
 import type { Category } from '../types';
+import { leetcodeHot100 } from '../data/leetcode-hot100';
+import { statisticsCards } from '../data/statistics';
+import { machineLearningCards } from '../data/machine-learning';
+import { deepLearningCards } from '../data/deep-learning';
+import { llmCards } from '../data/llm';
+import { agentCards } from '../data/agent';
+import { jargonCards } from '../data/jargon';
+import { workplaceCards } from '../data/workplace';
+import { vibeCodingCards } from '../data/vibe-coding';
+
+// 跨分类卡片名称查找表（解决 cardsById 只含当前分类的问题）
+const CARD_LABELS: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  const modules: [string, any[]][] = [
+    ['leetcode', leetcodeHot100],
+    ['statistics', statisticsCards],
+    ['machine-learning', machineLearningCards],
+    ['deep-learning', deepLearningCards],
+    ['llm', llmCards],
+    ['agent', agentCards],
+    ['jargon', jargonCards],
+    ['workplace', workplaceCards],
+    ['vibe-coding', vibeCodingCards],
+  ];
+  for (const [, cards] of modules) {
+    for (const card of (cards as any[])) {
+      const label = card.category === 'leetcode'
+        ? `#${card.number} ${card.titleCn || card.title}`
+        : (card.question || '').slice(0, 30);
+      map[card.id] = label;
+    }
+  }
+  return map;
+})();
 
 interface Props {
   onEnterStudy: (category: Category) => void;
@@ -82,10 +116,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
         if (overdue < 0) continue;
         const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
         const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
-        const card = state.cardsById[cardId];
-        const label = card
-          ? (card.category === 'leetcode' ? `#${(card as any).number} ${(card as any).titleCn || card.title}` : ((card as any).question || '').slice(0, 25))
-          : cardId;
+        const label = CARD_LABELS[cardId] || cardId;
         all.push({ id: cardId, label, category: cat.key, score });
       }
     }
