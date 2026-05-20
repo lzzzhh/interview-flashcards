@@ -49,6 +49,14 @@ export async function cardDraftRoutes(app: FastifyInstance) {
       const draft = await tx.cardDraft.findUnique({ where: { id } });
       if (!draft) throw { status: 404, message: 'Draft not found' };
 
+      // 确保目标牌组存在，不存在则自动创建
+      const deck = await tx.deck.findUnique({ where: { id: draft.deckId } });
+      if (!deck) {
+        await tx.deck.create({
+          data: { id: draft.deckId, name: draft.deckId, sortOrder: 99 },
+        });
+      }
+
       const cardId = `card-${Date.now()}`;
       await tx.card.create({
         data: {
@@ -90,6 +98,15 @@ export async function cardDraftRoutes(app: FastifyInstance) {
       for (const id of ids) {
         const draft = await tx.cardDraft.findUnique({ where: { id } });
         if (!draft) continue;
+
+        // 确保目标牌组存在
+        const deck = await tx.deck.findUnique({ where: { id: draft.deckId } });
+        if (!deck) {
+          await tx.deck.create({
+            data: { id: draft.deckId, name: draft.deckId, sortOrder: 99 },
+          });
+        }
+
         const cardId = `card-${Date.now()}-${cardIds.length}`;
         await tx.card.create({
           data: {
