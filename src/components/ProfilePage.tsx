@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { ArrowLeft, Moon, Sun, User, Download, Upload, Database, Dna, Tag, ChevronRight, Settings } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, User, Download, Upload, ChevronRight, Settings } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { exportProgress, importProgress, exportProgressCSV, importProgressCSV } from '../utils/backup';
 
@@ -71,9 +71,6 @@ export default function ProfilePage({ onBack, onNavigate }: Props) {
             onClick={() => onNavigate('card-database')}
             className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
           >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(40,130,215,0.15)' }}>
-              <Database className="w-4.5 h-4.5" style={{ color: BLUE }} />
-            </div>
             <div className="flex-1 text-left">
               <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>卡片数据库</h3>
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>搜索和管理所有面试卡片</p>
@@ -84,9 +81,6 @@ export default function ProfilePage({ onBack, onNavigate }: Props) {
             onClick={() => onNavigate('tag-manager')}
             className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
           >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(16,185,129,0.15)' }}>
-              <Tag className="w-4.5 h-4.5" style={{ color: '#10B981' }} />
-            </div>
             <div className="flex-1 text-left">
               <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>标签管理</h3>
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>批量重命名、合并和删除标签</p>
@@ -97,9 +91,6 @@ export default function ProfilePage({ onBack, onNavigate }: Props) {
             onClick={() => onNavigate('vector-database')}
             className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
           >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(139,92,246,0.15)' }}>
-              <Dna className="w-4.5 h-4.5" style={{ color: '#8B5CF6' }} />
-            </div>
             <div className="flex-1 text-left">
               <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>向量数据库</h3>
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>基于语义向量的智能搜索</p>

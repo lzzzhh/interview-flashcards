@@ -41,9 +41,6 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
                 className="w-full rounded-xl p-4 border text-left flex items-center gap-4 transition-colors"
                 style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}
               >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${agent.color}20` }}>
-                  <agent.icon className="w-5 h-5" style={{ color: agent.color }} />
-                </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>{agent.title}</h3>
                   <p className="text-[12px] mt-0.5" style={{ color: TEXT_MUTED }}>{agent.desc}</p>
