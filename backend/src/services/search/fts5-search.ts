@@ -67,44 +67,38 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     const escaped = query.replace(/['"]/g, ' ').trim();
     if (!escaped) return [];
 
-    // For Chinese queries: use LIKE with multi-level term extraction
+    // For Chinese-containing queries
     if (/[\u4e00-\u9fff]/.test(escaped)) {
-      let terms = escaped.split(/\s+/).filter(t => t.length > 0);
+      // Split: English/Latin terms → FTS5, Chinese terms → LIKE
+      const allTerms = escaped.split(/\s+/).filter(t => t.length > 0);
+      const hasLatin = allTerms.some(t => /[a-zA-Z]/.test(t));
 
-      // For single Chinese phrase without spaces, extract meaningful substrings
-      if (terms.length === 0 || (terms.length === 1 && terms[0].length >= 4)) {
-        const phrase = terms[0] || escaped;
-        const expanded = new Set<string>();
-        expanded.add(phrase);
+      if (hasLatin) {
+        // Mixed query: FTS5 for Latin/English terms, LIKE for Chinese terms
+        const latinTerms = allTerms.filter(t => /[a-zA-Z]/.test(t)).join(' ');
+        const cjkTerms = allTerms.filter(t => /[\u4e00-\u9fff]/.test(t));
 
-        // Strip common Chinese question/qualifier words
-        let stripped = phrase
-          .replace(/^(怎么|如何|什么样|什么|有没有|能不能|可以|应该|需要|为什么|请问|怎样)/, '')
-          .replace(/(呢|吗|啊|吧|的|了|是)$/, '');
-        if (stripped.length >= 2 && stripped !== phrase) expanded.add(stripped);
+        // Run both in parallel
+        const [ftsResults, likeResults] = await Promise.all([
+          latinTerms ? fts5RawSearch(latinTerms, limit, deckId) : Promise.resolve([] as FTS5Result[]),
+          cjkTerms.length > 0 ? likeSearch(cjkTerms, limit) : Promise.resolve([] as FTS5Result[]),
+        ]);
 
-        // Extract CJK-only substring
-        const cjkOnly = stripped.replace(/[^\u4e00-\u9fff]/g, '');
-        if (cjkOnly.length >= 2 && cjkOnly !== stripped) expanded.add(cjkOnly);
-
-        // Progressive truncation: try last 3 CJK chars (minimum meaningful unit)
-        if (cjkOnly.length >= 4) {
-          expanded.add(cjkOnly.slice(-3));
+        // Merge: deduplicate, FTS5 first, then LIKE
+        const results = [...ftsResults];
+        const seen = new Set(results.map(r => r.cardId));
+        for (const lr of likeResults) {
+          if (!seen.has(lr.cardId)) {
+            results.push(lr);
+            seen.add(lr.cardId);
+          }
         }
-
-        terms = [...expanded];
+        return results;
       }
 
-      const orClauses = terms.map(() => '(question LIKE ? OR titleCn LIKE ? OR title LIKE ? OR answer LIKE ?)').join(' OR ');
-      const likeParams: string[] = [];
-      for (const t of terms) {
-        likeParams.push(`%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`);
-      }
-      const likeRows = await prisma.$queryRawUnsafe(
-        `SELECT id as cardId, 1 as rank FROM Card WHERE ${orClauses} LIMIT ?`,
-        ...likeParams, limit,
-      ) as any[];
-      return (likeRows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'like' }));
+      // Pure Chinese: LIKE with smart term extraction
+      const terms = extractChineseTerms(escaped);
+      console.log("likeSearch terms:", terms, "limit:", limit); const lsr = await likeSearch(terms, limit); console.log("likeSearch returned:", lsr.length); return lsr;
     }
 
     // Pure English/Latin: use FTS5
@@ -152,4 +146,72 @@ export async function sourceChunkSearch(query: string, limit: number = 10, sourc
   } catch {
     return [];
   }
+}
+
+// ---- Internal Helpers ----
+
+/** Raw FTS5 search helper */
+async function fts5RawSearch(escaped: string, limit: number, deckId?: string): Promise<FTS5Result[]> {
+  const sql = deckId
+    ? 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? AND deckId = ? ORDER BY rank LIMIT ?'
+    : 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? ORDER BY rank LIMIT ?';
+  const params: any[] = deckId ? [escaped, deckId, limit] : [escaped, limit];
+  const rows = await prisma.$queryRawUnsafe(sql, ...params) as any[];
+  return (rows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'fts5' }));
+}
+
+/** LIKE search helper: runs separate queries per term to avoid result crowding */
+async function likeSearch(terms: string[], limit: number): Promise<FTS5Result[]> {
+  if (terms.length === 0) return [];
+
+  // For multiple terms, run separate queries and merge to avoid shorter/noisy terms crowding out good matches
+  const seen = new Set<string>();
+  const results: FTS5Result[] = [];
+
+  for (const t of terms.slice(0, 4)) { // max 4 terms
+    const rows = await prisma.$queryRawUnsafe(
+      `SELECT id as cardId, 1 as rank FROM Card WHERE question LIKE ? OR titleCn LIKE ? OR title LIKE ? OR answer LIKE ? OR tags LIKE ? LIMIT ?`,
+      `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, limit,
+    ) as any[];
+    for (const row of (rows || [])) {
+      if (!seen.has(row.cardId)) {
+        results.push({ cardId: row.cardId, rank: row.rank, matchField: 'like' });
+        seen.add(row.cardId);
+      }
+    }
+  }
+  return results;
+}
+
+/** Extract meaningful Chinese terms: strip qualifiers, progressive truncation */
+function extractChineseTerms(escaped: string): string[] {
+  const spaceTerms = escaped.split(/\s+/).filter(t => t.length > 0);
+  if (spaceTerms.length > 1) return spaceTerms;
+
+  const phrase = spaceTerms[0] || escaped;
+  const expanded = new Set<string>();
+  expanded.add(phrase);
+
+  let stripped = phrase
+    .replace(/^(怎么|如何|什么样|什么|有没有|能不能|可以|应该|需要|为什么|请问|怎样)/, '')
+    .replace(/(呢|吗|啊|吧|的|了|是)$/, '');
+  if (stripped.length >= 2 && stripped !== phrase) expanded.add(stripped);
+
+  const cjkOnly = stripped.replace(/[^\u4e00-\u9fff]/g, '');
+  if (cjkOnly.length >= 2 && cjkOnly !== stripped) expanded.add(cjkOnly);
+
+  // Try: first N chars (remove suffix) + last N chars (remove prefix)
+  if (cjkOnly.length >= 4) {
+    expanded.add(cjkOnly.slice(0, -1)); // remove last char: "双指针算" → useful
+    expanded.add(cjkOnly.slice(1));     // remove first char: "指针算法" → useful
+  }
+  if (cjkOnly.length >= 5) {
+    expanded.add(cjkOnly.slice(0, -2)); // remove last 2 chars: "双指针" → useful!
+    expanded.add(cjkOnly.slice(2));     // remove first 2 chars: "针算法" → less useful
+  }
+
+  // Clean up debug logs
+  const all = [...expanded];
+  all.sort((a, b) => b.length - a.length);
+  return all.slice(0, 4);
 }
