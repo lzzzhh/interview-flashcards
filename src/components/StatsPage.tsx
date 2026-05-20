@@ -3,7 +3,7 @@ import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp, ChevronDown }
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
-import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
+import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks, getModuleDailyReviewLimit, setModuleDailyReviewLimit } from '../utils/customDecks';
 import { useDecks, deriveGlobalStats } from '../repositories/useDeckStats';
 import type { Category } from '../types';
 
@@ -24,6 +24,7 @@ export default function StatsPage({ onBack }: Props) {
   const { dueCountByCategory } = useAppContext();
   const { decks } = useDecks();
   const [limitsOpen, setLimitsOpen] = useState(false);
+  const [reviewLimitsOpen, setReviewLimitsOpen] = useState(false);
 
   const globalStats = useMemo(() => deriveGlobalStats(decks), [decks]);
   const dueCount = useMemo(() => {
@@ -134,10 +135,28 @@ export default function StatsPage({ onBack }: Props) {
           {limitsOpen && (
             <div className="space-y-2 mt-3">
               {CATEGORIES.map((cat) => (
-                <ModuleLimitRow key={cat.key} id={cat.key} label={cat.label} />
+                <ModuleLimitRow key={cat.key} id={cat.key} label={cat.label} type="new" />
               ))}
               {loadCustomDecks().map((d) => (
-                <ModuleLimitRow key={d.id} id={d.id} label={d.name} />
+                <ModuleLimitRow key={d.id} id={d.id} label={d.name} type="new" />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 每日复习上限 */}
+        <div className="rounded-2xl p-4 mt-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <button onClick={() => setReviewLimitsOpen(!reviewLimitsOpen)} className="flex items-center justify-between w-full text-left">
+            <h2 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>每日复习上限</h2>
+            <ChevronDown className={`w-4 h-4 transition-transform`} style={{ color: TEXT_MUTED, transform: reviewLimitsOpen ? 'rotate(180deg)' : '' }} />
+          </button>
+          {reviewLimitsOpen && (
+            <div className="space-y-2 mt-3">
+              {CATEGORIES.map((cat) => (
+                <ModuleLimitRow key={cat.key} id={cat.key} label={cat.label} type="review" />
+              ))}
+              {loadCustomDecks().map((d) => (
+                <ModuleLimitRow key={d.id} id={d.id} label={d.name} type="review" />
               ))}
             </div>
           )}
@@ -178,16 +197,18 @@ function StageBadge({ label, count, color }: { label: string; count: number; col
   );
 }
 
-function ModuleLimitRow({ id, label }: { id: string; label: string }) {
-  const [limit, setLimit] = useState(() => getModuleDailyLimit(id));
+function ModuleLimitRow({ id, label, type }: { id: string; label: string; type: 'new' | 'review' }) {
+  const [limit, setLimit] = useState(() =>
+    type === 'new' ? getModuleDailyLimit(id) : getModuleDailyReviewLimit(id)
+  );
   return (
     <div className="flex items-center justify-between py-1">
       <span className="text-[12px] truncate flex-1" style={{ color: TEXT_MUTED }}>{label}</span>
       <div className="flex items-center gap-2">
-        <input type="range" min="0" max="100" value={limit}
-          onChange={(e) => { const v = Number(e.target.value); setLimit(v); setModuleDailyLimit(id, v); }}
+        <input type="range" min={type === 'new' ? 0 : 0} max={type === 'new' ? 100 : 300} value={limit}
+          onChange={(e) => { const v = Number(e.target.value); setLimit(v); type === 'new' ? setModuleDailyLimit(id, v) : setModuleDailyReviewLimit(id, v); }}
           className="w-20 h-1.5 accent-[#2882d7]" />
-        <span className="text-[13px] font-bold w-6 text-right" style={{ color: BLUE }}>{limit}</span>
+        <span className="text-[13px] font-bold w-6 text-right" style={{ color: type === 'new' ? BLUE : ORANGE }}>{limit}</span>
       </div>
     </div>
   );

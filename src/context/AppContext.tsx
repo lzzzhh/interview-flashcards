@@ -39,9 +39,9 @@ import { loadAppData, saveAppData } from '../utils/nativeStorage';
 import { appendReviewLog } from '../utils/reviewLogs';
 import { shuffle } from '../utils/shuffle';
 import { loadCustomCards } from '../utils/customDecks';
-import { getModuleDailyLimit } from '../utils/customDecks';
+import { getModuleDailyLimit, getModuleDailyReviewLimit } from '../utils/customDecks';
 import { SUB_MODULES } from '../constants';
-import { loadCustomDecks, getAllModuleLimits, loadAllCustomCards } from '../utils/customDecks';
+import { loadCustomDecks, getAllModuleLimits, getAllModuleReviewLimits, loadAllCustomCards } from '../utils/customDecks';
 
 // ---- Undo support ----
 let lastRating: { cardId: string; previousSm2: any } | null = null;
@@ -126,11 +126,29 @@ function computeVisibleIds(state: AppState): string[] {
       const sm2 = state.cardsById[id]?.sm2;
       return !sm2 || sm2.state === 'new';
     });
+    // 每日新卡上限
+    const limit = getModuleDailyLimit(state.category);
+    ids = ids.slice(0, limit);
   } else if (state.studyMode === 'review') {
+    // 到期复习卡片（包含 learning、review、relearning 状态）
     ids = ids.filter((id) => {
       const sm2 = state.cardsById[id]?.sm2;
       return sm2 && sm2.state !== 'new' && sm2.nextReview <= Date.now();
     });
+
+    // 重学队列优先排序：relearning → learning → review
+    ids = ids.sort((a, b) => {
+      const sa = state.cardsById[a]?.sm2?.state;
+      const sb = state.cardsById[b]?.sm2?.state;
+      const order: Record<string, number> = { relearning: 0, learning: 1, review: 2 };
+      return (order[sa ?? ''] ?? 3) - (order[sb ?? ''] ?? 3);
+    });
+
+    // 每日复习上限（优先使用模块级设置）
+    const reviewLimit = getModuleDailyReviewLimit(state.category) || state.dailyReviewLimit;
+    if (reviewLimit > 0) {
+      ids = ids.slice(0, reviewLimit);
+    }
   }
 
   // 难度
@@ -185,12 +203,6 @@ function computeVisibleIds(state: AppState): string[] {
     }
   }
 
-  // 每日上限（新学模式，在过滤之后截取）
-  if (state.studyMode === 'new') {
-    const limit = getModuleDailyLimit(state.category);
-    ids = ids.slice(0, limit);
-  }
-
   // 搜索
   if (state.searchQuery.trim()) {
     const q = state.searchQuery.toLowerCase();
@@ -243,6 +255,7 @@ function dtoToFlashCard(dto: CardDTO): FlashCard {
         repetitions: dto.progress?.repetitions ?? 0,
         lapses: dto.progress?.lapses ?? 0,
         nextReview: dto.progress?.nextReview ? new Date(dto.progress.nextReview).getTime() : Date.now(),
+        stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
       },
       favorited: dto.progress?.favorited ?? false,
       userNotes: dto.progress?.userNotes ?? undefined,
@@ -264,6 +277,7 @@ function dtoToFlashCard(dto: CardDTO): FlashCard {
       repetitions: dto.progress?.repetitions ?? 0,
       lapses: dto.progress?.lapses ?? 0,
       nextReview: dto.progress?.nextReview ? new Date(dto.progress.nextReview).getTime() : Date.now(),
+      stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
     },
     favorited: dto.progress?.favorited ?? false,
     userNotes: dto.progress?.userNotes ?? undefined,
@@ -520,6 +534,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'SET_DAILY_NEW_LIMIT':
       return { ...state, dailyNewLimit: action.payload };
+    case 'SET_DAILY_REVIEW_LIMIT':
+      return { ...state, dailyReviewLimit: action.payload };
 
     case 'SET_STUDY_MODE': {
       const next = { 
@@ -609,6 +625,7 @@ function createInitialState(): AppState {
     shuffled: false,
     reviewMode: false,
     dailyNewLimit: 20,
+    dailyReviewLimit: 100,
     studyMode: 'choose',
     loading: false,
     apiSource: false,
@@ -670,6 +687,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // Tauri 文件存储（v2 schema）
     const allData = loadAllProgress();
     const allLimits = getAllModuleLimits() as Record<string, number>;
+    const allReviewLimits = getAllModuleReviewLimits() as Record<string, number>;
     saveAppData({
       schemaVersion: 2,
       progress: allData,
@@ -679,6 +697,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       customDecks: loadCustomDecks().map((d: any) => ({ id: d.id, name: d.name, description: d.description || '' })),
       customCards: loadAllCustomCards(),
       moduleDailyLimits: allLimits,
+      moduleDailyReviewLimits: allReviewLimits,
     } as any);
   }, [state.cardsById, state.category, state.isDark]);
 

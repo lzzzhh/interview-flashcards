@@ -20,6 +20,7 @@ export interface AppData {
   customDecks: CustomDeckInfo[];
   customCards: Record<string, QACard[]>;
   moduleDailyLimits: Record<string, number>;
+  moduleDailyReviewLimits: Record<string, number>;
 }
 
 function emptyAppData(): AppData {
@@ -31,6 +32,7 @@ function emptyAppData(): AppData {
     customDecks: [],
     customCards: {},
     moduleDailyLimits: {},
+    moduleDailyReviewLimits: {},
   };
 }
 
@@ -105,7 +107,14 @@ function lsRead(): AppData {
       moduleDailyLimits[k.replace('fc-limit-', '')] = Number(localStorage.getItem(k)) || 20;
     }
   }
-  return { schemaVersion: 2, progress, settings, stats, customDecks, customCards, moduleDailyLimits };
+  let moduleDailyReviewLimits: Record<string, number> = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith('fc-review-limit-')) {
+      moduleDailyReviewLimits[k.replace('fc-review-limit-', '')] = Number(localStorage.getItem(k)) || 100;
+    }
+  }
+  return { schemaVersion: 2, progress, settings, stats, customDecks, customCards, moduleDailyLimits, moduleDailyReviewLimits };
 }
 
 function lsWrite(data: AppData): void {
@@ -119,6 +128,11 @@ function lsWrite(data: AppData): void {
   if (data.moduleDailyLimits) {
     for (const [id, limit] of Object.entries(data.moduleDailyLimits)) {
       localStorage.setItem(`fc-limit-${id}`, String(limit));
+    }
+  }
+  if (data.moduleDailyReviewLimits) {
+    for (const [id, limit] of Object.entries(data.moduleDailyReviewLimits)) {
+      localStorage.setItem(`fc-review-limit-${id}`, String(limit));
     }
   }
 }

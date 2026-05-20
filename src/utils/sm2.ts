@@ -10,6 +10,7 @@ export function createDefaultSM2(): SM2Record {
   return {
     state: 'new', easeFactor: 2.5, interval: 0,
     repetitions: 0, lapses: 0, nextReview: Date.now(),
+    stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
   };
 }
 
@@ -39,6 +40,12 @@ export function previewSchedule(record: SM2Record, rating: number): SM2Record {
   }
   next.nextReview = now + next.interval * 86400000;
   next.lastReviewedAt = now;
+  // FSRS-ready fields
+  next.elapsedDays = record.lastReviewedAt ? Math.max(0, (now - record.lastReviewedAt) / 86400000) : 0;
+  next.scheduledDays = next.interval;
+  // Simple stability/difficulty estimation (future FSRS migration)
+  next.stability = Math.max(0.1, next.interval * next.easeFactor / 10);
+  next.difficulty = Math.min(10, Math.max(0, (11 - rating) * (1 + record.lapses * 0.1)));
   return next;
 }
 

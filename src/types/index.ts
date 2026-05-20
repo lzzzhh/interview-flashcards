@@ -16,6 +16,12 @@ export interface SM2Record {
   lapses: number;           // 遗忘次数
   nextReview: number;       // 下次复习时间戳 (ms)
   lastReviewedAt?: number;  // 上次复习时间戳
+
+  /** FSRS-ready 预留字段 */
+  stability?: number;       // 记忆稳定性 (FSRS)
+  difficulty?: number;      // 卡片难度 (FSRS)
+  elapsedDays?: number;     // 上次实际间隔天数
+  scheduledDays?: number;   // 本次计划间隔天数
 }
 
 /** ReviewLog — 每次复习的完整记录 */
@@ -137,6 +143,7 @@ export interface AppState {
   shuffled: boolean;
   reviewMode: boolean;
   dailyNewLimit: number;
+  dailyReviewLimit: number;
   studyMode: StudyMode;
   loading: boolean;
   /** API 模式：true = 从 SQLite 拉取, false = 用前端静态数据 */
@@ -170,6 +177,7 @@ export type AppAction =
   | { type: 'JUMP_TO_CARD'; payload: { category: Category; cardId: string } }
   | { type: 'DELETE_CARD'; payload: string }
   | { type: 'SET_DAILY_NEW_LIMIT'; payload: number }
+  | { type: 'SET_DAILY_REVIEW_LIMIT'; payload: number }
   | { type: 'SET_STUDY_MODE'; payload: StudyMode }
   | { type: 'UNDO_LAST_RATING' }
   | { type: 'LOADED_QUEUE'; payload: { cards: FlashCard[]; mode: 'new' | 'review' } }

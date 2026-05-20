@@ -140,13 +140,38 @@ export function setModuleDailyLimit(moduleId: string, limit: number): void {
   localStorage.setItem(`fc-limit-${moduleId}`, String(Math.max(1, Math.min(100, limit))));
 }
 
+/** 获取模块的每日复习上限 */
+export function getModuleDailyReviewLimit(moduleId: string): number {
+  try {
+    const v = localStorage.getItem(`fc-review-limit-${moduleId}`);
+    return v ? parseInt(v) : 100;
+  } catch { return 100; }
+}
+
+/** 设置模块的每日复习上限 */
+export function setModuleDailyReviewLimit(moduleId: string, limit: number): void {
+  localStorage.setItem(`fc-review-limit-${moduleId}`, String(Math.max(1, Math.min(300, limit))));
+}
+
 /** 获取所有模块的每日新卡上限 */
 export function getAllModuleLimits(): Record<string, number> {
   const result: Record<string, number> = {};
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (key?.startsWith('fc-limit-')) {
+    if (key?.startsWith('fc-limit-') && !key.startsWith('fc-review-limit-')) {
       result[key.replace('fc-limit-', '')] = Number(localStorage.getItem(key)) || 20;
+    }
+  }
+  return result;
+}
+
+/** 获取所有模块的每日复习上限 */
+export function getAllModuleReviewLimits(): Record<string, number> {
+  const result: Record<string, number> = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith('fc-review-limit-')) {
+      result[key.replace('fc-review-limit-', '')] = Number(localStorage.getItem(key)) || 100;
     }
   }
   return result;

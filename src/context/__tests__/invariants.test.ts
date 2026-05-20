@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { createDefaultSM2, previewSchedule } from '../../utils/sm2';
 import type { FlashCard, QACard } from '../../types';
 import { getTodayReviewed, getStreak } from '../../utils/reviewLogs';
