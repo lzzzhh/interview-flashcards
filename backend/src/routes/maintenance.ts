@@ -4,6 +4,7 @@ import { FastifyInstance } from 'fastify';
 import { rebuildFTS5 } from '../services/search/fts5-search';
 import { getVectorStore } from '../services/vector/vector-store';
 import { syncCardEmbeddings } from '../services/vector/embedding-sync';
+import { rebuildLocalEmbeddings } from '../services/vector/local-embedding';
 import prisma from '../db/prisma';
 
 export async function maintenanceRoutes(app: FastifyInstance) {
@@ -25,6 +26,12 @@ export async function maintenanceRoutes(app: FastifyInstance) {
     const store = getVectorStore();
     const count = await store.cleanup();
     return { success: true, cleanedCount: count };
+  });
+
+  // 使用本地 n-gram 向量重建（无需外部 API）
+  app.post('/api/maintenance/rebuild-local-vectors', async () => {
+    const result = await rebuildLocalEmbeddings();
+    return { success: true, ...result };
   });
 
   // 全量同步所有卡片 embedding

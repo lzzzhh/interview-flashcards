@@ -1,8 +1,10 @@
 // backend/src/services/vector/embedding-sync.ts — 卡片 Embedding 自动同步
+// 优先使用外部 Embedding API，失败时降级到本地 n-gram 向量
 
 import prisma from '../../db/prisma';
 import { getEmbeddingProvider } from '../embedding-provider';
 import { getVectorStore } from './vector-store';
+import { localSyncCardEmbedding, localSyncCardEmbeddings } from './local-embedding';
 
 /** 构建卡片索引文本（用于 embedding） */
 export function buildCardIndexText(card: { question?: string | null; answer?: string | null; title?: string | null; titleCn?: string | null; tags?: string | null; description?: string | null }): string {
@@ -19,7 +21,7 @@ export function buildCardIndexText(card: { question?: string | null; answer?: st
 export async function syncCardEmbedding(cardId: string): Promise<void> {
   const provider = getEmbeddingProvider();
   const store = getVectorStore();
-  if (!provider || store.name === 'noop') return;
+  if (store.name === 'noop') return;
 
   const card = await prisma.card.findUnique({ where: { id: cardId } });
   if (!card) return;
@@ -27,67 +29,56 @@ export async function syncCardEmbedding(cardId: string): Promise<void> {
   const text = buildCardIndexText(card);
   if (!text.trim()) return;
 
-  try {
-    const res = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts: [text] });
-    if (res.embeddings.length > 0) {
-      await store.upsert(cardId, 'card', res.embeddings[0]);
-
-      // 记录到 EmbeddingRecord 表
-      await prisma.embeddingRecord.upsert({
-        where: { objectType_objectId_model: { objectType: 'card', objectId: cardId, model: res.dimension ? `emb-${res.dimension}` : 'embedding' } },
-        create: {
-          id: `emb-${cardId}-${Date.now()}`,
-          objectType: 'card',
-          objectId: cardId,
-          provider: provider.name,
-          model: (provider as any).defaultModel || 'text-embedding-3-small',
-          dimension: res.dimension || res.embeddings[0].length,
-          vectorStore: store.name,
-          vectorTable: 'vec_embeddings',
-          vectorRowId: 0,
-          status: 'active',
-          textHash: simpleHash(text),
-        },
-        update: {
-          dimension: res.dimension || res.embeddings[0].length,
-          status: 'active',
-        },
-      });
+  // 尝试外部 API
+  if (provider) {
+    try {
+      const res = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts: [text] });
+      if (res.embeddings.length > 0) {
+        await store.upsert(cardId, 'card', res.embeddings[0]);
+        return;
+      }
+    } catch {
+      // 降级到本地向量
     }
-  } catch (err) {
-    console.error(`[embedding-sync] sync failed for card ${cardId}:`, (err as Error).message);
   }
+
+  // 降级：本地 n-gram 向量
+  await localSyncCardEmbedding(cardId);
 }
 
 /** 为多张卡片批量生成并写入 embedding */
 export async function syncCardEmbeddings(cardIds: string[]): Promise<number> {
-  const provider = getEmbeddingProvider();
   const store = getVectorStore();
-  if (!provider || store.name === 'noop') return 0;
+  if (store.name === 'noop') return 0;
 
-  const cards = await prisma.card.findMany({ where: { id: { in: cardIds } } });
-  if (cards.length === 0) return 0;
+  const provider = getEmbeddingProvider();
 
-  const texts = cards.map(c => buildCardIndexText(c));
-  const validTexts = texts.filter(t => t.trim());
-
-  if (validTexts.length === 0) return 0;
-
-  try {
-    const res = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts: validTexts });
-    const items: { objectId: string; objectType: string; vector: number[] }[] = [];
-    for (let i = 0; i < res.embeddings.length; i++) {
-      const card = cards[i];
-      if (card && res.embeddings[i]) {
-        items.push({ objectId: card.id, objectType: 'card', vector: res.embeddings[i] });
+  // 优先尝试外部 API
+  if (provider) {
+    const cards = await prisma.card.findMany({ where: { id: { in: cardIds } } });
+    if (cards.length === 0) return 0;
+    const texts = cards.map(c => buildCardIndexText(c)).filter(t => t.trim());
+    if (texts.length === 0) return 0;
+    try {
+      const res = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts });
+      const items: { objectId: string; objectType: string; vector: number[] }[] = [];
+      for (let i = 0; i < res.embeddings.length; i++) {
+        const card = cards[i];
+        if (card && res.embeddings[i]) {
+          items.push({ objectId: card.id, objectType: 'card', vector: res.embeddings[i] });
+        }
       }
+      if (items.length > 0) {
+        await store.upsertBatch(items);
+        return items.length;
+      }
+    } catch {
+      // 降级到本地向量
     }
-    await store.upsertBatch(items);
-    return items.length;
-  } catch (err) {
-    console.error('[embedding-sync] batch sync failed:', (err as Error).message);
-    return 0;
   }
+
+  // 降级：本地 n-gram 向量
+  return await localSyncCardEmbeddings(cardIds);
 }
 
 /** 删除卡片的 embedding */

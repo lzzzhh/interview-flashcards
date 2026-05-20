@@ -4,6 +4,7 @@ import prisma from '../../db/prisma';
 import { getVectorStore } from '../vector/vector-store';
 import { fts5Search } from './fts5-search';
 import { getEmbeddingProvider } from '../embedding-provider';
+import { textToVector } from '../vector/local-embedding';
 
 interface HybridSearchInput {
   query: string;
@@ -33,16 +34,30 @@ interface CardMatch {
 const USER_ID = 'demo-user';
 
 export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[]> {
-  const provider = getEmbeddingProvider();
-  const vectorStore = getVectorStore();
   const results: CardMatch[] = [];
 
-  // 1. Vector search (if embedding provider available)
-  if (provider && vectorStore.name !== 'noop') {
+  // 1. Vector search (embedding API or local fallback)
+  const provider = getEmbeddingProvider();
+  const vectorStore = getVectorStore();
+  if (vectorStore.name !== 'noop') {
     try {
-      const emb = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts: [input.query] });
-      if (emb.embeddings.length > 0) {
-        const vecResults = await vectorStore.search(emb.embeddings[0], input.topK * 2);
+      let queryVec: number[] | null = null;
+
+      // Try external embedding API first
+      if (provider) {
+        try {
+          const emb = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts: [input.query] });
+          if (emb.embeddings.length > 0) queryVec = emb.embeddings[0];
+        } catch { /* fallback to local */ }
+      }
+
+      // Local fallback: n-gram vector
+      if (!queryVec) {
+        queryVec = textToVector(input.query);
+      }
+
+      if (queryVec && queryVec.length > 0) {
+        const vecResults = await vectorStore.search(queryVec, input.topK * 2);
         for (const r of vecResults) {
           results.push({ cardId: r.objectId, title: '', deckId: '', tags: [], score: r.score, matchType: 'vector', reason: '语义匹配' });
         }
