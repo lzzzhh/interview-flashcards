@@ -21,7 +21,7 @@ interface Props {
 }
 
 export default function StatsPage({ onBack }: Props) {
-  const { dueCountByCategory } = useAppContext();
+  const { dueCountByCategory, totalNew } = useAppContext();
   const { decks } = useDecks();
   const [limitsOpen, setLimitsOpen] = useState(false);
   const [reviewLimitsOpen, setReviewLimitsOpen] = useState(false);
@@ -79,7 +79,7 @@ export default function StatsPage({ onBack }: Props) {
         </div>
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="grid grid-cols-3 gap-3">
-            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="新卡数" value={globalStats.newCards} color={BLUE} />
+            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="新卡数" value={totalNew} color={BLUE} />
             <StatBoxSmall icon={<TrendingUp className="w-4 h-4" />} label="正确率" value={`${accuracy}%`} color={GREEN} />
             <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="学习中的" value={globalStats.learningCount} color="#CBD5E1" />
           </div>
@@ -96,7 +96,7 @@ export default function StatsPage({ onBack }: Props) {
           </p>
           <h2 className="text-[14px] font-bold mt-4 mb-2" style={{ color: TEXT_PRIMARY }}>复习阶段</h2>
           <div className="grid grid-cols-4 gap-2 text-center">
-            <StageBadge label="新学" count={globalStats.newCards} color={BLUE} />
+            <StageBadge label="新学" count={totalNew} color={BLUE} />
             <StageBadge label="学习中" count={globalStats.learningCount} color={ORANGE} />
             <StageBadge label="复习" count={globalStats.mastered} color={GREEN} />
             <StageBadge label="重学" count={globalStats.relearning} color="#EF4444" />
