@@ -1,5 +1,5 @@
 // src/components/AgentHubPage.tsx — Agent 中心入口
-import { ArrowLeft, FileText, Briefcase, Search, Sparkles, Settings, Mic, ListChecks } from 'lucide-react';
+import { ArrowLeft, FileText, Briefcase, Search, Sparkles, Mic, ListChecks } from 'lucide-react';
 
 interface Props {
   onBack: () => void;
@@ -18,10 +18,6 @@ const AGENTS = [
   { key: 'drafts', icon: Sparkles, title: '草稿审核', desc: '审核 AI 生成的卡片草稿，一键入库', color: '#8B5CF6' },
   { key: 'mock-interview', icon: Mic, title: '模拟面试', desc: '自答自评模拟真实面试场景', color: '#EC4899' },
   { key: 'resume-project', icon: ListChecks, title: '简历项目追问', desc: '基于项目描述生成面试追问卡片', color: '#14B8A6' },
-];
-
-const SETTINGS = [
-  { key: 'settings', icon: Settings, title: 'API 配置', desc: '设置 LLM API Key，驱动 AI 制卡和 JD 分析', color: '#6366F1' },
 ];
 
 export default function AgentHubPage({ onBack, onNavigate }: Props) {
@@ -51,32 +47,6 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>{agent.title}</h3>
                   <p className="text-[12px] mt-0.5" style={{ color: TEXT_MUTED }}>{agent.desc}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* 分隔线 */}
-          <div className="my-4 flex items-center gap-3">
-            <div className="flex-1 h-px" style={{ backgroundColor: CARD_BORDER }} />
-            <span className="text-[11px]" style={{ color: TEXT_MUTED }}>系统</span>
-            <div className="flex-1 h-px" style={{ backgroundColor: CARD_BORDER }} />
-          </div>
-
-          <div className="space-y-3">
-            {SETTINGS.map((item) => (
-              <button
-                key={item.key}
-                onClick={() => onNavigate(item.key)}
-                className="w-full rounded-xl p-4 border text-left flex items-center gap-4 transition-colors"
-                style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${item.color}20` }}>
-                  <item.icon className="w-5 h-5" style={{ color: item.color }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>{item.title}</h3>
-                  <p className="text-[12px] mt-0.5" style={{ color: TEXT_MUTED }}>{item.desc}</p>
                 </div>
               </button>
             ))}
