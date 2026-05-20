@@ -175,3 +175,10 @@ model EmbeddingRecord {
 
   @@unique([objectType, objectId, model])
 }
+
+// ============ API 配置 ============
+
+model AppConfig {
+  key   String @id
+  value String
+}

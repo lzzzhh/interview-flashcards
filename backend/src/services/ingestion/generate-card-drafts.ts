@@ -42,7 +42,7 @@ ${chunk.text.slice(0, 3000)}
 
     try {
       const res = await provider.chat({
-        model: 'gpt-4o-mini',
+        model: (provider as any).defaultModel || 'gpt-4o-mini',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.5,
         maxTokens: 2048,
@@ -52,8 +52,8 @@ ${chunk.text.slice(0, 3000)}
       for (const d of drafts) {
         allDrafts.push({ ...d, reason: `从 chunk ${chunk.chunkIndex} 生成` });
       }
-    } catch {
-      // skip failed chunk
+    } catch (err) {
+      console.error(`[generate-card-drafts] chunk ${chunk.chunkIndex} (source: ${sourceId}) failed:`, (err as Error).message || err);
     }
   }
 

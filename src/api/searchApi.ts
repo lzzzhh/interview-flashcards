@@ -5,12 +5,14 @@ export interface SearchResult {
   cardId: string;
   title: string;
   deckId: string;
+  deckName?: string;
   tags: string[];
   score: number;
   matchType: string;
   reason: string;
   due?: boolean;
   lapses?: number;
+  snippet?: string;
 }
 
 export interface HybridSearchResponse {

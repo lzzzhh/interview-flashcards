@@ -2,11 +2,13 @@
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
 import { handleJobPrepMessage } from '../services/job-prep/orchestrator';
+import { JobPrepSessionSchema, validate } from './schemas';
 
 export async function jobPrepRoutes(app: FastifyInstance) {
   // 创建/继续会话
   app.post('/api/job-prep/session', async (req) => {
-    const body = req.body as any;
+    const v = validate(JobPrepSessionSchema, req.body);
+    const body = v.success ? v.data : (req.body as any);
     const result = await handleJobPrepMessage({
       sessionId: body.sessionId,
       message: body.message,

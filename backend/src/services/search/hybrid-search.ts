@@ -20,12 +20,14 @@ interface CardMatch {
   cardId: string;
   title: string;
   deckId: string;
+  deckName?: string;
   tags: string[];
   score: number;
   matchType: 'vector' | 'keyword' | 'hybrid' | 'due';
   reason: string;
   due?: boolean;
   lapses?: number;
+  snippet?: string;
 }
 
 const USER_ID = 'demo-user';
@@ -38,7 +40,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   // 1. Vector search (if embedding provider available)
   if (provider && vectorStore.name !== 'noop') {
     try {
-      const emb = await provider.embed({ model: 'text-embedding-3-small', texts: [input.query] });
+      const emb = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts: [input.query] });
       if (emb.embeddings.length > 0) {
         const vecResults = await vectorStore.search(emb.embeddings[0], input.topK * 2);
         for (const r of vecResults) {
@@ -61,18 +63,25 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     }
   }
 
-  // 3. Fetch card details from DB
-  if (results.length > 0) {
-    const cardIds = results.map(r => r.cardId);
-    const cards = await prisma.card.findMany({ where: { id: { in: cardIds } } });
-    for (const card of cards) {
-      const match = results.find(r => r.cardId === card.id);
-      if (match) {
-        match.title = card.title || card.titleCn || card.question || card.id;
-        match.deckId = card.deckId;
-        match.tags = card.tags ? JSON.parse(card.tags) : [];
+    // 3. Fetch card details from DB
+    if (results.length > 0) {
+      const cardIds = results.map(r => r.cardId);
+      const cards = await prisma.card.findMany({
+        where: { id: { in: cardIds } },
+        include: { deck: true },
+      });
+      for (const card of cards) {
+        const match = results.find(r => r.cardId === card.id);
+        if (match) {
+          match.title = card.title || card.titleCn || card.question || card.id;
+          match.deckId = card.deckId;
+          match.deckName = card.deck.name;
+          match.tags = card.tags ? JSON.parse(card.tags) : [];
+          // 生成高亮片段：优先显示 question，截取前 100 字符
+          const content = card.question || card.answer || card.description || '';
+          match.snippet = content.slice(0, 120) + (content.length > 120 ? '...' : '');
+        }
       }
-    }
 
     // 4. Business rerank: SM-2 status
     const progresses = await prisma.cardProgress.findMany({ where: { userId: USER_ID, cardId: { in: cardIds } } });

@@ -10,11 +10,6 @@ interface Message {
 
 interface Props { onBack: () => void; }
 
-const TEXT_PRIMARY = 'var(--text-primary)';
-const TEXT_MUTED = 'var(--text-muted)';
-const BLUE = 'var(--blue)';
-const CARD_BORDER = 'var(--card-border)';
-
 export default function JobPrepPage({ onBack }: Props) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -37,8 +32,9 @@ export default function JobPrepPage({ onBack }: Props) {
       for (const msg of res.messages || []) {
         setMessages(prev => [...prev, { role: 'agent', text: msg }]);
       }
-    } catch {
-      setMessages(prev => [...prev, { role: 'agent', text: '抱歉，发生错误，请重试。' }]);
+    } catch (err: any) {
+      const msg = err.message || '请求失败，请确认后端已启动';
+      setMessages(prev => [...prev, { role: 'agent', text: msg }]);
     }
     setLoading(false);
   };
@@ -55,33 +51,54 @@ export default function JobPrepPage({ onBack }: Props) {
       <div className="flex-1 flex flex-col min-h-0">
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
           {messages.length === 0 && (
-            <p className="text-center text-[13px] mt-8" style={{ color: TEXT_MUTED }}>告诉我你准备面试的公司和岗位</p>
+            <p className="text-center text-[13px] mt-8" style={{ color: 'var(--text-muted)' }}>告诉我你准备面试的公司和岗位</p>
           )}
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className="max-w-[85%] rounded-xl px-4 py-2.5 text-[13px]" style={{
-                backgroundColor: m.role === 'user' ? 'rgba(64,156,255,0.15)' : 'rgba(255,255,255,0.08)',
-                color: m.role === 'user' ? BLUE : TEXT_PRIMARY,
-              }}>
+              <div
+                className="max-w-[85%] rounded-2xl px-4 py-3 text-[13px] leading-relaxed whitespace-pre-wrap"
+                style={m.role === 'user'
+                  ? {
+                      backgroundColor: '#2563EB',
+                      color: '#FFFFFF',
+                      borderBottomRightRadius: '4px',
+                    }
+                  : {
+                      backgroundColor: 'var(--card-bg)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--card-border)',
+                      borderBottomLeftRadius: '4px',
+                    }
+                }
+              >
                 {m.text}
               </div>
             </div>
           ))}
-          {loading && <p className="text-center text-[12px]" style={{ color: TEXT_MUTED }}>思考中...</p>}
+          {loading && <p className="text-center text-[12px]" style={{ color: 'var(--text-muted)' }}>思考中...</p>}
         </div>
 
-        <div className="shrink-0 px-5 py-3 border-t" style={{ borderColor: CARD_BORDER }}>
+        {/* 底部输入栏 */}
+        <div className="shrink-0 px-4 py-3 border-t" style={{ borderColor: 'var(--card-border)', backgroundColor: 'var(--card-bg)' }}>
           <div className="flex gap-2">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && send()}
-              placeholder="输入公司/岗位..."
-              className="flex-1 px-3 py-2 rounded-lg text-[13px] border-0 outline-none"
-              style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: TEXT_PRIMARY }}
+              placeholder="输入公司/岗位或 JD 链接..."
+              className="flex-1 px-4 py-2.5 rounded-xl text-[13px] outline-none"
+              style={{
+                backgroundColor: 'rgba(15,23,42,0.04)',
+                color: 'var(--text-primary)',
+              }}
             />
-            <button onClick={send} disabled={loading} className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(64,156,255,0.15)' }}>
-              <Send className="w-4 h-4" style={{ color: BLUE }} />
+            <button
+              onClick={send}
+              disabled={loading}
+              className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-opacity disabled:opacity-40"
+              style={{ backgroundColor: '#2563EB' }}
+            >
+              <Send className="w-4 h-4" style={{ color: '#FFFFFF' }} />
             </button>
           </div>
         </div>

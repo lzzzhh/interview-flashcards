@@ -25,3 +25,12 @@ src-tauri/target
 *.njsproj
 *.sln
 *.sw?
+
+# Environment secrets
+.env
+
+# Python cache
+__pycache__/
+
+# Local database
+*.db

@@ -78,14 +78,22 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-[13px] font-bold truncate flex-1" style={{ color: TEXT_PRIMARY }}>{r.title}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full ml-2" style={{
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full ml-2 shrink-0" style={{
                       backgroundColor: r.matchType === 'due' ? 'rgba(234,88,12,0.2)' : 'rgba(100,156,255,0.15)',
                       color: r.matchType === 'due' ? 'var(--orange)' : 'var(--blue)',
                     }}>
-                      {r.matchType === 'due' ? '到期' : r.matchType === 'keyword' ? '关键词' : '语义'}
+                      {r.matchType === 'due' ? '到期' : r.matchType === 'keyword' ? '关键词' : r.matchType === 'vector' ? '语义' : '混合'}
                     </span>
                   </div>
-                  <p className="text-[11px] mt-1 truncate" style={{ color: TEXT_MUTED }}>{r.reason}</p>
+                  {r.snippet && (
+                    <p className="text-[11px] mt-1 leading-relaxed truncate-2" style={{ color: TEXT_MUTED }}>
+                      {r.snippet}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 mt-1">
+                    {r.deckName && <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{r.deckName}</span>}
+                    <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{r.reason}</span>
+                  </div>
                 </button>
               ))}
             </div>

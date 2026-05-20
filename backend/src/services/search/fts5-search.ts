@@ -12,6 +12,7 @@ export interface FTS5Result {
 /** 初始化 FTS5 表和触发器 */
 export async function initFTS5(): Promise<void> {
   const db = (prisma as any).$queryRawUnsafe || prisma.$executeRawUnsafe;
+  // Card FTS5
   try {
     await db(`CREATE VIRTUAL TABLE IF NOT EXISTS card_fts USING fts5(cardId UNINDEXED, deckId UNINDEXED, question, answer, tags, tokenize='unicode61')`);
   } catch { /* may already exist */ }
@@ -26,19 +27,43 @@ export async function initFTS5(): Promise<void> {
       DELETE FROM card_fts WHERE cardId = old.id;
     END`);
   } catch {}
+  try {
+    await db(`CREATE TRIGGER IF NOT EXISTS card_fts_update AFTER UPDATE ON Card BEGIN
+      DELETE FROM card_fts WHERE cardId = old.id;
+      INSERT INTO card_fts(cardId, deckId, question, answer, tags)
+      VALUES (new.id, new.deckId, new.question, new.answer, new.tags);
+    END`);
+  } catch {}
+
+  // SourceChunk FTS5
+  try {
+    await db(`CREATE VIRTUAL TABLE IF NOT EXISTS source_chunk_fts USING fts5(chunkId UNINDEXED, sourceId UNINDEXED, text, tokenize='unicode61')`);
+  } catch { /* may already exist */ }
+  try {
+    await db(`CREATE TRIGGER IF NOT EXISTS source_chunk_fts_insert AFTER INSERT ON SourceChunk BEGIN
+      INSERT INTO source_chunk_fts(chunkId, sourceId, text)
+      VALUES (new.id, new.sourceId, new.text);
+    END`);
+  } catch {}
+  try {
+    await db(`CREATE TRIGGER IF NOT EXISTS source_chunk_fts_delete AFTER DELETE ON SourceChunk BEGIN
+      DELETE FROM source_chunk_fts WHERE chunkId = old.id;
+    END`);
+  } catch {}
 }
 
-/** 重建 FTS5 索引（删除旧索引，从 Card 表全量重建） */
+/** 重建 FTS5 索引 */
 export async function rebuildFTS5(): Promise<void> {
   const db = (prisma as any).$queryRawUnsafe || prisma.$executeRawUnsafe;
   try { await db(`DELETE FROM card_fts`); } catch {}
   try { await db(`INSERT INTO card_fts(cardId, deckId, question, answer, tags) SELECT id, deckId, question, answer, tags FROM Card`); } catch {}
+  try { await db(`DELETE FROM source_chunk_fts`); } catch {}
+  try { await db(`INSERT INTO source_chunk_fts(chunkId, sourceId, text) SELECT id, sourceId, text FROM SourceChunk`); } catch {}
 }
 
 /** FTS5 关键词搜索 */
 export async function fts5Search(query: string, limit: number = 20, deckId?: string): Promise<FTS5Result[]> {
   try {
-    // FTS5 MATCH requires special escaping
     const escaped = query.replace(/['"]/g, ' ').trim();
     if (!escaped) return [];
 
@@ -55,7 +80,7 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     const rows = await prisma.$queryRawUnsafe(sql, ...params) as any[];
     const results = (rows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'fts5' }));
 
-    // Fallback: SQLite LIKE for Chinese text (FTS5 unicode61 doesn't handle CJK well)
+    // Fallback: SQLite LIKE for Chinese text
     if (results.length === 0 && /[\u4e00-\u9fff]/.test(escaped)) {
       const likeRows = await prisma.$queryRawUnsafe(
         'SELECT id as cardId, 10 as rank FROM Card WHERE question LIKE ?1 OR titleCn LIKE ?1 OR title LIKE ?1 LIMIT ?2',
@@ -67,6 +92,34 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     return results;
   } catch (e) {
     console.error('FTS5 search error:', e);
+    return [];
+  }
+}
+
+/** SourceChunk FTS5 搜索 */
+export async function sourceChunkSearch(query: string, limit: number = 10, sourceId?: string): Promise<{ chunkId: string; sourceId: string; rank: number; textSnippet: string }[]> {
+  try {
+    const escaped = query.replace(/['"]/g, ' ').trim();
+    if (!escaped) return [];
+
+    let sql: string;
+    const params: any[] = [];
+    if (sourceId) {
+      sql = `SELECT chunkId, sourceId, rank, snippet(source_chunk_fts, 2, '<mark>', '</mark>', '...', 32) as snippet FROM source_chunk_fts WHERE source_chunk_fts MATCH ?1 AND sourceId = ?2 ORDER BY rank LIMIT ?3`;
+      params.push(escaped, sourceId, limit);
+    } else {
+      sql = `SELECT chunkId, sourceId, rank, snippet(source_chunk_fts, 2, '<mark>', '</mark>', '...', 32) as snippet FROM source_chunk_fts WHERE source_chunk_fts MATCH ?1 ORDER BY rank LIMIT ?2`;
+      params.push(escaped, limit);
+    }
+
+    const rows = await prisma.$queryRawUnsafe(sql, ...params) as any[];
+    return (rows || []).map((r: any) => ({
+      chunkId: r.chunkId,
+      sourceId: r.sourceId,
+      rank: r.rank,
+      textSnippet: r.snippet || '',
+    }));
+  } catch {
     return [];
   }
 }

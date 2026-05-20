@@ -1,10 +1,14 @@
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
+import { syncCardEmbedding, deleteCardEmbedding } from '../services/vector/embedding-sync';
+import { CreateCardSchema, UpdateCardSchema, validate } from './schemas';
 
 export async function cardRoutes(app: FastifyInstance) {
   // POST /api/cards — 新增卡片
   app.post('/api/cards', async (req, reply) => {
-    const body = req.body as any;
+    const v = validate(CreateCardSchema, req.body);
+    if (!v.success) return reply.status(400).send({ error: v.error });
+    const body = v.data;
     if (!body.id || !body.deckId) {
       return reply.status(400).send({ error: 'id and deckId required' });
     }
@@ -23,13 +27,16 @@ export async function cardRoutes(app: FastifyInstance) {
         codes: body.codes ? JSON.stringify(body.codes) : null,
       },
     });
+    // 异步同步 embedding（不阻塞请求）
+    syncCardEmbedding(card.id).catch(() => {});
     return card;
   });
 
   // PATCH /api/cards/:cardId — 更新卡片
   app.patch('/api/cards/:cardId', async (req, reply) => {
     const { cardId } = req.params as { cardId: string };
-    const body = req.body as any;
+    const v = validate(UpdateCardSchema, req.body);
+    const body = v.success ? v.data : (req.body as any);
     const card = await prisma.card.findUnique({ where: { id: cardId } });
     if (!card) return reply.status(404).send({ error: 'Not found' });
 
@@ -48,6 +55,8 @@ export async function cardRoutes(app: FastifyInstance) {
         source: body.source ?? card.source,
       },
     });
+    // 异步同步 embedding
+    syncCardEmbedding(cardId).catch(() => {});
     return updated;
   });
 
@@ -61,6 +70,9 @@ export async function cardRoutes(app: FastifyInstance) {
     await prisma.cardProgress.deleteMany({ where: { cardId } });
     await prisma.reviewLog.deleteMany({ where: { cardId } });
     await prisma.card.delete({ where: { id: cardId } });
+
+    // 异步清理 embedding
+    deleteCardEmbedding(cardId).catch(() => {});
 
     return { deleted: true };
   });

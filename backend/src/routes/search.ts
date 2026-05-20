@@ -2,10 +2,12 @@
 import { FastifyInstance } from 'fastify';
 import { hybridSearch } from '../services/search/hybrid-search';
 import { fts5Search } from '../services/search/fts5-search';
+import { HybridSearchSchema, validate } from './schemas';
 
 export async function searchRoutes(app: FastifyInstance) {
   app.post('/api/search/hybrid', async (req) => {
-    const body = req.body as any;
+    const v = validate(HybridSearchSchema, req.body);
+    const body = v.success ? v.data : (req.body as any);
     const results = await hybridSearch({
       query: body.query || '',
       deckIds: body.deckIds,

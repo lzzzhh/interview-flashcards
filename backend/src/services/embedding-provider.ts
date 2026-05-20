@@ -25,11 +25,15 @@ export class OpenAIEmbeddingProvider implements EmbeddingProvider {
     this.apiKey = apiKey;
   }
 
+  get defaultModel(): string { return (this as any)._defaultModel || 'text-embedding-3-small'; }
+  set defaultModel(m: string) { (this as any)._defaultModel = m; }
+
   async embed(request: EmbeddingRequest): Promise<EmbeddingResponse> {
+    const model = request.model || this.defaultModel;
     const res = await fetch(`${this.baseUrl}/v1/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` },
-      body: JSON.stringify({ model: request.model, input: request.texts }),
+      body: JSON.stringify({ model, input: request.texts }),
     });
     if (!res.ok) throw new Error(`Embedding error: ${res.status}`);
     const data = await res.json() as any;

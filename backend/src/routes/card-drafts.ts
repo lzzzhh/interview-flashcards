@@ -2,12 +2,15 @@
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
 import { generateCardDrafts, saveCardDrafts } from '../services/ingestion/generate-card-drafts';
+import { syncCardEmbedding } from '../services/vector/embedding-sync';
+import { GenerateDraftsSchema, ApproveBatchSchema, validate } from './schemas';
 
 export async function cardDraftRoutes(app: FastifyInstance) {
   // 从 SourceDocument 生成草稿
   app.post('/api/card-drafts/generate', async (req, reply) => {
-    const { sourceId, deckId } = req.body as any;
-    if (!sourceId || !deckId) return reply.status(400).send({ error: 'sourceId and deckId required' });
+    const v = validate(GenerateDraftsSchema, req.body);
+    if (!v.success) return reply.status(400).send({ error: v.error });
+    const { sourceId, deckId } = v.data;
 
     const source = await prisma.sourceDocument.findUnique({
       where: { id: sourceId },
@@ -41,39 +44,15 @@ export async function cardDraftRoutes(app: FastifyInstance) {
   // 审核通过单张
   app.post('/api/card-drafts/:id/approve', async (req, reply) => {
     const { id } = req.params as { id: string };
-    const draft = await prisma.cardDraft.findUnique({ where: { id } });
-    if (!draft) return reply.status(404).send({ error: 'Draft not found' });
 
-    // 写入 Card
-    await prisma.card.create({
-      data: {
-        id: `card-${Date.now()}`,
-        deckId: draft.deckId,
-        type: draft.type,
-        question: draft.question,
-        answer: draft.answer,
-        tags: draft.tags,
-        difficulty: draft.difficulty,
-        subTopic: draft.subTopic,
-      },
-    });
+    const result = await prisma.$transaction(async (tx) => {
+      const draft = await tx.cardDraft.findUnique({ where: { id } });
+      if (!draft) throw { status: 404, message: 'Draft not found' };
 
-    await prisma.cardDraft.update({ where: { id }, data: { status: 'approved' } });
-    return { approved: true, draftId: id };
-  });
-
-  // 批量审核通过
-  app.post('/api/card-drafts/approve-batch', async (req, reply) => {
-    const { ids } = req.body as { ids: string[] };
-    if (!ids || ids.length === 0) return reply.status(400).send({ error: 'ids required' });
-
-    let count = 0;
-    for (const id of ids) {
-      const draft = await prisma.cardDraft.findUnique({ where: { id } });
-      if (!draft) continue;
-      await prisma.card.create({
+      const cardId = `card-${Date.now()}`;
+      await tx.card.create({
         data: {
-          id: `card-${Date.now()}-${count}`,
+          id: cardId,
           deckId: draft.deckId,
           type: draft.type,
           question: draft.question,
@@ -83,10 +62,52 @@ export async function cardDraftRoutes(app: FastifyInstance) {
           subTopic: draft.subTopic,
         },
       });
-      await prisma.cardDraft.update({ where: { id }, data: { status: 'approved' } });
-      count++;
+
+      await tx.cardDraft.update({ where: { id }, data: { status: 'approved' } });
+      return { cardId, draft };
+    });
+
+    // 异步同步 embedding
+    syncCardEmbedding(result.cardId).catch(() => {});
+    return { approved: true, draftId: id, cardId: result.cardId };
+  });
+
+  // 批量审核通过
+  app.post('/api/card-drafts/approve-batch', async (req, reply) => {
+    const v = validate(ApproveBatchSchema, req.body);
+    if (!v.success) return reply.status(400).send({ error: v.error });
+    const { ids } = v.data;
+
+    const result = await prisma.$transaction(async (tx) => {
+      const cardIds: string[] = [];
+      for (const id of ids) {
+        const draft = await tx.cardDraft.findUnique({ where: { id } });
+        if (!draft) continue;
+        const cardId = `card-${Date.now()}-${cardIds.length}`;
+        await tx.card.create({
+          data: {
+            id: cardId,
+            deckId: draft.deckId,
+            type: draft.type,
+            question: draft.question,
+            answer: draft.answer,
+            tags: draft.tags,
+            difficulty: draft.difficulty,
+            subTopic: draft.subTopic,
+          },
+        });
+        await tx.cardDraft.update({ where: { id }, data: { status: 'approved' } });
+        cardIds.push(cardId);
+      }
+      return cardIds;
+    });
+
+    // 异步同步 embedding
+    for (const cardId of result) {
+      syncCardEmbedding(cardId).catch(() => {});
     }
-    return { approved: count };
+
+    return { approved: result.length, cardIds: result };
   });
 
   // 拒绝草稿

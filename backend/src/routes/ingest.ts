@@ -3,12 +3,14 @@ import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
 import { parseDocument, checkWorkerHealth } from '../services/document/parser-gateway';
 import { chunkText } from '../services/document/chunk-text';
+import { IngestDocumentSchema, validate } from './schemas';
 
 export async function ingestRoutes(app: FastifyInstance) {
   // 上传文档 → 解析 → chunk → 入库
   app.post('/api/ingest/documents', async (req, reply) => {
-    const { filePath, fileType, targetDeckId } = req.body as any;
-    if (!filePath) return reply.status(400).send({ error: 'filePath required' });
+    const v = validate(IngestDocumentSchema, req.body);
+    if (!v.success) return reply.status(400).send({ error: v.error });
+    const { filePath, fileType, targetDeckId } = v.data;
 
     const workerAlive = await checkWorkerHealth();
     if (!workerAlive) {

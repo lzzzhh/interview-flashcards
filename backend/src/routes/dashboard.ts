@@ -5,33 +5,39 @@ export async function dashboardRoutes(app: FastifyInstance) {
   const USER_ID = 'demo-user';
 
   app.get('/api/dashboard', async () => {
-    // 所有 decks 统计
-    const decks = await prisma.deck.findMany();
-    let todayDue = 0;
-    let totalCards = 0;
-    let learningCount = 0;
-    let newCount = 0;
+    // 批量获取所有统计数据，避免 N+1
+    const [totalCardsResult, allProgress] = await Promise.all([
+      prisma.$queryRawUnsafe<[{ count: number }]>(
+        'SELECT COUNT(*) as count FROM Card',
+      ),
+      prisma.cardProgress.findMany({
+        where: { userId: USER_ID },
+        select: { cardId: true, state: true, nextReview: true },
+      }),
+    ]);
 
-    for (const d of decks) {
-      const total = await prisma.card.count({ where: { deckId: d.id } });
-      totalCards += total;
-      const progressCards = await prisma.cardProgress.findMany({ where: { card: { deckId: d.id }, userId: USER_ID } });
-      const studiedCount = progressCards.filter(p => p.state !== 'new').length;
-      newCount += Math.max(0, total - studiedCount);
-      todayDue += progressCards.filter(p => p.state !== 'new' && p.nextReview <= new Date()).length;
-      learningCount += progressCards.filter(p => p.state === 'learning').length;
-    }
+    const totalCards = Number(totalCardsResult[0]?.count ?? 0);
 
-    // 简单推荐：返回待复习最多的 3 个模块
-    const recommendations = await prisma.cardProgress.groupBy({
-      by: ['cardId'],
-      where: { userId: USER_ID, state: { not: 'new' }, nextReview: { lte: new Date() } },
-    });
-    const recCards = await prisma.card.findMany({
-      where: { id: { in: recommendations.map(r => r.cardId) } },
-      take: 3,
-      include: { deck: true },
-    });
+    const now = new Date();
+    const studiedIds = new Set(allProgress.filter(p => p.state !== 'new').map(p => p.cardId));
+    const newCount = Math.max(0, totalCards - studiedIds.size);
+    const todayDue = allProgress.filter(p => p.state !== 'new' && p.nextReview <= now).length;
+    const learningCount = allProgress.filter(p => p.state === 'learning').length;
+
+    // 推荐：返回到期复习最多的 3 张卡片
+    const dueCardIds = allProgress
+      .filter(p => p.state !== 'new' && p.nextReview <= now)
+      .slice(0, 3)
+      .map(p => p.cardId);
+
+    const recCards = dueCardIds.length > 0
+      ? await prisma.card.findMany({
+          where: { id: { in: dueCardIds } },
+          take: 3,
+          include: { deck: true },
+        })
+      : [];
+
     const recommended = recCards.map(c => ({
       cardId: c.id,
       deckId: c.deckId,

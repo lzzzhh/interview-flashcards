@@ -18,6 +18,8 @@ import AISearchPage from './components/AISearchPage';
 import AgentHubPage from './components/AgentHubPage';
 import DraftReviewPage from './components/DraftReviewPage';
 import JobPrepPage from './components/JobPrepPage';
+import IngestPage from './components/IngestPage';
+import ApiSettingsPage from './components/ApiSettingsPage';
 import type { Category, FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
@@ -122,8 +124,10 @@ function AppInner() {
 
   if (showSearch) {
     if (agentPage === 'search') return <AISearchPage onBack={() => setAgentPage(null)} onEnterStudy={handleEnterStudy} />;
+    if (agentPage === 'ingest') return <IngestPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
     if (agentPage === 'drafts') return <DraftReviewPage onBack={() => setAgentPage(null)} />;
     if (agentPage === 'jobprep') return <JobPrepPage onBack={() => setAgentPage(null)} />;
+    if (agentPage === 'settings') return <ApiSettingsPage onBack={() => setAgentPage(null)} />;
     return <AgentHubPage onBack={() => setShowSearch(false)} onNavigate={setAgentPage} />;
   }
 
