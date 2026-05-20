@@ -4,6 +4,7 @@
 // ============================================================
 
 import type { StoredProgress, StoredSettings, StoredStats, QACard } from '../types';
+import { createLocalBackup } from './backup';
 
 export interface CustomDeckInfo {
   id: string;
@@ -133,8 +134,10 @@ export async function loadAppData(): Promise<AppData> {
   return lsRead();
 }
 
-/** 保存数据（Tauri 优先） */
+/** 保存数据（Tauri 优先，写入前自动备份） */
 export async function saveAppData(data: AppData): Promise<void> {
+  // 写入前创建 localStorage 备份（Tauri 端由 Rust atomic write 提供文件级备份）
+  createLocalBackup();
   // 始终写入 localStorage 作为缓存
   lsWrite(data);
   // Tauri 环境写入原生文件

@@ -5,6 +5,84 @@
 import { STORAGE_KEYS } from '../types';
 import type { StoredProgress, StoredSettings, StoredStats } from '../types';
 
+const MAX_BACKUPS = 10;
+const BACKUP_KEY_PREFIX = 'fc-backup-v2-';
+
+/** 创建 localStorage 备份轮换（保存所有当前数据快照） */
+export function createLocalBackup(): void {
+  const snapshot: Record<string, unknown> = {};
+
+  // Collect all fc-* keys
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && (key.startsWith('fc-') || key === 'reviewLogs')) {
+      try {
+        snapshot[key] = JSON.parse(localStorage.getItem(key) || 'null');
+      } catch {
+        snapshot[key] = localStorage.getItem(key);
+      }
+    }
+  }
+
+  // Rotate: find next slot
+  const keys = findBackupSlots();
+  const nextSlot = (keys.length > 0 ? Math.min(...keys) : 0) + 1;
+  const slot = nextSlot > MAX_BACKUPS ? 1 : nextSlot;
+
+  // Remove oldest overflow
+  for (let i = MAX_BACKUPS + 1; i <= MAX_BACKUPS + 5; i++) {
+    localStorage.removeItem(`${BACKUP_KEY_PREFIX}${i}`);
+  }
+
+  localStorage.setItem(`${BACKUP_KEY_PREFIX}${slot}`, JSON.stringify({
+    timestamp: new Date().toISOString(),
+    data: snapshot,
+  }));
+}
+
+/** 列出所有备份 */
+export function listBackups(): { slot: number; timestamp: string; keys: number }[] {
+  const results: { slot: number; timestamp: string; keys: number }[] = [];
+  for (let i = 1; i <= MAX_BACKUPS; i++) {
+    try {
+      const raw = localStorage.getItem(`${BACKUP_KEY_PREFIX}${i}`);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        results.push({ slot: i, timestamp: parsed.timestamp, keys: Object.keys(parsed.data || {}).length });
+      }
+    } catch {}
+  }
+  return results.sort((a, b) => b.slot - a.slot);
+}
+
+/** 从指定备份恢复 */
+export function restoreBackup(slot: number): boolean {
+  try {
+    const raw = localStorage.getItem(`${BACKUP_KEY_PREFIX}${slot}`);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    const data = parsed.data;
+    if (!data) return false;
+
+    for (const [key, value] of Object.entries(data)) {
+      localStorage.setItem(key, typeof value === 'string' ? value as string : JSON.stringify(value));
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function findBackupSlots(): number[] {
+  const slots: number[] = [];
+  for (let i = 1; i <= MAX_BACKUPS; i++) {
+    if (localStorage.getItem(`${BACKUP_KEY_PREFIX}${i}`)) {
+      slots.push(i);
+    }
+  }
+  return slots;
+}
+
 /** 导出所有进度为 JSON 文件并下载（v2 格式，包含自定义牌组） */
 export function exportProgress(): void {
   const progress: Record<string, StoredProgress> = {};

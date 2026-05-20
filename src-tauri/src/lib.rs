@@ -1,4 +1,5 @@
 use std::fs;
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Child};
 use std::sync::Mutex;
@@ -90,9 +91,76 @@ fn read_data() -> Result<String, String> {
 
 #[tauri::command]
 fn write_data(json: String) -> Result<(), String> {
+    write_data_atomic(json)
+}
+
+/// Atomic write: write to .tmp.json → flush → rename → data.json
+/// Also rotates backups (keeps up to 10)
+fn write_data_atomic(json: String) -> Result<(), String> {
     let path = data_file_path();
-    if let Some(parent) = path.parent() { fs::create_dir_all(parent).map_err(|e| format!("创建目录失败: {}", e))?; }
-    fs::write(&path, &json).map_err(|e| format!("写入失败: {}", e))
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| format!("创建目录失败: {}", e))?;
+    }
+
+    let tmp_path = path.with_extension("tmp.json");
+
+    // Step 1: Write to temp file
+    let mut f = fs::File::create(&tmp_path)
+        .map_err(|e| format!("创建临时文件失败: {}", e))?;
+    f.write_all(json.as_bytes())
+        .map_err(|e| format!("写入临时文件失败: {}", e))?;
+    f.flush().map_err(|e| format!("flush 失败: {}", e))?;
+
+    // Step 2: macOS full sync
+    #[cfg(target_os = "macos")]
+    {
+        use std::os::unix::io::AsRawFd;
+        let fd = f.as_raw_fd();
+        // F_FULLFSYNC = 51 on macOS
+        let result = unsafe { libc::fcntl(fd, libc::F_FULLFSYNC) };
+        if result != 0 {
+            log::warn!("fcntl F_FULLFSYNC 失败: {}", std::io::Error::last_os_error());
+        }
+    }
+    drop(f);
+
+    // Step 3: Rotate backups before atomic rename
+    rotate_backups(&path)?;
+
+    // Step 4: Atomic rename
+    fs::rename(&tmp_path, &path).map_err(|e| format!("原子重命名失败: {}", e))?;
+
+    Ok(())
+}
+
+/// Rotate backup files: data.backup.1.json → data.backup.2.json → ... → data.backup.10.json
+fn rotate_backups(main_path: &PathBuf) -> Result<(), String> {
+    let stem = main_path.file_stem()
+        .unwrap_or_default()
+        .to_string_lossy();
+
+    // Remove oldest backup (10)
+    let oldest = main_path.with_file_name(format!("{}.backup.10.json", stem));
+    if oldest.exists() {
+        let _ = fs::remove_file(&oldest);
+    }
+
+    // Shift backups 9→10, 8→9, ... 1→2
+    for i in (1..10).rev() {
+        let old = main_path.with_file_name(format!("{}.backup.{}.json", stem, i));
+        let new = main_path.with_file_name(format!("{}.backup.{}.json", stem, i + 1));
+        if old.exists() {
+            let _ = fs::rename(&old, &new);
+        }
+    }
+
+    // Copy current data.json → data.backup.1.json
+    if main_path.exists() {
+        fs::copy(main_path, main_path.with_file_name(format!("{}.backup.1.json", stem)))
+            .map_err(|e| format!("备份复制失败: {}", e))?;
+    }
+
+    Ok(())
 }
 
 #[tauri::command]
