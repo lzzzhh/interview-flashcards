@@ -1,7 +1,8 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
-import { AppProvider, useAppContext } from './context/AppContext';
+import { AppProvider, useAppContext, dtoToFlashCard } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
+import { getStudyQueue } from './api/study';
 import HomePage from './components/HomePage';
 import CardView from './components/CardView';
 import CardActions from './components/CardActions';
@@ -107,11 +108,24 @@ function AppInner() {
   const [showSearch, setShowSearch] = useState(false);
   const [agentPage, setAgentPage] = useState<string | null>(null);
   const { dispatch } = useAppContext();
-  const handleEnterStudy = (category: Category, cardId?: string) => {
+  const handleEnterStudy = useCallback(async (category: Category, cardId?: string) => {
     setStudyCategory(category); setShowDecks(false);
-    dispatch({ type: 'SET_CATEGORY', payload: category });
+    try {
+      // 尝试从 SQLite API 加载学习队列
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const queue = await getStudyQueue(category, 'new');
+      const cards = queue.cards.map(dtoToFlashCard);
+      dispatch({ type: 'LOADED_QUEUE', payload: { cards, mode: 'new' } });
+      dispatch({ type: 'SET_API_SOURCE', payload: true });
+    } catch {
+      // 降级到本地静态数据
+      dispatch({ type: 'SET_CATEGORY', payload: category });
+      dispatch({ type: 'SET_API_SOURCE', payload: false });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
     if (cardId) dispatch({ type: 'JUMP_TO_CARD', payload: { category, cardId } });
-  };
+  }, [dispatch]);
 
   if (showDecks) {
     return <DeckPage onEnterStudy={handleEnterStudy} onBack={() => setShowDecks(false)} />;

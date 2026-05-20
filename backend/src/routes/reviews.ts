@@ -62,7 +62,10 @@ export async function reviewRoutes(app: FastifyInstance) {
         state: updated.state, easeFactor: updated.easeFactor,
         intervalDays: updated.intervalDays, repetitions: updated.repetitions,
         lapses: updated.lapses, nextReview: updated.nextReview,
+        lastReviewedAt: updated.lastReviewedAt,
+        favorited: updated.favorited,
       } : null,
+      log: result.log,
     };
   });
 }

@@ -9,44 +9,9 @@ import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit } from '../utils/customDecks';
+import { useDecks, deriveGlobalStats } from '../repositories/useDeckStats';
 import { loadProgress } from '../utils/storage';
-import { leetcodeHot100 } from '../data/leetcode-hot100';
-import { statisticsCards } from '../data/statistics';
-import { machineLearningCards } from '../data/machine-learning';
-import { deepLearningCards } from '../data/deep-learning';
-import { llmCards } from '../data/llm';
-import { agentCards } from '../data/agent';
-import { jargonCards } from '../data/jargon';
-import { workplaceCards } from '../data/workplace';
-import { vibeCodingCards } from '../data/vibe-coding';
-import type { Category, FlashCard } from '../types';
-
-// 从源数据直接读取各模块卡片总数，不依赖后端 API
-const CARD_TOTALS: Record<string, number> = {};
-for (const [key, cards] of Object.entries({
-  leetcode: leetcodeHot100,
-  statistics: statisticsCards,
-  'machine-learning': machineLearningCards,
-  'deep-learning': deepLearningCards,
-  llm: llmCards,
-  agent: agentCards,
-  jargon: jargonCards,
-  workplace: workplaceCards,
-  'vibe-coding': vibeCodingCards,
-})) {
-  CARD_TOTALS[key] = (cards as any[]).length;
-}
-
-// 全量卡片标签查找（仅用于推荐展示，统计来自数据库）
-const CARD_LABELS: Record<string, string> = {};
-for (const cards of [leetcodeHot100, statisticsCards, machineLearningCards, deepLearningCards, llmCards, agentCards, jargonCards, workplaceCards, vibeCodingCards]) {
-  for (const c of cards) {
-    const anyC = c as any;
-    if (anyC.category === 'leetcode') CARD_LABELS[anyC.id] = `#${anyC.number} ${anyC.titleCn}`;
-    else if (anyC.question) CARD_LABELS[anyC.id] = anyC.question.slice(0, 25);
-    else CARD_LABELS[anyC.id] = anyC.id;
-  }
-}
+import type { Category } from '../types';
 
 interface Props {
   onEnterStudy: (category: Category) => void;
@@ -77,14 +42,15 @@ const TABS = [
 
 export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile, onShowSearch }: Props) {
   const { state, dueCountByCategory, dispatch } = useAppContext();
+  const { decks } = useDecks();
 
-  // Streak from local logs (API /dashboard doesn't have streak yet)
+  const globalStats = useMemo(() => deriveGlobalStats(decks), [decks]);
+
   const streak = useMemo(() => {
     const logs = loadReviewLogs();
     return getStreak(Object.values(logs).flat());
   }, []);
 
-  // Today's stats: use dueCountByCategory (AppContext has real-time counts)
   const todayDue = useMemo(() => {
     let total = 0;
     for (const cat of CATEGORIES) total += dueCountByCategory[cat.key] ?? 0;
@@ -97,29 +63,8 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
     return total;
   }, []);
 
-  // 全局学习中卡片数（跨所有模块）
-  const learningCount = useMemo(() => {
-    const sources: [Category, FlashCard[]][] = [
-      ['leetcode', leetcodeHot100 as FlashCard[]],
-      ['statistics', statisticsCards as FlashCard[]],
-      ['machine-learning', machineLearningCards as FlashCard[]],
-      ['deep-learning', deepLearningCards as FlashCard[]],
-      ['llm', llmCards as FlashCard[]],
-      ['agent', agentCards as FlashCard[]],
-      ['jargon', jargonCards as FlashCard[]],
-      ['workplace', workplaceCards as FlashCard[]],
-      ['vibe-coding', vibeCodingCards as FlashCard[]],
-    ];
-    let count = 0;
-    for (const [cat, cards] of sources) {
-      const progress = loadProgress(cat);
-      count += cards.filter((c) => {
-        const sm2 = progress.sm2[c.id];
-        return sm2?.state === 'learning';
-      }).length;
-    }
-    return count;
-  }, [state.cardsById]);
+  // 学习中卡片数从 API decks 统计
+  const learningCount = globalStats.learningCount;
 
   // 推荐
   const [recIndex, setRecIndex] = useState(0);
@@ -137,7 +82,10 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
         if (overdue < 0) continue;
         const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
         const score = (1 - R) * (1 + sm2.lapses) * (sm2.easeFactor > 0 ? 2.5 / sm2.easeFactor : 1);
-        const label = CARD_LABELS[cardId] || cardId;
+        const card = state.cardsById[cardId];
+        const label = card
+          ? (card.category === 'leetcode' ? `#${(card as any).number} ${(card as any).titleCn || card.title}` : ((card as any).question || '').slice(0, 25))
+          : cardId;
         all.push({ id: cardId, label, category: cat.key, score });
       }
     }
@@ -264,7 +212,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
-                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {CARD_TOTALS[cat.key] ?? '--'} 张卡片</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {globalStats.moduleTotals[cat.key] ?? '--'} 张卡片</p>
                   </div>
                   <div className="flex gap-4 text-right">
                     <div>

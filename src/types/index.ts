@@ -138,6 +138,9 @@ export interface AppState {
   reviewMode: boolean;
   dailyNewLimit: number;
   studyMode: StudyMode;
+  loading: boolean;
+  /** API 模式：true = 从 SQLite 拉取, false = 用前端静态数据 */
+  apiSource: boolean;
 }
 
 // ============================================================
@@ -168,7 +171,11 @@ export type AppAction =
   | { type: 'DELETE_CARD'; payload: string }
   | { type: 'SET_DAILY_NEW_LIMIT'; payload: number }
   | { type: 'SET_STUDY_MODE'; payload: StudyMode }
-  | { type: 'UNDO_LAST_RATING' };
+  | { type: 'UNDO_LAST_RATING' }
+  | { type: 'LOADED_QUEUE'; payload: { cards: FlashCard[]; mode: 'new' | 'review' } }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'API_RATE_SUCCESS'; payload: { cardId: string; progress: any } }
+  | { type: 'SET_API_SOURCE'; payload: boolean };
 
 // ============================================================
 // localStorage 持久化（兼容旧格式）

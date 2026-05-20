@@ -1,47 +1,41 @@
 import { useState, useEffect } from 'react';
 import { apiGet } from '../api/client';
+import type { DeckDTO, DecksResponse } from '../api/types';
 
-interface DeckStats {
-  total: number;
-  newCount: number;
-  dueCount: number;
-  dailyLimit: number;
-  learningCount: number;
-  reviewCount: number;
-  relearningCount: number;
-  favoritedCount: number;
+/** 从 decks 数据计算统计汇总 */
+export function deriveGlobalStats(decks: DeckDTO[]) {
+  let totalCards = 0;
+  let newCards = 0;
+  let dueCards = 0;
+  let learningCount = 0;
+  let mastered = 0;
+  let relearning = 0;
+  const moduleTotals: Record<string, number> = {};
+  const moduleDue: Record<string, number> = {};
+
+  for (const deck of decks) {
+    const s = deck.stats;
+    totalCards += s.total;
+    newCards += s.newCount;
+    dueCards += s.dueCount;
+    learningCount += s.learningCount;
+    mastered += s.reviewCount; // state=review 视为已掌握
+    relearning += s.relearningCount;
+    moduleTotals[deck.id] = s.total;
+    moduleDue[deck.id] = s.dueCount;
+  }
+
+  return { totalCards, newCards, dueCards, learningCount, mastered, relearning, masterPercent: totalCards > 0 ? Math.round((mastered / totalCards) * 100) : 0, moduleTotals, moduleDue };
 }
-
-interface DeckItem {
-  id: string;
-  name: string;
-  type: string;
-  sortOrder: number;
-  stats: DeckStats;
-}
-
-interface DecksResponse { decks: DeckItem[]; }
 
 const FALLBACK_TOTALS: Record<string, number> = {
   leetcode: 100, statistics: 199, 'machine-learning': 171, 'deep-learning': 32,
   llm: 37, agent: 26, jargon: 45, workplace: 76, 'vibe-coding': 23,
 };
 
-function buildFallbackDecks(): DeckItem[] {
-  const names: Record<string, string> = {
-    leetcode: '力扣', statistics: '统计学', 'machine-learning': '机器学习',
-    'deep-learning': '深度学习', llm: '大模型', agent: 'Agent', jargon: '黑话',
-    workplace: '职场', 'vibe-coding': 'Vibe Coding',
-  };
-  return Object.entries(FALLBACK_TOTALS).map(([id, total]) => ({
-    id, name: names[id] || id, type: 'builtin', sortOrder: 0,
-    stats: { total, newCount: total, dueCount: 0, dailyLimit: 20, learningCount: 0, reviewCount: 0, relearningCount: 0, favoritedCount: 0 },
-  }));
-}
-
-export function useDeckStats(): { totals: Record<string, number>; decks: DeckItem[]; loading: boolean } {
+export function useDecks(): { decks: DeckDTO[]; totals: Record<string, number>; loading: boolean } {
+  const [decks, setDecks] = useState<DeckDTO[]>([]);
   const [totals, setTotals] = useState<Record<string, number>>(FALLBACK_TOTALS);
-  const [decks, setDecks] = useState<DeckItem[]>(buildFallbackDecks);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -52,12 +46,17 @@ export function useDeckStats(): { totals: Record<string, number>; decks: DeckIte
         for (const d of data.decks) next[d.id] = d.stats.total;
         setTotals(next);
       })
-      .catch(() => {})
+      .catch(() => {
+        // 离线时用硬编码 fallback
+        setTotals(FALLBACK_TOTALS);
+      })
       .finally(() => setLoading(false));
   }, []);
 
-  return { totals, decks, loading };
+  return { decks, totals, loading };
 }
 
-/** @deprecated 使用 useDeckStats */
-export const useDeckTotals = useDeckStats;
+/** @deprecated 使用 useDecks */
+export const useDeckTotals = useDecks;
+/** @deprecated 使用 useDecks */
+export const useDeckStats = useDecks;

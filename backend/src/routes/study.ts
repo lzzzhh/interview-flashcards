@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
+import { toCardDTO } from '../modules/cards/card.mapper';
 
 const USER_ID = 'demo-user';
 
@@ -9,21 +10,15 @@ export async function studyRoutes(app: FastifyInstance) {
     if (!deckId || !mode) return { cards: [], total: 0 };
 
     if (mode === 'review') {
-      // 到期卡片（state != new 且 nextReview <= now）
       const cards = await prisma.card.findMany({
         where: {
           deckId,
-          progress: {
-            some: {
-              userId: USER_ID,
-              state: { not: 'new' },
-              nextReview: { lte: new Date() },
-            },
-          },
+          progress: { some: { userId: USER_ID, state: { not: 'new' }, nextReview: { lte: new Date() } } },
         },
+        include: { progress: { where: { userId: USER_ID } } },
         orderBy: { id: 'asc' },
       });
-      return { cards, total: cards.length, mode: 'review' };
+      return { cards: cards.map(toCardDTO), total: cards.length, mode: 'review' };
     }
 
     if (mode === 'new') {
@@ -32,19 +27,18 @@ export async function studyRoutes(app: FastifyInstance) {
       });
       const dailyLimit = limit?.dailyLimit || 20;
 
-      // 已经学过的卡（state != new 的 progress）
       const studiedIds = (await prisma.cardProgress.findMany({
         where: { userId: USER_ID, card: { deckId }, state: { not: 'new' } },
         select: { cardId: true },
       })).map(p => p.cardId);
 
-      // 新卡：没有 progress 或 progress.state === 'new'，且不在 studiedIds 中
       const cards = await prisma.card.findMany({
         where: { deckId, id: { notIn: studiedIds } },
+        include: { progress: { where: { userId: USER_ID } } },
         take: dailyLimit,
         orderBy: { id: 'asc' },
       });
-      return { cards, total: cards.length, mode: 'new', dailyLimit };
+      return { cards: cards.map(toCardDTO), total: cards.length, mode: 'new', dailyLimit };
     }
 
     return { cards: [], total: 0 };

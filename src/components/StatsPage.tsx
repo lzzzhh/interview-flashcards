@@ -3,18 +3,9 @@ import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp, ChevronDown }
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
-import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks, loadCustomCards } from '../utils/customDecks';
-import { loadProgress } from '../utils/storage';
-import { leetcodeHot100 } from '../data/leetcode-hot100';
-import { statisticsCards } from '../data/statistics';
-import { machineLearningCards } from '../data/machine-learning';
-import { deepLearningCards } from '../data/deep-learning';
-import { llmCards } from '../data/llm';
-import { agentCards } from '../data/agent';
-import { jargonCards } from '../data/jargon';
-import { workplaceCards } from '../data/workplace';
-import { vibeCodingCards } from '../data/vibe-coding';
-import type { Category, FlashCard } from '../types';
+import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks } from '../utils/customDecks';
+import { useDecks, deriveGlobalStats } from '../repositories/useDeckStats';
+import type { Category } from '../types';
 
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
@@ -30,89 +21,11 @@ interface Props {
 }
 
 export default function StatsPage({ onBack }: Props) {
-  const { dueCountByCategory, state } = useAppContext();
+  const { dueCountByCategory } = useAppContext();
+  const { decks } = useDecks();
   const [limitsOpen, setLimitsOpen] = useState(false);
 
-  // 全局统计：遍历所有内置模块 + 自定义牌组，从 localStorage 读取真实进度
-  const globalStats = useMemo(() => {
-    const builtinSources: [Category, FlashCard[]][] = [
-      ['leetcode', leetcodeHot100 as FlashCard[]],
-      ['statistics', statisticsCards as FlashCard[]],
-      ['machine-learning', machineLearningCards as FlashCard[]],
-      ['deep-learning', deepLearningCards as FlashCard[]],
-      ['llm', llmCards as FlashCard[]],
-      ['agent', agentCards as FlashCard[]],
-      ['jargon', jargonCards as FlashCard[]],
-      ['workplace', workplaceCards as FlashCard[]],
-      ['vibe-coding', vibeCodingCards as FlashCard[]],
-    ];
-
-    let totalCards = 0;
-    let newCards = 0;
-    let mastered = 0;
-    let learningCount = 0;
-    let relearning = 0;
-    const moduleTotals: Record<string, number> = {};
-    const moduleNew: Record<string, number> = {};
-
-    for (const [cat, cards] of builtinSources) {
-      const progress = loadProgress(cat);
-      const catNew = cards.filter((c) => {
-        const sm2 = progress.sm2[c.id];
-        return !sm2 || sm2.state === 'new';
-      }).length;
-      const catMastered = cards.filter((c) => {
-        const sm2 = progress.sm2[c.id];
-        return sm2 && sm2.state === 'review' && sm2.interval >= 21;
-      }).length;
-      const catLearning = cards.filter((c) => {
-        const sm2 = progress.sm2[c.id];
-        return sm2?.state === 'learning';
-      }).length;
-      const catRelearning = cards.filter((c) => {
-        const sm2 = progress.sm2[c.id];
-        return sm2?.state === 'relearning';
-      }).length;
-      totalCards += cards.length;
-      newCards += catNew;
-      mastered += catMastered;
-      learningCount += catLearning;
-      relearning += catRelearning;
-      moduleTotals[cat] = cards.length;
-      moduleNew[cat] = catNew;
-    }
-
-    // 自定义牌组
-    for (const deck of loadCustomDecks()) {
-      const customCards = loadCustomCards(deck.id);
-      const progress = loadProgress(deck.id as Category);
-      const catNew = customCards.filter((c) => {
-        const sm2 = progress.sm2[c.id];
-        return !sm2 || sm2.state === 'new';
-      }).length;
-      const catMastered = customCards.filter((c) => {
-        const sm2 = progress.sm2[c.id];
-        return sm2 && sm2.state === 'review' && sm2.interval >= 21;
-      }).length;
-      const catLearning = customCards.filter((c) => {
-        const sm2 = progress.sm2[c.id];
-        return sm2?.state === 'learning';
-      }).length;
-      const catRelearning = customCards.filter((c) => {
-        const sm2 = progress.sm2[c.id];
-        return sm2?.state === 'relearning';
-      }).length;
-      totalCards += customCards.length;
-      newCards += catNew;
-      mastered += catMastered;
-      learningCount += catLearning;
-      relearning += catRelearning;
-      moduleTotals[deck.id] = customCards.length;
-      moduleNew[deck.id] = catNew;
-    }
-
-    return { totalCards, newCards, mastered, learningCount, relearning, moduleTotals, moduleNew };
-  }, [state.cardsById]);
+  const globalStats = useMemo(() => deriveGlobalStats(decks), [decks]);
   const dueCount = useMemo(() => {
     let t = 0;
     for (const cat of CATEGORIES) t += dueCountByCategory[cat.key] ?? 0;
@@ -125,14 +38,14 @@ export default function StatsPage({ onBack }: Props) {
   const todayCount = getTodayReviewed(allLogs);
   const accuracy = getRecentAccuracy(allLogs, 30);
 
-  // Per-module breakdown
+  // Per-module breakdown from API
   const moduleStats = useMemo(() => {
-    return CATEGORIES.map(cat => ({
-      key: cat.key, label: cat.label,
-      total: globalStats.moduleTotals[cat.key] ?? 0,
-      started: (globalStats.moduleTotals[cat.key] ?? 0) - (globalStats.moduleNew[cat.key] ?? 0),
+    return decks.map(d => ({
+      key: d.id, label: d.name,
+      total: d.stats.total,
+      started: d.stats.total - d.stats.newCount,
     }));
-  }, [globalStats]);
+  }, [decks]);
 
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">

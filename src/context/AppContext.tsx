@@ -19,9 +19,11 @@ import type {
   Category,
   FlashCard,
   LeetCodeCard,
+  QACard,
   SM2Record,
   StoredProgress,
 } from '../types';
+import type { CardDTO } from '../api/types';
 import { leetcodeHot100 } from '../data/leetcode-hot100';
 import { statisticsCards } from '../data/statistics';
 import { machineLearningCards } from '../data/machine-learning';
@@ -220,9 +222,104 @@ function computeVisibleIds(state: AppState): string[] {
   return ids;
 }
 
+/** 从 API CardDTO 转换为 FlashCard */
+function dtoToFlashCard(dto: CardDTO): FlashCard {
+  if (dto.type === 'leetcode') {
+    return {
+      id: dto.id,
+      category: 'leetcode' as const,
+      number: dto.number || 0,
+      title: dto.title || '',
+      titleCn: dto.titleCn || dto.title || '',
+      description: dto.description || '',
+      approach: dto.approach || '',
+      difficulty: (dto.difficulty || 'medium') as 'easy' | 'medium' | 'hard',
+      tags: dto.tags,
+      codes: dto.codes || undefined,
+      sm2: {
+        state: (dto.progress?.state as any) || 'new',
+        easeFactor: dto.progress?.easeFactor ?? 2.5,
+        interval: dto.progress?.intervalDays ?? 0,
+        repetitions: dto.progress?.repetitions ?? 0,
+        lapses: dto.progress?.lapses ?? 0,
+        nextReview: dto.progress?.nextReview ? new Date(dto.progress.nextReview).getTime() : Date.now(),
+      },
+      favorited: dto.progress?.favorited ?? false,
+      userNotes: dto.progress?.userNotes ?? undefined,
+    };
+  }
+  return {
+    id: dto.id,
+    category: dto.deckId as QACard['category'],
+    question: dto.question || '',
+    answer: dto.answer || '',
+    tags: dto.tags,
+    subTopic: dto.subTopic || undefined,
+    difficulty: (dto.difficulty || 'medium') as 'easy' | 'medium' | 'hard',
+    source: dto.source || undefined,
+    sm2: {
+      state: (dto.progress?.state as any) || 'new',
+      easeFactor: dto.progress?.easeFactor ?? 2.5,
+      interval: dto.progress?.intervalDays ?? 0,
+      repetitions: dto.progress?.repetitions ?? 0,
+      lapses: dto.progress?.lapses ?? 0,
+      nextReview: dto.progress?.nextReview ? new Date(dto.progress.nextReview).getTime() : Date.now(),
+    },
+    favorited: dto.progress?.favorited ?? false,
+    userNotes: dto.progress?.userNotes ?? undefined,
+  };
+}
+
+// 为了 Step 3/4 导出
+export { dtoToFlashCard };
+
 // ---- Reducer ----
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_API_SOURCE':
+      return { ...state, apiSource: action.payload };
+    case 'LOADED_QUEUE': {
+      const cardsById: Record<string, FlashCard> = {};
+      for (const card of action.payload.cards) {
+        cardsById[card.id] = card;
+      }
+      const nextState = {
+        ...state,
+        loading: false,
+        cardsById,
+        category: action.payload.cards[0]?.category || state.category,
+        studyMode: action.payload.mode === 'review' ? 'review' as const : 'new' as const,
+        showApproach: false,
+        showCode: false,
+        qaAnswerVisible: false,
+      };
+      return { ...nextState, visibleCardIds: computeVisibleIds(nextState), currentVisibleIndex: 0 };
+    }
+    case 'API_RATE_SUCCESS': {
+      const card = state.cardsById[action.payload.cardId];
+      if (!card) return state;
+      const newSm2: SM2Record = {
+        state: action.payload.progress?.state || 'new',
+        easeFactor: action.payload.progress?.easeFactor ?? 2.5,
+        interval: action.payload.progress?.intervalDays ?? 0,
+        repetitions: action.payload.progress?.repetitions ?? 0,
+        lapses: action.payload.progress?.lapses ?? 0,
+        nextReview: action.payload.progress?.nextReview ? new Date(action.payload.progress.nextReview).getTime() : Date.now(),
+      };
+      const updated = {
+        ...state,
+        cardsById: { ...state.cardsById, [action.payload.cardId]: { ...card, sm2: newSm2 } },
+        qaAnswerVisible: false,
+      };
+      if (state.studyMode === 'review') {
+        const visibleIds = computeVisibleIds(updated);
+        const curIdx = Math.min(state.currentVisibleIndex + 1, visibleIds.length - 1);
+        return { ...updated, visibleCardIds: visibleIds, currentVisibleIndex: Math.max(0, curIdx) };
+      }
+      return updated;
+    }
     case 'SET_CATEGORY': {
       const nextState = {
         ...state,
@@ -513,6 +610,8 @@ function createInitialState(): AppState {
     reviewMode: false,
     dailyNewLimit: 20,
     studyMode: 'choose',
+    loading: false,
+    apiSource: false,
   };
 }
 

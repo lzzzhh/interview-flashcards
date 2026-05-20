@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
+import { toCardDTO } from '../modules/cards/card.mapper';
 
 export async function deckRoutes(app: FastifyInstance) {
   const USER_ID = 'demo-user';
@@ -113,9 +114,10 @@ export async function deckRoutes(app: FastifyInstance) {
   // GET /api/decks/:deckId/cards
   app.get('/api/decks/:deckId/cards', async (req) => {
     const { deckId } = req.params as { deckId: string };
-    const query = req.query as { limit?: string; offset?: string; search?: string };
+    const query = req.query as { limit?: string; offset?: string; search?: string; includeProgress?: string };
     const limit = parseInt(query.limit || '50', 10);
     const offset = parseInt(query.offset || '0', 10);
+    const includeProgress = query.includeProgress !== 'false';
     const where: any = { deckId };
     if (query.search) where.OR = [
       { title: { contains: query.search } },
@@ -123,10 +125,13 @@ export async function deckRoutes(app: FastifyInstance) {
       { question: { contains: query.search } },
     ];
     const [cards, total] = await Promise.all([
-      prisma.card.findMany({ where, skip: offset, take: limit }),
+      prisma.card.findMany({
+        where, skip: offset, take: limit,
+        include: includeProgress ? { progress: { where: { userId: USER_ID } } } : undefined,
+      }),
       prisma.card.count({ where }),
     ]);
-    return { cards, total, limit, offset };
+    return { cards: cards.map(toCardDTO), total, limit, offset };
   });
 
   // GET /api/decks/:deckId/stats

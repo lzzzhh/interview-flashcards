@@ -8,8 +8,11 @@ import { useAppContext } from '../context/AppContext';
 import { previewSchedule } from '../utils/sm2';
 import { apiPost } from '../api/client';
 
-async function submitReview(cardId: string, rating: number): Promise<boolean> {
-  try { await apiPost('/reviews', { cardId, rating }); return true; } catch { return false; }
+async function submitReview(cardId: string, rating: number): Promise<{ progress: any } | null> {
+  try {
+    const res = await apiPost<{ progress: any }>('/reviews', { cardId, rating });
+    return res;
+  } catch { return null; }
 }
 
 function previewInterval(card: { sm2: { easeFactor: number; interval: number; repetitions: number } }, quality: number): string {
@@ -115,9 +118,13 @@ export default function CardActions() {
             <button
               key={quality}
               onClick={async () => {
-                dispatch({ type: 'RATE_CARD', payload: { cardId: currentCard.id, rating: quality } });
-                const ok = await submitReview(currentCard.id, quality);
-                if (!ok) setSyncError(true);
+                const res = await submitReview(currentCard.id, quality);
+                if (res) {
+                  dispatch({ type: 'API_RATE_SUCCESS', payload: { cardId: currentCard.id, progress: res.progress } });
+                } else {
+                  dispatch({ type: 'RATE_CARD', payload: { cardId: currentCard.id, rating: quality } });
+                  setSyncError(true);
+                }
                 if (state.studyMode !== 'review') dispatch({ type: 'NEXT' });
               }}
               className={`flex-1 flex flex-col items-center py-2 sm:py-2.5 px-0.5 rounded-xl ${color} ${textColor} transition-all active:scale-95`}
