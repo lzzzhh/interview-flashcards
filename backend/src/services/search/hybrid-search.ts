@@ -51,7 +51,8 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   }
 
   // 2. FTS5 keyword search
-  const ftsResults = await fts5Search(input.query, input.topK);
+  const deckId = input.deckIds && input.deckIds.length === 1 ? input.deckIds[0] : undefined;
+  const ftsResults = await fts5Search(input.query, input.topK * 2, deckId);
   for (const r of ftsResults) {
     const baseScore = Math.max(0.1, 1 / (1 + Math.abs(Number(r.rank || 0)) * 0.01));
     if (!results.find(x => x.cardId === r.cardId)) {
@@ -67,8 +68,12 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     // 3. Fetch card details from DB
     if (results.length > 0) {
       const cardIds = results.map(r => r.cardId);
+      const where: any = { id: { in: cardIds } };
+      if (input.deckIds && input.deckIds.length > 0) {
+        where.deckId = { in: input.deckIds };
+      }
       const cards = await prisma.card.findMany({
-        where: { id: { in: cardIds } },
+        where,
         include: { deck: true },
       });
       for (const card of cards) {
