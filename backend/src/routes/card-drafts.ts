@@ -67,6 +67,13 @@ export async function cardDraftRoutes(app: FastifyInstance) {
       return { cardId, draft };
     });
 
+    // 同步 FTS5 索引
+    try {
+      await prisma.$executeRawUnsafe(
+        `INSERT OR REPLACE INTO card_fts(cardId, deckId, question, answer, tags)
+         SELECT id, deckId, question, answer, tags FROM Card WHERE id = '${result.cardId}'`
+      );
+    } catch {}
     // 异步同步 embedding
     syncCardEmbedding(result.cardId).catch(() => {});
     return { approved: true, draftId: id, cardId: result.cardId };
@@ -102,6 +109,16 @@ export async function cardDraftRoutes(app: FastifyInstance) {
       return cardIds;
     });
 
+    // 同步 FTS5 索引
+    if (result.length > 0) {
+      try {
+        const values = result.map(() => '(SELECT id, deckId, question, answer, tags FROM Card WHERE id = ?)').join(' UNION ALL ');
+        await prisma.$executeRawUnsafe(
+          `INSERT OR REPLACE INTO card_fts(cardId, deckId, question, answer, tags) ${values}`,
+          ...result
+        );
+      } catch {}
+    }
     // 异步同步 embedding
     for (const cardId of result) {
       syncCardEmbedding(cardId).catch(() => {});
