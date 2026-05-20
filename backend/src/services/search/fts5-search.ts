@@ -67,6 +67,23 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     const escaped = query.replace(/['"]/g, ' ').trim();
     if (!escaped) return [];
 
+    // For Chinese queries: skip FTS5 (unicode61 tokenizer splits CJK into individual chars causing noise)
+    // Use LIKE with space-separated term OR matching
+    if (/[\u4e00-\u9fff]/.test(escaped)) {
+      const terms = escaped.split(/\s+/).filter(t => t.length > 0);
+      const orClauses = terms.map(() => '(question LIKE ? OR titleCn LIKE ? OR title LIKE ? OR answer LIKE ?)').join(' OR ');
+      const likeParams: string[] = [];
+      for (const t of terms) {
+        likeParams.push(`%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`);
+      }
+      const likeRows = await prisma.$queryRawUnsafe(
+        `SELECT id as cardId, 1 as rank FROM Card WHERE ${orClauses} LIMIT ?`,
+        ...likeParams, limit,
+      ) as any[];
+      return (likeRows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'like' }));
+    }
+
+    // Pure English/Latin: use FTS5
     let sql = '';
     const params: any[] = [];
     if (deckId) {
@@ -78,18 +95,7 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     }
 
     const rows = await prisma.$queryRawUnsafe(sql, ...params) as any[];
-    const results = (rows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'fts5' }));
-
-    // Fallback: SQLite LIKE for Chinese text
-    if (results.length === 0 && /[\u4e00-\u9fff]/.test(escaped)) {
-      const likeRows = await prisma.$queryRawUnsafe(
-        'SELECT id as cardId, 10 as rank FROM Card WHERE question LIKE ? OR titleCn LIKE ? OR title LIKE ? LIMIT ?',
-        `%${escaped}%`, `%${escaped}%`, `%${escaped}%`, limit,
-      ) as any[];
-      return (likeRows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'like' }));
-    }
-
-    return results;
+    return (rows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'fts5' }));
   } catch (e) {
     console.error('FTS5 search error:', e);
     return [];
