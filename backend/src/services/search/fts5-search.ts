@@ -67,10 +67,34 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     const escaped = query.replace(/['"]/g, ' ').trim();
     if (!escaped) return [];
 
-    // For Chinese queries: skip FTS5 (unicode61 tokenizer splits CJK into individual chars causing noise)
-    // Use LIKE with space-separated term OR matching
+    // For Chinese queries: use LIKE with multi-level term extraction
     if (/[\u4e00-\u9fff]/.test(escaped)) {
-      const terms = escaped.split(/\s+/).filter(t => t.length > 0);
+      let terms = escaped.split(/\s+/).filter(t => t.length > 0);
+
+      // For single Chinese phrase without spaces, extract meaningful substrings
+      if (terms.length === 0 || (terms.length === 1 && terms[0].length >= 4)) {
+        const phrase = terms[0] || escaped;
+        const expanded = new Set<string>();
+        expanded.add(phrase);
+
+        // Strip common Chinese question/qualifier words
+        let stripped = phrase
+          .replace(/^(怎么|如何|什么样|什么|有没有|能不能|可以|应该|需要|为什么|请问|怎样)/, '')
+          .replace(/(呢|吗|啊|吧|的|了|是)$/, '');
+        if (stripped.length >= 2 && stripped !== phrase) expanded.add(stripped);
+
+        // Extract CJK-only substring
+        const cjkOnly = stripped.replace(/[^\u4e00-\u9fff]/g, '');
+        if (cjkOnly.length >= 2 && cjkOnly !== stripped) expanded.add(cjkOnly);
+
+        // Progressive truncation: try last 3 CJK chars (minimum meaningful unit)
+        if (cjkOnly.length >= 4) {
+          expanded.add(cjkOnly.slice(-3));
+        }
+
+        terms = [...expanded];
+      }
+
       const orClauses = terms.map(() => '(question LIKE ? OR titleCn LIKE ? OR title LIKE ? OR answer LIKE ?)').join(' OR ');
       const likeParams: string[] = [];
       for (const t of terms) {
