@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { ArrowLeft, Moon, Sun, User, Download, Upload, Database, Dna, Tag, ChevronRight, Mic, ListChecks } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, User, Download, Upload, Database, Dna, Tag, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { exportProgress, importProgress, exportProgressCSV, importProgressCSV } from '../utils/backup';
 
@@ -103,36 +103,6 @@ export default function ProfilePage({ onBack, onNavigate }: Props) {
             <div className="flex-1 text-left">
               <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>向量数据库</h3>
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>基于语义向量的智能搜索</p>
-            </div>
-            <ChevronRight className="w-4 h-4" style={{ color: TEXT_MUTED }} />
-          </button>
-        </div>
-
-        {/* 学习工具 */}
-        <div className="rounded-2xl p-4 mb-4 border space-y-1" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-          <button
-            onClick={() => onNavigate('mock-interview')}
-            className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(245,158,11,0.15)' }}>
-              <Mic className="w-4.5 h-4.5" style={{ color: '#F59E0B' }} />
-            </div>
-            <div className="flex-1 text-left">
-              <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>模拟面试</h3>
-              <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>自答自评模拟真实面试</p>
-            </div>
-            <ChevronRight className="w-4 h-4" style={{ color: TEXT_MUTED }} />
-          </button>
-          <button
-            onClick={() => onNavigate('resume-project')}
-            className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(139,92,246,0.15)' }}>
-              <ListChecks className="w-4.5 h-4.5" style={{ color: '#8B5CF6' }} />
-            </div>
-            <div className="flex-1 text-left">
-              <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>简历项目追问</h3>
-              <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>基于项目描述生成面试追问</p>
             </div>
             <ChevronRight className="w-4 h-4" style={{ color: TEXT_MUTED }} />
           </button>

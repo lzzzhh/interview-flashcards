@@ -1,5 +1,5 @@
 // src/components/AgentHubPage.tsx — Agent 中心入口
-import { ArrowLeft, FileText, Briefcase, Search, Sparkles, Settings } from 'lucide-react';
+import { ArrowLeft, FileText, Briefcase, Search, Sparkles, Settings, Mic, ListChecks } from 'lucide-react';
 
 interface Props {
   onBack: () => void;
@@ -16,6 +16,8 @@ const AGENTS = [
   { key: 'ingest', icon: FileText, title: '资料制卡', desc: '上传 PDF/Word，AI 自动生成面试卡片', color: '#10B981' },
   { key: 'jobprep', icon: Briefcase, title: '岗位备战', desc: '输入公司/岗位，匹配题库并生成学习计划', color: '#F59E0B' },
   { key: 'drafts', icon: Sparkles, title: '草稿审核', desc: '审核 AI 生成的卡片草稿，一键入库', color: '#8B5CF6' },
+  { key: 'mock-interview', icon: Mic, title: '模拟面试', desc: '自答自评模拟真实面试场景', color: '#EC4899' },
+  { key: 'resume-project', icon: ListChecks, title: '简历项目追问', desc: '基于项目描述生成面试追问卡片', color: '#14B8A6' },
 ];
 
 const SETTINGS = [

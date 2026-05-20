@@ -142,8 +142,6 @@ function AppInner() {
     if (profileSubPage === 'card-database') return <CardDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'vector-database') return <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'tag-manager') return <TagManagerPage onBack={() => setProfileSubPage(null)} />;
-    if (profileSubPage === 'mock-interview') return <MockInterviewPage onBack={() => setProfileSubPage(null)} />;
-    if (profileSubPage === 'resume-project') return <ResumeProjectPage onBack={() => setProfileSubPage(null)} />;
     return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
   }
 
@@ -153,6 +151,8 @@ function AppInner() {
     if (agentPage === 'drafts') return <DraftReviewPage onBack={() => setAgentPage(null)} />;
     if (agentPage === 'jobprep') return <JobPrepPage onBack={() => setAgentPage(null)} />;
     if (agentPage === 'settings') return <ApiSettingsPage onBack={() => setAgentPage(null)} />;
+    if (agentPage === 'mock-interview') return <MockInterviewPage onBack={() => setAgentPage(null)} />;
+    if (agentPage === 'resume-project') return <ResumeProjectPage onBack={() => setAgentPage(null)} />;
     return <AgentHubPage onBack={() => setShowSearch(false)} onNavigate={setAgentPage} />;
   }
 
