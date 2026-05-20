@@ -15,6 +15,7 @@ import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
 import { createDefaultSM2 } from '../utils/sm2';
+import { validateExportCards } from '../utils/backup';
 import type { Category, FlashCard, QACard, LeetCodeCard } from '../types';
 
 interface Props {
@@ -255,12 +256,18 @@ export default function CardDatabasePage({ onBack }: Props) {
 
   function importJSON(text: string) {
     const raw = JSON.parse(text);
-    let items: ExportCard[];
+    let items: unknown[];
     if (raw.version === 2) items = raw.cards || [];
     else if (raw.version === 1) { setImportMsg('v1 格式仅含复习进度，请使用 JSON 导入卡片数据。'); return; }
     else if (Array.isArray(raw)) items = raw;
     else { setImportMsg('无法识别的 JSON 格式'); return; }
-    importCards(items);
+
+    const { valid, errors } = validateExportCards(items);
+    if (errors.length > 0) {
+      setImportMsg(`校验警告：${errors.slice(0, 3).join('；')}${errors.length > 3 ? `等 ${errors.length} 项` : ''}\n有效卡片 ${valid.length} 张`);
+    }
+    if (valid.length === 0) return;
+    importCards(valid);
   }
 
   function importCSV(text: string) {

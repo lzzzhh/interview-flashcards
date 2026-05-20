@@ -3,7 +3,40 @@
 // ============================================================
 
 import { STORAGE_KEYS } from '../types';
-import type { StoredProgress, StoredSettings, StoredStats } from '../types';
+import type { StoredProgress, StoredSettings, StoredStats, ExportCard } from '../types';
+
+/** 校验导入的卡片数据，返回 { valid: 合法卡片, errors: 错误列表 } */
+export function validateExportCards(items: unknown[]): { valid: ExportCard[]; errors: string[] } {
+  const valid: ExportCard[] = [];
+  const errors: string[] = [];
+
+  if (!Array.isArray(items)) {
+    return { valid, errors: ['数据格式错误：应为数组'] };
+  }
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i] as Record<string, unknown>;
+    const errs: string[] = [];
+
+    if (!item || typeof item !== 'object') {
+      errs.push(`第 ${i + 1} 项不是有效对象`);
+    } else {
+      if (!item.id || typeof item.id !== 'string') errs.push(`缺少 id`);
+      if (!item.category || typeof item.category !== 'string') errs.push(`缺少 category`);
+      if (item.difficulty && !['easy', 'medium', 'hard', ''].includes(item.difficulty as string)) {
+        errs.push(`无效 difficulty: ${item.difficulty}`);
+      }
+    }
+
+    if (errs.length > 0) {
+      errors.push(`卡片[${i + 1}]: ${errs.join(', ')}`);
+    } else {
+      valid.push(item as ExportCard);
+    }
+  }
+
+  return { valid, errors };
+}
 
 const MAX_BACKUPS = 10;
 const BACKUP_KEY_PREFIX = 'fc-backup-v2-';
