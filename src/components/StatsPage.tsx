@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp, ChevronDown } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
-import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
+import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy, getDifficultCards } from '../utils/reviewLogs';
 import { getModuleDailyLimit, setModuleDailyLimit, loadCustomDecks, getModuleDailyReviewLimit, setModuleDailyReviewLimit } from '../utils/customDecks';
 import { useDecks, deriveGlobalStats } from '../repositories/useDeckStats';
 import type { Category } from '../types';
@@ -78,7 +78,37 @@ export default function StatsPage({ onBack }: Props) {
           </div>
         </div>
 
-        {/* Accuracy */}
+        {/* 薄弱知识点 */}
+        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>薄弱知识点</h2>
+          {(() => {
+            const logs = loadReviewLogs();
+            const allCardIds = Object.keys(logs);
+            const difficult = getDifficultCards(logs, allCardIds);
+            if (difficult.length === 0) {
+              return <p className="text-[12px]" style={{ color: TEXT_MUTED }}>暂无薄弱知识点，继续加油!</p>;
+            }
+            return (
+              <div className="space-y-1.5">
+                {difficult.slice(0, 5).map(cardId => {
+                  const cardLogs = logs[cardId] || [];
+                  const recentLogs = cardLogs.filter(l => l.reviewedAt > Date.now() - 7 * 86400000);
+                  const correctCount = recentLogs.filter(l => l.rating >= 3).length;
+                  const acc = recentLogs.length > 0 ? Math.round((correctCount / recentLogs.length) * 100) : 0;
+                  return (
+                    <div key={cardId} className="flex items-center justify-between py-1.5 px-3 rounded-lg" style={{ backgroundColor: 'rgba(239,68,68,0.06)' }}>
+                      <span className="text-[12px] truncate flex-1" style={{ color: TEXT_PRIMARY }}>{cardId}</span>
+                      <span className="text-[11px] font-medium ml-2" style={{ color: acc < 50 ? '#EF4444' : '#F59E0B' }}>正确率 {acc}%</span>
+                    </div>
+                  );
+                })}
+                {difficult.length > 5 && (
+                  <p className="text-[11px] text-center mt-1" style={{ color: TEXT_MUTED }}>还有 {difficult.length - 5} 个薄弱知识点</p>
+                )}
+              </div>
+            );
+          })()}
+        </div>
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <div className="grid grid-cols-3 gap-3">
             <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="新卡数" value={globalStats.newCards} color={BLUE} />

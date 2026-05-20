@@ -23,6 +23,7 @@ import DraftReviewPage from './components/DraftReviewPage';
 import JobPrepPage from './components/JobPrepPage';
 import IngestPage from './components/IngestPage';
 import ApiSettingsPage from './components/ApiSettingsPage';
+import TagManagerPage from './components/TagManagerPage';
 import type { Category, FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
@@ -138,6 +139,7 @@ function AppInner() {
   if (showProfile) {
     if (profileSubPage === 'card-database') return <CardDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'vector-database') return <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
+    if (profileSubPage === 'tag-manager') return <TagManagerPage onBack={() => setProfileSubPage(null)} />;
     return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
   }
 

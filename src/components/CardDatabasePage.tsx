@@ -1,6 +1,6 @@
 // src/components/CardDatabasePage.tsx — 卡片数据库（全局搜索 + 管理 + 导出导入）
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { ArrowLeft, Search, Trash2, Database, Download, Upload, ChevronDown, FileJson, FileSpreadsheet, FileInput } from 'lucide-react';
+import { ArrowLeft, Search, Trash2, Database, Download, Upload, ChevronDown, FileJson, FileSpreadsheet, FileInput, BrainCircuit } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadProgress } from '../utils/storage';
@@ -121,8 +121,16 @@ function downloadFile(content: string, filename: string, mime: string) {
   const blob = new Blob(['\uFEFF' + content], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = filename; a.click();
-  URL.revokeObjectURL(url);
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function escapeCsv(str: string): string {
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
 }
 
 function generateId(): string {
@@ -218,9 +226,9 @@ export default function CardDatabasePage({ onBack }: Props) {
     return source.map(toExportCard);
   };
 
-  const getExportFilename = (scope: 'all' | 'filtered', format: 'csv' | 'json'): string => {
+  const getExportFilename = (scope: 'all' | 'filtered', format: 'csv' | 'json' | 'anki'): string => {
     const prefix = scope === 'all' ? '全部卡片' : getCategoryLabel(categoryFilter);
-    const ext = format === 'csv' ? '.csv' : '.json';
+    const ext = format === 'anki' ? '_anki.csv' : format === 'csv' ? '.csv' : '.json';
     return `${prefix}${ext}`;
   };
 
@@ -235,6 +243,20 @@ export default function CardDatabasePage({ onBack }: Props) {
   const handleExportJSON = (scope: 'all' | 'filtered') => {
     const cards = getExportCards(scope);
     downloadFile(JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), cards }, null, 2), getExportFilename(scope, 'json'), 'application/json');
+    setShowExportMenu(false);
+  };
+
+  // Anki 兼容导出：Front/Back/Tags 双列 CSV
+  const handleExportAnki = (scope: 'all' | 'filtered') => {
+    const cards = getExportCards(scope);
+    const rows: string[] = ['Front,Back,Tags'];
+    for (const card of cards) {
+      const front = escapeCsv(card.question || card.titleCn || card.title || '');
+      const back = escapeCsv(card.answer || card.approach || card.description || '');
+      const tags = (card.tags || []).map(t => t.replace(/\s/g, '_')).join(' ');
+      rows.push(`${front},${back},${tags}`);
+    }
+    downloadFile(rows.join('\n'), getExportFilename(scope, 'anki'), 'text/csv;charset=utf-8');
     setShowExportMenu(false);
   };
 
@@ -383,6 +405,7 @@ export default function CardDatabasePage({ onBack }: Props) {
                       <div className="space-y-0.5">
                         <MenuItem icon={<FileSpreadsheet className="w-3.5 h-3.5" />} label="CSV 格式" onClick={() => handleExportCSV('all')} color={ACCENT} />
                         <MenuItem icon={<FileJson className="w-3.5 h-3.5" />} label="JSON 格式" onClick={() => handleExportJSON('all')} color={ACCENT} />
+                        <MenuItem icon={<BrainCircuit className="w-3.5 h-3.5" />} label="Anki CSV" onClick={() => handleExportAnki('all')} color="#F59E0B" />
                       </div>
                     </div>
                     {/* 分隔线 + 当前模块 */}
@@ -394,6 +417,7 @@ export default function CardDatabasePage({ onBack }: Props) {
                       <div className="space-y-0.5">
                         <MenuItem icon={<FileSpreadsheet className="w-3.5 h-3.5" />} label="CSV 格式" onClick={() => handleExportCSV('filtered')} color={PURPLE} />
                         <MenuItem icon={<FileJson className="w-3.5 h-3.5" />} label="JSON 格式" onClick={() => handleExportJSON('filtered')} color={PURPLE} />
+                        <MenuItem icon={<BrainCircuit className="w-3.5 h-3.5" />} label="Anki CSV" onClick={() => handleExportAnki('filtered')} color="#F59E0B" />
                       </div>
                     </div>
                   </div>

@@ -31,7 +31,7 @@ export function validateExportCards(items: unknown[]): { valid: ExportCard[]; er
     if (errs.length > 0) {
       errors.push(`卡片[${i + 1}]: ${errs.join(', ')}`);
     } else {
-      valid.push(item as ExportCard);
+      valid.push(item as unknown as ExportCard);
     }
   }
 
