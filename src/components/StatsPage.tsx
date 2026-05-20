@@ -42,7 +42,8 @@ export default function StatsPage({ onBack }: Props) {
   // Per-module breakdown from API
   const moduleStats = useMemo(() => {
     return decks.map(d => ({
-      key: d.id, label: d.name,
+      key: d.id,
+      label: CATEGORIES.find(c => c.key === d.id)?.label || d.name,
       total: d.stats.total,
       started: d.stats.total - d.stats.newCount,
     }));
