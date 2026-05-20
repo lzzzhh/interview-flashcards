@@ -22,7 +22,7 @@ interface Props {
 }
 
 export default function StatsPage({ onBack }: Props) {
-  const { dueCountByCategory } = useAppContext();
+  const { dueCountByCategory, state } = useAppContext();
   const { decks } = useDecks();
   const [limitsOpen, setLimitsOpen] = useState(false);
   const [reviewLimitsOpen, setReviewLimitsOpen] = useState(false);
@@ -136,7 +136,7 @@ export default function StatsPage({ onBack }: Props) {
             />
           </div>
           {(() => {
-            const plan = calculateCountdownPlan(countdownDate, useAppContext().state.cardsById);
+            const plan = calculateCountdownPlan(countdownDate, state.cardsById);
             return (
               <div className="grid grid-cols-3 gap-3">
                 <div className="text-center">
