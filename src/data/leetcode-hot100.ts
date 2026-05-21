@@ -20,7 +20,7 @@ const fav = false;
 // ============================================================
 
 const arrayHash: LeetCodeCard[] = [  {
-    id: 'lc-001',
+    id: 'lc-1',
     category: 'leetcode',
     number: 1,
     title: 'Two Sum',
@@ -33,7 +33,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-002',
+    id: 'lc-49',
     category: 'leetcode',
     number: 49,
     title: 'Group Anagrams',
@@ -46,7 +46,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-003',
+    id: 'lc-128',
     category: 'leetcode',
     number: 128,
     title: 'Longest Consecutive Sequence',
@@ -59,7 +59,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-004',
+    id: 'lc-560',
     category: 'leetcode',
     number: 560,
     title: 'Subarray Sum Equals K',
@@ -72,7 +72,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-005',
+    id: 'lc-283',
     category: 'leetcode',
     number: 283,
     title: 'Move Zeroes',
@@ -85,7 +85,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-006',
+    id: 'lc-11',
     category: 'leetcode',
     number: 11,
     title: 'Container With Most Water',
@@ -98,7 +98,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-007',
+    id: 'lc-15',
     category: 'leetcode',
     number: 15,
     title: '3Sum',
@@ -111,7 +111,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-008',
+    id: 'lc-42',
     category: 'leetcode',
     number: 42,
     title: 'Trapping Rain Water',
@@ -124,7 +124,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-009',
+    id: 'lc-41',
     category: 'leetcode',
     number: 41,
     title: 'First Missing Positive',
@@ -137,7 +137,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-010',
+    id: 'lc-73',
     category: 'leetcode',
     number: 73,
     title: 'Set Matrix Zeroes',
@@ -150,7 +150,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-011',
+    id: 'lc-54',
     category: 'leetcode',
     number: 54,
     title: 'Spiral Matrix',
@@ -163,7 +163,7 @@ const arrayHash: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-012',
+    id: 'lc-48',
     category: 'leetcode',
     number: 48,
     title: 'Rotate Image',
@@ -181,7 +181,7 @@ const arrayHash: LeetCodeCard[] = [  {
 // ============================================================
 
 const twoPointers: LeetCodeCard[] = [  {
-    id: 'lc-013',
+    id: 'lc-88',
     category: 'leetcode',
     number: 88,
     title: 'Merge Sorted Array',
@@ -194,7 +194,7 @@ const twoPointers: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-014',
+    id: 'lc-26',
     category: 'leetcode',
     number: 26,
     title: 'Remove Duplicates from Sorted Array',
@@ -207,7 +207,7 @@ const twoPointers: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-015',
+    id: 'lc-27',
     category: 'leetcode',
     number: 27,
     title: 'Remove Element',
@@ -220,7 +220,7 @@ const twoPointers: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-016',
+    id: 'lc-167',
     category: 'leetcode',
     number: 167,
     title: 'Two Sum II - Input Array Is Sorted',
@@ -233,7 +233,7 @@ const twoPointers: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-017',
+    id: 'lc-344',
     category: 'leetcode',
     number: 344,
     title: 'Reverse String',
@@ -246,7 +246,7 @@ const twoPointers: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-018',
+    id: 'lc-5',
     category: 'leetcode',
     number: 5,
     title: 'Longest Palindromic Substring',
@@ -264,7 +264,7 @@ const twoPointers: LeetCodeCard[] = [  {
 // ============================================================
 
 const slidingWindow: LeetCodeCard[] = [  {
-    id: 'lc-019',
+    id: 'lc-3',
     category: 'leetcode',
     number: 3,
     title: 'Longest Substring Without Repeating Characters',
@@ -277,7 +277,7 @@ const slidingWindow: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-020',
+    id: 'lc-438',
     category: 'leetcode',
     number: 438,
     title: 'Find All Anagrams in a String',
@@ -290,7 +290,7 @@ const slidingWindow: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-021',
+    id: 'lc-76',
     category: 'leetcode',
     number: 76,
     title: 'Minimum Window Substring',
@@ -303,7 +303,7 @@ const slidingWindow: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-022',
+    id: 'lc-239',
     category: 'leetcode',
     number: 239,
     title: 'Sliding Window Maximum',
@@ -316,7 +316,7 @@ const slidingWindow: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-023',
+    id: 'lc-567',
     category: 'leetcode',
     number: 567,
     title: 'Permutation in String',
@@ -334,7 +334,7 @@ const slidingWindow: LeetCodeCard[] = [  {
 // ============================================================
 
 const binarySearch: LeetCodeCard[] = [  {
-    id: 'lc-024',
+    id: 'lc-33',
     category: 'leetcode',
     number: 33,
     title: 'Search in Rotated Sorted Array',
@@ -347,7 +347,7 @@ const binarySearch: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-025',
+    id: 'lc-34',
     category: 'leetcode',
     number: 34,
     title: 'Find First and Last Position of Element in Sorted Array',
@@ -360,7 +360,7 @@ const binarySearch: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-026',
+    id: 'lc-74',
     category: 'leetcode',
     number: 74,
     title: 'Search a 2D Matrix',
@@ -373,7 +373,7 @@ const binarySearch: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-027',
+    id: 'lc-153',
     category: 'leetcode',
     number: 153,
     title: 'Find Minimum in Rotated Sorted Array',
@@ -391,7 +391,7 @@ const binarySearch: LeetCodeCard[] = [  {
 // ============================================================
 
 const stackQueue: LeetCodeCard[] = [  {
-    id: 'lc-028',
+    id: 'lc-20',
     category: 'leetcode',
     number: 20,
     title: 'Valid Parentheses',
@@ -404,7 +404,7 @@ const stackQueue: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-029',
+    id: 'lc-155',
     category: 'leetcode',
     number: 155,
     title: 'Min Stack',
@@ -417,7 +417,7 @@ const stackQueue: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-030',
+    id: 'lc-739',
     category: 'leetcode',
     number: 739,
     title: 'Daily Temperatures',
@@ -430,7 +430,7 @@ const stackQueue: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-031',
+    id: 'lc-394',
     category: 'leetcode',
     number: 394,
     title: 'Decode String',
@@ -448,7 +448,7 @@ const stackQueue: LeetCodeCard[] = [  {
 // ============================================================
 
 const linkedList: LeetCodeCard[] = [  {
-    id: 'lc-032',
+    id: 'lc-141',
     category: 'leetcode',
     number: 141,
     title: 'Linked List Cycle',
@@ -461,7 +461,7 @@ const linkedList: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-033',
+    id: 'lc-206',
     category: 'leetcode',
     number: 206,
     title: 'Reverse Linked List',
@@ -474,7 +474,7 @@ const linkedList: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-034',
+    id: 'lc-160',
     category: 'leetcode',
     number: 160,
     title: 'Intersection of Two Linked Lists',
@@ -487,7 +487,7 @@ const linkedList: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-035',
+    id: 'lc-23',
     category: 'leetcode',
     number: 23,
     title: 'Merge k Sorted Lists',
@@ -500,7 +500,7 @@ const linkedList: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-036',
+    id: 'lc-2',
     category: 'leetcode',
     number: 2,
     title: 'Add Two Numbers',
@@ -513,7 +513,7 @@ const linkedList: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-037',
+    id: 'lc-19',
     category: 'leetcode',
     number: 19,
     title: 'Remove Nth Node From End of List',
@@ -526,7 +526,7 @@ const linkedList: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-038',
+    id: 'lc-21',
     category: 'leetcode',
     number: 21,
     title: 'Merge Two Sorted Lists',
@@ -539,7 +539,7 @@ const linkedList: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-039',
+    id: 'lc-234',
     category: 'leetcode',
     number: 234,
     title: 'Palindrome Linked List',
@@ -557,7 +557,7 @@ const linkedList: LeetCodeCard[] = [  {
 // ============================================================
 
 const binaryTree: LeetCodeCard[] = [  {
-    id: 'lc-040',
+    id: 'lc-94',
     category: 'leetcode',
     number: 94,
     title: 'Binary Tree Inorder Traversal',
@@ -570,7 +570,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-041',
+    id: 'lc-104',
     category: 'leetcode',
     number: 104,
     title: 'Maximum Depth of Binary Tree',
@@ -583,7 +583,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-042',
+    id: 'lc-226',
     category: 'leetcode',
     number: 226,
     title: 'Invert Binary Tree',
@@ -596,7 +596,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-043',
+    id: 'lc-102',
     category: 'leetcode',
     number: 102,
     title: 'Binary Tree Level Order Traversal',
@@ -609,7 +609,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-044',
+    id: 'lc-105',
     category: 'leetcode',
     number: 105,
     title: 'Construct Binary Tree from Preorder and Inorder Traversal',
@@ -622,7 +622,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-045',
+    id: 'lc-98',
     category: 'leetcode',
     number: 98,
     title: 'Validate Binary Search Tree',
@@ -635,7 +635,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-046',
+    id: 'lc-101',
     category: 'leetcode',
     number: 101,
     title: 'Symmetric Tree',
@@ -648,7 +648,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-047',
+    id: 'lc-543',
     category: 'leetcode',
     number: 543,
     title: 'Diameter of Binary Tree',
@@ -661,7 +661,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-048',
+    id: 'lc-114',
     category: 'leetcode',
     number: 114,
     title: 'Flatten Binary Tree to Linked List',
@@ -674,7 +674,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-049',
+    id: 'lc-236',
     category: 'leetcode',
     number: 236,
     title: 'Lowest Common Ancestor of a Binary Tree',
@@ -687,7 +687,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-050',
+    id: 'lc-124',
     category: 'leetcode',
     number: 124,
     title: 'Binary Tree Maximum Path Sum',
@@ -700,7 +700,7 @@ const binaryTree: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-051',
+    id: 'lc-437',
     category: 'leetcode',
     number: 437,
     title: 'Path Sum III',
@@ -718,7 +718,7 @@ const binaryTree: LeetCodeCard[] = [  {
 // ============================================================
 
 const graph: LeetCodeCard[] = [  {
-    id: 'lc-052',
+    id: 'lc-200',
     category: 'leetcode',
     number: 200,
     title: 'Number of Islands',
@@ -731,7 +731,7 @@ const graph: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-053',
+    id: 'lc-207',
     category: 'leetcode',
     number: 207,
     title: 'Course Schedule',
@@ -744,7 +744,7 @@ const graph: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-054',
+    id: 'lc-994',
     category: 'leetcode',
     number: 994,
     title: 'Rotting Oranges',
@@ -757,7 +757,7 @@ const graph: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-055',
+    id: 'lc-208',
     category: 'leetcode',
     number: 208,
     title: 'Implement Trie (Prefix Tree)',
@@ -775,7 +775,7 @@ const graph: LeetCodeCard[] = [  {
 // ============================================================
 
 const backtracking: LeetCodeCard[] = [  {
-    id: 'lc-056',
+    id: 'lc-46',
     category: 'leetcode',
     number: 46,
     title: 'Permutations',
@@ -788,7 +788,7 @@ const backtracking: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-057',
+    id: 'lc-78',
     category: 'leetcode',
     number: 78,
     title: 'Subsets',
@@ -801,7 +801,7 @@ const backtracking: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-058',
+    id: 'lc-79',
     category: 'leetcode',
     number: 79,
     title: 'Word Search',
@@ -814,7 +814,7 @@ const backtracking: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-059',
+    id: 'lc-51',
     category: 'leetcode',
     number: 51,
     title: 'N-Queens',
@@ -827,7 +827,7 @@ const backtracking: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-060',
+    id: 'lc-22',
     category: 'leetcode',
     number: 22,
     title: 'Generate Parentheses',
@@ -840,7 +840,7 @@ const backtracking: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-061',
+    id: 'lc-39',
     category: 'leetcode',
     number: 39,
     title: 'Combination Sum',
@@ -858,7 +858,7 @@ const backtracking: LeetCodeCard[] = [  {
 // ============================================================
 
 const dynamicProgramming: LeetCodeCard[] = [  {
-    id: 'lc-062',
+    id: 'lc-70',
     category: 'leetcode',
     number: 70,
     title: 'Climbing Stairs',
@@ -871,7 +871,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-063',
+    id: 'lc-53',
     category: 'leetcode',
     number: 53,
     title: 'Maximum Subarray',
@@ -884,7 +884,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-064',
+    id: 'lc-300',
     category: 'leetcode',
     number: 300,
     title: 'Longest Increasing Subsequence',
@@ -897,7 +897,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-065',
+    id: 'lc-322',
     category: 'leetcode',
     number: 322,
     title: 'Coin Change',
@@ -910,7 +910,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-066',
+    id: 'lc-1143',
     category: 'leetcode',
     number: 1143,
     title: 'Longest Common Subsequence',
@@ -923,7 +923,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-067',
+    id: 'lc-198',
     category: 'leetcode',
     number: 198,
     title: 'House Robber',
@@ -936,7 +936,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-068',
+    id: 'lc-279',
     category: 'leetcode',
     number: 279,
     title: 'Perfect Squares',
@@ -949,7 +949,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-069',
+    id: 'lc-62',
     category: 'leetcode',
     number: 62,
     title: 'Unique Paths',
@@ -962,7 +962,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-070',
+    id: 'lc-64',
     category: 'leetcode',
     number: 64,
     title: 'Minimum Path Sum',
@@ -975,7 +975,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-071',
+    id: 'lc-72',
     category: 'leetcode',
     number: 72,
     title: 'Edit Distance',
@@ -988,7 +988,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-072',
+    id: 'lc-139',
     category: 'leetcode',
     number: 139,
     title: 'Word Break',
@@ -1001,7 +1001,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-073',
+    id: 'lc-152',
     category: 'leetcode',
     number: 152,
     title: 'Maximum Product Subarray',
@@ -1014,7 +1014,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-074',
+    id: 'lc-416',
     category: 'leetcode',
     number: 416,
     title: 'Partition Equal Subset Sum',
@@ -1027,7 +1027,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-075',
+    id: 'lc-32',
     category: 'leetcode',
     number: 32,
     title: 'Longest Valid Parentheses',
@@ -1040,7 +1040,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-076',
+    id: 'lc-312',
     category: 'leetcode',
     number: 312,
     title: 'Burst Balloons',
@@ -1053,7 +1053,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-077',
+    id: 'lc-10',
     category: 'leetcode',
     number: 10,
     title: 'Regular Expression Matching',
@@ -1071,7 +1071,7 @@ const dynamicProgramming: LeetCodeCard[] = [  {
 // ============================================================
 
 const greedy: LeetCodeCard[] = [  {
-    id: 'lc-078',
+    id: 'lc-121',
     category: 'leetcode',
     number: 121,
     title: 'Best Time to Buy and Sell Stock',
@@ -1084,7 +1084,7 @@ const greedy: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-079',
+    id: 'lc-55',
     category: 'leetcode',
     number: 55,
     title: 'Jump Game',
@@ -1097,7 +1097,7 @@ const greedy: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-080',
+    id: 'lc-45',
     category: 'leetcode',
     number: 45,
     title: 'Jump Game II',
@@ -1115,7 +1115,7 @@ const greedy: LeetCodeCard[] = [  {
 // ============================================================
 
 const heap: LeetCodeCard[] = [  {
-    id: 'lc-081',
+    id: 'lc-215',
     category: 'leetcode',
     number: 215,
     title: 'Kth Largest Element in an Array',
@@ -1128,7 +1128,7 @@ const heap: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-082',
+    id: 'lc-347',
     category: 'leetcode',
     number: 347,
     title: 'Top K Frequent Elements',
@@ -1141,7 +1141,7 @@ const heap: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-083',
+    id: 'lc-295',
     category: 'leetcode',
     number: 295,
     title: 'Find Median from Data Stream',
@@ -1159,7 +1159,7 @@ const heap: LeetCodeCard[] = [  {
 // ============================================================
 
 const sorting: LeetCodeCard[] = [  {
-    id: 'lc-084',
+    id: 'lc-56',
     category: 'leetcode',
     number: 56,
     title: 'Merge Intervals',
@@ -1172,7 +1172,7 @@ const sorting: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-085',
+    id: 'lc-75',
     category: 'leetcode',
     number: 75,
     title: 'Sort Colors',
@@ -1185,7 +1185,7 @@ const sorting: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-086',
+    id: 'lc-148',
     category: 'leetcode',
     number: 148,
     title: 'Sort List',
@@ -1203,7 +1203,7 @@ const sorting: LeetCodeCard[] = [  {
 // ============================================================
 
 const design: LeetCodeCard[] = [  {
-    id: 'lc-087',
+    id: 'lc-146',
     category: 'leetcode',
     number: 146,
     title: 'LRU Cache',
@@ -1216,7 +1216,7 @@ const design: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-088',
+    id: 'lc-380',
     category: 'leetcode',
     number: 380,
     title: 'Insert Delete GetRandom O(1)',
@@ -1234,7 +1234,7 @@ const design: LeetCodeCard[] = [  {
 // ============================================================
 
 const others: LeetCodeCard[] = [  {
-    id: 'lc-089',
+    id: 'lc-136',
     category: 'leetcode',
     number: 136,
     title: 'Single Number',
@@ -1247,7 +1247,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-090',
+    id: 'lc-169',
     category: 'leetcode',
     number: 169,
     title: 'Majority Element',
@@ -1260,7 +1260,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-091',
+    id: 'lc-238',
     category: 'leetcode',
     number: 238,
     title: 'Product of Array Except Self',
@@ -1273,7 +1273,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-092',
+    id: 'lc-31',
     category: 'leetcode',
     number: 31,
     title: 'Next Permutation',
@@ -1286,7 +1286,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-093',
+    id: 'lc-287',
     category: 'leetcode',
     number: 287,
     title: 'Find the Duplicate Number',
@@ -1299,7 +1299,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-094',
+    id: 'lc-240',
     category: 'leetcode',
     number: 240,
     title: 'Search a 2D Matrix II',
@@ -1312,7 +1312,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-095',
+    id: 'lc-189',
     category: 'leetcode',
     number: 189,
     title: 'Rotate Array',
@@ -1325,7 +1325,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-096',
+    id: 'lc-108',
     category: 'leetcode',
     number: 108,
     title: 'Convert Sorted Array to Binary Search Tree',
@@ -1338,7 +1338,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-097',
+    id: 'lc-118',
     category: 'leetcode',
     number: 118,
     title: "Pascal's Triangle",
@@ -1351,7 +1351,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-098',
+    id: 'lc-448',
     category: 'leetcode',
     number: 448,
     title: 'Find All Numbers Disappeared in an Array',
@@ -1364,7 +1364,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-099',
+    id: 'lc-17',
     category: 'leetcode',
     number: 17,
     title: 'Letter Combinations of a Phone Number',
@@ -1377,7 +1377,7 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   },
   {
-    id: 'lc-100',
+    id: 'lc-338',
     category: 'leetcode',
     number: 338,
     title: 'Counting Bits',

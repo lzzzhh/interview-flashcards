@@ -2,7 +2,7 @@
 // DO NOT EDIT MANUALLY
 
 export const pythonSolutions: Record<string, string> = {
-  'lc-001': `def twoSum(nums: List[int], target: int) -> List[int]:
+  'lc-1': `def twoSum(nums: List[int], target: int) -> List[int]:
     seen = {}
     for i, num in enumerate(nums):
         diff = target - num
@@ -10,7 +10,7 @@ export const pythonSolutions: Record<string, string> = {
             return [seen[diff], i]
         seen[num] = i
     return []`,
-  'lc-002': `from collections import defaultdict
+  'lc-49': `from collections import defaultdict
 
 def groupAnagrams(strs: List[str]) -> List[List[str]]:
     groups = defaultdict(list)
@@ -18,7 +18,7 @@ def groupAnagrams(strs: List[str]) -> List[List[str]]:
         key = ''.join(sorted(s))
         groups[key].append(s)
     return list(groups.values())`,
-  'lc-003': `def longestConsecutive(nums: List[int]) -> int:
+  'lc-128': `def longestConsecutive(nums: List[int]) -> int:
     num_set = set(nums)
     longest = 0
     for num in num_set:
@@ -30,7 +30,7 @@ def groupAnagrams(strs: List[str]) -> List[List[str]]:
                 streak += 1
             longest = max(longest, streak)
     return longest`,
-  'lc-004': `from collections import defaultdict
+  'lc-560': `from collections import defaultdict
 
 def subarraySum(nums: List[int], k: int) -> int:
     count = defaultdict(int)
@@ -42,13 +42,13 @@ def subarraySum(nums: List[int], k: int) -> int:
         ans += count[pre_sum - k]
         count[pre_sum] += 1
     return ans`,
-  'lc-005': `def moveZeroes(nums: List[int]) -> None:
+  'lc-283': `def moveZeroes(nums: List[int]) -> None:
     slow = 0
     for fast in range(len(nums)):
         if nums[fast] != 0:
             nums[slow], nums[fast] = nums[fast], nums[slow]
             slow += 1`,
-  'lc-006': `def maxArea(height: List[int]) -> int:
+  'lc-11': `def maxArea(height: List[int]) -> int:
     l, r = 0, len(height) - 1
     ans = 0
     while l < r:
@@ -59,7 +59,7 @@ def subarraySum(nums: List[int], k: int) -> int:
         else:
             r -= 1
     return ans`,
-  'lc-007': `def threeSum(nums: List[int]) -> List[List[int]]:
+  'lc-15': `def threeSum(nums: List[int]) -> List[List[int]]:
     nums.sort()
     n = len(nums)
     res = []
@@ -82,7 +82,7 @@ def subarraySum(nums: List[int], k: int) -> int:
                 l += 1
                 r -= 1
     return res`,
-  'lc-008': `def trap(height: List[int]) -> int:
+  'lc-42': `def trap(height: List[int]) -> int:
     l, r = 0, len(height) - 1
     left_max = right_max = 0
     ans = 0
@@ -96,7 +96,7 @@ def subarraySum(nums: List[int], k: int) -> int:
             ans += right_max - height[r]
             r -= 1
     return ans`,
-  'lc-009': `def firstMissingPositive(nums: List[int]) -> int:
+  'lc-41': `def firstMissingPositive(nums: List[int]) -> int:
     n = len(nums)
     for i in range(n):
         while 1 <= nums[i] <= n and nums[nums[i] - 1] != nums[i]:
@@ -105,7 +105,7 @@ def subarraySum(nums: List[int], k: int) -> int:
         if nums[i] != i + 1:
             return i + 1
     return n + 1`,
-  'lc-010': `def setZeroes(matrix: List[List[int]]) -> None:
+  'lc-73': `def setZeroes(matrix: List[List[int]]) -> None:
     m, n = len(matrix), len(matrix[0])
     row0 = any(matrix[0][j] == 0 for j in range(n))
     col0 = any(matrix[i][0] == 0 for i in range(m))
@@ -127,7 +127,7 @@ def subarraySum(nums: List[int], k: int) -> int:
     if col0:
         for i in range(m):
             matrix[i][0] = 0`,
-  'lc-011': `def spiralOrder(matrix: List[List[int]]) -> List[int]:
+  'lc-54': `def spiralOrder(matrix: List[List[int]]) -> List[int]:
     res = []
     top, bottom = 0, len(matrix) - 1
     left, right = 0, len(matrix[0]) - 1
@@ -147,14 +147,14 @@ def subarraySum(nums: List[int], k: int) -> int:
                 res.append(matrix[i][left])
             left += 1
     return res`,
-  'lc-012': `def rotate(matrix: List[List[int]]) -> None:
+  'lc-48': `def rotate(matrix: List[List[int]]) -> None:
     n = len(matrix)
     for i in range(n):
         for j in range(i + 1, n):
             matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
     for row in matrix:
         row.reverse()`,
-  'lc-013': `def merge(nums1: List[int], m: int, nums2: List[int], n: int) -> None:
+  'lc-88': `def merge(nums1: List[int], m: int, nums2: List[int], n: int) -> None:
     p1, p2 = m - 1, n - 1
     p = m + n - 1
     while p2 >= 0:
@@ -165,7 +165,7 @@ def subarraySum(nums: List[int], k: int) -> int:
             nums1[p] = nums2[p2]
             p2 -= 1
         p -= 1`,
-  'lc-014': `def removeDuplicates(nums: List[int]) -> int:
+  'lc-26': `def removeDuplicates(nums: List[int]) -> int:
     if not nums:
         return 0
     slow = 0
@@ -174,14 +174,14 @@ def subarraySum(nums: List[int], k: int) -> int:
             slow += 1
             nums[slow] = nums[fast]
     return slow + 1`,
-  'lc-015': `def removeElement(nums: List[int], val: int) -> int:
+  'lc-27': `def removeElement(nums: List[int], val: int) -> int:
     slow = 0
     for fast in range(len(nums)):
         if nums[fast] != val:
             nums[slow] = nums[fast]
             slow += 1
     return slow`,
-  'lc-016': `def twoSum(numbers: List[int], target: int) -> List[int]:
+  'lc-167': `def twoSum(numbers: List[int], target: int) -> List[int]:
     l, r = 0, len(numbers) - 1
     while l < r:
         s = numbers[l] + numbers[r]
@@ -192,13 +192,13 @@ def subarraySum(nums: List[int], k: int) -> int:
         else:
             r -= 1
     return []`,
-  'lc-017': `def reverseString(s: List[str]) -> None:
+  'lc-344': `def reverseString(s: List[str]) -> None:
     l, r = 0, len(s) - 1
     while l < r:
         s[l], s[r] = s[r], s[l]
         l += 1
         r -= 1`,
-  'lc-018': `def longestPalindrome(s: str) -> str:
+  'lc-5': `def longestPalindrome(s: str) -> str:
     start, max_len = 0, 0
     for i in range(len(s)):
         l, r = i, i
@@ -216,7 +216,7 @@ def subarraySum(nums: List[int], k: int) -> int:
             l -= 1
             r += 1
     return s[start:start + max_len]`,
-  'lc-019': `def lengthOfLongestSubstring(s: str) -> int:
+  'lc-3': `def lengthOfLongestSubstring(s: str) -> int:
     seen = set()
     l = 0
     ans = 0
@@ -227,7 +227,7 @@ def subarraySum(nums: List[int], k: int) -> int:
         seen.add(s[r])
         ans = max(ans, r - l + 1)
     return ans`,
-  'lc-020': `from collections import Counter
+  'lc-438': `from collections import Counter
 
 def findAnagrams(s: str, p: str) -> List[int]:
     need = Counter(p)
@@ -251,7 +251,7 @@ def findAnagrams(s: str, p: str) -> List[int]:
                 window[c] -= 1
             l += 1
     return res`,
-  'lc-021': `from collections import Counter
+  'lc-76': `from collections import Counter
 
 def minWindow(s: str, t: str) -> str:
     need = Counter(t)
@@ -277,7 +277,7 @@ def minWindow(s: str, t: str) -> str:
                 window[c] -= 1
             l += 1
     return s[start:start + min_len] if min_len != float('inf') else ''`,
-  'lc-022': `from collections import deque
+  'lc-239': `from collections import deque
 
 def maxSlidingWindow(nums: List[int], k: int) -> List[int]:
     q = deque()
@@ -291,7 +291,7 @@ def maxSlidingWindow(nums: List[int], k: int) -> List[int]:
         if r >= k - 1:
             res.append(nums[q[0]])
     return res`,
-  'lc-023': `from collections import Counter
+  'lc-567': `from collections import Counter
 
 def checkInclusion(s1: str, s2: str) -> bool:
     need = Counter(s1)
@@ -314,7 +314,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
                 window[c] -= 1
             l += 1
     return False`,
-  'lc-024': `def search(nums: List[int], target: int) -> int:
+  'lc-33': `def search(nums: List[int], target: int) -> int:
     l, r = 0, len(nums) - 1
     while l <= r:
         mid = (l + r) // 2
@@ -331,7 +331,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
             else:
                 r = mid - 1
     return -1`,
-  'lc-025': `def searchRange(nums: List[int], target: int) -> List[int]:
+  'lc-34': `def searchRange(nums: List[int], target: int) -> List[int]:
     def left_bound():
         l, r = 0, len(nums) - 1
         while l <= r:
@@ -353,7 +353,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
         return r if r >= 0 and nums[r] == target else -1
 
     return [left_bound(), right_bound()]`,
-  'lc-026': `def searchMatrix(matrix: List[List[int]], target: int) -> bool:
+  'lc-74': `def searchMatrix(matrix: List[List[int]], target: int) -> bool:
     m, n = len(matrix), len(matrix[0])
     l, r = 0, m * n - 1
     while l <= r:
@@ -366,7 +366,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
         else:
             r = mid - 1
     return False`,
-  'lc-027': `def findMin(nums: List[int]) -> int:
+  'lc-153': `def findMin(nums: List[int]) -> int:
     l, r = 0, len(nums) - 1
     while l < r:
         mid = (l + r) // 2
@@ -375,7 +375,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
         else:
             l = mid + 1
     return nums[l]`,
-  'lc-028': `def isValid(s: str) -> bool:
+  'lc-20': `def isValid(s: str) -> bool:
     stack = []
     pairs = {')': '(', '}': '{', ']': '['}
     for c in s:
@@ -386,7 +386,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
         else:
             stack.append(c)
     return len(stack) == 0`,
-  'lc-029': `class MinStack:
+  'lc-155': `class MinStack:
     def __init__(self):
         self.stack = []
         self.min_stack = []
@@ -405,7 +405,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
 
     def getMin(self) -> int:
         return self.min_stack[-1]`,
-  'lc-030': `def dailyTemperatures(temperatures: List[int]) -> List[int]:
+  'lc-739': `def dailyTemperatures(temperatures: List[int]) -> List[int]:
     n = len(temperatures)
     ans = [0] * n
     stack = []
@@ -415,7 +415,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
             ans[prev] = i - prev
         stack.append(i)
     return ans`,
-  'lc-031': `def decodeString(s: str) -> str:
+  'lc-394': `def decodeString(s: str) -> str:
     num_stack = []
     str_stack = []
     cur_str = ''
@@ -435,7 +435,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
         else:
             cur_str += c
     return cur_str`,
-  'lc-032': `def hasCycle(head: Optional[ListNode]) -> bool:
+  'lc-141': `def hasCycle(head: Optional[ListNode]) -> bool:
     slow = fast = head
     while fast and fast.next:
         slow = slow.next
@@ -443,7 +443,7 @@ def checkInclusion(s1: str, s2: str) -> bool:
         if slow == fast:
             return True
     return False`,
-  'lc-033': `def reverseList(head: Optional[ListNode]) -> Optional[ListNode]:
+  'lc-206': `def reverseList(head: Optional[ListNode]) -> Optional[ListNode]:
     prev = None
     curr = head
     while curr:
@@ -452,13 +452,13 @@ def checkInclusion(s1: str, s2: str) -> bool:
         prev = curr
         curr = nxt
     return prev`,
-  'lc-034': `def getIntersectionNode(headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+  'lc-160': `def getIntersectionNode(headA: ListNode, headB: ListNode) -> Optional[ListNode]:
     pA, pB = headA, headB
     while pA != pB:
         pA = pA.next if pA else headB
         pB = pB.next if pB else headA
     return pA`,
-  'lc-035': `import heapq
+  'lc-23': `import heapq
 
 def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     heap = []
@@ -474,7 +474,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         if node.next:
             heapq.heappush(heap, (node.next.val, i, node.next))
     return dummy.next`,
-  'lc-036': `def addTwoNumbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+  'lc-2': `def addTwoNumbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
     dummy = ListNode()
     cur = dummy
     carry = 0
@@ -488,7 +488,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         l1 = l1.next if l1 else None
         l2 = l2.next if l2 else None
     return dummy.next`,
-  'lc-037': `def removeNthFromEnd(head: Optional[ListNode], n: int) -> Optional[ListNode]:
+  'lc-19': `def removeNthFromEnd(head: Optional[ListNode], n: int) -> Optional[ListNode]:
     dummy = ListNode(0, head)
     slow = fast = dummy
     for _ in range(n):
@@ -498,7 +498,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         fast = fast.next
     slow.next = slow.next.next
     return dummy.next`,
-  'lc-038': `def mergeTwoLists(list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+  'lc-21': `def mergeTwoLists(list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
     dummy = ListNode()
     cur = dummy
     while list1 and list2:
@@ -511,7 +511,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         cur = cur.next
     cur.next = list1 if list1 else list2
     return dummy.next`,
-  'lc-039': `def isPalindrome(head: Optional[ListNode]) -> bool:
+  'lc-234': `def isPalindrome(head: Optional[ListNode]) -> bool:
     slow = fast = head
     while fast and fast.next:
         slow = slow.next
@@ -529,7 +529,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         left = left.next
         right = right.next
     return True`,
-  'lc-040': `def inorderTraversal(root: Optional[TreeNode]) -> List[int]:
+  'lc-94': `def inorderTraversal(root: Optional[TreeNode]) -> List[int]:
     res = []
     stack = []
     cur = root
@@ -541,18 +541,18 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         res.append(cur.val)
         cur = cur.right
     return res`,
-  'lc-041': `def maxDepth(root: Optional[TreeNode]) -> int:
+  'lc-104': `def maxDepth(root: Optional[TreeNode]) -> int:
     if not root:
         return 0
     return 1 + max(maxDepth(root.left), maxDepth(root.right))`,
-  'lc-042': `def invertTree(root: Optional[TreeNode]) -> Optional[TreeNode]:
+  'lc-226': `def invertTree(root: Optional[TreeNode]) -> Optional[TreeNode]:
     if not root:
         return None
     root.left, root.right = root.right, root.left
     invertTree(root.left)
     invertTree(root.right)
     return root`,
-  'lc-043': `from collections import deque
+  'lc-102': `from collections import deque
 
 def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     if not root:
@@ -570,7 +570,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
                 q.append(node.right)
         res.append(level)
     return res`,
-  'lc-044': `def buildTree(preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+  'lc-105': `def buildTree(preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
     in_map = {v: i for i, v in enumerate(inorder)}
 
     def build(pre_start, pre_end, in_start, in_end):
@@ -585,7 +585,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
         return root
 
     return build(0, len(preorder) - 1, 0, len(inorder) - 1)`,
-  'lc-045': `def isValidBST(root: Optional[TreeNode]) -> bool:
+  'lc-98': `def isValidBST(root: Optional[TreeNode]) -> bool:
     def validate(node, low, high):
         if not node:
             return True
@@ -594,7 +594,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
         return validate(node.left, low, node.val) and validate(node.right, node.val, high)
 
     return validate(root, float('-inf'), float('inf'))`,
-  'lc-046': `def isSymmetric(root: Optional[TreeNode]) -> bool:
+  'lc-101': `def isSymmetric(root: Optional[TreeNode]) -> bool:
     def isMirror(t1, t2):
         if not t1 and not t2:
             return True
@@ -605,7 +605,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
                 isMirror(t1.right, t2.left))
 
     return isMirror(root, root)`,
-  'lc-047': `def diameterOfBinaryTree(root: Optional[TreeNode]) -> int:
+  'lc-543': `def diameterOfBinaryTree(root: Optional[TreeNode]) -> int:
     ans = 0
 
     def depth(node):
@@ -619,7 +619,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
 
     depth(root)
     return ans`,
-  'lc-048': `def flatten(root: Optional[TreeNode]) -> None:
+  'lc-114': `def flatten(root: Optional[TreeNode]) -> None:
     cur = root
     while cur:
         if cur.left:
@@ -630,7 +630,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
             cur.right = cur.left
             cur.left = None
         cur = cur.right`,
-  'lc-049': `def lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+  'lc-236': `def lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
     if not root or root == p or root == q:
         return root
     left = lowestCommonAncestor(root.left, p, q)
@@ -638,7 +638,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     if left and right:
         return root
     return left if left else right`,
-  'lc-050': `def maxPathSum(root: Optional[TreeNode]) -> int:
+  'lc-124': `def maxPathSum(root: Optional[TreeNode]) -> int:
     ans = float('-inf')
 
     def maxGain(node):
@@ -652,7 +652,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
 
     maxGain(root)
     return ans`,
-  'lc-051': `def pathSum(root: Optional[TreeNode], targetSum: int) -> int:
+  'lc-437': `def pathSum(root: Optional[TreeNode], targetSum: int) -> int:
     from collections import defaultdict
     prefix = defaultdict(int)
     prefix[0] = 1
@@ -671,7 +671,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
 
     dfs(root, 0)
     return ans`,
-  'lc-052': `def numIslands(grid: List[List[str]]) -> int:
+  'lc-200': `def numIslands(grid: List[List[str]]) -> int:
     m, n = len(grid), len(grid[0])
 
     def dfs(i, j):
@@ -690,7 +690,7 @@ def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
                 count += 1
                 dfs(i, j)
     return count`,
-  'lc-053': `from collections import deque, defaultdict
+  'lc-207': `from collections import deque, defaultdict
 
 def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
     graph = defaultdict(list)
@@ -708,7 +708,7 @@ def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
             if indegree[nxt] == 0:
                 q.append(nxt)
     return count == numCourses`,
-  'lc-054': `from collections import deque
+  'lc-994': `from collections import deque
 
 def orangesRotting(grid: List[List[int]]) -> int:
     m, n = len(grid), len(grid[0])
@@ -736,7 +736,7 @@ def orangesRotting(grid: List[List[int]]) -> int:
         if q:
             minutes += 1
     return minutes if fresh == 0 else -1`,
-  'lc-055': `class TrieNode:
+  'lc-208': `class TrieNode:
     def __init__(self):
         self.children = {}
         self.is_end = False
@@ -768,7 +768,7 @@ class Trie:
                 return False
             node = node.children[ch]
         return True`,
-  'lc-056': `def permute(nums: List[int]) -> List[List[int]]:
+  'lc-46': `def permute(nums: List[int]) -> List[List[int]]:
     res = []
     used = [False] * len(nums)
 
@@ -786,7 +786,7 @@ class Trie:
 
     backtrack([])
     return res`,
-  'lc-057': `def subsets(nums: List[int]) -> List[List[int]]:
+  'lc-78': `def subsets(nums: List[int]) -> List[List[int]]:
     res = []
 
     def backtrack(start, path):
@@ -798,7 +798,7 @@ class Trie:
 
     backtrack(0, [])
     return res`,
-  'lc-058': `def exist(board: List[List[str]], word: str) -> bool:
+  'lc-79': `def exist(board: List[List[str]], word: str) -> bool:
     m, n = len(board), len(board[0])
 
     def dfs(i, j, idx):
@@ -820,7 +820,7 @@ class Trie:
             if dfs(i, j, 0):
                 return True
     return False`,
-  'lc-059': `def solveNQueens(n: int) -> List[List[str]]:
+  'lc-51': `def solveNQueens(n: int) -> List[List[str]]:
     res = []
     board = [['.'] * n for _ in range(n)]
     cols = set()
@@ -846,7 +846,7 @@ class Trie:
 
     backtrack(0)
     return res`,
-  'lc-060': `def generateParenthesis(n: int) -> List[str]:
+  'lc-22': `def generateParenthesis(n: int) -> List[str]:
     res = []
 
     def backtrack(s, left, right):
@@ -860,7 +860,7 @@ class Trie:
 
     backtrack('', n, n)
     return res`,
-  'lc-061': `def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
+  'lc-39': `def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
     res = []
 
     def backtrack(start, path, remain):
@@ -876,21 +876,21 @@ class Trie:
 
     backtrack(0, [], target)
     return res`,
-  'lc-062': `def climbStairs(n: int) -> int:
+  'lc-70': `def climbStairs(n: int) -> int:
     if n <= 2:
         return n
     a, b = 1, 2
     for _ in range(3, n + 1):
         a, b = b, a + b
     return b`,
-  'lc-063': `def maxSubArray(nums: List[int]) -> int:
+  'lc-53': `def maxSubArray(nums: List[int]) -> int:
     cur_max = nums[0]
     global_max = nums[0]
     for i in range(1, len(nums)):
         cur_max = max(nums[i], cur_max + nums[i])
         global_max = max(global_max, cur_max)
     return global_max`,
-  'lc-064': `from bisect import bisect_left
+  'lc-300': `from bisect import bisect_left
 
 def lengthOfLIS(nums: List[int]) -> int:
     tails = []
@@ -901,7 +901,7 @@ def lengthOfLIS(nums: List[int]) -> int:
         else:
             tails[idx] = x
     return len(tails)`,
-  'lc-065': `def coinChange(coins: List[int], amount: int) -> int:
+  'lc-322': `def coinChange(coins: List[int], amount: int) -> int:
     dp = [amount + 1] * (amount + 1)
     dp[0] = 0
     for i in range(1, amount + 1):
@@ -909,7 +909,7 @@ def lengthOfLIS(nums: List[int]) -> int:
             if i >= coin:
                 dp[i] = min(dp[i], dp[i - coin] + 1)
     return dp[amount] if dp[amount] != amount + 1 else -1`,
-  'lc-066': `def longestCommonSubsequence(text1: str, text2: str) -> int:
+  'lc-1143': `def longestCommonSubsequence(text1: str, text2: str) -> int:
     m, n = len(text1), len(text2)
     dp = [[0] * (n + 1) for _ in range(m + 1)]
     for i in range(1, m + 1):
@@ -919,7 +919,7 @@ def lengthOfLIS(nums: List[int]) -> int:
             else:
                 dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
     return dp[m][n]`,
-  'lc-067': `def rob(nums: List[int]) -> int:
+  'lc-198': `def rob(nums: List[int]) -> int:
     if not nums:
         return 0
     if len(nums) == 1:
@@ -931,7 +931,7 @@ def lengthOfLIS(nums: List[int]) -> int:
         prev2 = prev1
         prev1 = cur
     return prev1`,
-  'lc-068': `import math
+  'lc-279': `import math
 
 def numSquares(n: int) -> int:
     dp = [float('inf')] * (n + 1)
@@ -942,13 +942,13 @@ def numSquares(n: int) -> int:
             dp[i] = min(dp[i], dp[i - j * j] + 1)
             j += 1
     return dp[n]`,
-  'lc-069': `def uniquePaths(m: int, n: int) -> int:
+  'lc-62': `def uniquePaths(m: int, n: int) -> int:
     dp = [1] * n
     for i in range(1, m):
         for j in range(1, n):
             dp[j] += dp[j - 1]
     return dp[-1]`,
-  'lc-070': `def minPathSum(grid: List[List[int]]) -> int:
+  'lc-64': `def minPathSum(grid: List[List[int]]) -> int:
     m, n = len(grid), len(grid[0])
     for i in range(m):
         for j in range(n):
@@ -961,7 +961,7 @@ def numSquares(n: int) -> int:
             else:
                 grid[i][j] += min(grid[i - 1][j], grid[i][j - 1])
     return grid[-1][-1]`,
-  'lc-071': `def minDistance(word1: str, word2: str) -> int:
+  'lc-72': `def minDistance(word1: str, word2: str) -> int:
     m, n = len(word1), len(word2)
     dp = [[0] * (n + 1) for _ in range(m + 1)]
     for i in range(m + 1):
@@ -975,7 +975,7 @@ def numSquares(n: int) -> int:
             else:
                 dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
     return dp[m][n]`,
-  'lc-072': `def wordBreak(s: str, wordDict: List[str]) -> bool:
+  'lc-139': `def wordBreak(s: str, wordDict: List[str]) -> bool:
     word_set = set(wordDict)
     n = len(s)
     dp = [False] * (n + 1)
@@ -986,7 +986,7 @@ def numSquares(n: int) -> int:
                 dp[i] = True
                 break
     return dp[n]`,
-  'lc-073': `def maxProduct(nums: List[int]) -> int:
+  'lc-152': `def maxProduct(nums: List[int]) -> int:
     cur_max = cur_min = ans = nums[0]
     for i in range(1, len(nums)):
         candidates = (nums[i], nums[i] * cur_max, nums[i] * cur_min)
@@ -994,7 +994,7 @@ def numSquares(n: int) -> int:
         cur_min = min(candidates)
         ans = max(ans, cur_max)
     return ans`,
-  'lc-074': `def canPartition(nums: List[int]) -> bool:
+  'lc-416': `def canPartition(nums: List[int]) -> bool:
     total = sum(nums)
     if total % 2 != 0:
         return False
@@ -1005,7 +1005,7 @@ def numSquares(n: int) -> int:
         for i in range(target, num - 1, -1):
             dp[i] = dp[i] or dp[i - num]
     return dp[target]`,
-  'lc-075': `def longestValidParentheses(s: str) -> int:
+  'lc-32': `def longestValidParentheses(s: str) -> int:
     stack = [-1]
     ans = 0
     for i, c in enumerate(s):
@@ -1018,7 +1018,7 @@ def numSquares(n: int) -> int:
             else:
                 ans = max(ans, i - stack[-1])
     return ans`,
-  'lc-076': `def maxCoins(nums: List[int]) -> int:
+  'lc-312': `def maxCoins(nums: List[int]) -> int:
     points = [1] + nums + [1]
     n = len(points)
     dp = [[0] * n for _ in range(n)]
@@ -1029,7 +1029,7 @@ def numSquares(n: int) -> int:
                 dp[i][j] = max(dp[i][j],
                     dp[i][k] + dp[k][j] + points[i] * points[k] * points[j])
     return dp[0][n - 1]`,
-  'lc-077': `def isMatch(s: str, p: str) -> bool:
+  'lc-10': `def isMatch(s: str, p: str) -> bool:
     m, n = len(s), len(p)
     dp = [[False] * (n + 1) for _ in range(m + 1)]
     dp[0][0] = True
@@ -1046,14 +1046,14 @@ def numSquares(n: int) -> int:
                 if p[j - 2] == '.' or s[i - 1] == p[j - 2]:
                     dp[i][j] = dp[i][j] or dp[i - 1][j]
     return dp[m][n]`,
-  'lc-078': `def maxProfit(prices: List[int]) -> int:
+  'lc-121': `def maxProfit(prices: List[int]) -> int:
     min_price = float('inf')
     max_profit = 0
     for price in prices:
         min_price = min(min_price, price)
         max_profit = max(max_profit, price - min_price)
     return max_profit`,
-  'lc-079': `def canJump(nums: List[int]) -> bool:
+  'lc-55': `def canJump(nums: List[int]) -> bool:
     max_reach = 0
     for i in range(len(nums)):
         if i > max_reach:
@@ -1062,7 +1062,7 @@ def numSquares(n: int) -> int:
         if max_reach >= len(nums) - 1:
             return True
     return True`,
-  'lc-080': `def jump(nums: List[int]) -> int:
+  'lc-45': `def jump(nums: List[int]) -> int:
     n = len(nums)
     if n == 1:
         return 0
@@ -1075,7 +1075,7 @@ def numSquares(n: int) -> int:
             jumps += 1
             cur_end = cur_farthest
     return jumps`,
-  'lc-081': `import heapq
+  'lc-215': `import heapq
 
 def findKthLargest(nums: List[int], k: int) -> int:
     heap = []
@@ -1084,7 +1084,7 @@ def findKthLargest(nums: List[int], k: int) -> int:
         if len(heap) > k:
             heapq.heappop(heap)
     return heap[0]`,
-  'lc-082': `from collections import Counter
+  'lc-347': `from collections import Counter
 import heapq
 
 def topKFrequent(nums: List[int], k: int) -> List[int]:
@@ -1095,7 +1095,7 @@ def topKFrequent(nums: List[int], k: int) -> List[int]:
         if len(heap) > k:
             heapq.heappop(heap)
     return [num for f, num in heap]`,
-  'lc-083': `import heapq
+  'lc-295': `import heapq
 
 class MedianFinder:
     def __init__(self):
@@ -1112,7 +1112,7 @@ class MedianFinder:
         if len(self.small) > len(self.large):
             return -self.small[0]
         return (-self.small[0] + self.large[0]) / 2`,
-  'lc-084': `def merge(intervals: List[List[int]]) -> List[List[int]]:
+  'lc-56': `def merge(intervals: List[List[int]]) -> List[List[int]]:
     intervals.sort(key=lambda x: x[0])
     res = []
     for interval in intervals:
@@ -1121,7 +1121,7 @@ class MedianFinder:
         else:
             res[-1][1] = max(res[-1][1], interval[1])
     return res`,
-  'lc-085': `def sortColors(nums: List[int]) -> None:
+  'lc-75': `def sortColors(nums: List[int]) -> None:
     p0, cur, p2 = 0, 0, len(nums) - 1
     while cur <= p2:
         if nums[cur] == 0:
@@ -1133,7 +1133,7 @@ class MedianFinder:
             p2 -= 1
         else:
             cur += 1`,
-  'lc-086': `def sortList(head: Optional[ListNode]) -> Optional[ListNode]:
+  'lc-148': `def sortList(head: Optional[ListNode]) -> Optional[ListNode]:
     if not head or not head.next:
         return head
     # 快慢指针找中点
@@ -1158,7 +1158,7 @@ class MedianFinder:
         cur = cur.next
     cur.next = left if left else right
     return dummy.next`,
-  'lc-087': `class DNode:
+  'lc-146': `class DNode:
     def __init__(self, key=0, val=0):
         self.key = key
         self.val = val
@@ -1208,7 +1208,7 @@ class LRUCache:
                 tail = self.tail.prev
                 self._remove(tail)
                 del self.cache[tail.key]`,
-  'lc-088': `import random
+  'lc-380': `import random
 
 class RandomizedSet:
     def __init__(self):
@@ -1235,12 +1235,12 @@ class RandomizedSet:
 
     def getRandom(self) -> int:
         return random.choice(self.nums)`,
-  'lc-089': `def singleNumber(nums: List[int]) -> int:
+  'lc-136': `def singleNumber(nums: List[int]) -> int:
     res = 0
     for num in nums:
         res ^= num
     return res`,
-  'lc-090': `def majorityElement(nums: List[int]) -> int:
+  'lc-169': `def majorityElement(nums: List[int]) -> int:
     candidate = None
     count = 0
     for num in nums:
@@ -1248,7 +1248,7 @@ class RandomizedSet:
             candidate = num
         count += 1 if num == candidate else -1
     return candidate`,
-  'lc-091': `def productExceptSelf(nums: List[int]) -> List[int]:
+  'lc-238': `def productExceptSelf(nums: List[int]) -> List[int]:
     n = len(nums)
     ans = [1] * n
     for i in range(1, n):
@@ -1258,7 +1258,7 @@ class RandomizedSet:
         ans[i] *= suffix
         suffix *= nums[i]
     return ans`,
-  'lc-092': `def nextPermutation(nums: List[int]) -> None:
+  'lc-31': `def nextPermutation(nums: List[int]) -> None:
     n = len(nums)
     i = n - 2
     while i >= 0 and nums[i] >= nums[i + 1]:
@@ -1273,7 +1273,7 @@ class RandomizedSet:
         nums[l], nums[r] = nums[r], nums[l]
         l += 1
         r -= 1`,
-  'lc-093': `def findDuplicate(nums: List[int]) -> int:
+  'lc-287': `def findDuplicate(nums: List[int]) -> int:
     slow = fast = nums[0]
     while True:
         slow = nums[slow]
@@ -1285,7 +1285,7 @@ class RandomizedSet:
         slow = nums[slow]
         fast = nums[fast]
     return slow`,
-  'lc-094': `def searchMatrix(matrix: List[List[int]], target: int) -> bool:
+  'lc-240': `def searchMatrix(matrix: List[List[int]], target: int) -> bool:
     m, n = len(matrix), len(matrix[0])
     i, j = 0, n - 1
     while i < m and j >= 0:
@@ -1296,7 +1296,7 @@ class RandomizedSet:
         else:
             i += 1
     return False`,
-  'lc-095': `def rotate(nums: List[int], k: int) -> None:
+  'lc-189': `def rotate(nums: List[int], k: int) -> None:
     n = len(nums)
     k %= n
 
@@ -1309,7 +1309,7 @@ class RandomizedSet:
     rev(0, n - 1)
     rev(0, k - 1)
     rev(k, n - 1)`,
-  'lc-096': `def sortedArrayToBST(nums: List[int]) -> Optional[TreeNode]:
+  'lc-108': `def sortedArrayToBST(nums: List[int]) -> Optional[TreeNode]:
     if not nums:
         return None
     mid = len(nums) // 2
@@ -1317,7 +1317,7 @@ class RandomizedSet:
     root.left = sortedArrayToBST(nums[:mid])
     root.right = sortedArrayToBST(nums[mid + 1:])
     return root`,
-  'lc-097': `def generate(numRows: int) -> List[List[int]]:
+  'lc-118': `def generate(numRows: int) -> List[List[int]]:
     res = []
     for i in range(numRows):
         row = [1] * (i + 1)
@@ -1325,12 +1325,12 @@ class RandomizedSet:
             row[j] = res[i - 1][j - 1] + res[i - 1][j]
         res.append(row)
     return res`,
-  'lc-098': `def findDisappearedNumbers(nums: List[int]) -> List[int]:
+  'lc-448': `def findDisappearedNumbers(nums: List[int]) -> List[int]:
     for num in nums:
         idx = abs(num) - 1
         nums[idx] = -abs(nums[idx])
     return [i + 1 for i in range(len(nums)) if nums[i] > 0]`,
-  'lc-099': `def letterCombinations(digits: str) -> List[str]:
+  'lc-17': `def letterCombinations(digits: str) -> List[str]:
     if not digits:
         return []
     mapping = {
@@ -1350,7 +1350,7 @@ class RandomizedSet:
 
     backtrack(0, [])
     return res`,
-  'lc-100': `def countBits(n: int) -> List[int]:
+  'lc-338': `def countBits(n: int) -> List[int]:
     dp = [0] * (n + 1)
     for i in range(1, n + 1):
         dp[i] = dp[i >> 1] + (i & 1)

@@ -325,6 +325,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
       const updated = {
         ...state,
         cardsById: { ...state.cardsById, [action.payload.cardId]: { ...card, sm2: newSm2 } },
+        showApproach: false,
+        showCode: false,
         qaAnswerVisible: false,
       };
       if (state.studyMode === 'review') {
@@ -356,6 +358,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         currentVisibleIndex: Math.max(0, Math.min(action.payload, state.visibleCardIds.length - 1)),
+        qaAnswerVisible: false,
+        showApproach: false,
+        showCode: false,
       };
 
     case 'NEXT':
@@ -431,6 +436,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
           ...state.cardsById,
           [cardId]: { ...card, sm2: result.sm2 },
         },
+        showApproach: false,
+        showCode: false,
         qaAnswerVisible: false,
       };
       // 复习模式下重算可见卡片并前进
@@ -473,12 +480,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case 'SHUFFLE': {
-      const next = { ...state, shuffled: true };
+      const next = { ...state, shuffled: true, showApproach: false, showCode: false, qaAnswerVisible: false };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
     }
 
     case 'RESET_ORDER': {
-      const next = { ...state, shuffled: false };
+      const next = { ...state, shuffled: false, showApproach: false, showCode: false, qaAnswerVisible: false };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
     }
 
@@ -542,6 +549,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...state, 
         studyMode: action.payload,
         filterSubTopic: action.payload === 'choose' ? 'all' : state.filterSubTopic,
+        showApproach: false,
+        showCode: false,
+        qaAnswerVisible: false,
       };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
     }
@@ -556,6 +566,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
           [last.cardId]: { ...state.cardsById[last.cardId], sm2: last.previousSm2 } 
         },
         qaAnswerVisible: false,
+        showApproach: false,
+        showCode: false,
       };
     }
 

@@ -2,7 +2,7 @@
 // DO NOT EDIT MANUALLY
 
 export const cppSolutions: Record<string, string> = {
-  'lc-001': `#include <vector>
+  'lc-1': `#include <vector>
 #include <unordered_map>
 using namespace std;
 
@@ -20,7 +20,7 @@ public:
         return {};
     }
 };`,
-  'lc-002': `#include <vector>
+  'lc-49': `#include <vector>
 #include <string>
 #include <unordered_map>
 #include <algorithm>
@@ -42,7 +42,7 @@ public:
         return res;
     }
 };`,
-  'lc-003': `#include <vector>
+  'lc-128': `#include <vector>
 #include <unordered_set>
 using namespace std;
 
@@ -65,7 +65,7 @@ public:
         return longest;
     }
 };`,
-  'lc-004': `#include <vector>
+  'lc-560': `#include <vector>
 #include <unordered_map>
 using namespace std;
 
@@ -84,7 +84,7 @@ public:
         return ans;
     }
 };`,
-  'lc-005': `#include <vector>
+  'lc-283': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -99,7 +99,7 @@ public:
         }
     }
 };`,
-  'lc-006': `#include <vector>
+  'lc-11': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -120,7 +120,7 @@ public:
         return ans;
     }
 };`,
-  'lc-007': `#include <vector>
+  'lc-15': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -151,7 +151,7 @@ public:
         return res;
     }
 };`,
-  'lc-008': `#include <vector>
+  'lc-42': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -175,7 +175,7 @@ public:
         return ans;
     }
 };`,
-  'lc-009': `#include <vector>
+  'lc-41': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -195,7 +195,7 @@ public:
         return n + 1;
     }
 };`,
-  'lc-010': `#include <vector>
+  'lc-73': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -243,7 +243,7 @@ public:
         }
     }
 };`,
-  'lc-011': `#include <vector>
+  'lc-54': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -277,7 +277,7 @@ public:
         return res;
     }
 };`,
-  'lc-012': `#include <vector>
+  'lc-48': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -295,7 +295,7 @@ public:
         }
     }
 };`,
-  'lc-013': `#include <vector>
+  'lc-88': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -315,7 +315,7 @@ public:
         }
     }
 };`,
-  'lc-014': `#include <vector>
+  'lc-26': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -332,7 +332,7 @@ public:
         return slow + 1;
     }
 };`,
-  'lc-015': `#include <vector>
+  'lc-27': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -348,7 +348,7 @@ public:
         return slow;
     }
 };`,
-  'lc-016': `#include <vector>
+  'lc-167': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -368,7 +368,7 @@ public:
         return {};
     }
 };`,
-  'lc-017': `#include <vector>
+  'lc-344': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -382,7 +382,7 @@ public:
         }
     }
 };`,
-  'lc-018': `#include <string>
+  'lc-5': `#include <string>
 using namespace std;
 
 class Solution {
@@ -414,7 +414,7 @@ public:
         return s.substr(start, maxLen);
     }
 };`,
-  'lc-019': `#include <string>
+  'lc-3': `#include <string>
 #include <unordered_set>
 #include <algorithm>
 using namespace std;
@@ -435,7 +435,7 @@ public:
         return ans;
     }
 };`,
-  'lc-020': `#include <vector>
+  'lc-438': `#include <vector>
 #include <string>
 #include <unordered_map>
 using namespace std;
@@ -466,7 +466,7 @@ public:
         return res;
     }
 };`,
-  'lc-021': `#include <string>
+  'lc-76': `#include <string>
 #include <unordered_map>
 #include <climits>
 using namespace std;
@@ -500,7 +500,7 @@ public:
         return minLen == INT_MAX ? "" : s.substr(start, minLen);
     }
 };`,
-  'lc-022': `#include <vector>
+  'lc-239': `#include <vector>
 #include <deque>
 using namespace std;
 
@@ -524,7 +524,7 @@ public:
         return res;
     }
 };`,
-  'lc-023': `#include <string>
+  'lc-567': `#include <string>
 #include <unordered_map>
 using namespace std;
 
@@ -553,7 +553,7 @@ public:
         return false;
     }
 };`,
-  'lc-024': `#include <vector>
+  'lc-33': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -582,7 +582,7 @@ public:
         return -1;
     }
 };`,
-  'lc-025': `#include <vector>
+  'lc-34': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -622,7 +622,7 @@ private:
         return -1;
     }
 };`,
-  'lc-026': `#include <vector>
+  'lc-74': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -640,7 +640,7 @@ public:
         return false;
     }
 };`,
-  'lc-027': `#include <vector>
+  'lc-153': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -655,7 +655,7 @@ public:
         return nums[l];
     }
 };`,
-  'lc-028': `#include <string>
+  'lc-20': `#include <string>
 #include <stack>
 using namespace std;
 
@@ -678,7 +678,7 @@ public:
         return st.empty();
     }
 };`,
-  'lc-029': `#include <stack>
+  'lc-155': `#include <stack>
 using namespace std;
 
 class MinStack {
@@ -711,7 +711,7 @@ public:
         return min_s.top();
     }
 };`,
-  'lc-030': `#include <vector>
+  'lc-739': `#include <vector>
 #include <stack>
 using namespace std;
 
@@ -732,7 +732,7 @@ public:
         return ans;
     }
 };`,
-  'lc-031': `#include <string>
+  'lc-394': `#include <string>
 #include <stack>
 using namespace std;
 
@@ -767,7 +767,7 @@ public:
         return cur;
     }
 };`,
-  'lc-032': `struct ListNode {
+  'lc-141': `struct ListNode {
     int val;
     ListNode *next;
     ListNode(int x) : val(x), next(nullptr) {}
@@ -785,7 +785,7 @@ public:
         return false;
     }
 };`,
-  'lc-033': `struct ListNode {
+  'lc-206': `struct ListNode {
     int val;
     ListNode *next;
     ListNode() : val(0), next(nullptr) {}
@@ -806,7 +806,7 @@ public:
         return prev;
     }
 };`,
-  'lc-034': `struct ListNode {
+  'lc-160': `struct ListNode {
     int val;
     ListNode *next;
     ListNode(int x) : val(x), next(nullptr) {}
@@ -823,7 +823,7 @@ public:
         return pA;
     }
 };`,
-  'lc-035': `#include <vector>
+  'lc-23': `#include <vector>
 #include <queue>
 using namespace std;
 
@@ -855,7 +855,7 @@ public:
         return dummy.next;
     }
 };`,
-  'lc-036': `struct ListNode {
+  'lc-2': `struct ListNode {
     int val;
     ListNode *next;
     ListNode() : val(0), next(nullptr) {}
@@ -882,7 +882,7 @@ public:
         return dummy.next;
     }
 };`,
-  'lc-037': `struct ListNode {
+  'lc-19': `struct ListNode {
     int val;
     ListNode *next;
     ListNode() : val(0), next(nullptr) {}
@@ -904,7 +904,7 @@ public:
         return dummy.next;
     }
 };`,
-  'lc-038': `struct ListNode {
+  'lc-21': `struct ListNode {
     int val;
     ListNode *next;
     ListNode() : val(0), next(nullptr) {}
@@ -931,7 +931,7 @@ public:
         return dummy.next;
     }
 };`,
-  'lc-039': `struct ListNode {
+  'lc-234': `struct ListNode {
     int val;
     ListNode *next;
     ListNode() : val(0), next(nullptr) {}
@@ -963,7 +963,7 @@ public:
         return true;
     }
 };`,
-  'lc-040': `#include <vector>
+  'lc-94': `#include <vector>
 #include <stack>
 using namespace std;
 
@@ -995,7 +995,7 @@ public:
         return res;
     }
 };`,
-  'lc-041': `struct TreeNode {
+  'lc-104': `struct TreeNode {
     int val;
     TreeNode *left;
     TreeNode *right;
@@ -1011,7 +1011,7 @@ public:
         return 1 + max(maxDepth(root->left), maxDepth(root->right));
     }
 };`,
-  'lc-042': `struct TreeNode {
+  'lc-226': `struct TreeNode {
     int val;
     TreeNode *left;
     TreeNode *right;
@@ -1030,7 +1030,7 @@ public:
         return root;
     }
 };`,
-  'lc-043': `#include <vector>
+  'lc-102': `#include <vector>
 #include <queue>
 using namespace std;
 
@@ -1065,7 +1065,7 @@ public:
         return res;
     }
 };`,
-  'lc-044': `#include <vector>
+  'lc-105': `#include <vector>
 #include <unordered_map>
 using namespace std;
 
@@ -1101,7 +1101,7 @@ public:
         return build(preorder, 0, preorder.size() - 1, inorder, 0, inorder.size() - 1);
     }
 };`,
-  'lc-045': `#include <climits>
+  'lc-98': `#include <climits>
 using namespace std;
 
 struct TreeNode {
@@ -1125,7 +1125,7 @@ public:
         return validate(root, LLONG_MIN, LLONG_MAX);
     }
 };`,
-  'lc-046': `struct TreeNode {
+  'lc-101': `struct TreeNode {
     int val;
     TreeNode *left;
     TreeNode *right;
@@ -1148,7 +1148,7 @@ public:
         return isMirror(root, root);
     }
 };`,
-  'lc-047': `#include <algorithm>
+  'lc-543': `#include <algorithm>
 using namespace std;
 
 struct TreeNode {
@@ -1177,7 +1177,7 @@ public:
         return ans;
     }
 };`,
-  'lc-048': `struct TreeNode {
+  'lc-114': `struct TreeNode {
     int val;
     TreeNode *left;
     TreeNode *right;
@@ -1202,7 +1202,7 @@ public:
         }
     }
 };`,
-  'lc-049': `struct TreeNode {
+  'lc-236': `struct TreeNode {
     int val;
     TreeNode *left;
     TreeNode *right;
@@ -1219,7 +1219,7 @@ public:
         return left ? left : right;
     }
 };`,
-  'lc-050': `#include <algorithm>
+  'lc-124': `#include <algorithm>
 #include <climits>
 using namespace std;
 
@@ -1249,7 +1249,7 @@ public:
         return ans;
     }
 };`,
-  'lc-051': `#include <unordered_map>
+  'lc-437': `#include <unordered_map>
 using namespace std;
 
 struct TreeNode {
@@ -1278,7 +1278,7 @@ public:
         return dfs(root, 0, targetSum);
     }
 };`,
-  'lc-052': `#include <vector>
+  'lc-200': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -1308,7 +1308,7 @@ public:
         return count;
     }
 };`,
-  'lc-053': `#include <vector>
+  'lc-207': `#include <vector>
 #include <queue>
 using namespace std;
 
@@ -1338,7 +1338,7 @@ public:
         return count == numCourses;
     }
 };`,
-  'lc-054': `#include <vector>
+  'lc-994': `#include <vector>
 #include <queue>
 using namespace std;
 
@@ -1376,7 +1376,7 @@ public:
         return fresh == 0 ? minutes : -1;
     }
 };`,
-  'lc-055': `#include <string>
+  'lc-208': `#include <string>
 #include <unordered_map>
 using namespace std;
 
@@ -1422,7 +1422,7 @@ public:
         return true;
     }
 };`,
-  'lc-056': `#include <vector>
+  'lc-46': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -1451,7 +1451,7 @@ public:
         return res;
     }
 };`,
-  'lc-057': `#include <vector>
+  'lc-78': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -1472,7 +1472,7 @@ public:
         return res;
     }
 };`,
-  'lc-058': `#include <vector>
+  'lc-79': `#include <vector>
 #include <string>
 using namespace std;
 
@@ -1503,7 +1503,7 @@ public:
         return false;
     }
 };`,
-  'lc-059': `#include <vector>
+  'lc-51': `#include <vector>
 #include <string>
 #include <unordered_set>
 using namespace std;
@@ -1539,7 +1539,7 @@ public:
         return res;
     }
 };`,
-  'lc-060': `#include <vector>
+  'lc-22': `#include <vector>
 #include <string>
 using namespace std;
 
@@ -1569,7 +1569,7 @@ public:
         return res;
     }
 };`,
-  'lc-061': `#include <vector>
+  'lc-39': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -1594,7 +1594,7 @@ public:
         return res;
     }
 };`,
-  'lc-062': `class Solution {
+  'lc-70': `class Solution {
 public:
     int climbStairs(int n) {
         if (n <= 2) return n;
@@ -1607,7 +1607,7 @@ public:
         return b;
     }
 };`,
-  'lc-063': `#include <vector>
+  'lc-53': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -1622,7 +1622,7 @@ public:
         return globalMax;
     }
 };`,
-  'lc-064': `#include <vector>
+  'lc-300': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -1641,7 +1641,7 @@ public:
         return tails.size();
     }
 };`,
-  'lc-065': `#include <vector>
+  'lc-322': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -1661,7 +1661,7 @@ public:
         return dp[amount] == maxVal ? -1 : dp[amount];
     }
 };`,
-  'lc-066': `#include <string>
+  'lc-1143': `#include <string>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -1683,7 +1683,7 @@ public:
         return dp[m][n];
     }
 };`,
-  'lc-067': `#include <vector>
+  'lc-198': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -1701,7 +1701,7 @@ public:
         return prev1;
     }
 };`,
-  'lc-068': `#include <vector>
+  'lc-279': `#include <vector>
 #include <algorithm>
 #include <climits>
 using namespace std;
@@ -1719,7 +1719,7 @@ public:
         return dp[n];
     }
 };`,
-  'lc-069': `#include <vector>
+  'lc-62': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -1734,7 +1734,7 @@ public:
         return dp[n - 1];
     }
 };`,
-  'lc-070': `#include <vector>
+  'lc-64': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -1753,7 +1753,7 @@ public:
         return grid[m - 1][n - 1];
     }
 };`,
-  'lc-071': `#include <string>
+  'lc-72': `#include <string>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -1777,7 +1777,7 @@ public:
         return dp[m][n];
     }
 };`,
-  'lc-072': `#include <string>
+  'lc-139': `#include <string>
 #include <vector>
 #include <unordered_set>
 using namespace std;
@@ -1800,7 +1800,7 @@ public:
         return dp[n];
     }
 };`,
-  'lc-073': `#include <vector>
+  'lc-152': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -1817,7 +1817,7 @@ public:
         return ans;
     }
 };`,
-  'lc-074': `#include <vector>
+  'lc-416': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -1837,7 +1837,7 @@ public:
         return dp[target];
     }
 };`,
-  'lc-075': `#include <string>
+  'lc-32': `#include <string>
 #include <stack>
 #include <algorithm>
 using namespace std;
@@ -1863,7 +1863,7 @@ public:
         return ans;
     }
 };`,
-  'lc-076': `#include <vector>
+  'lc-312': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -1888,7 +1888,7 @@ public:
         return dp[0][n + 1];
     }
 };`,
-  'lc-077': `#include <string>
+  'lc-10': `#include <string>
 #include <vector>
 using namespace std;
 
@@ -1920,7 +1920,7 @@ public:
         return dp[m][n];
     }
 };`,
-  'lc-078': `#include <vector>
+  'lc-121': `#include <vector>
 #include <algorithm>
 #include <climits>
 using namespace std;
@@ -1937,7 +1937,7 @@ public:
         return maxProfit;
     }
 };`,
-  'lc-079': `#include <vector>
+  'lc-55': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -1957,7 +1957,7 @@ public:
         return true;
     }
 };`,
-  'lc-080': `#include <vector>
+  'lc-45': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -1977,7 +1977,7 @@ public:
         return jumps;
     }
 };`,
-  'lc-081': `#include <vector>
+  'lc-215': `#include <vector>
 #include <queue>
 using namespace std;
 
@@ -1994,7 +1994,7 @@ public:
         return heap.top();
     }
 };`,
-  'lc-082': `#include <vector>
+  'lc-347': `#include <vector>
 #include <unordered_map>
 #include <queue>
 using namespace std;
@@ -2021,7 +2021,7 @@ public:
         return res;
     }
 };`,
-  'lc-083': `#include <queue>
+  'lc-295': `#include <queue>
 #include <vector>
 using namespace std;
 
@@ -2049,7 +2049,7 @@ public:
         return (small.top() + large.top()) / 2.0;
     }
 };`,
-  'lc-084': `#include <vector>
+  'lc-56': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -2068,7 +2068,7 @@ public:
         return res;
     }
 };`,
-  'lc-085': `#include <vector>
+  'lc-75': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -2090,7 +2090,7 @@ public:
         }
     }
 };`,
-  'lc-086': `class Solution {
+  'lc-148': `class Solution {
 public:
     ListNode* sortList(ListNode* head) {
         if (!head || !head->next) return head;
@@ -2125,7 +2125,7 @@ private:
         return dummy.next;
     }
 };`,
-  'lc-087': `#include <unordered_map>
+  'lc-146': `#include <unordered_map>
 using namespace std;
 
 class LRUCache {
@@ -2194,7 +2194,7 @@ private:
         addToHead(node);
     }
 };`,
-  'lc-088': `#include <vector>
+  'lc-380': `#include <vector>
 #include <unordered_map>
 #include <cstdlib>
 using namespace std;
@@ -2228,7 +2228,7 @@ public:
         return nums[rand() % nums.size()];
     }
 };`,
-  'lc-089': `#include <vector>
+  'lc-136': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -2241,7 +2241,7 @@ public:
         return res;
     }
 };`,
-  'lc-090': `#include <vector>
+  'lc-169': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -2257,7 +2257,7 @@ public:
         return candidate;
     }
 };`,
-  'lc-091': `#include <vector>
+  'lc-238': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -2276,7 +2276,7 @@ public:
         return ans;
     }
 };`,
-  'lc-092': `#include <vector>
+  'lc-31': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -2298,7 +2298,7 @@ public:
         reverse(nums.begin() + i + 1, nums.end());
     }
 };`,
-  'lc-093': `#include <vector>
+  'lc-287': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -2317,7 +2317,7 @@ public:
         return slow;
     }
 };`,
-  'lc-094': `#include <vector>
+  'lc-240': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -2337,7 +2337,7 @@ public:
         return false;
     }
 };`,
-  'lc-095': `#include <vector>
+  'lc-189': `#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -2351,7 +2351,7 @@ public:
         reverse(nums.begin() + k, nums.end());
     }
 };`,
-  'lc-096': `#include <vector>
+  'lc-108': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -2370,7 +2370,7 @@ private:
         return root;
     }
 };`,
-  'lc-097': `#include <vector>
+  'lc-118': `#include <vector>
 using namespace std;
 
 class Solution {
@@ -2387,7 +2387,7 @@ public:
         return res;
     }
 };`,
-  'lc-098': `#include <vector>
+  'lc-448': `#include <vector>
 #include <cstdlib>
 using namespace std;
 
@@ -2407,7 +2407,7 @@ public:
         return res;
     }
 };`,
-  'lc-099': `#include <vector>
+  'lc-17': `#include <vector>
 #include <string>
 using namespace std;
 
@@ -2435,7 +2435,7 @@ public:
         }
     }
 };`,
-  'lc-100': `#include <vector>
+  'lc-338': `#include <vector>
 using namespace std;
 
 class Solution {

@@ -2,7 +2,7 @@
 // DO NOT EDIT MANUALLY
 
 export const javascriptSolutions: Record<string, string> = {
-  'lc-001': `var twoSum = function(nums, target) {
+  'lc-1': `var twoSum = function(nums, target) {
     const map = new Map();
     for (let i = 0; i < nums.length; i++) {
         const diff = target - nums[i];
@@ -13,7 +13,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return [];
 };`,
-  'lc-002': `var groupAnagrams = function(strs) {
+  'lc-49': `var groupAnagrams = function(strs) {
     const map = new Map();
     for (const s of strs) {
         const key = s.split('').sort().join('');
@@ -24,7 +24,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return Array.from(map.values());
 };`,
-  'lc-003': `var longestConsecutive = function(nums) {
+  'lc-128': `var longestConsecutive = function(nums) {
     const set = new Set(nums);
     let longest = 0;
     for (const num of set) {
@@ -40,7 +40,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return longest;
 };`,
-  'lc-004': `var subarraySum = function(nums, k) {
+  'lc-560': `var subarraySum = function(nums, k) {
     const count = new Map();
     count.set(0, 1);
     let preSum = 0;
@@ -52,7 +52,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return ans;
 };`,
-  'lc-005': `var moveZeroes = function(nums) {
+  'lc-283': `var moveZeroes = function(nums) {
     let slow = 0;
     for (let fast = 0; fast < nums.length; fast++) {
         if (nums[fast] !== 0) {
@@ -61,7 +61,7 @@ export const javascriptSolutions: Record<string, string> = {
         }
     }
 };`,
-  'lc-006': `var maxArea = function(height) {
+  'lc-11': `var maxArea = function(height) {
     let l = 0, r = height.length - 1;
     let ans = 0;
     while (l < r) {
@@ -75,7 +75,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return ans;
 };`,
-  'lc-007': `var threeSum = function(nums) {
+  'lc-15': `var threeSum = function(nums) {
     nums.sort((a, b) => a - b);
     const n = nums.length;
     const res = [];
@@ -99,7 +99,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return res;
 };`,
-  'lc-008': `var trap = function(height) {
+  'lc-42': `var trap = function(height) {
     let l = 0, r = height.length - 1;
     let leftMax = 0, rightMax = 0;
     let ans = 0;
@@ -116,7 +116,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return ans;
 };`,
-  'lc-009': `var firstMissingPositive = function(nums) {
+  'lc-41': `var firstMissingPositive = function(nums) {
     const n = nums.length;
     for (let i = 0; i < n; i++) {
         while (nums[i] >= 1 && nums[i] <= n && nums[nums[i] - 1] !== nums[i]) {
@@ -132,7 +132,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return n + 1;
 };`,
-  'lc-010': `var setZeroes = function(matrix) {
+  'lc-73': `var setZeroes = function(matrix) {
     const m = matrix.length, n = matrix[0].length;
     let row0 = false, col0 = false;
     for (let j = 0; j < n; j++) {
@@ -174,7 +174,7 @@ export const javascriptSolutions: Record<string, string> = {
         }
     }
 };`,
-  'lc-011': `var spiralOrder = function(matrix) {
+  'lc-54': `var spiralOrder = function(matrix) {
     const res = [];
     let top = 0, bottom = matrix.length - 1;
     let left = 0, right = matrix[0].length - 1;
@@ -202,7 +202,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return res;
 };`,
-  'lc-012': `var rotate = function(matrix) {
+  'lc-48': `var rotate = function(matrix) {
     const n = matrix.length;
     for (let i = 0; i < n; i++) {
         for (let j = i + 1; j < n; j++) {
@@ -213,7 +213,7 @@ export const javascriptSolutions: Record<string, string> = {
         matrix[i].reverse();
     }
 };`,
-  'lc-013': `var merge = function(nums1, m, nums2, n) {
+  'lc-88': `var merge = function(nums1, m, nums2, n) {
     let p1 = m - 1, p2 = n - 1;
     let p = m + n - 1;
     while (p2 >= 0) {
@@ -227,7 +227,7 @@ export const javascriptSolutions: Record<string, string> = {
         p--;
     }
 };`,
-  'lc-014': `var removeDuplicates = function(nums) {
+  'lc-26': `var removeDuplicates = function(nums) {
     if (nums.length === 0) return 0;
     let slow = 0;
     for (let fast = 1; fast < nums.length; fast++) {
@@ -238,7 +238,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return slow + 1;
 };`,
-  'lc-015': `var removeElement = function(nums, val) {
+  'lc-27': `var removeElement = function(nums, val) {
     let slow = 0;
     for (let fast = 0; fast < nums.length; fast++) {
         if (nums[fast] !== val) {
@@ -248,7 +248,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return slow;
 };`,
-  'lc-016': `var twoSum = function(numbers, target) {
+  'lc-167': `var twoSum = function(numbers, target) {
     let l = 0, r = numbers.length - 1;
     while (l < r) {
         const sum = numbers[l] + numbers[r];
@@ -262,7 +262,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return [];
 };`,
-  'lc-017': `var reverseString = function(s) {
+  'lc-344': `var reverseString = function(s) {
     let l = 0, r = s.length - 1;
     while (l < r) {
         [s[l], s[r]] = [s[r], s[l]];
@@ -270,7 +270,7 @@ export const javascriptSolutions: Record<string, string> = {
         r--;
     }
 };`,
-  'lc-018': `var longestPalindrome = function(s) {
+  'lc-5': `var longestPalindrome = function(s) {
     let start = 0, maxLen = 0;
     const n = s.length;
     for (let i = 0; i < n; i++) {
@@ -296,7 +296,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return s.substring(start, start + maxLen);
 };`,
-  'lc-019': `var lengthOfLongestSubstring = function(s) {
+  'lc-3': `var lengthOfLongestSubstring = function(s) {
     const seen = new Set();
     let l = 0, ans = 0;
     for (let r = 0; r < s.length; r++) {
@@ -309,7 +309,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return ans;
 };`,
-  'lc-020': `var findAnagrams = function(s, p) {
+  'lc-438': `var findAnagrams = function(s, p) {
     const need = new Map();
     const window = new Map();
     for (const c of p) {
@@ -341,7 +341,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return res;
 };`,
-  'lc-021': `var minWindow = function(s, t) {
+  'lc-76': `var minWindow = function(s, t) {
     const need = new Map();
     const window = new Map();
     for (const c of t) {
@@ -374,7 +374,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return minLen === Infinity ? "" : s.substring(start, start + minLen);
 };`,
-  'lc-022': `var maxSlidingWindow = function(nums, k) {
+  'lc-239': `var maxSlidingWindow = function(nums, k) {
     const q = [];
     const res = [];
     for (let r = 0; r < nums.length; r++) {
@@ -391,7 +391,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return res;
 };`,
-  'lc-023': `var checkInclusion = function(s1, s2) {
+  'lc-567': `var checkInclusion = function(s1, s2) {
     const need = new Map();
     const window = new Map();
     for (const c of s1) {
@@ -422,7 +422,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return false;
 };`,
-  'lc-024': `var search = function(nums, target) {
+  'lc-33': `var search = function(nums, target) {
     let l = 0, r = nums.length - 1;
     while (l <= r) {
         const mid = Math.floor((l + r) / 2);
@@ -445,7 +445,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return -1;
 };`,
-  'lc-025': `var searchRange = function(nums, target) {
+  'lc-34': `var searchRange = function(nums, target) {
     const leftBound = () => {
         let l = 0, r = nums.length - 1;
         while (l <= r) {
@@ -476,7 +476,7 @@ export const javascriptSolutions: Record<string, string> = {
 
     return [leftBound(), rightBound()];
 };`,
-  'lc-026': `var searchMatrix = function(matrix, target) {
+  'lc-74': `var searchMatrix = function(matrix, target) {
     const m = matrix.length, n = matrix[0].length;
     let l = 0, r = m * n - 1;
     while (l <= r) {
@@ -488,7 +488,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return false;
 };`,
-  'lc-027': `var findMin = function(nums) {
+  'lc-153': `var findMin = function(nums) {
     let l = 0, r = nums.length - 1;
     while (l < r) {
         const mid = Math.floor((l + r) / 2);
@@ -497,7 +497,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return nums[l];
 };`,
-  'lc-028': `var isValid = function(s) {
+  'lc-20': `var isValid = function(s) {
     const stack = [];
     for (const c of s) {
         if (c === '(' || c === '{' || c === '[') {
@@ -512,7 +512,7 @@ export const javascriptSolutions: Record<string, string> = {
     }
     return stack.length === 0;
 };`,
-  'lc-029': `var MinStack = function() {
+  'lc-155': `var MinStack = function() {
     this.stack = [];
     this.minStack = [];
 };
@@ -537,7 +537,7 @@ MinStack.prototype.top = function() {
 MinStack.prototype.getMin = function() {
     return this.minStack[this.minStack.length - 1];
 };`,
-  'lc-030': `var dailyTemperatures = function(temperatures) {
+  'lc-739': `var dailyTemperatures = function(temperatures) {
     const n = temperatures.length;
     const ans = new Array(n).fill(0);
     const stack = [];
@@ -550,7 +550,7 @@ MinStack.prototype.getMin = function() {
     }
     return ans;
 };`,
-  'lc-031': `var decodeString = function(s) {
+  'lc-394': `var decodeString = function(s) {
     const numStack = [];
     const strStack = [];
     let cur = '';
@@ -573,7 +573,7 @@ MinStack.prototype.getMin = function() {
     }
     return cur;
 };`,
-  'lc-032': `var hasCycle = function(head) {
+  'lc-141': `var hasCycle = function(head) {
     let slow = head, fast = head;
     while (fast && fast.next) {
         slow = slow.next;
@@ -582,7 +582,7 @@ MinStack.prototype.getMin = function() {
     }
     return false;
 };`,
-  'lc-033': `var reverseList = function(head) {
+  'lc-206': `var reverseList = function(head) {
     let prev = null, curr = head;
     while (curr) {
         const next = curr.next;
@@ -592,7 +592,7 @@ MinStack.prototype.getMin = function() {
     }
     return prev;
 };`,
-  'lc-034': `var getIntersectionNode = function(headA, headB) {
+  'lc-160': `var getIntersectionNode = function(headA, headB) {
     let pA = headA, pB = headB;
     while (pA !== pB) {
         pA = pA ? pA.next : headB;
@@ -600,7 +600,7 @@ MinStack.prototype.getMin = function() {
     }
     return pA;
 };`,
-  'lc-035': `var mergeKLists = function(lists) {
+  'lc-23': `var mergeKLists = function(lists) {
     const pq = new MinPriorityQueue({ priority: node => node.val });
     for (const node of lists) {
         if (node) pq.enqueue(node);
@@ -615,7 +615,7 @@ MinStack.prototype.getMin = function() {
     }
     return dummy.next;
 };`,
-  'lc-036': `var addTwoNumbers = function(l1, l2) {
+  'lc-2': `var addTwoNumbers = function(l1, l2) {
     const dummy = new ListNode(0);
     let cur = dummy, carry = 0;
     while (l1 || l2 || carry) {
@@ -630,7 +630,7 @@ MinStack.prototype.getMin = function() {
     }
     return dummy.next;
 };`,
-  'lc-037': `var removeNthFromEnd = function(head, n) {
+  'lc-19': `var removeNthFromEnd = function(head, n) {
     const dummy = new ListNode(0, head);
     let slow = dummy, fast = dummy;
     for (let i = 0; i < n; i++) fast = fast.next;
@@ -641,7 +641,7 @@ MinStack.prototype.getMin = function() {
     slow.next = slow.next.next;
     return dummy.next;
 };`,
-  'lc-038': `var mergeTwoLists = function(list1, list2) {
+  'lc-21': `var mergeTwoLists = function(list1, list2) {
     const dummy = new ListNode(0);
     let cur = dummy;
     while (list1 && list2) {
@@ -657,7 +657,7 @@ MinStack.prototype.getMin = function() {
     cur.next = list1 || list2;
     return dummy.next;
 };`,
-  'lc-039': `var isPalindrome = function(head) {
+  'lc-234': `var isPalindrome = function(head) {
     let slow = head, fast = head;
     while (fast && fast.next) {
         slow = slow.next;
@@ -678,7 +678,7 @@ MinStack.prototype.getMin = function() {
     }
     return true;
 };`,
-  'lc-040': `var inorderTraversal = function(root) {
+  'lc-94': `var inorderTraversal = function(root) {
     const res = [];
     const stack = [];
     let cur = root;
@@ -693,18 +693,18 @@ MinStack.prototype.getMin = function() {
     }
     return res;
 };`,
-  'lc-041': `var maxDepth = function(root) {
+  'lc-104': `var maxDepth = function(root) {
     if (!root) return 0;
     return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
 };`,
-  'lc-042': `var invertTree = function(root) {
+  'lc-226': `var invertTree = function(root) {
     if (!root) return null;
     [root.left, root.right] = [root.right, root.left];
     invertTree(root.left);
     invertTree(root.right);
     return root;
 };`,
-  'lc-043': `var levelOrder = function(root) {
+  'lc-102': `var levelOrder = function(root) {
     if (!root) return [];
     const res = [];
     const q = [root];
@@ -721,7 +721,7 @@ MinStack.prototype.getMin = function() {
     }
     return res;
 };`,
-  'lc-044': `var buildTree = function(preorder, inorder) {
+  'lc-105': `var buildTree = function(preorder, inorder) {
     const inMap = new Map();
     for (let i = 0; i < inorder.length; i++) {
         inMap.set(inorder[i], i);
@@ -740,7 +740,7 @@ MinStack.prototype.getMin = function() {
 
     return build(0, preorder.length - 1, 0, inorder.length - 1);
 };`,
-  'lc-045': `var isValidBST = function(root) {
+  'lc-98': `var isValidBST = function(root) {
     function validate(node, low, high) {
         if (!node) return true;
         if (node.val <= low || node.val >= high) return false;
@@ -748,7 +748,7 @@ MinStack.prototype.getMin = function() {
     }
     return validate(root, -Infinity, Infinity);
 };`,
-  'lc-046': `var isSymmetric = function(root) {
+  'lc-101': `var isSymmetric = function(root) {
     function isMirror(t1, t2) {
         if (!t1 && !t2) return true;
         if (!t1 || !t2) return false;
@@ -756,7 +756,7 @@ MinStack.prototype.getMin = function() {
     }
     return isMirror(root, root);
 };`,
-  'lc-047': `var diameterOfBinaryTree = function(root) {
+  'lc-543': `var diameterOfBinaryTree = function(root) {
     let ans = 0;
 
     function depth(node) {
@@ -770,7 +770,7 @@ MinStack.prototype.getMin = function() {
     depth(root);
     return ans;
 };`,
-  'lc-048': `var flatten = function(root) {
+  'lc-114': `var flatten = function(root) {
     let cur = root;
     while (cur) {
         if (cur.left) {
@@ -783,14 +783,14 @@ MinStack.prototype.getMin = function() {
         cur = cur.right;
     }
 };`,
-  'lc-049': `var lowestCommonAncestor = function(root, p, q) {
+  'lc-236': `var lowestCommonAncestor = function(root, p, q) {
     if (!root || root === p || root === q) return root;
     const left = lowestCommonAncestor(root.left, p, q);
     const right = lowestCommonAncestor(root.right, p, q);
     if (left && right) return root;
     return left || right;
 };`,
-  'lc-050': `var maxPathSum = function(root) {
+  'lc-124': `var maxPathSum = function(root) {
     let ans = -Infinity;
 
     function maxGain(node) {
@@ -804,7 +804,7 @@ MinStack.prototype.getMin = function() {
     maxGain(root);
     return ans;
 };`,
-  'lc-051': `var pathSum = function(root, targetSum) {
+  'lc-437': `var pathSum = function(root, targetSum) {
     const prefix = new Map();
     prefix.set(0, 1);
 
@@ -821,7 +821,7 @@ MinStack.prototype.getMin = function() {
 
     return dfs(root, 0);
 };`,
-  'lc-052': `var numIslands = function(grid) {
+  'lc-200': `var numIslands = function(grid) {
     const m = grid.length, n = grid[0].length;
     let count = 0;
 
@@ -846,7 +846,7 @@ MinStack.prototype.getMin = function() {
     }
     return count;
 };`,
-  'lc-053': `var canFinish = function(numCourses, prerequisites) {
+  'lc-207': `var canFinish = function(numCourses, prerequisites) {
     const graph = Array.from({ length: numCourses }, () => []);
     const indegree = new Array(numCourses).fill(0);
     for (const [a, b] of prerequisites) {
@@ -868,7 +868,7 @@ MinStack.prototype.getMin = function() {
     }
     return count === numCourses;
 };`,
-  'lc-054': `var orangesRotting = function(grid) {
+  'lc-994': `var orangesRotting = function(grid) {
     const m = grid.length, n = grid[0].length;
     const q = [];
     let fresh = 0;
@@ -898,7 +898,7 @@ MinStack.prototype.getMin = function() {
     }
     return fresh === 0 ? minutes : -1;
 };`,
-  'lc-055': `var Trie = function() {
+  'lc-208': `var Trie = function() {
     this.root = Object.create(null);
 };
 
@@ -928,7 +928,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return true;
 };`,
-  'lc-056': `var permute = function(nums) {
+  'lc-46': `var permute = function(nums) {
     const res = [];
     const used = new Array(nums.length).fill(false);
 
@@ -951,7 +951,7 @@ Trie.prototype.startsWith = function(prefix) {
     backtrack([]);
     return res;
 };`,
-  'lc-057': `var subsets = function(nums) {
+  'lc-78': `var subsets = function(nums) {
     const res = [];
 
     function backtrack(start, path) {
@@ -966,7 +966,7 @@ Trie.prototype.startsWith = function(prefix) {
     backtrack(0, []);
     return res;
 };`,
-  'lc-058': `var exist = function(board, word) {
+  'lc-79': `var exist = function(board, word) {
     const m = board.length, n = board[0].length;
 
     function dfs(i, j, idx) {
@@ -991,7 +991,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return false;
 };`,
-  'lc-059': `var solveNQueens = function(n) {
+  'lc-51': `var solveNQueens = function(n) {
     const res = [];
     const board = Array.from({ length: n }, () => new Array(n).fill('.'));
     const cols = new Set();
@@ -1020,7 +1020,7 @@ Trie.prototype.startsWith = function(prefix) {
     backtrack(0);
     return res;
 };`,
-  'lc-060': `var generateParenthesis = function(n) {
+  'lc-22': `var generateParenthesis = function(n) {
     const res = [];
 
     function backtrack(s, left, right) {
@@ -1039,7 +1039,7 @@ Trie.prototype.startsWith = function(prefix) {
     backtrack('', n, n);
     return res;
 };`,
-  'lc-061': `var combinationSum = function(candidates, target) {
+  'lc-39': `var combinationSum = function(candidates, target) {
     const res = [];
 
     function backtrack(start, path, remain) {
@@ -1058,7 +1058,7 @@ Trie.prototype.startsWith = function(prefix) {
     backtrack(0, [], target);
     return res;
 };`,
-  'lc-062': `var climbStairs = function(n) {
+  'lc-70': `var climbStairs = function(n) {
     if (n <= 2) return n;
     let a = 1, b = 2;
     for (let i = 3; i <= n; i++) {
@@ -1066,7 +1066,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return b;
 };`,
-  'lc-063': `var maxSubArray = function(nums) {
+  'lc-53': `var maxSubArray = function(nums) {
     let curMax = nums[0], globalMax = nums[0];
     for (let i = 1; i < nums.length; i++) {
         curMax = Math.max(nums[i], curMax + nums[i]);
@@ -1074,7 +1074,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return globalMax;
 };`,
-  'lc-064': `var lengthOfLIS = function(nums) {
+  'lc-300': `var lengthOfLIS = function(nums) {
     const tails = [];
     for (const x of nums) {
         let l = 0, r = tails.length;
@@ -1094,7 +1094,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return tails.length;
 };`,
-  'lc-065': `var coinChange = function(coins, amount) {
+  'lc-322': `var coinChange = function(coins, amount) {
     const max = amount + 1;
     const dp = new Array(amount + 1).fill(max);
     dp[0] = 0;
@@ -1107,7 +1107,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return dp[amount] === max ? -1 : dp[amount];
 };`,
-  'lc-066': `var longestCommonSubsequence = function(text1, text2) {
+  'lc-1143': `var longestCommonSubsequence = function(text1, text2) {
     const m = text1.length, n = text2.length;
     const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
     for (let i = 1; i <= m; i++) {
@@ -1121,7 +1121,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return dp[m][n];
 };`,
-  'lc-067': `var rob = function(nums) {
+  'lc-198': `var rob = function(nums) {
         if (nums.length === 0) return 0;
         if (nums.length === 1) return nums[0];
         let prev2 = nums[0], prev1 = Math.max(nums[0], nums[1]);
@@ -1132,7 +1132,7 @@ Trie.prototype.startsWith = function(prefix) {
         }
         return prev1;
     };`,
-  'lc-068': `var numSquares = function(n) {
+  'lc-279': `var numSquares = function(n) {
     const dp = new Array(n + 1).fill(Infinity);
     dp[0] = 0;
     for (let i = 1; i <= n; i++) {
@@ -1142,7 +1142,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return dp[n];
 };`,
-  'lc-069': `var uniquePaths = function(m, n) {
+  'lc-62': `var uniquePaths = function(m, n) {
     const dp = new Array(n).fill(1);
     for (let i = 1; i < m; i++) {
         for (let j = 1; j < n; j++) {
@@ -1151,7 +1151,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return dp[n - 1];
 };`,
-  'lc-070': `var minPathSum = function(grid) {
+  'lc-64': `var minPathSum = function(grid) {
     const m = grid.length, n = grid[0].length;
     for (let i = 0; i < m; i++) {
         for (let j = 0; j < n; j++) {
@@ -1163,7 +1163,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return grid[m - 1][n - 1];
 };`,
-  'lc-071': `var minDistance = function(word1, word2) {
+  'lc-72': `var minDistance = function(word1, word2) {
     const m = word1.length, n = word2.length;
     const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
     for (let i = 0; i <= m; i++) dp[i][0] = i;
@@ -1179,7 +1179,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return dp[m][n];
 };`,
-  'lc-072': `var wordBreak = function(s, wordDict) {
+  'lc-139': `var wordBreak = function(s, wordDict) {
     const wordSet = new Set(wordDict);
     const n = s.length;
     const dp = new Array(n + 1).fill(false);
@@ -1194,7 +1194,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return dp[n];
 };`,
-  'lc-073': `var maxProduct = function(nums) {
+  'lc-152': `var maxProduct = function(nums) {
     let curMax = nums[0], curMin = nums[0], ans = nums[0];
     for (let i = 1; i < nums.length; i++) {
         const tmpMax = Math.max(nums[i], nums[i] * curMax, nums[i] * curMin);
@@ -1204,7 +1204,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return ans;
 };`,
-  'lc-074': `var canPartition = function(nums) {
+  'lc-416': `var canPartition = function(nums) {
     const total = nums.reduce((a, b) => a + b, 0);
     if (total % 2 !== 0) return false;
     const target = total / 2;
@@ -1217,7 +1217,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return dp[target];
 };`,
-  'lc-075': `var longestValidParentheses = function(s) {
+  'lc-32': `var longestValidParentheses = function(s) {
     const stack = [-1];
     let ans = 0;
     for (let i = 0; i < s.length; i++) {
@@ -1234,7 +1234,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return ans;
 };`,
-  'lc-076': `var maxCoins = function(nums) {
+  'lc-312': `var maxCoins = function(nums) {
     const points = [1, ...nums, 1];
     const n = points.length;
     const dp = Array.from({ length: n }, () => Array(n).fill(0));
@@ -1249,7 +1249,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return dp[0][n - 1];
 };`,
-  'lc-077': `var isMatch = function(s, p) {
+  'lc-10': `var isMatch = function(s, p) {
     const m = s.length, n = p.length;
     const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(false));
     dp[0][0] = true;
@@ -1274,7 +1274,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return dp[m][n];
 };`,
-  'lc-078': `var maxProfit = function(prices) {
+  'lc-121': `var maxProfit = function(prices) {
     let minPrice = Infinity;
     let maxProfit = 0;
     for (const price of prices) {
@@ -1283,7 +1283,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return maxProfit;
 };`,
-  'lc-079': `var canJump = function(nums) {
+  'lc-55': `var canJump = function(nums) {
     let maxReach = 0;
     for (let i = 0; i < nums.length; i++) {
         if (i > maxReach) {
@@ -1296,7 +1296,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return true;
 };`,
-  'lc-080': `var jump = function(nums) {
+  'lc-45': `var jump = function(nums) {
     const n = nums.length;
     if (n === 1) return 0;
     let jumps = 0;
@@ -1311,7 +1311,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return jumps;
 };`,
-  'lc-081': `var findKthLargest = function(nums, k) {
+  'lc-215': `var findKthLargest = function(nums, k) {
     const heap = [];
     for (const num of nums) {
         heap.push(num);
@@ -1322,7 +1322,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return heap[0];
 };`,
-  'lc-082': `var topKFrequent = function(nums, k) {
+  'lc-347': `var topKFrequent = function(nums, k) {
     const freq = new Map();
     for (const num of nums) {
         freq.set(num, (freq.get(num) || 0) + 1);
@@ -1337,7 +1337,7 @@ Trie.prototype.startsWith = function(prefix) {
     }
     return res.slice(0, k);
 };`,
-  'lc-083': `var MedianFinder = function() {
+  'lc-295': `var MedianFinder = function() {
     this.small = []; // max heap (store negatives)
     this.large = []; // min heap
 };
@@ -1359,7 +1359,7 @@ MedianFinder.prototype.findMedian = function() {
     }
     return (-this.small[0] + this.large[0]) / 2;
 };`,
-  'lc-084': `var merge = function(intervals) {
+  'lc-56': `var merge = function(intervals) {
     intervals.sort((a, b) => a[0] - b[0]);
     const res = [];
     for (const interval of intervals) {
@@ -1371,7 +1371,7 @@ MedianFinder.prototype.findMedian = function() {
     }
     return res;
 };`,
-  'lc-085': `var sortColors = function(nums) {
+  'lc-75': `var sortColors = function(nums) {
     let p0 = 0, cur = 0, p2 = nums.length - 1;
     while (cur <= p2) {
         if (nums[cur] === 0) {
@@ -1386,7 +1386,7 @@ MedianFinder.prototype.findMedian = function() {
         }
     }
 };`,
-  'lc-086': `var sortList = function(head) {
+  'lc-148': `var sortList = function(head) {
     if (!head || !head.next) return head;
     let slow = head, fast = head.next;
     while (fast && fast.next) {
@@ -1416,7 +1416,7 @@ var merge = function(l1, l2) {
     cur.next = l1 || l2;
     return dummy.next;
 };`,
-  'lc-087': `var LRUCache = function(capacity) {
+  'lc-146': `var LRUCache = function(capacity) {
     this.cap = capacity;
     this.cache = new Map();
 };
@@ -1440,7 +1440,7 @@ LRUCache.prototype.put = function(key, value) {
         this.cache.delete(this.cache.keys().next().value);
     }
 };`,
-  'lc-088': `var RandomizedSet = function() {
+  'lc-380': `var RandomizedSet = function() {
     this.nums = [];
     this.pos = new Map();
 };
@@ -1466,14 +1466,14 @@ RandomizedSet.prototype.remove = function(val) {
 RandomizedSet.prototype.getRandom = function() {
     return this.nums[Math.floor(Math.random() * this.nums.length)];
 };`,
-  'lc-089': `var singleNumber = function(nums) {
+  'lc-136': `var singleNumber = function(nums) {
     let res = 0;
     for (const num of nums) {
         res ^= num;
     }
     return res;
 };`,
-  'lc-090': `var majorityElement = function(nums) {
+  'lc-169': `var majorityElement = function(nums) {
     let candidate = null;
     let count = 0;
     for (const num of nums) {
@@ -1484,7 +1484,7 @@ RandomizedSet.prototype.getRandom = function() {
     }
     return candidate;
 };`,
-  'lc-091': `var productExceptSelf = function(nums) {
+  'lc-238': `var productExceptSelf = function(nums) {
     const n = nums.length;
     const ans = new Array(n).fill(1);
     for (let i = 1; i < n; i++) {
@@ -1497,7 +1497,7 @@ RandomizedSet.prototype.getRandom = function() {
     }
     return ans;
 };`,
-  'lc-092': `var nextPermutation = function(nums) {
+  'lc-31': `var nextPermutation = function(nums) {
     const n = nums.length;
     let i = n - 2;
     while (i >= 0 && nums[i] >= nums[i + 1]) {
@@ -1517,7 +1517,7 @@ RandomizedSet.prototype.getRandom = function() {
         r--;
     }
 };`,
-  'lc-093': `var findDuplicate = function(nums) {
+  'lc-287': `var findDuplicate = function(nums) {
     let slow = nums[0], fast = nums[0];
     do {
         slow = nums[slow];
@@ -1530,7 +1530,7 @@ RandomizedSet.prototype.getRandom = function() {
     }
     return slow;
 };`,
-  'lc-094': `var searchMatrix = function(matrix, target) {
+  'lc-240': `var searchMatrix = function(matrix, target) {
     const m = matrix.length, n = matrix[0].length;
     let i = 0, j = n - 1;
     while (i < m && j >= 0) {
@@ -1544,7 +1544,7 @@ RandomizedSet.prototype.getRandom = function() {
     }
     return false;
 };`,
-  'lc-095': `var rotate = function(nums, k) {
+  'lc-189': `var rotate = function(nums, k) {
     const n = nums.length;
     k %= n;
     const rev = (l, r) => {
@@ -1558,7 +1558,7 @@ RandomizedSet.prototype.getRandom = function() {
     rev(0, k - 1);
     rev(k, n - 1);
 };`,
-  'lc-096': `var sortedArrayToBST = function(nums) {
+  'lc-108': `var sortedArrayToBST = function(nums) {
     const build = (l, r) => {
         if (l > r) return null;
         const mid = l + Math.floor((r - l) / 2);
@@ -1569,7 +1569,7 @@ RandomizedSet.prototype.getRandom = function() {
     };
     return build(0, nums.length - 1);
 };`,
-  'lc-097': `var generate = function(numRows) {
+  'lc-118': `var generate = function(numRows) {
     const res = [];
     for (let i = 0; i < numRows; i++) {
         const row = new Array(i + 1).fill(1);
@@ -1580,7 +1580,7 @@ RandomizedSet.prototype.getRandom = function() {
     }
     return res;
 };`,
-  'lc-098': `var findDisappearedNumbers = function(nums) {
+  'lc-448': `var findDisappearedNumbers = function(nums) {
     for (const num of nums) {
         const idx = Math.abs(num) - 1;
         nums[idx] = -Math.abs(nums[idx]);
@@ -1593,7 +1593,7 @@ RandomizedSet.prototype.getRandom = function() {
     }
     return res;
 };`,
-  'lc-099': `var letterCombinations = function(digits) {
+  'lc-17': `var letterCombinations = function(digits) {
     if (!digits) return [];
     const mapping = {
         '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl',
@@ -1614,7 +1614,7 @@ RandomizedSet.prototype.getRandom = function() {
     backtrack(0, []);
     return res;
 };`,
-  'lc-100': `var countBits = function(n) {
+  'lc-338': `var countBits = function(n) {
     const dp = new Array(n + 1).fill(0);
     for (let i = 1; i <= n; i++) {
         dp[i] = dp[i >> 1] + (i & 1);

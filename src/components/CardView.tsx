@@ -2,7 +2,7 @@
 // src/components/CardView.tsx — 核心卡片组件（含 Anki 复习状态）
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronUp, Clock, Repeat, StickyNote, X } from 'lucide-react';
 import type { AppAction, FlashCard, LeetCodeCard, QACard, SM2Record } from '../types';
@@ -183,6 +183,12 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
   const { dispatch } = useAppContext();
   const [localApproach, setLocalApproach] = useState(false);
   const [localCode, setLocalCode] = useState(false);
+
+  // 卡片切换时强制关闭本地代码/思路面板
+  useEffect(() => {
+    setLocalApproach(false);
+    setLocalCode(false);
+  }, [card.id]);
 
   // Multi-language support — 优先顺序：导入的 codes > 内置方案库 > 旧 code 字段
   const codes = (() => {

@@ -2,7 +2,7 @@
 // DO NOT EDIT MANUALLY
 
 export const javaSolutions: Record<string, string> = {
-  'lc-001': `class Solution {
+  'lc-1': `class Solution {
     public int[] twoSum(int[] nums, int target) {
         Map<Integer, Integer> map = new HashMap<>();
         for (int i = 0; i < nums.length; i++) {
@@ -15,7 +15,7 @@ export const javaSolutions: Record<string, string> = {
         return new int[]{};
     }
 }`,
-  'lc-002': `import java.util.*;
+  'lc-49': `import java.util.*;
 
 class Solution {
     public List<List<String>> groupAnagrams(String[] strs) {
@@ -29,7 +29,7 @@ class Solution {
         return new ArrayList<>(map.values());
     }
 }`,
-  'lc-003': `import java.util.*;
+  'lc-128': `import java.util.*;
 
 class Solution {
     public int longestConsecutive(int[] nums) {
@@ -52,7 +52,7 @@ class Solution {
         return longest;
     }
 }`,
-  'lc-004': `import java.util.*;
+  'lc-560': `import java.util.*;
 
 class Solution {
     public int subarraySum(int[] nums, int k) {
@@ -68,7 +68,7 @@ class Solution {
         return ans;
     }
 }`,
-  'lc-005': `class Solution {
+  'lc-283': `class Solution {
     public void moveZeroes(int[] nums) {
         int slow = 0;
         for (int fast = 0; fast < nums.length; fast++) {
@@ -81,7 +81,7 @@ class Solution {
         }
     }
 }`,
-  'lc-006': `class Solution {
+  'lc-11': `class Solution {
     public int maxArea(int[] height) {
         int l = 0, r = height.length - 1;
         int ans = 0;
@@ -97,7 +97,7 @@ class Solution {
         return ans;
     }
 }`,
-  'lc-007': `import java.util.*;
+  'lc-15': `import java.util.*;
 
 class Solution {
     public List<List<Integer>> threeSum(int[] nums) {
@@ -125,7 +125,7 @@ class Solution {
         return res;
     }
 }`,
-  'lc-008': `class Solution {
+  'lc-42': `class Solution {
     public int trap(int[] height) {
         int l = 0, r = height.length - 1;
         int leftMax = 0, rightMax = 0;
@@ -144,7 +144,7 @@ class Solution {
         return ans;
     }
 }`,
-  'lc-009': `class Solution {
+  'lc-41': `class Solution {
     public int firstMissingPositive(int[] nums) {
         int n = nums.length;
         for (int i = 0; i < n; i++) {
@@ -162,7 +162,7 @@ class Solution {
         return n + 1;
     }
 }`,
-  'lc-010': `class Solution {
+  'lc-73': `class Solution {
     public void setZeroes(int[][] matrix) {
         int m = matrix.length, n = matrix[0].length;
         boolean row0 = false, col0 = false;
@@ -206,7 +206,7 @@ class Solution {
         }
     }
 }`,
-  'lc-011': `import java.util.*;
+  'lc-54': `import java.util.*;
 
 class Solution {
     public List<Integer> spiralOrder(int[][] matrix) {
@@ -238,7 +238,7 @@ class Solution {
         return res;
     }
 }`,
-  'lc-012': `class Solution {
+  'lc-48': `class Solution {
     public void rotate(int[][] matrix) {
         int n = matrix.length;
         for (int i = 0; i < n; i++) {
@@ -260,7 +260,7 @@ class Solution {
         }
     }
 }`,
-  'lc-013': `class Solution {
+  'lc-88': `class Solution {
     public void merge(int[] nums1, int m, int[] nums2, int n) {
         int p1 = m - 1, p2 = n - 1;
         int p = m + n - 1;
@@ -276,7 +276,7 @@ class Solution {
         }
     }
 }`,
-  'lc-014': `class Solution {
+  'lc-26': `class Solution {
     public int removeDuplicates(int[] nums) {
         if (nums.length == 0) return 0;
         int slow = 0;
@@ -289,7 +289,7 @@ class Solution {
         return slow + 1;
     }
 }`,
-  'lc-015': `class Solution {
+  'lc-27': `class Solution {
     public int removeElement(int[] nums, int val) {
         int slow = 0;
         for (int fast = 0; fast < nums.length; fast++) {
@@ -301,7 +301,7 @@ class Solution {
         return slow;
     }
 }`,
-  'lc-016': `class Solution {
+  'lc-167': `class Solution {
     public int[] twoSum(int[] numbers, int target) {
         int l = 0, r = numbers.length - 1;
         while (l < r) {
@@ -317,7 +317,7 @@ class Solution {
         return new int[]{};
     }
 }`,
-  'lc-017': `class Solution {
+  'lc-344': `class Solution {
     public void reverseString(char[] s) {
         int l = 0, r = s.length - 1;
         while (l < r) {
@@ -329,7 +329,7 @@ class Solution {
         }
     }
 }`,
-  'lc-018': `class Solution {
+  'lc-5': `class Solution {
     public String longestPalindrome(String s) {
         int start = 0, maxLen = 0;
         int n = s.length();
@@ -357,7 +357,7 @@ class Solution {
         return s.substring(start, start + maxLen);
     }
 }`,
-  'lc-019': `import java.util.*;
+  'lc-3': `import java.util.*;
 
 class Solution {
     public int lengthOfLongestSubstring(String s) {
@@ -374,7 +374,7 @@ class Solution {
         return ans;
     }
 }`,
-  'lc-020': `import java.util.*;
+  'lc-438': `import java.util.*;
 
 class Solution {
     public List<Integer> findAnagrams(String s, String p) {
@@ -410,7 +410,7 @@ class Solution {
         return res;
     }
 }`,
-  'lc-021': `import java.util.*;
+  'lc-76': `import java.util.*;
 
 class Solution {
     public String minWindow(String s, String t) {
@@ -447,7 +447,7 @@ class Solution {
         return minLen == Integer.MAX_VALUE ? "" : s.substring(start, start + minLen);
     }
 }`,
-  'lc-022': `import java.util.*;
+  'lc-239': `import java.util.*;
 
 class Solution {
     public int[] maxSlidingWindow(int[] nums, int k) {
@@ -469,7 +469,7 @@ class Solution {
         return res;
     }
 }`,
-  'lc-023': `import java.util.*;
+  'lc-567': `import java.util.*;
 
 class Solution {
     public boolean checkInclusion(String s1, String s2) {
@@ -504,7 +504,7 @@ class Solution {
         return false;
     }
 }`,
-  'lc-024': `class Solution {
+  'lc-33': `class Solution {
     public int search(int[] nums, int target) {
         int l = 0, r = nums.length - 1;
         while (l <= r) {
@@ -529,7 +529,7 @@ class Solution {
         return -1;
     }
 }`,
-  'lc-025': `class Solution {
+  'lc-34': `class Solution {
     public int[] searchRange(int[] nums, int target) {
         int left = leftBound(nums, target);
         int right = rightBound(nums, target);
@@ -564,7 +564,7 @@ class Solution {
         return -1;
     }
 }`,
-  'lc-026': `class Solution {
+  'lc-74': `class Solution {
     public boolean searchMatrix(int[][] matrix, int target) {
         int m = matrix.length, n = matrix[0].length;
         int l = 0, r = m * n - 1;
@@ -578,7 +578,7 @@ class Solution {
         return false;
     }
 }`,
-  'lc-027': `class Solution {
+  'lc-153': `class Solution {
     public int findMin(int[] nums) {
         int l = 0, r = nums.length - 1;
         while (l < r) {
@@ -589,7 +589,7 @@ class Solution {
         return nums[l];
     }
 }`,
-  'lc-028': `class Solution {
+  'lc-20': `class Solution {
     public boolean isValid(String s) {
         Deque<Character> stack = new ArrayDeque<>();
         for (char c : s.toCharArray()) {
@@ -606,7 +606,7 @@ class Solution {
         return stack.isEmpty();
     }
 }`,
-  'lc-029': `class MinStack {
+  'lc-155': `class MinStack {
     private Deque<Integer> stack;
     private Deque<Integer> minStack;
 
@@ -636,7 +636,7 @@ class Solution {
         return minStack.peek();
     }
 }`,
-  'lc-030': `class Solution {
+  'lc-739': `class Solution {
     public int[] dailyTemperatures(int[] temperatures) {
         int n = temperatures.length;
         int[] ans = new int[n];
@@ -651,7 +651,7 @@ class Solution {
         return ans;
     }
 }`,
-  'lc-031': `class Solution {
+  'lc-394': `class Solution {
     public String decodeString(String s) {
         Deque<Integer> numStack = new ArrayDeque<>();
         Deque<StringBuilder> strStack = new ArrayDeque<>();
@@ -679,7 +679,7 @@ class Solution {
         return cur.toString();
     }
 }`,
-  'lc-032': `class Solution {
+  'lc-141': `class Solution {
     public boolean hasCycle(ListNode head) {
         ListNode slow = head, fast = head;
         while (fast != null && fast.next != null) {
@@ -690,7 +690,7 @@ class Solution {
         return false;
     }
 }`,
-  'lc-033': `class Solution {
+  'lc-206': `class Solution {
     public ListNode reverseList(ListNode head) {
         ListNode prev = null, curr = head;
         while (curr != null) {
@@ -702,7 +702,7 @@ class Solution {
         return prev;
     }
 }`,
-  'lc-034': `class Solution {
+  'lc-160': `class Solution {
     public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
         ListNode pA = headA, pB = headB;
         while (pA != pB) {
@@ -712,7 +712,7 @@ class Solution {
         return pA;
     }
 }`,
-  'lc-035': `class Solution {
+  'lc-23': `class Solution {
     public ListNode mergeKLists(ListNode[] lists) {
         PriorityQueue<ListNode> pq = new PriorityQueue<>((a, b) -> a.val - b.val);
         for (ListNode node : lists) {
@@ -729,7 +729,7 @@ class Solution {
         return dummy.next;
     }
 }`,
-  'lc-036': `class Solution {
+  'lc-2': `class Solution {
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
         ListNode dummy = new ListNode(0);
         ListNode cur = dummy;
@@ -747,7 +747,7 @@ class Solution {
         return dummy.next;
     }
 }`,
-  'lc-037': `class Solution {
+  'lc-19': `class Solution {
     public ListNode removeNthFromEnd(ListNode head, int n) {
         ListNode dummy = new ListNode(0, head);
         ListNode slow = dummy, fast = dummy;
@@ -760,7 +760,7 @@ class Solution {
         return dummy.next;
     }
 }`,
-  'lc-038': `class Solution {
+  'lc-21': `class Solution {
     public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
         ListNode dummy = new ListNode(0);
         ListNode cur = dummy;
@@ -778,7 +778,7 @@ class Solution {
         return dummy.next;
     }
 }`,
-  'lc-039': `class Solution {
+  'lc-234': `class Solution {
     public boolean isPalindrome(ListNode head) {
         ListNode slow = head, fast = head;
         while (fast != null && fast.next != null) {
@@ -801,7 +801,7 @@ class Solution {
         return true;
     }
 }`,
-  'lc-040': `class Solution {
+  'lc-94': `class Solution {
     public List<Integer> inorderTraversal(TreeNode root) {
         List<Integer> res = new ArrayList<>();
         Deque<TreeNode> stack = new ArrayDeque<>();
@@ -818,13 +818,13 @@ class Solution {
         return res;
     }
 }`,
-  'lc-041': `class Solution {
+  'lc-104': `class Solution {
     public int maxDepth(TreeNode root) {
         if (root == null) return 0;
         return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
     }
 }`,
-  'lc-042': `class Solution {
+  'lc-226': `class Solution {
     public TreeNode invertTree(TreeNode root) {
         if (root == null) return null;
         TreeNode temp = root.left;
@@ -835,7 +835,7 @@ class Solution {
         return root;
     }
 }`,
-  'lc-043': `class Solution {
+  'lc-102': `class Solution {
     public List<List<Integer>> levelOrder(TreeNode root) {
         List<List<Integer>> res = new ArrayList<>();
         if (root == null) return res;
@@ -855,7 +855,7 @@ class Solution {
         return res;
     }
 }`,
-  'lc-044': `class Solution {
+  'lc-105': `class Solution {
     private Map<Integer, Integer> inMap;
     private int[] preorder;
     private int[] inorder;
@@ -881,7 +881,7 @@ class Solution {
         return root;
     }
 }`,
-  'lc-045': `class Solution {
+  'lc-98': `class Solution {
     public boolean isValidBST(TreeNode root) {
         return validate(root, null, null);
     }
@@ -893,7 +893,7 @@ class Solution {
         return validate(node.left, low, node.val) && validate(node.right, node.val, high);
     }
 }`,
-  'lc-046': `class Solution {
+  'lc-101': `class Solution {
     public boolean isSymmetric(TreeNode root) {
         return isMirror(root, root);
     }
@@ -904,7 +904,7 @@ class Solution {
         return t1.val == t2.val && isMirror(t1.left, t2.right) && isMirror(t1.right, t2.left);
     }
 }`,
-  'lc-047': `class Solution {
+  'lc-543': `class Solution {
     private int ans = 0;
 
     public int diameterOfBinaryTree(TreeNode root) {
@@ -920,7 +920,7 @@ class Solution {
         return 1 + Math.max(left, right);
     }
 }`,
-  'lc-048': `class Solution {
+  'lc-114': `class Solution {
     public void flatten(TreeNode root) {
         TreeNode cur = root;
         while (cur != null) {
@@ -935,7 +935,7 @@ class Solution {
         }
     }
 }`,
-  'lc-049': `class Solution {
+  'lc-236': `class Solution {
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
         if (root == null || root == p || root == q) return root;
         TreeNode left = lowestCommonAncestor(root.left, p, q);
@@ -944,7 +944,7 @@ class Solution {
         return left != null ? left : right;
     }
 }`,
-  'lc-050': `class Solution {
+  'lc-124': `class Solution {
     private int ans = Integer.MIN_VALUE;
 
     public int maxPathSum(TreeNode root) {
@@ -960,7 +960,7 @@ class Solution {
         return node.val + Math.max(left, right);
     }
 }`,
-  'lc-051': `import java.util.*;
+  'lc-437': `import java.util.*;
 
 class Solution {
     public int pathSum(TreeNode root, int targetSum) {
@@ -980,7 +980,7 @@ class Solution {
         return ans;
     }
 }`,
-  'lc-052': `class Solution {
+  'lc-200': `class Solution {
     public int numIslands(char[][] grid) {
         int m = grid.length, n = grid[0].length;
         int count = 0;
@@ -1006,7 +1006,7 @@ class Solution {
         dfs(grid, i, j - 1);
     }
 }`,
-  'lc-053': `import java.util.*;
+  'lc-207': `import java.util.*;
 
 class Solution {
     public boolean canFinish(int numCourses, int[][] prerequisites) {
@@ -1035,7 +1035,7 @@ class Solution {
         return count == numCourses;
     }
 }`,
-  'lc-054': `import java.util.*;
+  'lc-994': `import java.util.*;
 
 class Solution {
     public int orangesRotting(int[][] grid) {
@@ -1069,7 +1069,7 @@ class Solution {
         return fresh == 0 ? minutes : -1;
     }
 }`,
-  'lc-055': `import java.util.*;
+  'lc-208': `import java.util.*;
 
 class Trie {
     static class TrieNode {
@@ -1110,7 +1110,7 @@ class Trie {
         return true;
     }
 }`,
-  'lc-056': `import java.util.*;
+  'lc-46': `import java.util.*;
 
 class Solution {
     public List<List<Integer>> permute(int[] nums) {
@@ -1136,7 +1136,7 @@ class Solution {
         }
     }
 }`,
-  'lc-057': `import java.util.*;
+  'lc-78': `import java.util.*;
 
 class Solution {
     public List<List<Integer>> subsets(int[] nums) {
@@ -1154,7 +1154,7 @@ class Solution {
         }
     }
 }`,
-  'lc-058': `class Solution {
+  'lc-79': `class Solution {
     public boolean exist(char[][] board, String word) {
         int m = board.length, n = board[0].length;
         for (int i = 0; i < m; i++) {
@@ -1180,7 +1180,7 @@ class Solution {
         return found;
     }
 }`,
-  'lc-059': `import java.util.*;
+  'lc-51': `import java.util.*;
 
 class Solution {
     public List<List<String>> solveNQueens(int n) {
@@ -1218,7 +1218,7 @@ class Solution {
         }
     }
 }`,
-  'lc-060': `import java.util.*;
+  'lc-22': `import java.util.*;
 
 class Solution {
     public List<String> generateParenthesis(int n) {
@@ -1244,7 +1244,7 @@ class Solution {
         }
     }
 }`,
-  'lc-061': `import java.util.*;
+  'lc-39': `import java.util.*;
 
 class Solution {
     public List<List<Integer>> combinationSum(int[] candidates, int target) {
@@ -1266,7 +1266,7 @@ class Solution {
         }
     }
 }`,
-  'lc-062': `class Solution {
+  'lc-70': `class Solution {
     public int climbStairs(int n) {
         if (n <= 2) return n;
         int a = 1, b = 2;
@@ -1278,7 +1278,7 @@ class Solution {
         return b;
     }
 }`,
-  'lc-063': `class Solution {
+  'lc-53': `class Solution {
     public int maxSubArray(int[] nums) {
         int curMax = nums[0], globalMax = nums[0];
         for (int i = 1; i < nums.length; i++) {
@@ -1288,7 +1288,7 @@ class Solution {
         return globalMax;
     }
 }`,
-  'lc-064': `import java.util.*;
+  'lc-300': `import java.util.*;
 
 class Solution {
     public int lengthOfLIS(int[] nums) {
@@ -1305,7 +1305,7 @@ class Solution {
         return tails.size();
     }
 }`,
-  'lc-065': `import java.util.*;
+  'lc-322': `import java.util.*;
 
 class Solution {
     public int coinChange(int[] coins, int amount) {
@@ -1323,7 +1323,7 @@ class Solution {
         return dp[amount] == max ? -1 : dp[amount];
     }
 }`,
-  'lc-066': `class Solution {
+  'lc-1143': `class Solution {
     public int longestCommonSubsequence(String text1, String text2) {
         int m = text1.length(), n = text2.length();
         int[][] dp = new int[m + 1][n + 1];
@@ -1339,7 +1339,7 @@ class Solution {
         return dp[m][n];
     }
 }`,
-  'lc-067': `class Solution {
+  'lc-198': `class Solution {
     public int rob(int[] nums) {
         if (nums.length == 0) return 0;
         if (nums.length == 1) return nums[0];
@@ -1352,7 +1352,7 @@ class Solution {
         return prev1;
     }
 }`,
-  'lc-068': `import java.util.*;
+  'lc-279': `import java.util.*;
 
 class Solution {
     public int numSquares(int n) {
@@ -1367,7 +1367,7 @@ class Solution {
         return dp[n];
     }
 }`,
-  'lc-069': `import java.util.*;
+  'lc-62': `import java.util.*;
 
 class Solution {
     public int uniquePaths(int m, int n) {
@@ -1381,7 +1381,7 @@ class Solution {
         return dp[n - 1];
     }
 }`,
-  'lc-070': `class Solution {
+  'lc-64': `class Solution {
     public int minPathSum(int[][] grid) {
         int m = grid.length, n = grid[0].length;
         for (int i = 0; i < m; i++) {
@@ -1395,7 +1395,7 @@ class Solution {
         return grid[m - 1][n - 1];
     }
 }`,
-  'lc-071': `class Solution {
+  'lc-72': `class Solution {
     public int minDistance(String word1, String word2) {
         int m = word1.length(), n = word2.length();
         int[][] dp = new int[m + 1][n + 1];
@@ -1413,7 +1413,7 @@ class Solution {
         return dp[m][n];
     }
 }`,
-  'lc-072': `import java.util.*;
+  'lc-139': `import java.util.*;
 
 class Solution {
     public boolean wordBreak(String s, List<String> wordDict) {
@@ -1432,7 +1432,7 @@ class Solution {
         return dp[n];
     }
 }`,
-  'lc-073': `class Solution {
+  'lc-152': `class Solution {
     public int maxProduct(int[] nums) {
         int curMax = nums[0], curMin = nums[0], ans = nums[0];
         for (int i = 1; i < nums.length; i++) {
@@ -1444,7 +1444,7 @@ class Solution {
         return ans;
     }
 }`,
-  'lc-074': `class Solution {
+  'lc-416': `class Solution {
     public boolean canPartition(int[] nums) {
         int total = 0;
         for (int num : nums) total += num;
@@ -1460,7 +1460,7 @@ class Solution {
         return dp[target];
     }
 }`,
-  'lc-075': `import java.util.*;
+  'lc-32': `import java.util.*;
 
 class Solution {
     public int longestValidParentheses(String s) {
@@ -1482,7 +1482,7 @@ class Solution {
         return ans;
     }
 }`,
-  'lc-076': `import java.util.*;
+  'lc-312': `import java.util.*;
 
 class Solution {
     public int maxCoins(int[] nums) {
@@ -1505,7 +1505,7 @@ class Solution {
         return dp[0][n + 1];
     }
 }`,
-  'lc-077': `class Solution {
+  'lc-10': `class Solution {
     public boolean isMatch(String s, String p) {
         int m = s.length(), n = p.length();
         boolean[][] dp = new boolean[m + 1][n + 1];
@@ -1532,7 +1532,7 @@ class Solution {
         return dp[m][n];
     }
 }`,
-  'lc-078': `class Solution {
+  'lc-121': `class Solution {
     public int maxProfit(int[] prices) {
         int minPrice = Integer.MAX_VALUE;
         int maxProfit = 0;
@@ -1543,7 +1543,7 @@ class Solution {
         return maxProfit;
     }
 }`,
-  'lc-079': `class Solution {
+  'lc-55': `class Solution {
     public boolean canJump(int[] nums) {
         int maxReach = 0;
         for (int i = 0; i < nums.length; i++) {
@@ -1558,7 +1558,7 @@ class Solution {
         return true;
     }
 }`,
-  'lc-080': `class Solution {
+  'lc-45': `class Solution {
     public int jump(int[] nums) {
         int n = nums.length;
         if (n == 1) return 0;
@@ -1575,7 +1575,7 @@ class Solution {
         return jumps;
     }
 }`,
-  'lc-081': `import java.util.*;
+  'lc-215': `import java.util.*;
 
 class Solution {
     public int findKthLargest(int[] nums, int k) {
@@ -1589,7 +1589,7 @@ class Solution {
         return heap.peek();
     }
 }`,
-  'lc-082': `import java.util.*;
+  'lc-347': `import java.util.*;
 
 class Solution {
     public int[] topKFrequent(int[] nums, int k) {
@@ -1612,7 +1612,7 @@ class Solution {
         return res;
     }
 }`,
-  'lc-083': `import java.util.*;
+  'lc-295': `import java.util.*;
 
 class MedianFinder {
     private PriorityQueue<Integer> small; // max heap (negate)
@@ -1638,7 +1638,7 @@ class MedianFinder {
         return (small.peek() + large.peek()) / 2.0;
     }
 }`,
-  'lc-084': `import java.util.*;
+  'lc-56': `import java.util.*;
 
 class Solution {
     public int[][] merge(int[][] intervals) {
@@ -1654,7 +1654,7 @@ class Solution {
         return res.toArray(new int[res.size()][]);
     }
 }`,
-  'lc-085': `class Solution {
+  'lc-75': `class Solution {
     public void sortColors(int[] nums) {
         int p0 = 0, cur = 0, p2 = nums.length - 1;
         while (cur <= p2) {
@@ -1675,7 +1675,7 @@ class Solution {
         }
     }
 }`,
-  'lc-086': `class Solution {
+  'lc-148': `class Solution {
     public ListNode sortList(ListNode head) {
         if (head == null || head.next == null) return head;
         ListNode slow = head, fast = head.next;
@@ -1707,7 +1707,7 @@ class Solution {
         return dummy.next;
     }
 }`,
-  'lc-087': `import java.util.*;
+  'lc-146': `import java.util.*;
 
 class LRUCache {
     class Node {
@@ -1772,7 +1772,7 @@ class LRUCache {
         }
     }
 }`,
-  'lc-088': `import java.util.*;
+  'lc-380': `import java.util.*;
 
 class RandomizedSet {
     private List<Integer> nums;
@@ -1807,7 +1807,7 @@ class RandomizedSet {
         return nums.get(rand.nextInt(nums.size()));
     }
 }`,
-  'lc-089': `class Solution {
+  'lc-136': `class Solution {
     public int singleNumber(int[] nums) {
         int res = 0;
         for (int num : nums) {
@@ -1816,7 +1816,7 @@ class RandomizedSet {
         return res;
     }
 }`,
-  'lc-090': `class Solution {
+  'lc-169': `class Solution {
     public int majorityElement(int[] nums) {
         int candidate = 0, count = 0;
         for (int num : nums) {
@@ -1828,7 +1828,7 @@ class RandomizedSet {
         return candidate;
     }
 }`,
-  'lc-091': `class Solution {
+  'lc-238': `class Solution {
     public int[] productExceptSelf(int[] nums) {
         int n = nums.length;
         int[] ans = new int[n];
@@ -1844,7 +1844,7 @@ class RandomizedSet {
         return ans;
     }
 }`,
-  'lc-092': `class Solution {
+  'lc-31': `class Solution {
     public void nextPermutation(int[] nums) {
         int n = nums.length;
         int i = n - 2;
@@ -1870,7 +1870,7 @@ class RandomizedSet {
         }
     }
 }`,
-  'lc-093': `class Solution {
+  'lc-287': `class Solution {
     public int findDuplicate(int[] nums) {
         int slow = nums[0], fast = nums[0];
         do {
@@ -1885,7 +1885,7 @@ class RandomizedSet {
         return slow;
     }
 }`,
-  'lc-094': `class Solution {
+  'lc-240': `class Solution {
     public boolean searchMatrix(int[][] matrix, int target) {
         int m = matrix.length, n = matrix[0].length;
         int i = 0, j = n - 1;
@@ -1901,7 +1901,7 @@ class RandomizedSet {
         return false;
     }
 }`,
-  'lc-095': `class Solution {
+  'lc-189': `class Solution {
     public void rotate(int[] nums, int k) {
         int n = nums.length;
         k %= n;
@@ -1920,7 +1920,7 @@ class RandomizedSet {
         }
     }
 }`,
-  'lc-096': `class Solution {
+  'lc-108': `class Solution {
     public TreeNode sortedArrayToBST(int[] nums) {
         return build(nums, 0, nums.length - 1);
     }
@@ -1934,7 +1934,7 @@ class RandomizedSet {
         return root;
     }
 }`,
-  'lc-097': `import java.util.*;
+  'lc-118': `import java.util.*;
 
 class Solution {
     public List<List<Integer>> generate(int numRows) {
@@ -1953,7 +1953,7 @@ class Solution {
         return res;
     }
 }`,
-  'lc-098': `import java.util.*;
+  'lc-448': `import java.util.*;
 
 class Solution {
     public List<Integer> findDisappearedNumbers(int[] nums) {
@@ -1972,7 +1972,7 @@ class Solution {
         return res;
     }
 }`,
-  'lc-099': `import java.util.*;
+  'lc-17': `import java.util.*;
 
 class Solution {
     private static final String[] MAPPING = {
@@ -1999,7 +1999,7 @@ class Solution {
         }
     }
 }`,
-  'lc-100': `class Solution {
+  'lc-338': `class Solution {
     public int[] countBits(int n) {
         int[] dp = new int[n + 1];
         for (int i = 1; i <= n; i++) {

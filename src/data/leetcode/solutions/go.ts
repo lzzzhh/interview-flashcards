@@ -2,7 +2,7 @@
 // DO NOT EDIT MANUALLY
 
 export const goSolutions: Record<string, string> = {
-  'lc-001': `func twoSum(nums []int, target int) []int {
+  'lc-1': `func twoSum(nums []int, target int) []int {
     m := make(map[int]int)
     for i, num := range nums {
         diff := target - num
@@ -13,7 +13,7 @@ export const goSolutions: Record<string, string> = {
     }
     return nil
 }`,
-  'lc-002': `import "sort"
+  'lc-49': `import "sort"
 
 func groupAnagrams(strs []string) [][]string {
     m := make(map[string][]string)
@@ -29,7 +29,7 @@ func groupAnagrams(strs []string) [][]string {
     }
     return res
 }`,
-  'lc-003': `func longestConsecutive(nums []int) int {
+  'lc-128': `func longestConsecutive(nums []int) int {
     set := make(map[int]bool)
     for _, num := range nums {
         set[num] = true
@@ -50,7 +50,7 @@ func groupAnagrams(strs []string) [][]string {
     }
     return longest
 }`,
-  'lc-004': `func subarraySum(nums []int, k int) int {
+  'lc-560': `func subarraySum(nums []int, k int) int {
     count := make(map[int]int)
     count[0] = 1
     preSum := 0
@@ -62,7 +62,7 @@ func groupAnagrams(strs []string) [][]string {
     }
     return ans
 }`,
-  'lc-005': `func moveZeroes(nums []int) {
+  'lc-283': `func moveZeroes(nums []int) {
     slow := 0
     for fast := 0; fast < len(nums); fast++ {
         if nums[fast] != 0 {
@@ -71,7 +71,7 @@ func groupAnagrams(strs []string) [][]string {
         }
     }
 }`,
-  'lc-006': `func maxArea(height []int) int {
+  'lc-11': `func maxArea(height []int) int {
     l, r := 0, len(height)-1
     ans := 0
     for l < r {
@@ -91,7 +91,7 @@ func groupAnagrams(strs []string) [][]string {
     }
     return ans
 }`,
-  'lc-007': `import "sort"
+  'lc-15': `import "sort"
 
 func threeSum(nums []int) [][]int {
     sort.Ints(nums)
@@ -119,7 +119,7 @@ func threeSum(nums []int) [][]int {
     }
     return res
 }`,
-  'lc-008': `func trap(height []int) int {
+  'lc-42': `func trap(height []int) int {
     l, r := 0, len(height)-1
     leftMax, rightMax := 0, 0
     ans := 0
@@ -140,7 +140,7 @@ func threeSum(nums []int) [][]int {
     }
     return ans
 }`,
-  'lc-009': `func firstMissingPositive(nums []int) int {
+  'lc-41': `func firstMissingPositive(nums []int) int {
     n := len(nums)
     for i := 0; i < n; i++ {
         for nums[i] >= 1 && nums[i] <= n && nums[nums[i]-1] != nums[i] {
@@ -154,7 +154,7 @@ func threeSum(nums []int) [][]int {
     }
     return n + 1
 }`,
-  'lc-010': `func setZeroes(matrix [][]int) {
+  'lc-73': `func setZeroes(matrix [][]int) {
     m, n := len(matrix), len(matrix[0])
     row0, col0 := false, false
     for j := 0; j < n; j++ {
@@ -202,7 +202,7 @@ func threeSum(nums []int) [][]int {
         }
     }
 }`,
-  'lc-011': `func spiralOrder(matrix [][]int) []int {
+  'lc-54': `func spiralOrder(matrix [][]int) []int {
     var res []int
     top, bottom := 0, len(matrix)-1
     left, right := 0, len(matrix[0])-1
@@ -230,7 +230,7 @@ func threeSum(nums []int) [][]int {
     }
     return res
 }`,
-  'lc-012': `func rotate(matrix [][]int) {
+  'lc-48': `func rotate(matrix [][]int) {
     n := len(matrix)
     for i := 0; i < n; i++ {
         for j := i + 1; j < n; j++ {
@@ -243,7 +243,7 @@ func threeSum(nums []int) [][]int {
         }
     }
 }`,
-  'lc-013': `func merge(nums1 []int, m int, nums2 []int, n int) {
+  'lc-88': `func merge(nums1 []int, m int, nums2 []int, n int) {
     p1, p2 := m-1, n-1
     p := m + n - 1
     for p2 >= 0 {
@@ -257,7 +257,7 @@ func threeSum(nums []int) [][]int {
         p--
     }
 }`,
-  'lc-014': `func removeDuplicates(nums []int) int {
+  'lc-26': `func removeDuplicates(nums []int) int {
     if len(nums) == 0 {
         return 0
     }
@@ -270,7 +270,7 @@ func threeSum(nums []int) [][]int {
     }
     return slow + 1
 }`,
-  'lc-015': `func removeElement(nums []int, val int) int {
+  'lc-27': `func removeElement(nums []int, val int) int {
     slow := 0
     for fast := 0; fast < len(nums); fast++ {
         if nums[fast] != val {
@@ -280,7 +280,7 @@ func threeSum(nums []int) [][]int {
     }
     return slow
 }`,
-  'lc-016': `func twoSum(numbers []int, target int) []int {
+  'lc-167': `func twoSum(numbers []int, target int) []int {
     l, r := 0, len(numbers)-1
     for l < r {
         sum := numbers[l] + numbers[r]
@@ -294,7 +294,7 @@ func threeSum(nums []int) [][]int {
     }
     return nil
 }`,
-  'lc-017': `func reverseString(s []byte) {
+  'lc-344': `func reverseString(s []byte) {
     l, r := 0, len(s)-1
     for l < r {
         s[l], s[r] = s[r], s[l]
@@ -302,7 +302,7 @@ func threeSum(nums []int) [][]int {
         r--
     }
 }`,
-  'lc-018': `func longestPalindrome(s string) string {
+  'lc-5': `func longestPalindrome(s string) string {
     start, maxLen := 0, 0
     n := len(s)
     for i := 0; i < n; i++ {
@@ -327,7 +327,7 @@ func threeSum(nums []int) [][]int {
     }
     return s[start : start+maxLen]
 }`,
-  'lc-019': `func lengthOfLongestSubstring(s string) int {
+  'lc-3': `func lengthOfLongestSubstring(s string) int {
     seen := make(map[byte]bool)
     l, ans := 0, 0
     for r := 0; r < len(s); r++ {
@@ -342,7 +342,7 @@ func threeSum(nums []int) [][]int {
     }
     return ans
 }`,
-  'lc-020': `func findAnagrams(s string, p string) []int {
+  'lc-438': `func findAnagrams(s string, p string) []int {
     need := make(map[byte]int)
     window := make(map[byte]int)
     for i := 0; i < len(p); i++ {
@@ -374,7 +374,7 @@ func threeSum(nums []int) [][]int {
     }
     return res
 }`,
-  'lc-021': `import "math"
+  'lc-76': `import "math"
 
 func minWindow(s string, t string) string {
     need := make(map[byte]int)
@@ -412,7 +412,7 @@ func minWindow(s string, t string) string {
     }
     return s[start : start+minLen]
 }`,
-  'lc-022': `func maxSlidingWindow(nums []int, k int) []int {
+  'lc-239': `func maxSlidingWindow(nums []int, k int) []int {
     q := make([]int, 0)
     var res []int
     for r := 0; r < len(nums); r++ {
@@ -429,7 +429,7 @@ func minWindow(s string, t string) string {
     }
     return res
 }`,
-  'lc-023': `func checkInclusion(s1 string, s2 string) bool {
+  'lc-567': `func checkInclusion(s1 string, s2 string) bool {
     need := make(map[byte]int)
     window := make(map[byte]int)
     for i := 0; i < len(s1); i++ {
@@ -460,7 +460,7 @@ func minWindow(s string, t string) string {
     }
     return false
 }`,
-  'lc-024': `func search(nums []int, target int) int {
+  'lc-33': `func search(nums []int, target int) int {
     l, r := 0, len(nums)-1
     for l <= r {
         mid := l + (r-l)/2
@@ -483,7 +483,7 @@ func minWindow(s string, t string) string {
     }
     return -1
 }`,
-  'lc-025': `func searchRange(nums []int, target int) []int {
+  'lc-34': `func searchRange(nums []int, target int) []int {
     leftBound := func() int {
         l, r := 0, len(nums)-1
         for l <= r {
@@ -518,7 +518,7 @@ func minWindow(s string, t string) string {
 
     return []int{leftBound(), rightBound()}
 }`,
-  'lc-026': `func searchMatrix(matrix [][]int, target int) bool {
+  'lc-74': `func searchMatrix(matrix [][]int, target int) bool {
     m, n := len(matrix), len(matrix[0])
     l, r := 0, m*n-1
     for l <= r {
@@ -534,7 +534,7 @@ func minWindow(s string, t string) string {
     }
     return false
 }`,
-  'lc-027': `func findMin(nums []int) int {
+  'lc-153': `func findMin(nums []int) int {
     l, r := 0, len(nums)-1
     for l < r {
         mid := (l + r) / 2
@@ -546,7 +546,7 @@ func minWindow(s string, t string) string {
     }
     return nums[l]
 }`,
-  'lc-028': `func isValid(s string) bool {
+  'lc-20': `func isValid(s string) bool {
     stack := []rune{}
     for _, c := range s {
         if c == '(' || c == '{' || c == '[' {
@@ -564,7 +564,7 @@ func minWindow(s string, t string) string {
     }
     return len(stack) == 0
 }`,
-  'lc-029': `type MinStack struct {
+  'lc-155': `type MinStack struct {
     stack    []int
     minStack []int
 }
@@ -594,7 +594,7 @@ func (this *MinStack) Top() int {
 func (this *MinStack) GetMin() int {
     return this.minStack[len(this.minStack)-1]
 }`,
-  'lc-030': `func dailyTemperatures(temperatures []int) []int {
+  'lc-739': `func dailyTemperatures(temperatures []int) []int {
     n := len(temperatures)
     ans := make([]int, n)
     stack := []int{}
@@ -608,7 +608,7 @@ func (this *MinStack) GetMin() int {
     }
     return ans
 }`,
-  'lc-031': `func decodeString(s string) string {
+  'lc-394': `func decodeString(s string) string {
     numStack := []int{}
     strStack := []string{}
     cur := ""
@@ -636,7 +636,7 @@ func (this *MinStack) GetMin() int {
     }
     return cur
 }`,
-  'lc-032': `type ListNode struct {
+  'lc-141': `type ListNode struct {
     Val  int
     Next *ListNode
 }
@@ -652,7 +652,7 @@ func hasCycle(head *ListNode) bool {
     }
     return false
 }`,
-  'lc-033': `type ListNode struct {
+  'lc-206': `type ListNode struct {
     Val  int
     Next *ListNode
 }
@@ -668,7 +668,7 @@ func reverseList(head *ListNode) *ListNode {
     }
     return prev
 }`,
-  'lc-034': `type ListNode struct {
+  'lc-160': `type ListNode struct {
     Val  int
     Next *ListNode
 }
@@ -689,7 +689,7 @@ func getIntersectionNode(headA, headB *ListNode) *ListNode {
     }
     return pA
 }`,
-  'lc-035': `import "container/heap"
+  'lc-23': `import "container/heap"
 
 type ListNode struct {
     Val  int
@@ -730,7 +730,7 @@ func mergeKLists(lists []*ListNode) *ListNode {
     }
     return dummy.Next
 }`,
-  'lc-036': `type ListNode struct {
+  'lc-2': `type ListNode struct {
     Val  int
     Next *ListNode
 }
@@ -756,7 +756,7 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
     }
     return dummy.Next
 }`,
-  'lc-037': `type ListNode struct {
+  'lc-19': `type ListNode struct {
     Val  int
     Next *ListNode
 }
@@ -774,7 +774,7 @@ func removeNthFromEnd(head *ListNode, n int) *ListNode {
     slow.Next = slow.Next.Next
     return dummy.Next
 }`,
-  'lc-038': `type ListNode struct {
+  'lc-21': `type ListNode struct {
     Val  int
     Next *ListNode
 }
@@ -799,7 +799,7 @@ func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode {
     }
     return dummy.Next
 }`,
-  'lc-039': `type ListNode struct {
+  'lc-234': `type ListNode struct {
     Val  int
     Next *ListNode
 }
@@ -827,7 +827,7 @@ func isPalindrome(head *ListNode) bool {
     }
     return true
 }`,
-  'lc-040': `type TreeNode struct {
+  'lc-94': `type TreeNode struct {
     Val   int
     Left  *TreeNode
     Right *TreeNode
@@ -849,7 +849,7 @@ func inorderTraversal(root *TreeNode) []int {
     }
     return res
 }`,
-  'lc-041': `type TreeNode struct {
+  'lc-104': `type TreeNode struct {
     Val   int
     Left  *TreeNode
     Right *TreeNode
@@ -866,7 +866,7 @@ func maxDepth(root *TreeNode) int {
     }
     return 1 + right
 }`,
-  'lc-042': `type TreeNode struct {
+  'lc-226': `type TreeNode struct {
     Val   int
     Left  *TreeNode
     Right *TreeNode
@@ -881,7 +881,7 @@ func invertTree(root *TreeNode) *TreeNode {
     invertTree(root.Right)
     return root
 }`,
-  'lc-043': `type TreeNode struct {
+  'lc-102': `type TreeNode struct {
     Val   int
     Left  *TreeNode
     Right *TreeNode
@@ -911,7 +911,7 @@ func levelOrder(root *TreeNode) [][]int {
     }
     return res
 }`,
-  'lc-044': `type TreeNode struct {
+  'lc-105': `type TreeNode struct {
     Val   int
     Left  *TreeNode
     Right *TreeNode
@@ -939,7 +939,7 @@ func buildTree(preorder []int, inorder []int) *TreeNode {
 
     return build(0, len(preorder)-1, 0, len(inorder)-1)
 }`,
-  'lc-045': `import "math"
+  'lc-98': `import "math"
 
 type TreeNode struct {
     Val   int
@@ -960,7 +960,7 @@ func isValidBST(root *TreeNode) bool {
     }
     return validate(root, math.MinInt64, math.MaxInt64)
 }`,
-  'lc-046': `type TreeNode struct {
+  'lc-101': `type TreeNode struct {
     Val   int
     Left  *TreeNode
     Right *TreeNode
@@ -981,7 +981,7 @@ func isSymmetric(root *TreeNode) bool {
     }
     return isMirror(root, root)
 }`,
-  'lc-047': `type TreeNode struct {
+  'lc-543': `type TreeNode struct {
     Val   int
     Left  *TreeNode
     Right *TreeNode
@@ -1009,7 +1009,7 @@ func diameterOfBinaryTree(root *TreeNode) int {
     depth(root)
     return ans
 }`,
-  'lc-048': `type TreeNode struct {
+  'lc-114': `type TreeNode struct {
     Val   int
     Left  *TreeNode
     Right *TreeNode
@@ -1030,7 +1030,7 @@ func flatten(root *TreeNode) {
         cur = cur.Right
     }
 }`,
-  'lc-049': `type TreeNode struct {
+  'lc-236': `type TreeNode struct {
     Val   int
     Left  *TreeNode
     Right *TreeNode
@@ -1050,7 +1050,7 @@ func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
     }
     return right
 }`,
-  'lc-050': `import "math"
+  'lc-124': `import "math"
 
 type TreeNode struct {
     Val   int
@@ -1087,7 +1087,7 @@ func max(a, b int) int {
     }
     return b
 }`,
-  'lc-051': `func pathSum(root *TreeNode, targetSum int) int {
+  'lc-437': `func pathSum(root *TreeNode, targetSum int) int {
     prefix := map[int]int{0: 1}
 
     var dfs func(*TreeNode, int) int
@@ -1106,7 +1106,7 @@ func max(a, b int) int {
 
     return dfs(root, 0)
 }`,
-  'lc-052': `func numIslands(grid [][]byte) int {
+  'lc-200': `func numIslands(grid [][]byte) int {
     m, n := len(grid), len(grid[0])
     count := 0
 
@@ -1132,7 +1132,7 @@ func max(a, b int) int {
     }
     return count
 }`,
-  'lc-053': `func canFinish(numCourses int, prerequisites [][]int) bool {
+  'lc-207': `func canFinish(numCourses int, prerequisites [][]int) bool {
     graph := make([][]int, numCourses)
     indegree := make([]int, numCourses)
     for _, pre := range prerequisites {
@@ -1159,7 +1159,7 @@ func max(a, b int) int {
     }
     return count == numCourses
 }`,
-  'lc-054': `func orangesRotting(grid [][]int) int {
+  'lc-994': `func orangesRotting(grid [][]int) int {
     m, n := len(grid), len(grid[0])
     type pair struct{ i, j int }
     q := make([]pair, 0)
@@ -1199,7 +1199,7 @@ func max(a, b int) int {
     }
     return -1
 }`,
-  'lc-055': `type Trie struct {
+  'lc-208': `type Trie struct {
     root *TrieNode
 }
 
@@ -1247,7 +1247,7 @@ func (t *Trie) StartsWith(prefix string) bool {
     }
     return true
 }`,
-  'lc-056': `func permute(nums []int) [][]int {
+  'lc-46': `func permute(nums []int) [][]int {
     var res [][]int
     used := make([]bool, len(nums))
 
@@ -1273,7 +1273,7 @@ func (t *Trie) StartsWith(prefix string) bool {
     backtrack([]int{})
     return res
 }`,
-  'lc-057': `func subsets(nums []int) [][]int {
+  'lc-78': `func subsets(nums []int) [][]int {
     var res [][]int
 
     var backtrack func(int, []int)
@@ -1291,7 +1291,7 @@ func (t *Trie) StartsWith(prefix string) bool {
     backtrack(0, []int{})
     return res
 }`,
-  'lc-058': `func exist(board [][]byte, word string) bool {
+  'lc-79': `func exist(board [][]byte, word string) bool {
     m, n := len(board), len(board[0])
 
     var dfs func(int, int, int) bool
@@ -1321,7 +1321,7 @@ func (t *Trie) StartsWith(prefix string) bool {
     }
     return false
 }`,
-  'lc-059': `func solveNQueens(n int) [][]string {
+  'lc-51': `func solveNQueens(n int) [][]string {
     var res [][]string
     board := make([][]byte, n)
     for i := 0; i < n; i++ {
@@ -1363,7 +1363,7 @@ func (t *Trie) StartsWith(prefix string) bool {
     backtrack(0)
     return res
 }`,
-  'lc-060': `func generateParenthesis(n int) []string {
+  'lc-22': `func generateParenthesis(n int) []string {
     var res []string
 
     var backtrack func(string, int, int)
@@ -1383,7 +1383,7 @@ func (t *Trie) StartsWith(prefix string) bool {
     backtrack("", n, n)
     return res
 }`,
-  'lc-061': `func combinationSum(candidates []int, target int) [][]int {
+  'lc-39': `func combinationSum(candidates []int, target int) [][]int {
     var res [][]int
 
     var backtrack func(int, []int, int)
@@ -1407,7 +1407,7 @@ func (t *Trie) StartsWith(prefix string) bool {
     backtrack(0, []int{}, target)
     return res
 }`,
-  'lc-062': `func climbStairs(n int) int {
+  'lc-70': `func climbStairs(n int) int {
     if n <= 2 {
         return n
     }
@@ -1417,7 +1417,7 @@ func (t *Trie) StartsWith(prefix string) bool {
     }
     return b
 }`,
-  'lc-063': `func maxSubArray(nums []int) int {
+  'lc-53': `func maxSubArray(nums []int) int {
     curMax, globalMax := nums[0], nums[0]
     for i := 1; i < len(nums); i++ {
         if nums[i] > curMax+nums[i] {
@@ -1431,7 +1431,7 @@ func (t *Trie) StartsWith(prefix string) bool {
     }
     return globalMax
 }`,
-  'lc-064': `import "sort"
+  'lc-300': `import "sort"
 
 func lengthOfLIS(nums []int) int {
     tails := make([]int, 0)
@@ -1445,7 +1445,7 @@ func lengthOfLIS(nums []int) int {
     }
     return len(tails)
 }`,
-  'lc-065': `func coinChange(coins []int, amount int) int {
+  'lc-322': `func coinChange(coins []int, amount int) int {
     maxVal := amount + 1
     dp := make([]int, amount+1)
     for i := 1; i <= amount; i++ {
@@ -1463,7 +1463,7 @@ func lengthOfLIS(nums []int) int {
     }
     return dp[amount]
 }`,
-  'lc-066': `func longestCommonSubsequence(text1 string, text2 string) int {
+  'lc-1143': `func longestCommonSubsequence(text1 string, text2 string) int {
     m, n := len(text1), len(text2)
     dp := make([][]int, m+1)
     for i := 0; i <= m; i++ {
@@ -1484,7 +1484,7 @@ func lengthOfLIS(nums []int) int {
     }
     return dp[m][n]
 }`,
-  'lc-067': `func rob(nums []int) int {
+  'lc-198': `func rob(nums []int) int {
     if len(nums) == 0 {
         return 0
     }
@@ -1506,7 +1506,7 @@ func lengthOfLIS(nums []int) int {
     }
     return prev1
 }`,
-  'lc-068': `import "math"
+  'lc-279': `import "math"
 
 func numSquares(n int) int {
     dp := make([]int, n+1)
@@ -1522,7 +1522,7 @@ func numSquares(n int) int {
     }
     return dp[n]
 }`,
-  'lc-069': `func uniquePaths(m int, n int) int {
+  'lc-62': `func uniquePaths(m int, n int) int {
     dp := make([]int, n)
     for j := 0; j < n; j++ {
         dp[j] = 1
@@ -1534,7 +1534,7 @@ func numSquares(n int) int {
     }
     return dp[n-1]
 }`,
-  'lc-070': `func minPathSum(grid [][]int) int {
+  'lc-64': `func minPathSum(grid [][]int) int {
     m, n := len(grid), len(grid[0])
     for i := 0; i < m; i++ {
         for j := 0; j < n; j++ {
@@ -1555,7 +1555,7 @@ func numSquares(n int) int {
     }
     return grid[m-1][n-1]
 }`,
-  'lc-071': `func minDistance(word1 string, word2 string) int {
+  'lc-72': `func minDistance(word1 string, word2 string) int {
     m, n := len(word1), len(word2)
     dp := make([][]int, m+1)
     for i := 0; i <= m; i++ {
@@ -1576,7 +1576,7 @@ func numSquares(n int) int {
     }
     return dp[m][n]
 }`,
-  'lc-072': `func wordBreak(s string, wordDict []string) bool {
+  'lc-139': `func wordBreak(s string, wordDict []string) bool {
     wordSet := make(map[string]bool)
     for _, w := range wordDict {
         wordSet[w] = true
@@ -1594,7 +1594,7 @@ func numSquares(n int) int {
     }
     return dp[n]
 }`,
-  'lc-073': `func maxProduct(nums []int) int {
+  'lc-152': `func maxProduct(nums []int) int {
     curMax, curMin, ans := nums[0], nums[0], nums[0]
     for i := 1; i < len(nums); i++ {
         tmpMax := max(nums[i], nums[i]*curMax, nums[i]*curMin)
@@ -1606,7 +1606,7 @@ func numSquares(n int) int {
     }
     return ans
 }`,
-  'lc-074': `func canPartition(nums []int) bool {
+  'lc-416': `func canPartition(nums []int) bool {
     total := 0
     for _, num := range nums {
         total += num
@@ -1624,7 +1624,7 @@ func numSquares(n int) int {
     }
     return dp[target]
 }`,
-  'lc-075': `func longestValidParentheses(s string) int {
+  'lc-32': `func longestValidParentheses(s string) int {
     stack := []int{-1}
     ans := 0
     for i := 0; i < len(s); i++ {
@@ -1643,7 +1643,7 @@ func numSquares(n int) int {
     }
     return ans
 }`,
-  'lc-076': `func maxCoins(nums []int) int {
+  'lc-312': `func maxCoins(nums []int) int {
     n := len(nums)
     points := make([]int, n+2)
     points[0], points[n+1] = 1, 1
@@ -1665,7 +1665,7 @@ func numSquares(n int) int {
     }
     return dp[0][n+1]
 }`,
-  'lc-077': `func isMatch(s string, p string) bool {
+  'lc-10': `func isMatch(s string, p string) bool {
     m, n := len(s), len(p)
     dp := make([][]bool, m+1)
     for i := range dp {
@@ -1693,7 +1693,7 @@ func numSquares(n int) int {
     }
     return dp[m][n]
 }`,
-  'lc-078': `import "math"
+  'lc-121': `import "math"
 
 func maxProfit(prices []int) int {
     minPrice := math.MaxInt32
@@ -1709,7 +1709,7 @@ func maxProfit(prices []int) int {
     }
     return maxProfit
 }`,
-  'lc-079': `func canJump(nums []int) bool {
+  'lc-55': `func canJump(nums []int) bool {
     maxReach := 0
     for i := 0; i < len(nums); i++ {
         if i > maxReach {
@@ -1724,7 +1724,7 @@ func maxProfit(prices []int) int {
     }
     return true
 }`,
-  'lc-080': `func jump(nums []int) int {
+  'lc-45': `func jump(nums []int) int {
     n := len(nums)
     if n == 1 {
         return 0
@@ -1741,7 +1741,7 @@ func maxProfit(prices []int) int {
     }
     return jumps
 }`,
-  'lc-081': `func findKthLargest(nums []int, k int) int {
+  'lc-215': `func findKthLargest(nums []int, k int) int {
     h := &minHeap{}
     for _, num := range nums {
         heap.Push(h, num)
@@ -1765,7 +1765,7 @@ func (h *minHeap) Pop() any {
     *h = old[:n-1]
     return x
 }`,
-  'lc-082': `func topKFrequent(nums []int, k int) []int {
+  'lc-347': `func topKFrequent(nums []int, k int) []int {
     freq := make(map[int]int)
     for _, num := range nums {
         freq[num]++
@@ -1780,7 +1780,7 @@ func (h *minHeap) Pop() any {
     }
     return res[:k]
 }`,
-  'lc-083': `import "container/heap"
+  'lc-295': `import "container/heap"
 
 type MaxHeap []int // store negative for max heap
 func (h MaxHeap) Len() int           { return len(h) }
@@ -1823,7 +1823,7 @@ func (m *MedianFinder) FindMedian() float64 {
     }
     return float64(-(*m.small)[0]+(*m.large)[0]) / 2
 }`,
-  'lc-084': `import "sort"
+  'lc-56': `import "sort"
 
 func merge(intervals [][]int) [][]int {
     sort.Slice(intervals, func(i, j int) bool {
@@ -1841,7 +1841,7 @@ func merge(intervals [][]int) [][]int {
     }
     return res
 }`,
-  'lc-085': `func sortColors(nums []int) {
+  'lc-75': `func sortColors(nums []int) {
     p0, cur, p2 := 0, 0, len(nums)-1
     for cur <= p2 {
         if nums[cur] == 0 {
@@ -1856,7 +1856,7 @@ func merge(intervals [][]int) [][]int {
         }
     }
 }`,
-  'lc-086': `func sortList(head *ListNode) *ListNode {
+  'lc-148': `func sortList(head *ListNode) *ListNode {
     if head == nil || head.Next == nil {
         return head
     }
@@ -1892,7 +1892,7 @@ func merge(l1, l2 *ListNode) *ListNode {
     }
     return dummy.Next
 }`,
-  'lc-087': `type Node struct {
+  'lc-146': `type Node struct {
     key, val int
     prev, next *Node
 }
@@ -1956,7 +1956,7 @@ func (l *LRUCache) Put(key int, value int) {
         delete(l.cache, tail.key)
     }
 }`,
-  'lc-088': `import "math/rand"
+  'lc-380': `import "math/rand"
 
 type RandomizedSet struct {
     nums []int
@@ -1992,14 +1992,14 @@ func (s *RandomizedSet) Remove(val int) bool {
 func (s *RandomizedSet) GetRandom() int {
     return s.nums[rand.Intn(len(s.nums))]
 }`,
-  'lc-089': `func singleNumber(nums []int) int {
+  'lc-136': `func singleNumber(nums []int) int {
     res := 0
     for _, num := range nums {
         res ^= num
     }
     return res
 }`,
-  'lc-090': `func majorityElement(nums []int) int {
+  'lc-169': `func majorityElement(nums []int) int {
     candidate, count := 0, 0
     for _, num := range nums {
         if count == 0 {
@@ -2013,7 +2013,7 @@ func (s *RandomizedSet) GetRandom() int {
     }
     return candidate
 }`,
-  'lc-091': `func productExceptSelf(nums []int) []int {
+  'lc-238': `func productExceptSelf(nums []int) []int {
     n := len(nums)
     ans := make([]int, n)
     ans[0] = 1
@@ -2027,7 +2027,7 @@ func (s *RandomizedSet) GetRandom() int {
     }
     return ans
 }`,
-  'lc-092': `func nextPermutation(nums []int) {
+  'lc-31': `func nextPermutation(nums []int) {
     n := len(nums)
     i := n - 2
     for i >= 0 && nums[i] >= nums[i+1] {
@@ -2044,7 +2044,7 @@ func (s *RandomizedSet) GetRandom() int {
         nums[l], nums[r] = nums[r], nums[l]
     }
 }`,
-  'lc-093': `func findDuplicate(nums []int) int {
+  'lc-287': `func findDuplicate(nums []int) int {
     slow, fast := nums[0], nums[0]
     for {
         slow = nums[slow]
@@ -2060,7 +2060,7 @@ func (s *RandomizedSet) GetRandom() int {
     }
     return slow
 }`,
-  'lc-094': `func searchMatrix(matrix [][]int, target int) bool {
+  'lc-240': `func searchMatrix(matrix [][]int, target int) bool {
     m, n := len(matrix), len(matrix[0])
     i, j := 0, n-1
     for i < m && j >= 0 {
@@ -2074,7 +2074,7 @@ func (s *RandomizedSet) GetRandom() int {
     }
     return false
 }`,
-  'lc-095': `func rotate(nums []int, k int) {
+  'lc-189': `func rotate(nums []int, k int) {
     n := len(nums)
     k %= n
     reverse := func(l, r int) {
@@ -2088,7 +2088,7 @@ func (s *RandomizedSet) GetRandom() int {
     reverse(0, k-1)
     reverse(k, n-1)
 }`,
-  'lc-096': `func sortedArrayToBST(nums []int) *TreeNode {
+  'lc-108': `func sortedArrayToBST(nums []int) *TreeNode {
     var build func(l, r int) *TreeNode
     build = func(l, r int) *TreeNode {
         if l > r {
@@ -2102,7 +2102,7 @@ func (s *RandomizedSet) GetRandom() int {
     }
     return build(0, len(nums)-1)
 }`,
-  'lc-097': `func generate(numRows int) [][]int {
+  'lc-118': `func generate(numRows int) [][]int {
     res := make([][]int, 0, numRows)
     for i := 0; i < numRows; i++ {
         row := make([]int, i+1)
@@ -2114,7 +2114,7 @@ func (s *RandomizedSet) GetRandom() int {
     }
     return res
 }`,
-  'lc-098': `func findDisappearedNumbers(nums []int) []int {
+  'lc-448': `func findDisappearedNumbers(nums []int) []int {
     for _, num := range nums {
         idx := abs(num) - 1
         nums[idx] = -abs(nums[idx])
@@ -2134,7 +2134,7 @@ func abs(x int) int {
     }
     return x
 }`,
-  'lc-099': `func letterCombinations(digits string) []string {
+  'lc-17': `func letterCombinations(digits string) []string {
     if len(digits) == 0 {
         return nil
     }
@@ -2156,7 +2156,7 @@ func abs(x int) int {
     backtrack(0, []byte{})
     return res
 }`,
-  'lc-100': `func countBits(n int) []int {
+  'lc-338': `func countBits(n int) []int {
     dp := make([]int, n+1)
     for i := 1; i <= n; i++ {
         dp[i] = dp[i>>1] + (i & 1)
