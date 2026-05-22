@@ -68,6 +68,16 @@ export default function ProfilePage({ onBack, onNavigate }: Props) {
         {/* 数据库入口 */}
         <div className="rounded-2xl p-4 mb-4 border space-y-1" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <button
+            onClick={() => onNavigate('learning-plans')}
+            className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
+          >
+            <div className="flex-1 text-left">
+              <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>学习清单</h3>
+              <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>AI 生成的个性化学习计划</p>
+            </div>
+            <ChevronRight className="w-4 h-4" style={{ color: TEXT_MUTED }} />
+          </button>
+          <button
             onClick={() => onNavigate('card-database')}
             className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
           >

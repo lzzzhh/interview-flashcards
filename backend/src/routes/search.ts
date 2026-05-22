@@ -1,6 +1,6 @@
 // backend/src/routes/search.ts — AI 搜索路由
 import { FastifyInstance } from 'fastify';
-import { hybridSearch } from '../services/search/hybrid-search';
+import { hybridSearch, learningPlanSearch } from '../services/search/hybrid-search';
 import { fts5Search } from '../services/search/fts5-search';
 import { HybridSearchSchema, validate } from './schemas';
 
@@ -21,5 +21,16 @@ export async function searchRoutes(app: FastifyInstance) {
     const { q, limit, deckId } = req.query as { q?: string; limit?: string; deckId?: string };
     const results = await fts5Search(q || '', parseInt(limit || '20'), deckId);
     return { results, total: results.length };
+  });
+
+  // 学习清单：不限 topK，按学习优先级排序
+  app.post('/api/search/learning-plan', async (req) => {
+    const body = req.body as any;
+    const plan = await learningPlanSearch({
+      query: body.query || '',
+      deckIds: body.deckIds,
+      filters: body.filters,
+    });
+    return { plan, total: plan.length };
   });
 }

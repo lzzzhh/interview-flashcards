@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Search, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, Loader2, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 import { hybridSearch, type SearchResult } from '../api/searchApi';
 import { useAppContext } from '../context/AppContext';
 import { API_BASE } from '../api/client';
+import { savePlan, type LearningPlanItem } from '../utils/learningPlans';
 import type { Category } from '../types';
 
 interface Props {
@@ -15,6 +16,8 @@ const TEXT_MUTED = 'var(--text-muted)';
 const BLUE = 'var(--blue)';
 const CARD_BG = 'var(--card-bg)';
 const CARD_BORDER = 'var(--card-border)';
+const GREEN = '#10B981';
+const AMBER = '#D97706';
 
 export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const { dispatch } = useAppContext();
@@ -23,8 +26,11 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [warmingUp, setWarmingUp] = useState(true);
+  const [planExpanded, setPlanExpanded] = useState(false);
+  const [planItems, setPlanItems] = useState<LearningPlanItem[]>([]);
+  const [planSaved, setPlanSaved] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
-  // 进入页面时预热 bge-m3
   useEffect(() => {
     fetch(`${API_BASE}/health/warmup`, { method: 'POST' })
       .then(() => setWarmingUp(false))
@@ -34,6 +40,8 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const handleSearch = async () => {
     if (!query.trim()) return;
     setLoading(true);
+    setPlanExpanded(false);
+    setPlanSaved(false);
     try {
       const res = await hybridSearch(query.trim(), 15);
       setResults(res.results);
@@ -42,10 +50,57 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
     setLoading(false);
   };
 
-  const handleCardClick = (card: SearchResult) => {
-    dispatch({ type: 'JUMP_TO_CARD', payload: { category: card.deckId as Category, cardId: card.cardId } });
-    onEnterStudy(card.deckId as Category);
+  const handleFetchPlan = async () => {
+    if (planExpanded) { setPlanExpanded(false); return; }
+    try {
+      const res = await fetch(`${API_BASE}/search/learning-plan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query.trim() }),
+      });
+      const data = await res.json();
+      setPlanItems((data.plan || []).map((p: any) => ({
+        cardId: p.cardId, title: p.title, deckId: p.deckId, deckName: p.deckName,
+        state: p.state, interval: p.interval, selected: true, snippet: p.snippet,
+      })));
+      setPlanExpanded(true);
+    } catch { setPlanItems([]); }
   };
+
+  const togglePlanItem = (idx: number) => {
+    setPlanItems(prev => prev.map((item, i) =>
+      i === idx ? { ...item, selected: !item.selected } : item
+    ));
+  };
+
+  const handleSavePlan = async () => {
+    const selected = planItems.filter(p => p.selected);
+    if (selected.length === 0) return;
+    setGenerating(true);
+    try {
+      savePlan({
+        id: `plan-${Date.now()}`,
+        title: query.trim(),
+        query: query.trim(),
+        items: selected,
+        createdAt: Date.now(),
+      });
+      // small delay to show spinner
+      await new Promise(r => setTimeout(r, 600));
+    } catch (e) {
+      console.error('savePlan failed:', e);
+    }
+    setGenerating(false);
+    setPlanSaved(true);
+    setPlanExpanded(false);
+  };
+
+  const handleCardClick = (cardId: string, deckId: string) => {
+    dispatch({ type: 'JUMP_TO_CARD', payload: { category: deckId as Category, cardId } });
+    onEnterStudy(deckId as Category);
+  };
+
+  const selectedCount = planItems.filter(p => p.selected).length;
 
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
@@ -83,12 +138,76 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
           ) : results.length === 0 ? (
             <p className="text-center text-[13px] mt-8" style={{ color: TEXT_MUTED }}>未找到相关卡片</p>
           ) : (
-            <div className="space-y-2">
-              <p className="text-[12px] mb-2" style={{ color: TEXT_MUTED }}>{results.length} 条结果</p>
+            <div className="space-y-3">
+
+              {!planSaved && (
+                <div className="rounded-2xl border overflow-hidden" style={{ borderColor: `${AMBER}40`, backgroundColor: `${AMBER}08` }}>
+                  <button onClick={handleFetchPlan} className="w-full text-left px-4 py-3 flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-[13px] font-bold" style={{ color: TEXT_PRIMARY }}>AI 为你推荐学习清单</h3>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${AMBER}18`, color: AMBER }}>AI</span>
+                      </div>
+                      <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>
+                        {planExpanded ? `${planItems.length} 张卡片待选择` : '智能筛选相关卡片，按学习优先级排序'}
+                      </p>
+                    </div>
+                    {planExpanded ? <ChevronUp className="w-4 h-4 shrink-0" style={{ color: AMBER }} /> : <ChevronDown className="w-4 h-4 shrink-0" style={{ color: AMBER }} />}
+                  </button>
+                  {planExpanded && (
+                    <div className="border-t px-3 py-2 space-y-1 max-h-80 overflow-y-auto" style={{ borderColor: `${AMBER}20` }}>
+                      {planItems.length === 0 ? (
+                        <p className="text-center text-[12px] py-3" style={{ color: TEXT_MUTED }}>未找到相关卡片</p>
+                      ) : (
+                        planItems.map((item, i) => (
+                          <button key={item.cardId} onClick={() => togglePlanItem(i)}
+                            className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors"
+                            style={{ opacity: item.selected ? 1 : 0.5 }}
+                          >
+                            <div className={`w-4 h-4 rounded border-2 shrink-0 transition-all bg-white dark:bg-transparent ${
+                              item.selected ? 'border-gray-800 dark:border-white' : 'border-gray-300 dark:border-gray-600'
+                            }`} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[12px] font-medium truncate" style={{ color: TEXT_PRIMARY }}>{item.title}</p>
+                              <p className="text-[10px] truncate" style={{ color: TEXT_MUTED }}>
+                                {item.deckName} {item.state !== 'new' ? `· 间隔${item.interval}天` : '· 新卡'}
+                              </p>
+                            </div>
+                          </button>
+                        ))
+                      )}
+                      {planItems.length > 0 && (
+                        <div className="flex items-center justify-between pt-2 pb-1 px-1">
+                          <button onClick={() => setPlanItems(prev => prev.map(p => ({ ...p, selected: !p.selected })))}
+                            className="text-[11px]" style={{ color: TEXT_MUTED }}>
+                            {selectedCount === planItems.length ? '取消全选' : '全选'}
+                          </button>
+                          <span className="text-[11px]" style={{ color: TEXT_MUTED }}>已选 {selectedCount}/{planItems.length}</span>
+                          <button onClick={handleSavePlan} disabled={selectedCount === 0 || generating}
+                            className="px-3 py-1 rounded-lg text-[12px] font-bold disabled:opacity-30 flex items-center gap-1.5"
+                            style={{ backgroundColor: AMBER, color: '#fff' }}>
+                            {generating ? <><Loader2 className="w-3 h-3 animate-spin" /> 生成中</> : '生成清单'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {planSaved && (
+                <div className="rounded-xl px-4 py-3 flex items-center gap-2" style={{ backgroundColor: `${GREEN}12` }}>
+                  <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: GREEN }} />
+                  <div>
+                    <p className="text-[13px] font-medium" style={{ color: GREEN }}>学习清单已生成</p>
+                    <p className="text-[11px]" style={{ color: TEXT_MUTED }}>位置在「我的」→「学习清单」</p>
+                  </div>
+                </div>
+              )}
+
+              <p className="text-[12px]" style={{ color: TEXT_MUTED }}>{results.length} 条结果</p>
               {results.map((r) => (
-                <button
-                  key={r.cardId}
-                  onClick={() => handleCardClick(r)}
+                <button key={r.cardId} onClick={() => handleCardClick(r.cardId, r.deckId)}
                   className="w-full text-left rounded-xl p-3 border transition-colors"
                   style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}
                 >
@@ -102,13 +221,11 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
                     </span>
                   </div>
                   {r.snippet && (
-                    <p className="text-[11px] mt-1 leading-relaxed truncate-2" style={{ color: TEXT_MUTED }}>
-                      {r.snippet}
-                    </p>
+                    <p className="text-[11px] mt-1 leading-relaxed truncate-2" style={{ color: TEXT_MUTED }}>{r.snippet}</p>
                   )}
                   <div className="flex items-center gap-2 mt-1">
-                    {r.deckName && <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{r.deckName}</span>}
-                    <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{r.reason}</span>
+                    {r.deckName && <span className="text-[10px]" style={{ color: TEXT_MUTED }}>{r.deckName}</span>}
+                    <span className="text-[10px]" style={{ color: TEXT_MUTED }}>{r.reason}</span>
                   </div>
                 </button>
               ))}

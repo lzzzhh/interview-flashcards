@@ -232,6 +232,10 @@ const RULES: ExpansionEntry[] = [
   // 业务系统集成LLM（agent-7 buried）
   { pattern: /集成.*业务|落地.*系统|业务.*集成|怎么.*把.*模型|能力.*集成|集成.*自己.*系统/i,
     keywords: ['RAG', '检索增强生成', '知识库', 'API调用', 'LLM', 'Function Calling', 'Agent'] },
+
+  // 集成学习专项（学习清单用）
+  { pattern: /集成学习|ensemble|集成方法|bagging.*boosting|多模型.*融合|模型.*集成/i,
+    keywords: ['集成学习', 'ensemble learning', 'Bagging', 'Boosting', 'Stacking', 'Blending', '随机森林', 'GBDT', 'XGBoost', '模型融合', '投票'] },
 ];
 
 /**
@@ -252,7 +256,8 @@ const KEYWORD_DECK_MAP: Record<string, string> = {
   '集成学习': 'machine-learning', 'k-means': 'machine-learning', 'kmeans': 'machine-learning',
   '决策树': 'machine-learning', '逻辑回归': 'machine-learning', '支持向量机': 'machine-learning',
   '随机森林': 'machine-learning', '交叉验证': 'machine-learning', 'bagging': 'machine-learning',
-  'boosting': 'machine-learning', 'roc': 'machine-learning', 'auc': 'machine-learning',
+  'boosting': 'machine-learning', '集成学习': 'machine-learning', 'ensemble': 'machine-learning',
+  'roc': 'machine-learning', 'auc': 'machine-learning',
   't-sne': 'machine-learning', 'dbscan': 'machine-learning',
   // 统计学
   '贝叶斯': 'statistics', '置信区间': 'statistics', '假设检验': 'statistics',

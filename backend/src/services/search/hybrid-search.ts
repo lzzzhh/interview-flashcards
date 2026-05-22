@@ -412,3 +412,108 @@ async function recallVector(
 function safeJsonParse(s: string): string[] {
   try { return JSON.parse(s); } catch { return []; }
 }
+
+// ---- 学习清单搜索 ----
+
+interface LearningPlanItem {
+  cardId: string;
+  title: string;
+  deckId: string;
+  deckName?: string;
+  tags: string[];
+  score: number;
+  state: string;
+  interval: number;
+  nextReview: number;
+  priority: number; // 0=新卡(高优先), 1=到期, 2=即将到期, 3=已掌握
+  snippet?: string;
+}
+
+export async function learningPlanSearch(input: {
+  query: string;
+  deckIds?: string[];
+  filters?: { difficulty?: string[]; onlyDue?: boolean };
+}): Promise<LearningPlanItem[]> {
+  // 1. 用大候选池跑搜索（topK=999，取全部结果）
+  const matches = await hybridSearch({
+    query: input.query,
+    deckIds: input.deckIds,
+    topK: 999,
+    filters: input.filters,
+  });
+
+  if (matches.length === 0) return [];
+
+  // 过滤：只保留有实际语义/关键词匹配的结果（score >= 0.08 且 deck 匹配相关概念）
+  const deckBoostSet = new Set<string>();
+  // 从 query expansion 推断目标牌组
+  const { deckIds: expandedDecks } = expandQuery(input.query);
+  for (const d of expandedDecks) deckBoostSet.add(d);
+
+  const relevant = matches.filter(m => {
+    if (m.score >= 0.30) return true;  // 高分直接保留
+    if (m.score >= 0.20 && deckBoostSet.has(m.deckId)) return true;  // 目标牌组降分保留
+    return false;
+  });
+
+  if (relevant.length === 0) return [];
+
+  // 限制最多 100 张（保持学习清单可管理）
+  const capped = relevant.slice(0, 100);
+
+  // 2. 获取学习状态
+  const cardIds = capped.map(c => c.cardId);
+  const [progresses, cards] = await Promise.all([
+    prisma.cardProgress.findMany({
+      where: { userId: 'demo-user', cardId: { in: cardIds } },
+    }),
+    prisma.card.findMany({
+      where: { id: { in: cardIds } },
+      include: { deck: true },
+    }),
+  ]);
+
+  const progressMap = new Map(progresses.map(p => [p.cardId, p]));
+  const cardMap = new Map(cards.map(c => [c.id, c]));
+  const now = Date.now();
+
+  // 3. 计算学习优先级
+  const plan: LearningPlanItem[] = [];
+  for (const m of capped) {
+    const card = cardMap.get(m.cardId);
+    const prog = progressMap.get(m.cardId);
+    const state = prog?.state || 'new';
+    const nextReview = prog?.nextReview ? new Date(prog.nextReview).getTime() : 0;
+
+    let priority: number;
+    if (state === 'new') {
+      priority = 0; // 最高优先：新卡片，还没学过
+    } else if (state !== 'new' && nextReview <= now) {
+      priority = 1; // 高优先：到期复习
+    } else if (state !== 'new' && nextReview <= now + 3 * 86400000) {
+      priority = 2; // 中优先：3天内到期
+    } else {
+      priority = 3; // 低优先：已掌握，间隔较长
+    }
+
+    const content = card?.question || card?.answer || '';
+    plan.push({
+      cardId: m.cardId,
+      title: m.title,
+      deckId: m.deckId,
+      deckName: m.deckName || card?.deck?.name,
+      tags: m.tags,
+      score: m.score,
+      state,
+      interval: prog?.intervalDays || 0,
+      nextReview,
+      priority,
+      snippet: content.slice(0, 100) + (content.length > 100 ? '...' : ''),
+    });
+  }
+
+  // 4. 按优先级排序：priority ASC（新卡优先），然后 score DESC
+  plan.sort((a, b) => a.priority - b.priority || b.score - a.score);
+
+  return plan;
+}

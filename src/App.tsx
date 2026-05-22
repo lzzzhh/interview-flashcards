@@ -25,6 +25,8 @@ import ApiSettingsPage from './components/ApiSettingsPage';
 import TagManagerPage from './components/TagManagerPage';
 import MockInterviewPage from './components/MockInterviewPage';
 import ResumeProjectPage from './components/ResumeProjectPage';
+import LearningPlanListPage from './components/LearningPlanListPage';
+import LearningPlanDetailPage from './components/LearningPlanDetailPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import type { Category, FlashCard } from './types';
 
@@ -108,6 +110,7 @@ function AppInner() {
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [profileSubPage, setProfileSubPage] = useState<string | null>(null);
+  const [learningPlanId, setLearningPlanId] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [agentPage, setAgentPage] = useState<string | null>(null);
   const { dispatch } = useAppContext();
@@ -132,6 +135,8 @@ function AppInner() {
     if (profileSubPage === 'vector-database') return <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'tag-manager') return <TagManagerPage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'api-settings') return <ApiSettingsPage onBack={() => setProfileSubPage(null)} />;
+    if (profileSubPage === 'learning-plans' && learningPlanId) return <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} onEnterStudy={handleEnterStudy} />;
+    if (profileSubPage === 'learning-plans') return <LearningPlanListPage onBack={() => setProfileSubPage(null)} onViewPlan={(id) => setLearningPlanId(id)} />;
     return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
   }
 
