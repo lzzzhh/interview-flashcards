@@ -181,4 +181,45 @@ export const TEST_CASES: TestCase[] = [
   { query: 'overfitting vs underfitting deep learning', group: '英文-机器学习', primaryIds: ['ml-7'], secondaryIds: ['ml-8', 'dl-4'], acceptableDecks: ['machine-learning', 'deep-learning'], acceptableConcepts: ['overfitting', 'underfitting'] },
   { query: 'binary tree traversal preorder inorder postorder', group: '英文-力扣', primaryIds: ['lc-043', 'lc-040'], secondaryIds: ['lc-041'], acceptableDecks: ['leetcode'], acceptableConcepts: ['binary tree', 'traversal', 'DFS'] },
 
+  // ════════════════════ 学习路径推荐 (5) ════════════════════
+  // 用户用自然语言表达学习意图，期望返回概念相关的系列卡片
+
+  { query: '假如我想学习决策树，我应该学习哪些卡片', group: '学习路径-机器学习', primaryIds: ['ml-3'], secondaryIds: ['ml-16', 'ml-17'], acceptableDecks: ['machine-learning'], acceptableConcepts: ['决策树', '随机森林', '集成学习'] },
+  { query: '现在想入门深度学习，需要看哪些基础卡片', group: '学习路径-深度学习', primaryIds: ['dl-1'], secondaryIds: ['dl-2', 'dl-3', 'dl-5'], acceptableDecks: ['deep-learning'], acceptableConcepts: ['深度学习', '反向传播', '激活函数'] },
+  { query: '我 Transformer 不太懂，帮我找相关卡片', group: '学习路径-大模型', primaryIds: ['llm-1'], secondaryIds: ['llm-3', 'llm-4', 'llm-9'], acceptableDecks: ['llm'], acceptableConcepts: ['Transformer', 'Attention', '位置编码'] },
+  { query: '想刷动态规划，推荐几道题', group: '学习路径-力扣', primaryIds: ['lc-062'], secondaryIds: ['lc-063', 'lc-064', 'lc-067'], acceptableDecks: ['leetcode'], acceptableConcepts: ['动态规划', 'DP'] },
+  { query: '如何系统地学习假设检验', group: '学习路径-统计学', primaryIds: ['stats-24', 'stats-25'], secondaryIds: ['stats-26', 'stats-27'], acceptableDecks: ['statistics'], acceptableConcepts: ['假设检验', 'p值', 't检验'] },
+
+  // ════════════════════ 长句自然语言查询 (15) ════════════════════
+  // 模拟真实用户日常提问，包含大量口语填充词
+
+  // --- 机器学习 ---
+  { query: '面试官如果问我 SVM 的原理和核函数怎么选，我该怎么回答比较好', group: '长句-机器学习', primaryIds: ['ml-2'], secondaryIds: ['ml-19', 'ml-20'], acceptableDecks: ['machine-learning'], acceptableConcepts: ['SVM', '核函数', 'kernel'] },
+  { query: '最近在复习机器学习基础，想问一下偏差和方差到底怎么理解，有什么直观的例子吗', group: '长句-机器学习', primaryIds: ['ml-8'], secondaryIds: ['ml-7'], acceptableDecks: ['machine-learning'], acceptableConcepts: ['偏差方差', 'bias-variance', '过拟合'] },
+  { query: '我有个数据集样本特别不均衡，正样本只有百分之五，这种情况一般怎么处理比较好', group: '长句-机器学习', primaryIds: ['ml-16'], secondaryIds: ['ml-17', 'ml-50'], acceptableDecks: ['machine-learning'], acceptableConcepts: ['样本不均衡', 'SMOTE', '类别权重'] },
+
+  // --- 深度学习 ---
+  { query: '能不能用通俗易懂的方式给我解释一下 Batch Normalization 到底做了什么事情', group: '长句-深度学习', primaryIds: ['dl-3'], secondaryIds: ['dl-2'], acceptableDecks: ['deep-learning'], acceptableConcepts: ['BatchNorm', '归一化'] },
+  { query: '我在做图像分类任务，模型训练了好几个小时一直在震荡不收敛，可能是什么原因', group: '长句-深度学习', primaryIds: ['dl-2'], secondaryIds: ['dl-1', 'dl-5'], acceptableDecks: ['deep-learning'], acceptableConcepts: ['梯度消失', '激活函数', '学习率'] },
+
+  // --- 大模型 ---
+  { query: '我们团队想把一个大模型部署到生产环境，但是推理速度太慢了，有没有什么加速的方案可以推荐一下', group: '长句-大模型', primaryIds: ['llm-15'], secondaryIds: ['llm-16', 'llm-17'], acceptableDecks: ['llm'], acceptableConcepts: ['推理加速', '量化', 'KV Cache'] },
+  { query: '想了解一下现在主流的 prompt engineering 技巧有哪些，有没有什么套路可以参考', group: '长句-大模型', primaryIds: ['llm-14'], secondaryIds: ['llm-13'], acceptableDecks: ['llm'], acceptableConcepts: ['Prompt', 'CoT', 'Few-shot'] },
+
+  // --- 统计学 ---
+  { query: '领导让我分析一下新功能上线前后用户留存有没有显著变化，我应该用什么统计方法', group: '长句-统计学', primaryIds: ['stats-24'], secondaryIds: ['stats-25', 'stats-26'], acceptableDecks: ['statistics'], acceptableConcepts: ['AB测试', '假设检验', '显著性'] },
+  { query: '面试被问到中心极限定理，我其实一直没完全理解它的实际应用场景，能帮我梳理一下吗', group: '长句-统计学', primaryIds: ['stats-10'], secondaryIds: ['stats-11'], acceptableDecks: ['statistics'], acceptableConcepts: ['中心极限定理', '大数定律', '抽样分布'] },
+
+  // --- 力扣 ---
+  { query: '力扣里面二叉树相关的题目我做得不太好，尤其是递归遍历老是写错，有哪些经典题可以练手', group: '长句-力扣', primaryIds: ['lc-043'], secondaryIds: ['lc-040', 'lc-041', 'lc-039'], acceptableDecks: ['leetcode'], acceptableConcepts: ['二叉树', '遍历', '递归'] },
+  { query: '最近在刷数组相关的题，哈希表和双指针这两类经常搞混，什么时候用哈希什么时候用双指针', group: '长句-力扣', primaryIds: ['lc-001'], secondaryIds: ['lc-002', 'lc-005'], acceptableDecks: ['leetcode'], acceptableConcepts: ['哈希表', '双指针', '数组'] },
+
+  // --- Agent ---
+  { query: '我们想在公司内部搭建一个基于 RAG 的知识库问答系统，从技术选型到落地有什么需要注意的地方', group: '长句-Agent', primaryIds: ['agent-7'], secondaryIds: ['agent-15', 'agent-18', 'agent-22'], acceptableDecks: ['agent'], acceptableConcepts: ['RAG', '检索增强生成', '知识库'] },
+  { query: 'Agent 开发里面 ReAct 模式和 Function Calling 到底有什么区别，什么时候用哪个', group: '长句-Agent', primaryIds: ['agent-2'], secondaryIds: ['agent-3', 'agent-4'], acceptableDecks: ['agent'], acceptableConcepts: ['ReAct', 'Function Calling', 'Tool Use'] },
+
+  // --- 职场 ---
+  { query: '下周要跟领导做季度述职汇报了，怎么把工作成果讲得有条理又有亮点，有什么推荐的框架吗', group: '长句-职场', primaryIds: ['wp-3'], secondaryIds: ['wp-8'], acceptableDecks: ['workplace'], acceptableConcepts: ['汇报', '向上沟通', '述职'] },
+  { query: '最近想跳槽但是简历投出去都没有回音，想请教一下怎么写简历才能让 HR 眼前一亮', group: '长句-职场', primaryIds: ['wp-7'], secondaryIds: ['wp-6', 'wp-5'], acceptableDecks: ['workplace'], acceptableConcepts: ['简历', '面试', 'STAR法则'] },
+
 ];

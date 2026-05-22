@@ -214,6 +214,24 @@ const RULES: ExpansionEntry[] = [
   // 强化学习
   { pattern: /强化学习|reinforcement|RL|Q.learning|DQN|PPO|policy.*gradient/i,
     keywords: ['强化学习', 'reinforcement learning', 'Q-learning', 'DQN', 'PPO', 'policy gradient', 'reward', '状态', '动作', '马尔可夫'] },
+
+  // ── Good/Bad Case 优化 ──
+
+  // p-value 专项（stats-24 buried）
+  { pattern: /p.?value|p.?值|统计推断|显著性检验|显著.*检验|留存.*显著|上线.*前后.*变化/i,
+    keywords: ['p值', 'p-value', '假设检验', '显著性水平', '统计推断', '显著性差异'] },
+
+  // 模型不收敛/震荡（dl-2 buried）
+  { pattern: /不收敛|loss.*震荡|loss.*不降|震[荡荡]|训练.*几.*小时|一直.*训练/i,
+    keywords: ['梯度消失', '梯度爆炸', '激活函数', '学习率', 'BatchNorm', 'ReLU', 'sigmoid'] },
+
+  // 哈希vs双指针混淆（lc-001 buried）
+  { pattern: /哈希.*双指针|双指针.*哈希|搞混|分不清|什么.*时候.*用|区别.*哈希.*双指针/i,
+    keywords: ['哈希表', '双指针', '数组', '两数之和', '前缀和', '滑动窗口'] },
+
+  // 业务系统集成LLM（agent-7 buried）
+  { pattern: /集成.*业务|落地.*系统|业务.*集成|怎么.*把.*模型|能力.*集成|集成.*自己.*系统/i,
+    keywords: ['RAG', '检索增强生成', '知识库', 'API调用', 'LLM', 'Function Calling', 'Agent'] },
 ];
 
 /**
@@ -290,6 +308,13 @@ export function expandQuery(rawQuery: string): { keywords: string[]; deckIds: st
   const q = rawQuery.trim();
   if (!q) return { keywords: [], deckIds: [] };
 
+  // 1. 学习意图核心概念抽取
+  const learningIntents = extractLearningConcepts(q);
+  for (const kw of learningIntents) {
+    keywords.add(kw.toLowerCase());
+  }
+
+  // 2. 规则词典扩展
   for (const rule of RULES) {
     if (rule.pattern.test(q)) {
       for (const kw of rule.keywords) {
@@ -300,4 +325,33 @@ export function expandQuery(rawQuery: string): { keywords: string[]; deckIds: st
 
   const kwList = [...keywords];
   return { keywords: kwList, deckIds: inferDeckIds(kwList) };
+}
+
+// ── 学习意图概念抽取 ──
+
+const LEARNING_INTENT_PATTERNS: Array<{ pattern: RegExp; group: number }> = [
+  // "想学习XXX" / "入门XXX" / "系统学习XXX" / "刷XXX"
+  { pattern: /(?:想|要|准备|打算|如何|怎么)?(?:系统(?:地|的)?)?(?:学习|入门|复习|刷|了解|掌握|搞懂)(.+)$/i, group: 1 },
+  // "XXX不太懂" / "XXX不会" / "XXX没懂"
+  { pattern: /(.+?)(?:不太懂|不会|没懂|搞不清楚|不太熟)$/i, group: 1 },
+  // "哪些卡片关于XXX" / "什么卡片是XXX"
+  { pattern: /(?:哪些|什么).*?(?:卡片|内容|题).*?(?:关于|是|学)?(.+)$/i, group: 1 },
+];
+
+function extractLearningConcepts(query: string): string[] {
+  const results: string[] = [];
+  for (const { pattern, group } of LEARNING_INTENT_PATTERNS) {
+    const m = query.match(pattern);
+    if (m && m[group]) {
+      let concept = m[group]
+        .replace(/[,，.。!！?？、\s]+$/, '')
+        .replace(/[,，\s]*(?:应该|可以|需要|推荐|有没有|有没有什么|有什么|一下|一些|几道|几张).*$/, '')
+        .replace(/[，,]\s*我.*$/, '')
+        .trim();
+      if (concept.length >= 1 && concept.length <= 30) {
+        results.push(concept);
+      }
+    }
+  }
+  return [...new Set(results)];
 }
