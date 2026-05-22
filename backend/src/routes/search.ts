@@ -11,8 +11,9 @@ export async function searchRoutes(app: FastifyInstance) {
     const results = await hybridSearch({
       query: body.query || '',
       deckIds: body.deckIds,
-      topK: body.topK || 20,
+      maxResults: body.maxResults ?? body.topK ?? undefined,
       minScore: body.minScore,
+      candidateLimit: body.candidateLimit,
       filters: body.filters,
     });
     return { results, total: results.length };

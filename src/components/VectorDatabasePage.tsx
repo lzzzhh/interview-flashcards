@@ -60,7 +60,7 @@ export default function VectorDatabasePage({ onBack }: Props) {
     if (!query.trim()) return;
     setLoading(true);
     try {
-      const res = await hybridSearch(query.trim(), 20);
+      const res = await hybridSearch({ query: query.trim(), minScore: 0.3, maxResults: 20 });
       setResults(res.results);
       setSearched(true);
     } catch {

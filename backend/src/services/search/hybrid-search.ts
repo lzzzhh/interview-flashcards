@@ -26,8 +26,14 @@ import {
 interface HybridSearchInput {
   query: string;
   deckIds?: string[];
-  topK: number;
+  /** @deprecated use maxResults */
+  topK?: number;
+  /** 最多返回多少条，默认 50 */
+  maxResults?: number;
+  /** 质量阈值，低于此分数的结果不返回，默认 0 */
   minScore?: number;
+  /** 内部召回候选池大小，默认 300 */
+  candidateLimit?: number;
   filters?: {
     difficulty?: string[];
     onlyDue?: boolean;
@@ -50,9 +56,9 @@ interface CardMatch {
 }
 
 const USER_ID = 'demo-user';
-const RECALL_MULTIPLIER = 5;     // FTS5 recall: topK × 5
-const TAG_RECALL_MULTIPLIER = 15; // tag/searchKeywords recall: topK × 15
-const VECTOR_RECALL_MULTIPLIER = 8; // vector recall: topK × 8 (bge-m3 needs bigger pool)
+const DEFAULT_MIN_SCORE = 0.30;
+const DEFAULT_MAX_RESULTS = 50;
+const DEFAULT_CANDIDATE_LIMIT = 300;
 
 interface RecallCandidate {
   cardId: string;
@@ -65,13 +71,18 @@ interface RecallCandidate {
 // ---- 主入口 ----
 
 export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[]> {
+  // Resolve parameters: new fields take priority, fallback to legacy topK
+  const maxResults = input.maxResults ?? input.topK ?? DEFAULT_MAX_RESULTS;
+  const minScore = input.minScore ?? 0;
+  const candidateLimit = Math.min(input.candidateLimit ?? DEFAULT_CANDIDATE_LIMIT, 1000);
+
   // 1. Query expansion
   const { keywords: expandedKW, deckIds: expandedDeckIds } = expandQuery(input.query);
   const allQueryText = [input.query, ...expandedKW].join(' ');
 
-  // 2. 多路召回（并行）
-  const poolSize = input.topK * RECALL_MULTIPLIER;
-  const tagPoolSize = input.topK * TAG_RECALL_MULTIPLIER;
+  // 2. 多路召回（并行）— 召回池大小由 candidateLimit 控制
+  const poolSize = candidateLimit;
+  const tagPoolSize = candidateLimit;
 
   const [
     fts5Pool,
@@ -82,7 +93,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     recallFTS5(allQueryText, poolSize, input.deckIds),
     recallByTags(allQueryText, expandedKW, tagPoolSize),
     recallBySearchKeywords(allQueryText, expandedKW, tagPoolSize),
-    recallVector(allQueryText, input.topK * VECTOR_RECALL_MULTIPLIER),
+    recallVector(allQueryText, candidateLimit),
   ]);
 
   // 3. Union + dedup
@@ -263,11 +274,10 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     });
   }
 
-  // Sort by finalScore descending
+  // Sort by finalScore descending, then apply threshold and limit
   results.sort((a, b) => b.score - a.score);
-  const threshold = input.minScore ?? 0;
-  const filtered = threshold > 0 ? results.filter(r => r.score >= threshold) : results;
-  return filtered.slice(0, input.topK);
+  const filtered = minScore > 0 ? results.filter(r => r.score >= minScore) : results;
+  return filtered.slice(0, maxResults);
 }
 
 // ---- 召回通道 ----

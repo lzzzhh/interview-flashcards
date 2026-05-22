@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Search, Loader2, ChevronDown, ChevronUp, CheckCircle2, Check } from 'lucide-react';
+import { ArrowLeft, Search, Loader2, ChevronDown, ChevronUp, CheckCircle2, Check, ZoomIn } from 'lucide-react';
 import { hybridSearch, type SearchResult } from '../api/searchApi';
 import { useAppContext } from '../context/AppContext';
 import { API_BASE } from '../api/client';
@@ -52,6 +52,8 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const [planItems, setPlanItems] = useState<PlanItemDisplay[]>([]);
   const [planSaved, setPlanSaved] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [activeThreshold, setActiveThreshold] = useState(0.3);
 
   useEffect(() => {
     fetch(`${API_BASE}/health/warmup`, { method: 'POST' })
@@ -64,18 +66,25 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
     return searched && planItems.length === 0 ? hasPlanIntent(query) : planExpanded || (searched && hasPlanIntent(query));
   }, [searched, query, planExpanded, planSaved, planItems.length]);
 
-  const handleSearch = async () => {
+  const handleSearch = async (threshold = 0.3) => {
     if (!query.trim()) return;
     setLoading(true);
     setPlanExpanded(false);
     setPlanSaved(false);
     setPlanItems([]);
+    setExpanded(false);
+    setActiveThreshold(threshold);
     try {
-      const res = await hybridSearch(query.trim(), 15, undefined, 0.3);
+      const res = await hybridSearch({ query: query.trim(), minScore: threshold, maxResults: 50 });
       setResults(res.results);
       setSearched(true);
     } catch { setResults([]); }
     setLoading(false);
+  };
+
+  const handleExpandSearch = () => {
+    setExpanded(true);
+    handleSearch(0.2);
   };
 
   const handleFetchPlan = async () => {
@@ -150,7 +159,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
             style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: TEXT_PRIMARY }}
             autoFocus
           />
-          <button onClick={handleSearch} disabled={loading} className="p-1.5 rounded-lg" style={{ backgroundColor: 'rgba(64,156,255,0.15)' }}>
+          <button onClick={() => handleSearch()} disabled={loading} className="p-1.5 rounded-lg" style={{ backgroundColor: 'rgba(64,156,255,0.15)' }}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin" style={{ color: BLUE }} /> : <Search className="w-4 h-4" style={{ color: BLUE }} />}
           </button>
         </div>
@@ -240,7 +249,18 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
                 </div>
               )}
 
-              <p className="text-[12px]" style={{ color: TEXT_MUTED }}>{results.length} 条结果</p>
+              <p className="text-[12px]" style={{ color: TEXT_MUTED }}>
+                {results.length} 条结果 · score ≥ {activeThreshold.toFixed(2)}
+                {expanded && <span className="ml-1" style={{ color: AMBER }}>（已扩大范围）</span>}
+              </p>
+              {results.length > 0 && results.length < 3 && !expanded && (
+                <button onClick={handleExpandSearch} disabled={loading}
+                  className="w-full rounded-xl py-2 flex items-center justify-center gap-1.5 text-[12px] border transition-colors"
+                  style={{ borderColor: `${AMBER}30`, color: AMBER }}>
+                  <ZoomIn className="w-3.5 h-3.5" />
+                  结果较少，扩大搜索范围
+                </button>
+              )}
               {results.map((r) => (
                 <button key={r.cardId} onClick={() => handleCardClick(r.cardId, r.deckId)}
                   className="w-full text-left rounded-xl p-3 border transition-colors"

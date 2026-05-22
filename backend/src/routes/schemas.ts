@@ -62,7 +62,10 @@ export const JobPrepSessionSchema = z.object({
 export const HybridSearchSchema = z.object({
   query: z.string().min(1),
   deckIds: z.array(z.string()).optional(),
-  topK: z.number().optional().default(20),
+  topK: z.number().optional(),
+  maxResults: z.number().optional(),
+  minScore: z.number().optional(),
+  candidateLimit: z.number().optional(),
   filters: z.object({
     difficulty: z.array(z.string()).optional(),
     onlyDue: z.boolean().optional(),
