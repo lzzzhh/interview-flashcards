@@ -20,8 +20,8 @@ export interface HybridSearchResponse {
   total: number;
 }
 
-export async function hybridSearch(query: string, topK?: number, deckIds?: string[]): Promise<HybridSearchResponse> {
-  return apiPost('/search/hybrid', { query, topK: topK || 10, deckIds });
+export async function hybridSearch(query: string, topK?: number, deckIds?: string[], minScore?: number): Promise<HybridSearchResponse> {
+  return apiPost('/search/hybrid', { query, topK: topK || 10, deckIds, minScore });
 }
 
 export async function keywordSearch(q: string, limit?: number): Promise<{ results: any[]; total: number }> {

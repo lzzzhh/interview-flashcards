@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Search, Loader2, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { ArrowLeft, Search, Loader2, ChevronDown, ChevronUp, CheckCircle2, Check } from 'lucide-react';
 import { hybridSearch, type SearchResult } from '../api/searchApi';
 import { useAppContext } from '../context/AppContext';
 import { API_BASE } from '../api/client';
@@ -11,6 +11,18 @@ interface Props {
   onEnterStudy: (category: Category) => void;
 }
 
+// Local display type with full card details; stripped to LearningPlanItem when saving
+interface PlanItemDisplay {
+  cardId: string;
+  deckId: string;
+  title: string;
+  deckName?: string;
+  state: string;
+  interval: number;
+  selected: boolean;
+  snippet?: string;
+}
+
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
 const BLUE = 'var(--blue)';
@@ -18,6 +30,16 @@ const CARD_BG = 'var(--card-bg)';
 const CARD_BORDER = 'var(--card-border)';
 const GREEN = '#10B981';
 const AMBER = '#D97706';
+
+// Intent keywords that suggest the user wants a learning plan
+const PLAN_INTENT_PATTERNS = [
+  /学[习会]|计划|复习|掌握|了解|入门|系统.*学|路线|清单|安排|规划|整理|准备.*面试|面试.*准备|备考|要学|想学|需要学|怎么学|如何学/,
+];
+
+function hasPlanIntent(query: string): boolean {
+  if (!query.trim()) return false;
+  return PLAN_INTENT_PATTERNS.some(p => p.test(query));
+}
 
 export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const { dispatch } = useAppContext();
@@ -27,7 +49,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const [searched, setSearched] = useState(false);
   const [warmingUp, setWarmingUp] = useState(true);
   const [planExpanded, setPlanExpanded] = useState(false);
-  const [planItems, setPlanItems] = useState<LearningPlanItem[]>([]);
+  const [planItems, setPlanItems] = useState<PlanItemDisplay[]>([]);
   const [planSaved, setPlanSaved] = useState(false);
   const [generating, setGenerating] = useState(false);
 
@@ -37,13 +59,19 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
       .catch(() => setWarmingUp(false));
   }, []);
 
+  const showPlanCard = useMemo(() => {
+    if (planSaved) return false;
+    return searched && planItems.length === 0 ? hasPlanIntent(query) : planExpanded || (searched && hasPlanIntent(query));
+  }, [searched, query, planExpanded, planSaved, planItems.length]);
+
   const handleSearch = async () => {
     if (!query.trim()) return;
     setLoading(true);
     setPlanExpanded(false);
     setPlanSaved(false);
+    setPlanItems([]);
     try {
-      const res = await hybridSearch(query.trim(), 15);
+      const res = await hybridSearch(query.trim(), 15, undefined, 0.3);
       setResults(res.results);
       setSearched(true);
     } catch { setResults([]); }
@@ -60,11 +88,15 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
       });
       const data = await res.json();
       setPlanItems((data.plan || []).map((p: any) => ({
-        cardId: p.cardId, title: p.title, deckId: p.deckId, deckName: p.deckName,
-        state: p.state, interval: p.interval, selected: true, snippet: p.snippet,
+        cardId: p.cardId, deckId: p.deckId,
+        title: p.title, deckName: p.deckName,
+        state: p.state, interval: p.interval,
+        selected: true, snippet: p.snippet,
       })));
       setPlanExpanded(true);
-    } catch { setPlanItems([]); }
+    } catch (e) {
+      setPlanItems([]);
+    }
   };
 
   const togglePlanItem = (idx: number) => {
@@ -78,14 +110,14 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
     if (selected.length === 0) return;
     setGenerating(true);
     try {
+      const slimItems: LearningPlanItem[] = selected.map(({ cardId, deckId }) => ({ cardId, deckId }));
       savePlan({
         id: `plan-${Date.now()}`,
         title: query.trim(),
         query: query.trim(),
-        items: selected,
+        items: slimItems,
         createdAt: Date.now(),
       });
-      // small delay to show spinner
       await new Promise(r => setTimeout(r, 600));
     } catch (e) {
       console.error('savePlan failed:', e);
@@ -140,7 +172,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
           ) : (
             <div className="space-y-3">
 
-              {!planSaved && (
+              {showPlanCard && (
                 <div className="rounded-2xl border overflow-hidden" style={{ borderColor: `${AMBER}40`, backgroundColor: `${AMBER}08` }}>
                   <button onClick={handleFetchPlan} className="w-full text-left px-4 py-3 flex items-center gap-3">
                     <div className="flex-1 min-w-0">
@@ -162,11 +194,14 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
                         planItems.map((item, i) => (
                           <button key={item.cardId} onClick={() => togglePlanItem(i)}
                             className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors"
-                            style={{ opacity: item.selected ? 1 : 0.5 }}
                           >
-                            <div className={`w-4 h-4 rounded border-2 shrink-0 transition-all bg-white dark:bg-transparent ${
-                              item.selected ? 'border-gray-800 dark:border-white' : 'border-gray-300 dark:border-gray-600'
-                            }`} />
+                            {item.selected ? (
+                              <div className="w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center" style={{ borderColor: AMBER, backgroundColor: AMBER }}>
+                                <Check className="w-3 h-3" style={{ color: '#fff' }} />
+                              </div>
+                            ) : (
+                              <div className="w-4 h-4 rounded border-2 shrink-0" style={{ borderColor: 'var(--card-border)' }} />
+                            )}
                             <div className="flex-1 min-w-0">
                               <p className="text-[12px] font-medium truncate" style={{ color: TEXT_PRIMARY }}>{item.title}</p>
                               <p className="text-[10px] truncate" style={{ color: TEXT_MUTED }}>

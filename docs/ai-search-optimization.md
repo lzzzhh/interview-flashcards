@@ -303,3 +303,20 @@ cd backend && npm run evaluate
 # 90 天学习模拟（验证首页/统计/推荐数据）
 cd . && npx tsx backend/src/evaluation/90day-sim.ts
 ```
+
+---
+
+## 附录 C：学习清单功能
+
+### 意图识别（前端）
+查询匹配 `/学[习会]|计划|复习|掌握|了解|入门|系统.*学|路线|清单|安排|规划|整理|准备.*面试|面试.*准备|备考|要学|想学|需要学|怎么学|如何学/` 时，搜索结果顶部显示「AI 为你推荐学习清单」卡片。
+
+### 后端推荐（/api/search/learning-plan）
+- 不限 topK，评分过滤（score ≥ 0.3 或目标牌组 ≥ 0.2）
+- 最多 100 张，按学习优先级排序（新卡 > 到期 > 即将到期 > 已掌握）
+- 复用 hybrid-search 管线（QE → bigram → 多路召回 → reranker）
+
+### 本地持久化
+- 存储 key：`fc-learning-plans`（localStorage）
+- 仅存 `{cardId, deckId}`（~52 bytes/item），避免 QuotaExceededError
+- 查看时通过 AppContext cardsById 实时查询卡片详情

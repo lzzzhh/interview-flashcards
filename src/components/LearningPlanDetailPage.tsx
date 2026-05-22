@@ -1,8 +1,10 @@
 // src/components/LearningPlanDetailPage.tsx — 学习清单详情
+// Items only store cardId+deckId (slim format). Card details are looked up from AppContext.
 import { useState, useMemo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { getPlan, type LearningPlan } from '../utils/learningPlans';
 import { useAppContext } from '../context/AppContext';
+import { CATEGORIES } from '../constants';
 import type { Category } from '../types';
 
 interface Props {
@@ -27,19 +29,44 @@ const PRIORITY_CONFIG: Record<string, { label: string; color: string }> = {
 };
 
 export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }: Props) {
-  const { dispatch } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const [plan] = useState<LearningPlan | undefined>(() => getPlan(planId));
 
+  // Enrich plan items with card data from store
+  const enrichedItems = useMemo(() => {
+    if (!plan) return [];
+    return plan.items.map(item => {
+      const card = state.cardsById[item.cardId];
+      const category = CATEGORIES.find(c => c.key === item.deckId);
+      const sm2 = card?.sm2;
+      const cardState = sm2?.state || 'new';
+      const cfg = PRIORITY_CONFIG[cardState] || { label: 'unknown', color: TEXT_MUTED };
+      const title = card
+        ? (card.category === 'leetcode'
+          ? String((card as any).titleCn || (card as any).title || '')
+          : String(card.question || ''))
+        : item.cardId;
+      return {
+        cardId: item.cardId,
+        deckId: item.deckId,
+        title: typeof title === 'string' ? title : String(title || ''),
+        deckName: category?.label || item.deckId,
+        state: cardState,
+        interval: sm2?.interval || 0,
+        stateLabel: cfg.label,
+        stateColor: cfg.color,
+      };
+    });
+  }, [plan, state.cardsById]);
+
   const stats = useMemo(() => {
-    if (!plan) return { new: 0, due: 0, mastered: 0 };
-    let n = 0, d = 0, m = 0;
-    for (const item of plan.items) {
+    let n = 0, d = 0;
+    for (const item of enrichedItems) {
       if (item.state === 'new') n++;
-      else if (item.state !== 'new') d++;
-      else m++;
+      else d++;
     }
-    return { new: n, due: d, mastered: m };
-  }, [plan]);
+    return { new: n, due: d };
+  }, [enrichedItems]);
 
   const handleCardClick = (cardId: string, deckId: string) => {
     dispatch({ type: 'JUMP_TO_CARD', payload: { category: deckId as Category, cardId } });
@@ -83,40 +110,34 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
             </div>
             <div className="flex-1 rounded-xl px-3 py-2 text-center" style={{ backgroundColor: `${GREEN}10` }}>
               <p className="text-[11px]" style={{ color: GREEN }}>总计</p>
-              <p className="text-[14px] font-bold" style={{ color: GREEN }}>{plan.items.length}</p>
+              <p className="text-[14px] font-bold" style={{ color: GREEN }}>{enrichedItems.length}</p>
             </div>
           </div>
 
           {/* Card list */}
-          {plan.items.map((item, i) => {
-            const cfg = PRIORITY_CONFIG[item.state] || { label: item.state, color: TEXT_MUTED };
-            return (
-              <button
-                key={item.cardId}
-                onClick={() => handleCardClick(item.cardId, item.deckId)}
-                className="w-full text-left rounded-xl p-3 border flex items-start gap-3 transition-colors"
-                style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}
-              >
-                <span className="text-[12px] font-bold shrink-0 mt-0.5 min-w-[20px]" style={{ color: cfg.color }}>
-                  {i + 1}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{item.title}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: `${cfg.color}15`, color: cfg.color }}>
-                      {cfg.label}
-                    </span>
-                  </div>
-                  {item.snippet && (
-                    <p className="text-[11px] mt-0.5 leading-relaxed line-clamp-2" style={{ color: TEXT_MUTED }}>{item.snippet}</p>
-                  )}
-                  <p className="text-[10px] mt-1" style={{ color: TEXT_MUTED }}>
-                    {item.deckName}{item.interval > 0 ? ` · 间隔${item.interval}天` : ''}
-                  </p>
+          {enrichedItems.map((item, i) => (
+            <button
+              key={item.cardId}
+              onClick={() => handleCardClick(item.cardId, item.deckId)}
+              className="w-full text-left rounded-xl p-3 border flex items-start gap-3 transition-colors"
+              style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}
+            >
+              <span className="text-[12px] font-bold shrink-0 mt-0.5 min-w-[20px]" style={{ color: item.stateColor }}>
+                {i + 1}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{item.title}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: `${item.stateColor}15`, color: item.stateColor }}>
+                    {item.stateLabel}
+                  </span>
                 </div>
-              </button>
-            );
-          })}
+                <p className="text-[10px] mt-1" style={{ color: TEXT_MUTED }}>
+                  {item.deckName}{item.interval > 0 ? ` · 间隔${item.interval}天` : ''}
+                </p>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
     </div>

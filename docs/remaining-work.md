@@ -8,10 +8,10 @@
 | Phase | 完成度 | 说明 |
 |-------|--------|------|
 | Phase 1：后端 Agent 基座 | 60% | 表和路由完整，但 Provider 未 wiring，TaskManager 缺失 |
-| Phase 2：向量检索基座 | 40% | FTS5 有但缺 source_chunk_fts、sqlite-vec 未接入 |
+| Phase 2：向量检索基座 | 70% | FTS5 + bigram + bge-m3/Ollama 向量搜索可用；sqlite-vec 未接入（非必需） |
 | Phase 3：Python 文档解析 Worker | 90% | 代码完整，但运行时依赖和启动脚本缺失 |
 | Phase 4：资料制卡 Agent | 50% | 后端管线完整，但前端上传页缺失、LLM 未 wiring |
-| Phase 5：Hybrid RAG | 70% | 编排和重排已写好，但向量部分永远是空 |
+| Phase 5：Hybrid RAG + 学习清单 | 85% | 搜索/向量/学习清单/评测可用；source_chunk 搜索未做 |
 | Phase 6：岗位备战 Agent | 60% | 状态机完整，但缺 JD 自动抓取和 analyzeJD |
 | Phase 7：增强能力 | 0% | 全部未开始 |
 
@@ -73,20 +73,19 @@
 ### ✅ 已完成
 - [x] FTS5 card_fts 虚拟表 + 触发器（Card 插入/删除自动同步）
 - [x] fts5Search.ts（关键词搜索 + CJK LIKE fallback）
-- [x] VectorStore 接口定义
+- [x] 中文 bigram 分词器
+- [x] VectorStore 接口定义 + Ollama bge-m3 实现
+- [x] ai_search_vec 向量存储表 + 多模块支持
 - [x] EmbeddingRecord 表定义
-- [x] Hybrid search 编排层
+- [x] Hybrid search 编排层（多路召回 + Reranker）
 
 ### ❌ 未完成
 
-#### 🔴 2.1 sqlite-vec 未接入
-**位置：** `backend/src/services/vector/`
-**问题：** 当前 VectorStore 是 `NoOpVectorStore`，所有向量搜索返回空。
-**需要做的：**
-- `npm install sqlite-vec` 验证 macOS ARM64 兼容性
-- 实现 `SqliteVecVectorStore` 类（对接 vec0 虚拟表 CRUD）
-- 初始化 sqlite-vec extension + 创建 vec0 虚拟表
-- 在启动时调用 `setVectorStore(new SqliteVecVectorStore(prisma))`
+#### 🔴 2.1 sqlite-vec 未接入（已用 bge-m3 + Ollama 替代）
+
+**状态：** 已通过 Ollama 本地部署 bge-m3 模型实现向量搜索，不依赖 sqlite-vec。
+当前 VectorStore 通过 HTTP 调用 Ollama embedding API，向量存储在 `ai_search_vec` 表中。
+sqlite-vec 仍可作为备选方案（离线场景）。
 
 #### 🟠 2.2 缺少 source_chunk_fts
 **问题：** FTS5 只有 `card_fts`，没有 `source_chunk_fts`——文档块的关键词搜索不可用。
@@ -170,23 +169,22 @@
 
 ---
 
-## Phase 5：Hybrid RAG + AI 搜索页
+## Phase 5：Hybrid RAG + AI 搜索页 + 学习清单
 
 ### ✅ 已完成
 - [x] hybridSearch.ts 三路编排（向量 + FTS5 + 业务重排）
 - [x] 业务重排逻辑（到期复习卡片加分、lapses 权重）
 - [x] AI 搜索页前端（AISearchPage）
+- [x] **bge-m3 向量搜索（通过 Ollama 本地部署）** — 覆盖 sqlite-vec 缺口
+- [x] **AI 学习清单** — 学习意图识别 → 后端推荐 → 本地存储 → 查看/跳转
+- [x] **评测框架** — 120 条测试用例，Top15 90%+，Missing 0
+- [x] **前端向量数据库管理页** — 模块切换、语义搜索、模型状态检测
+- [x] 学习意图检测（查询含「学习/计划/掌握/入门/备考」等关键词时触发推荐）
 
 ### ❌ 未完成
 
-#### 🔴 5.1 向量搜索永远是空
-**关联 Phase 2.1：** NoOpVectorStore 导致 hybridSearch 只有 keyword 分支生效。
-
 #### 🟠 5.2 缺少 source_chunk 搜索
 **关联 Phase 2.2：** 当前 hybridSearch 只搜索 Card，不搜索 SourceChunk。
-
-#### 🟢 5.3 搜索页显示优化
-**建议：** 当前搜索结果展示 cardId + title，可增加 match 高亮片段预览。
 
 ---
 

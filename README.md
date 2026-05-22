@@ -17,8 +17,8 @@
 
 <p align="center">
   Active Recall + SM-2 间隔重复驱动的面试复习桌面应用。<br>
-  <b>709 张</b>内置卡片覆盖算法 · 统计学 · 机器学习 · 深度学习 · 大模型 · Agent · <b>Vibe Coding</b> · 行业黑话 · 职场话术。<br>
-  全新首页设计、数据库后端、毛玻璃主题系统。
+  <b>AI 智能搜索</b> · <b>学习清单生成</b> · <b>向量语义匹配</b><br>
+  内置卡片覆盖算法 · 统计学 · 机器学习 · 深度学习 · 大模型 · Agent · Vibe Coding · 行业黑话 · 职场话术。
 </p>
 
 ---
@@ -60,19 +60,35 @@ curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/in
 - **到期复习队列** — 复习模式只展示到期卡片，新卡模式每日上限控制
 - **撤回上次评分** — `Ctrl/Cmd + Z` 回滚
 
-### 📊 九大内置模块（709 张卡片）
+### 📊 九大内置模块
 
-| 模块 | 数量 | 覆盖范围 |
-|------|------|----------|
-| 🔥 力扣 | 100 | Hot 100 |
-| 📊 统计学 | 199 | 描述统计、概率论、假设检验、贝叶斯等 |
-| 🤖 机器学习 | 171 | 监督/无监督、集成学习、特征工程等 |
-| 🧩 深度学习 | 32 | 神经网络训练、生成模型等 |
-| 🧠 大模型 | 37 | Transformer、RAG、训练微调等 |
-| 🤖 Agent | 26 | Agent 架构、工具调用、记忆等 |
-| 🔮 Vibe Coding | 23 | /command、Skill、Agent Team、MCP、Hooks 等 |
-| 💬 黑话 | 45 | 互联网黑话、职场术语 |
-| 👔 职场 | 76 | 向上沟通、面试技巧等 |
+| 模块 | 覆盖范围 |
+|------|----------|
+| 🔥 力扣 | Hot 100 |
+| 📊 统计学 | 描述统计、概率论、假设检验、贝叶斯等 |
+| 🤖 机器学习 | 监督/无监督、集成学习、特征工程等 |
+| 🧩 深度学习 | 神经网络训练、生成模型等 |
+| 🧠 大模型 | Transformer、RAG、训练微调等 |
+| 🤖 Agent | Agent 架构、工具调用、记忆等 |
+| 🔮 Vibe Coding | /command、Skill、Agent Team、MCP、Hooks 等 |
+| 💬 黑话 | 互联网黑话、职场术语 |
+| 👔 职场 | 向上沟通、面试技巧等 |
+
+### 🔍 AI 智能搜索（需要后端 + Ollama）
+
+基于 bge-m3 向量嵌入的语义搜索，支持中文自然语言查询，自动匹配最相关的面试卡片。
+
+- **多路召回**：FTS5 全文搜索 + 标签匹配 + 语义向量检索
+- **智能排序**：字段加权 + 学习状态 Boost + 牌组匹配度
+- **语义理解**：同义词、中英混合、自然语言查询
+
+### 📋 AI 学习清单
+
+搜索后输入学习意图（如「学习决策树」「想掌握 SVM」），AI 自动筛选相关卡片并按学习优先级排序生成学习计划。清单保存在本地，可在「我的 → 学习清单」中查看和跳转学习。
+
+### 🗄️ 向量数据库
+
+可视化向量存储管理，支持多模块切换，实时查看嵌入记录与语义搜索结果。
 
 ### 📈 学习统计
 
@@ -107,6 +123,8 @@ curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/in
 | 图标 | lucide-react |
 | 桌面框架 | Tauri v2 (Rust) |
 | **后端 API** | **Fastify + Prisma + SQLite** |
+| 向量嵌入 | bge-m3 via Ollama (本地部署) |
+| 全文搜索 | SQLite FTS5 + 中文 bigram 分词 |
 | 间隔重复 | SM-2 算法（前后端双份，后端优先） |
 | CI/CD | GitHub Actions (macOS/Win/Linux) |
 
@@ -122,7 +140,8 @@ curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/in
 │  ┌───────────────────────────────────────────────┐  │
 │  │              React 前端 (SPA)                  │  │
 │  │  ┌─────────┐ ┌────────┐ ┌──────────────────┐  │  │
-│  │  │ HomePage │ │StudyPage│ │Stats/Deck/Profile│  │  │
+│  │  │ HomePage │ │StudyPage│ │ Stats/Deck/      │  │  │
+│  │  │         │ │        │ │ Profile/Search   │  │  │
 │  │  └────┬─────┘ └───┬────┘ └────────┬─────────┘  │  │
 │  │       │            │              │             │  │
 │  │  ┌────▼────────────▼──────────────▼─────────┐  │  │
@@ -142,6 +161,10 @@ curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/in
 │  │ /api/    │ │ /api/  │ │ /api/    │ │ /api/   │  │
 │  │  decks   │ │ cards  │ │ reviews  │ │ study   │  │
 │  └────┬─────┘ └───┬────┘ └────┬─────┘ └────┬────┘  │
+│  ┌────┴─────┐ ┌────┴───────────────────────────┐  │
+│  │ /api/    │ │ /api/search (AI 搜索 + 学习清单) │  │
+│  │ settings │ │ /api/maintenance (向量数据库)    │  │
+│  └────┬─────┘ └────┬───────────────────────────┘  │
 │       │            │           │            │       │
 │  ┌────▼────────────▼───────────▼────────────▼────┐  │
 │  │              Prisma ORM                        │  │

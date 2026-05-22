@@ -27,6 +27,7 @@ interface HybridSearchInput {
   query: string;
   deckIds?: string[];
   topK: number;
+  minScore?: number;
   filters?: {
     difficulty?: string[];
     onlyDue?: boolean;
@@ -264,7 +265,9 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
 
   // Sort by finalScore descending
   results.sort((a, b) => b.score - a.score);
-  return results.slice(0, input.topK);
+  const threshold = input.minScore ?? 0;
+  const filtered = threshold > 0 ? results.filter(r => r.score >= threshold) : results;
+  return filtered.slice(0, input.topK);
 }
 
 // ---- 召回通道 ----

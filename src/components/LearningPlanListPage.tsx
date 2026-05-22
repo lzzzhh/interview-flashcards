@@ -14,11 +14,18 @@ const CARD_BG = 'var(--card-bg)';
 const CARD_BORDER = 'var(--card-border)';
 
 export default function LearningPlanListPage({ onBack, onViewPlan }: Props) {
-  const [plans, setPlans] = useState<LearningPlan[]>(() => loadPlans());
+  const [plans, setPlans] = useState<LearningPlan[]>(() => {
+    const loaded = loadPlans();
+    console.log('[LearningPlanListPage] mounted, loaded', loaded.length, 'plans');
+    return loaded;
+  });
 
   const handleDelete = (id: string) => {
+    console.log('[LearningPlanListPage] deleting plan:', id);
     deletePlan(id);
-    setPlans(loadPlans());
+    const reloaded = loadPlans();
+    console.log('[LearningPlanListPage] after delete,', reloaded.length, 'plans');
+    setPlans(reloaded);
   };
 
   const formatDate = (ts: number) => {

@@ -12,6 +12,7 @@ export async function searchRoutes(app: FastifyInstance) {
       query: body.query || '',
       deckIds: body.deckIds,
       topK: body.topK || 20,
+      minScore: body.minScore,
       filters: body.filters,
     });
     return { results, total: results.length };
