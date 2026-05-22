@@ -73,7 +73,7 @@ interface RecallCandidate {
 export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[]> {
   // Resolve parameters: new fields take priority, fallback to legacy topK
   const maxResults = input.maxResults ?? input.topK ?? DEFAULT_MAX_RESULTS;
-  const minScore = input.minScore ?? 0;
+  const minScore = input.minScore ?? DEFAULT_MIN_SCORE;
   const candidateLimit = Math.min(input.candidateLimit ?? DEFAULT_CANDIDATE_LIMIT, 1000);
 
   // 1. Query expansion
