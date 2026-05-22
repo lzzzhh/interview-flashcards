@@ -2,7 +2,7 @@
 // src/components/CardView.tsx — 核心卡片组件（含 Anki 复习状态）
 // ============================================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronUp, Clock, Repeat, StickyNote, X } from 'lucide-react';
 import type { AppAction, FlashCard, LeetCodeCard, QACard, SM2Record } from '../types';
@@ -62,7 +62,7 @@ function ReviewMeta({ sm2, sticky: isSticky = false, inline = false }: { sm2: SM
   const isNew = !sm2.state || sm2.state === 'new';
 
   return (
-    <div className={`${inline ? 'min-w-0 flex flex-wrap items-center gap-x-3 gap-y-1' : 'flex items-center justify-center gap-3 border-b border-white/35 pb-2 mb-2 -mx-4 px-4 pt-1 dark:border-white/10 sm:-mx-6 sm:px-6'} text-xs text-gray-500 dark:text-gray-400 bg-transparent ${isSticky ? 'sticky top-0 z-10' : ''}`}>
+    <div className={`${inline ? 'min-w-0 flex flex-wrap items-center gap-x-3 gap-y-1' : 'flex items-center justify-center gap-3 border-b border-black/5 pb-2 mb-2 -mx-4 px-4 pt-1 dark:border-white/10 sm:-mx-6 sm:px-6'} text-xs text-gray-500 dark:text-gray-400 bg-transparent ${isSticky ? 'sticky top-0 z-10' : ''}`}>
       <span className="flex items-center gap-1">
         <Repeat className="w-3 h-3" />
         重复 {sm2.repetitions} 次
@@ -107,24 +107,29 @@ function NotesButton({ card, dispatch }: { card: FlashCard; dispatch: React.Disp
     <>
       <button
         onClick={() => setOpen(true)}
-        className={`inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-semibold transition-all ${
-          hasNotes
-            ? 'border-orange-200 bg-orange-50 text-orange-600 shadow-sm shadow-orange-100/60 hover:bg-orange-100 dark:border-orange-900/60 dark:bg-orange-950/30 dark:text-orange-300 dark:shadow-none dark:hover:bg-orange-950/50'
-            : 'border-white/55 bg-white/35 text-gray-400 hover:border-white/80 hover:bg-white/60 hover:text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-500 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-gray-300'
-        }`}
+        className="relative shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95"
+        style={{
+          backgroundColor: hasNotes ? 'rgba(251, 191, 36, 0.12)' : 'rgba(0,0,0,0.04)',
+          color: hasNotes ? '#D97706' : 'var(--text-secondary)',
+        }}
         title={hasNotes ? '查看笔记' : '添加笔记'}
       >
-        <StickyNote className="h-3.5 w-3.5" />
-        <span>笔记</span>
+        <StickyNote className="w-4 h-4" />
+        {hasNotes && (
+          <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full" style={{ backgroundColor: '#D97706' }} />
+        )}
       </button>
 
       {open && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/35 backdrop-blur-sm" onClick={handleClose} />
-          <div className="relative w-full max-w-md rounded-2xl border border-white/45 bg-white/80 p-4 shadow-2xl backdrop-blur-2xl animate-fadeIn dark:border-white/10 dark:bg-gray-900/85">
+          <div className="relative w-full max-w-md rounded-2xl border border-black/5 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl animate-fadeIn dark:border-white/10 dark:bg-gray-900/90">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">笔记</h3>
-              <button onClick={handleClose} className="rounded-lg p-1 hover:bg-white/50 dark:hover:bg-white/10">
+              <div className="flex items-center gap-2">
+                <StickyNote className="w-4 h-4" style={{ color: '#D97706' }} />
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">笔记</h3>
+              </div>
+              <button onClick={handleClose} className="rounded-lg p-1 hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
                 <X className="h-4 w-4 text-gray-400" />
               </button>
             </div>
@@ -133,10 +138,10 @@ function NotesButton({ card, dispatch }: { card: FlashCard; dispatch: React.Disp
               onChange={(e) => setText(e.target.value)}
               onBlur={handleSave}
               placeholder="记录这道题的面试心得、易错点、追问思路..."
-              className="h-44 w-full resize-none rounded-xl border border-white/50 bg-white/55 p-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500/30 dark:border-white/10 dark:bg-white/5 dark:text-gray-300"
+              className="h-44 w-full resize-none rounded-xl border border-black/5 bg-black/[0.02] p-3 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:placeholder:text-gray-500"
               autoFocus
             />
-            <p className="mt-2 text-[10px] text-gray-400">
+            <p className="mt-2 text-[11px] text-gray-400 dark:text-gray-500">
               失焦自动保存 · 仅自己可见
             </p>
           </div>
@@ -164,7 +169,7 @@ function CardPanelButton({
       className={`min-w-0 flex-1 rounded-xl border px-3 py-2.5 text-left transition-all duration-200 ${
         open
           ? 'border-blue-200 bg-blue-50/80 text-blue-700 shadow-sm dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300'
-          : 'border-white/45 bg-white/30 text-gray-700 hover:border-blue-200/80 hover:bg-white/55 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:border-white/20 dark:hover:bg-white/10'
+          : 'border-black/5 bg-white/30 text-gray-700 hover:border-blue-200/80 hover:bg-white/55 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:border-white/20 dark:hover:bg-white/10'
       }`}
     >
       <div className="flex items-center justify-between gap-2">
@@ -179,16 +184,21 @@ function CardPanelButton({
 }
 
 // ---- LeetCode Card ----
-function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; showApproach: boolean; showCode: boolean }) {
+function LeetCodeView({ card, showApproach: _showApproach, showCode: _showCode }: { card: LeetCodeCard; showApproach: boolean; showCode: boolean }) {
   const { dispatch } = useAppContext();
   const [localApproach, setLocalApproach] = useState(false);
   const [localCode, setLocalCode] = useState(false);
+  const cardRef = useRef(card.id);
 
-  // 卡片切换时强制关闭本地代码/思路面板
+  // 卡片切换时强制关闭面板，并更新 ref
   useEffect(() => {
     setLocalApproach(false);
     setLocalCode(false);
+    cardRef.current = card.id;
   }, [card.id]);
+
+  // 不再监听键盘快捷键 — 代码/思路仅通过按钮点击打开
+  // 防止键盘意外触发导致代码面板在快速切卡时出现
 
   // Multi-language support — 优先顺序：导入的 codes > 内置方案库 > 旧 code 字段
   const codes = (() => {
@@ -205,32 +215,32 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
     card.defaultLanguage || (languages.includes('python') ? 'python' : languages[0])
   );
 
-  const approachOpen = showApproach || localApproach;
-  const codeOpen = showCode || localCode;
+  const approachOpen = localApproach;
+  const codeOpen = localCode;
   const activePanel = approachOpen ? 'approach' : codeOpen ? 'code' : null;
 
   const handleToggleApproach = () => {
-    if (showApproach) {
-      dispatch({ type: 'TOGGLE_APPROACH' });
+    if (approachOpen) {
+      setLocalApproach(false);
     } else {
-      if (!localApproach) setLocalCode(false);
-      setLocalApproach((prev) => !prev);
+      setLocalCode(false);
+      setLocalApproach(true);
     }
   };
 
   const handleToggleCode = () => {
-    if (showCode) {
-      dispatch({ type: 'TOGGLE_CODE' });
+    if (codeOpen) {
+      setLocalCode(false);
     } else {
-      if (!localCode) setLocalApproach(false);
-      setLocalCode((prev) => !prev);
+      setLocalApproach(false);
+      setLocalCode(true);
     }
   };
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="shrink-0 -mx-4 border-b border-white/35 bg-white/20 px-4 pb-3 pt-1 backdrop-blur-md dark:border-white/10 dark:bg-white/5 sm:-mx-6 sm:px-6">
-        <div className="mb-2 flex items-center justify-between gap-3 border-b border-white/35 pb-2 dark:border-white/10">
+      <div className="shrink-0 -mx-4 border-b border-black/5 bg-transparent px-4 pb-3 pt-1 dark:border-white/10 dark:bg-transparent sm:-mx-6 sm:px-6">
+        <div className="mb-2 flex items-center justify-between gap-3 border-b border-black/5 pb-2 dark:border-white/10">
           <div className="min-w-0 flex-1">
             <ReviewMeta sm2={card.sm2} inline />
           </div>
@@ -264,21 +274,21 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden py-3">
-        <div className="h-full min-h-[8rem] overflow-y-auto rounded-xl border border-white/45 bg-white/35 px-3 py-2.5 text-sm leading-relaxed text-gray-700 backdrop-blur-md dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
+        <div className="h-full min-h-[8rem] overflow-y-auto rounded-xl border border-black/5 bg-white/35 px-3 py-2.5 text-sm leading-relaxed text-gray-700 backdrop-blur-md dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
           <MathText text={card.description} />
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-white/35 pt-3 dark:border-white/10">
+      <div className="shrink-0 border-t border-black/5 pt-3 dark:border-white/10">
         <div className="grid grid-cols-2 gap-2">
           <CardPanelButton title="思路解析" detail="复杂度与关键分析" open={activePanel === 'approach'} onClick={handleToggleApproach} />
           <CardPanelButton title="代码实现" detail="参考代码与细节" open={activePanel === 'code'} onClick={handleToggleCode} />
         </div>
       </div>
 
-      {activePanel && (
-        <div className="absolute inset-0 z-20 flex flex-col rounded-2xl border border-white/45 bg-white/80 p-2 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-gray-900/80 sm:p-3">
-          <div className="mb-2 flex h-9 shrink-0 items-center justify-between border-b border-white/45 px-1 pb-2 dark:border-white/10">
+      {activePanel && cardRef.current === card.id && (
+        <div className="absolute inset-0 z-20 flex flex-col rounded-2xl border border-black/5 bg-white/80 p-2 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-gray-900/80 sm:p-3">
+          <div className="mb-2 flex h-9 shrink-0 items-center justify-between border-b border-black/5 px-1 pb-2 dark:border-white/10">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
               {activePanel === 'approach' ? '思路解析' : '代码实现'}
             </h3>
@@ -294,7 +304,7 @@ function LeetCodeView({ card, showApproach, showCode }: { card: LeetCodeCard; sh
           </div>
           <div className="min-h-0 flex-1 overflow-hidden">
             {activePanel === 'approach' && (
-              <div className="h-full overflow-y-auto rounded-xl border border-white/45 bg-white/35 px-3 py-2.5 text-sm leading-relaxed text-gray-600 backdrop-blur-md dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
+              <div className="h-full overflow-y-auto rounded-xl border border-black/5 bg-white/35 px-3 py-2.5 text-sm leading-relaxed text-gray-600 backdrop-blur-md dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
                 {card.approach}
               </div>
             )}
@@ -339,8 +349,8 @@ function QAView({ card }: { card: QACard }) {
   return (
     <div className="space-y-2">
       {/* Sticky header: Meta + Question + Tags */}
-      <div className="sticky top-0 z-10 -mx-4 border-b border-white/35 bg-white/25 px-4 pb-3 pt-1 backdrop-blur-md dark:border-white/10 dark:bg-white/5 sm:-mx-6 sm:px-6">
-        <div className="mb-2 flex items-center justify-between gap-3 border-b border-white/35 pb-2 dark:border-white/10">
+      <div className="sticky top-0 z-10 -mx-4 border-b border-black/5 bg-transparent px-4 pb-3 pt-1 dark:border-white/10 dark:bg-transparent sm:-mx-6 sm:px-6">
+        <div className="mb-2 flex items-center justify-between gap-3 border-b border-black/5 pb-2 dark:border-white/10">
           <div className="min-w-0 flex-1">
             <ReviewMeta sm2={card.sm2} inline />
           </div>
@@ -399,7 +409,7 @@ function QAView({ card }: { card: QACard }) {
               : 'max-h-0 opacity-0 overflow-hidden'
           }`}
         >
-          <div key={showAnswer ? 'visible' : 'hidden'} className={`text-sm text-gray-700 dark:text-gray-300 leading-relaxed rounded-lg border border-white/45 bg-white/35 p-4 px-3 text-justify backdrop-blur-md dark:border-white/10 dark:bg-white/5 sm:px-4 ${showAnswer ? 'answer-reveal' : ''}`}>
+          <div key={showAnswer ? 'visible' : 'hidden'} className={`text-sm text-gray-700 dark:text-gray-300 leading-relaxed rounded-lg border border-black/5 bg-white/35 p-4 px-3 text-justify backdrop-blur-md dark:border-white/10 dark:bg-white/5 sm:px-4 ${showAnswer ? 'answer-reveal' : ''}`}>
             <MathText text={card.answer} />
           </div>
         </div>
@@ -418,7 +428,7 @@ function QAView({ card }: { card: QACard }) {
 
 // ---- Main CardView ----
 export default function CardView({ card, showApproach, showCode }: CardViewProps) {
-  const shellClass = 'study-glass-card rounded-2xl p-4 sm:p-5 transition-shadow hover:shadow-xl card-slide-in h-full max-h-[34rem] flex flex-col relative overflow-hidden';
+  const shellClass = 'study-glass-card rounded-2xl p-4 sm:p-5 transition-shadow hover:shadow-xl card-slide-in h-full max-h-[32rem] flex flex-col relative overflow-hidden';
 
   if (isLeetCode(card)) {
     return (

@@ -8,12 +8,13 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
+import { ErrorBoundary } from './ErrorBoundary';
 
 interface MathTextProps {
   text: string;
 }
 
-export default function MathText({ text }: MathTextProps) {
+function MathTextInner({ text }: MathTextProps) {
   const content = useMemo(() => preprocess(text), [text]);
 
   return (
@@ -58,6 +59,15 @@ export default function MathText({ text }: MathTextProps) {
         {content}
       </ReactMarkdown>
     </div>
+  );
+}
+
+export default function MathText({ text }: MathTextProps) {
+  if (!text) return null;
+  return (
+    <ErrorBoundary fallback={<span className="text-xs" style={{ color: 'var(--text-muted)' }}>{String(text).slice(0, 80)}{String(text).length > 80 ? '...' : ''}</span>}>
+      <MathTextInner text={text} />
+    </ErrorBoundary>
   );
 }
 
@@ -401,55 +411,21 @@ function normalizeUnicodeScript(text: string): string {
 
 function convertSubscript(text: string): string {
   const map: Record<string, string> = {
-    '₀': '0',
-    '₁': '1',
-    '₂': '2',
-    '₃': '3',
-    '₄': '4',
-    '₅': '5',
-    '₆': '6',
-    '₇': '7',
-    '₈': '8',
-    '₉': '9',
-    'ᵢ': 'i',
-    'ⱼ': 'j',
-    'ₖ': 'k',
-    'ₗ': 'l',
-    'ₘ': 'm',
-    'ₙ': 'n',
-    'ₜ': 't',
+    '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
+    '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9',
+    'ᵢ': 'i', 'ⱼ': 'j', 'ₖ': 'k', 'ₗ': 'l', 'ₘ': 'm', 'ₙ': 'n', 'ₜ': 't',
   };
   return Array.from(text).map((char) => map[char] ?? char).join('');
 }
 
 function convertSuperscript(text: string): string {
   const map: Record<string, string> = {
-    '⁰': '0',
-    '¹': '1',
-    '²': '2',
-    '³': '3',
-    '⁴': '4',
-    '⁵': '5',
-    '⁶': '6',
-    '⁷': '7',
-    '⁸': '8',
-    '⁹': '9',
-    'ⁱ': 'i',
-    '⁻': '-',
-    '⁺': '+',
-    'ⁿ': 'n',
-    '⁽': '(',
-    '⁾': ')',
-    'ᵀ': 'T',
-    'ᵗ': 't',
-    'ᵢ': 'i',
-    'ᵧ': 'y',
-    'ᵏ': 'k',
-    'ᵐ': 'm',
-    'ᵈ': 'd',
-    'ᵃ': 'a',
-    'ᵇ': 'b',
-    'ᶜ': 'c',
+    '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
+    '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
+    'ⁱ': 'i', '⁻': '-', '⁺': '+', 'ⁿ': 'n',
+    '⁽': '(', '⁾': ')',
+    'ᵀ': 'T', 'ᵗ': 't', 'ᵢ': 'i', 'ᵧ': 'y', 'ᵏ': 'k',
+    'ᵐ': 'm', 'ᵈ': 'd', 'ᵃ': 'a', 'ᵇ': 'b', 'ᶜ': 'c',
   };
   return Array.from(text).map((char) => map[char] ?? char).join('');
 }

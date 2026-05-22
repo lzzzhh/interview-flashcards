@@ -32,20 +32,15 @@ export function useKeyboard({ dispatch, searchInputRef, getCurrentCardId }: Keyb
         }
       }
 
-      // Space to toggle QA answer / LeetCode approach
+      // Space to toggle QA answer only (LeetCode approach/code handled locally)
       if (!isInput && e.key === ' ') {
         e.preventDefault();
         dispatch({ type: 'TOGGLE_QA_ANSWER' });
-        dispatch({ type: 'TOGGLE_APPROACH' });
         return;
       }
 
-      // S or C to toggle code
-      if (!isInput && (e.key === 's' || e.key === 'c' || e.key === 'S' || e.key === 'C')) {
-        e.preventDefault();
-        dispatch({ type: 'TOGGLE_CODE' });
-        return;
-      }
+      // C/S to toggle code removed — now handled locally in LeetCodeView
+      // to prevent code panel persisting across card transitions
 
       // M to toggle mastered
       if (!isInput && (e.key === 'm' || e.key === 'M')) {

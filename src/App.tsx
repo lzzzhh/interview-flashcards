@@ -1,8 +1,7 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
-import { AppProvider, useAppContext, dtoToFlashCard } from './context/AppContext';
+import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
-import { getStudyQueue } from './api/study';
 import HomePage from './components/HomePage';
 import CardView from './components/CardView';
 import CardActions from './components/CardActions';
@@ -26,6 +25,7 @@ import ApiSettingsPage from './components/ApiSettingsPage';
 import TagManagerPage from './components/TagManagerPage';
 import MockInterviewPage from './components/MockInterviewPage';
 import ResumeProjectPage from './components/ResumeProjectPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import type { Category, FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
@@ -113,20 +113,9 @@ function AppInner() {
   const { dispatch } = useAppContext();
   const handleEnterStudy = useCallback(async (category: Category, cardId?: string) => {
     setStudyCategory(category); setShowDecks(false);
-    try {
-      // 尝试从 SQLite API 加载学习队列
-      dispatch({ type: 'SET_LOADING', payload: true });
-      const queue = await getStudyQueue(category, 'new');
-      const cards = queue.cards.map(dtoToFlashCard);
-      dispatch({ type: 'LOADED_QUEUE', payload: { cards, mode: 'new' } });
-      dispatch({ type: 'SET_API_SOURCE', payload: true });
-    } catch {
-      // 降级到本地静态数据
-      dispatch({ type: 'SET_CATEGORY', payload: category });
-      dispatch({ type: 'SET_API_SOURCE', payload: false });
-    } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
+    // 始终先进入子模块选择页，不直接加载学习队列
+    dispatch({ type: 'SET_CATEGORY', payload: category });
+    dispatch({ type: 'SET_API_SOURCE', payload: false });
     if (cardId) dispatch({ type: 'JUMP_TO_CARD', payload: { category, cardId } });
   }, [dispatch]);
 
@@ -171,5 +160,5 @@ function AppInner() {
 }
 
 export default function App() {
-  return <AppProvider><AppInner /></AppProvider>;
+  return <AppProvider><ErrorBoundary fallback={<div className="dark-bg text-white p-8 text-center mt-20">页面加载出错，请刷新重试</div>}><AppInner /></ErrorBoundary></AppProvider>;
 }

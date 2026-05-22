@@ -33,12 +33,13 @@ model Card {
   description String?
   approach    String?
   difficulty  String?
-  tags        String?
-  subTopic    String?
-  source      String?
-  codes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  tags           String?
+  searchKeywords String?
+  subTopic       String?
+  source         String?
+  codes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   deck     Deck           @relation(fields: [deckId], references: [id])
   progress CardProgress[]

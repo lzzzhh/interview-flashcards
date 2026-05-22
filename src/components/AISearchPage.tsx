@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Search, Loader2 } from 'lucide-react';
 import { hybridSearch, type SearchResult } from '../api/searchApi';
 import { useAppContext } from '../context/AppContext';
@@ -21,6 +21,14 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [warmingUp, setWarmingUp] = useState(true);
+
+  // 进入页面时预热 bge-m3
+  useEffect(() => {
+    fetch('http://localhost:3001/api/health/warmup', { method: 'POST' })
+      .then(() => setWarmingUp(false))
+      .catch(() => setWarmingUp(false));
+  }, []);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -63,7 +71,14 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
       <div className="flex-1 flex items-start justify-center">
         <div className="relative z-10 w-full max-w-md px-5 py-6 pb-24">
           {!searched ? (
-            <p className="text-center text-[13px] mt-8" style={{ color: TEXT_MUTED }}>输入关键词搜索卡片</p>
+            warmingUp ? (
+              <div className="text-center mt-8">
+                <Loader2 className="w-5 h-5 mx-auto mb-2 animate-spin" style={{ color: BLUE }} />
+                <p className="text-[13px]" style={{ color: TEXT_MUTED }}>正在预热 AI 搜索模型...</p>
+              </div>
+            ) : (
+              <p className="text-center text-[13px] mt-8" style={{ color: TEXT_MUTED }}>输入关键词搜索卡片</p>
+            )
           ) : results.length === 0 ? (
             <p className="text-center text-[13px] mt-8" style={{ color: TEXT_MUTED }}>未找到相关卡片</p>
           ) : (

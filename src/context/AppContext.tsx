@@ -450,17 +450,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case 'SET_FILTER_DIFFICULTY': {
-      const next = { ...state, filterDifficulty: action.payload };
+      const next = { ...state, filterDifficulty: action.payload, showApproach: false, showCode: false, qaAnswerVisible: false };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
     }
 
     case 'SET_FILTER_SUBTOPIC': {
-      const next = { ...state, filterSubTopic: action.payload };
+      const next = { ...state, filterSubTopic: action.payload, showApproach: false, showCode: false, qaAnswerVisible: false };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
     }
 
     case 'SET_SEARCH': {
-      const next = { ...state, searchQuery: action.payload };
+      const next = { ...state, searchQuery: action.payload, showApproach: false, showCode: false, qaAnswerVisible: false };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
     }
 
@@ -475,7 +475,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'TOGGLE_REVIEW_MODE': {
       const nextReview = !state.reviewMode;
-      const next = { ...state, reviewMode: nextReview };
+      const next = { ...state, reviewMode: nextReview, showApproach: false, showCode: false, qaAnswerVisible: false };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
     }
 

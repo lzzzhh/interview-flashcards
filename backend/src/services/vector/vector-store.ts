@@ -45,7 +45,7 @@ export class SqliteVecVectorStore implements VectorStore {
   name = 'sqlite-vec-js';
   private tableName: string;
 
-  constructor(tableName = 'vec_embeddings') {
+  constructor(tableName = 'ai_search_vec') {
     this.tableName = tableName;
   }
 
@@ -53,14 +53,19 @@ export class SqliteVecVectorStore implements VectorStore {
   async init(): Promise<void> {
     await prisma.$executeRawUnsafe(`
       CREATE TABLE IF NOT EXISTS ${this.tableName} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        module TEXT NOT NULL DEFAULT 'ai-search',
         object_id TEXT NOT NULL,
         object_type TEXT NOT NULL DEFAULT 'card',
+        field TEXT NOT NULL DEFAULT 'full',
         embedding TEXT NOT NULL,
-        dimension INTEGER NOT NULL DEFAULT 1536,
-        created_at INTEGER NOT NULL DEFAULT (unixepoch()),
-        PRIMARY KEY (object_id, object_type)
+        dimension INTEGER NOT NULL DEFAULT 1024,
+        created_at INTEGER NOT NULL DEFAULT (unixepoch())
       )
     `);
+    // Indices
+    try { await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_module ON ${this.tableName}(module)`); } catch {}
+    try { await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_object ON ${this.tableName}(object_id, field)`); } catch {}
   }
 
   /** 序列化向量为 JSON */
@@ -74,45 +79,52 @@ export class SqliteVecVectorStore implements VectorStore {
   }
 
   /** 插入/更新 */
-  async upsert(objectId: string, objectType: string, vector: number[]): Promise<number> {
+  async upsert(objectId: string, objectType: string, vector: number[], field: string = 'full'): Promise<number> {
     const emb = this.serialize(vector);
     await prisma.$executeRawUnsafe(
-      `INSERT OR REPLACE INTO ${this.tableName} (object_id, object_type, embedding, dimension) VALUES (?, ?, ?, ?)`,
-      objectId, objectType, emb, vector.length,
+      `INSERT OR REPLACE INTO ${this.tableName} (module, object_id, object_type, field, embedding, dimension) VALUES (?, ?, ?, ?, ?, ?)`,
+      'ai-search', objectId, objectType, field, emb, vector.length,
     );
     return vector.length;
   }
 
   /** 批量插入 */
-  async upsertBatch(items: { objectId: string; objectType: string; vector: number[] }[]): Promise<void> {
+  async upsertBatch(items: { objectId: string; objectType: string; vector: number[]; field?: string }[]): Promise<void> {
     if (items.length === 0) return;
-    const stmts = items.map(() => `(?, ?, ?, ?)`).join(', ');
+    const stmts = items.map(() => `(?, ?, ?, ?, ?, ?)`).join(', ');
     const params: any[] = [];
     for (const item of items) {
-      params.push(item.objectId, item.objectType, this.serialize(item.vector), item.vector.length);
+      params.push('ai-search', item.objectId, item.objectType, item.field || 'full', this.serialize(item.vector), item.vector.length);
     }
     await prisma.$executeRawUnsafe(
-      `INSERT OR REPLACE INTO ${this.tableName} (object_id, object_type, embedding, dimension) VALUES ${stmts}`,
+      `INSERT OR REPLACE INTO ${this.tableName} (module, object_id, object_type, field, embedding, dimension) VALUES ${stmts}`,
       ...params,
     );
   }
 
   /** 向量搜索 */
-  async search(vector: number[], topK: number, filter?: { objectType?: string; deckId?: string }): Promise<VectorSearchResult[]> {
-    // 取出所有向量
+  async search(vector: number[], topK: number, filter?: { objectType?: string; deckId?: string; field?: string; module?: string }): Promise<VectorSearchResult[]> {
+    const module = filter?.module || 'ai-search';
+    const field = filter?.field;
+    
     let rows: any[];
-    if (filter?.objectType) {
+    if (field) {
       rows = await prisma.$queryRawUnsafe(
-        `SELECT object_id, object_type, embedding FROM ${this.tableName} WHERE object_type = ?`,
-        filter.objectType,
+        `SELECT object_id, object_type, embedding FROM ${this.tableName} WHERE module = ? AND field = ? AND object_type = ?`,
+        module, field, filter?.objectType || 'card',
+      ) as any[];
+    } else if (filter?.objectType) {
+      rows = await prisma.$queryRawUnsafe(
+        `SELECT object_id, object_type, embedding FROM ${this.tableName} WHERE module = ? AND object_type = ?`,
+        module, filter.objectType,
       ) as any[];
     } else {
       rows = await prisma.$queryRawUnsafe(
-        `SELECT object_id, object_type, embedding FROM ${this.tableName}`,
+        `SELECT object_id, object_type, embedding FROM ${this.tableName} WHERE module = ?`,
+        module,
       ) as any[];
     }
 
-    // JS 端计算余弦相似度
     const scored: VectorSearchResult[] = [];
     for (const row of rows) {
       const emb = this.deserialize(row.embedding);
@@ -138,18 +150,40 @@ export class SqliteVecVectorStore implements VectorStore {
     );
   }
 
-  /** 删除所有标记为 pending_delete 的 EmbeddingRecord 对应的向量 */
+  /** 获取模块列表 */
+  async listModules(): Promise<{ module: string; count: number }[]> {
+    const rows = await prisma.$queryRawUnsafe(
+      `SELECT module, COUNT(*) as cnt FROM ${this.tableName} GROUP BY module`
+    ) as any[];
+    return (rows || []).map((r: any) => ({ module: r.module, count: r.cnt }));
+  }
+
+  /** 获取模块向量列表（分页） */
+  async listVectors(module: string, offset: number = 0, limit: number = 50): Promise<{ objectId: string; objectType: string; field: string; dimension: number }[]> {
+    const rows = await prisma.$queryRawUnsafe(
+      `SELECT object_id, object_type, field, dimension FROM ${this.tableName} WHERE module = ? LIMIT ? OFFSET ?`,
+      module, limit, offset,
+    ) as any[];
+    return (rows || []).map((r: any) => ({
+      objectId: r.object_id,
+      objectType: r.object_type,
+      field: r.field,
+      dimension: r.dimension,
+    }));
+  }
+
+  /** 按状态清理 */
   async cleanup(): Promise<number> {
     const rows = await prisma.$queryRawUnsafe(
-      `SELECT vr.object_id, vr.object_type FROM ${this.tableName} vr
-       LEFT JOIN EmbeddingRecord er ON vr.object_id = er.objectId AND vr.object_type = er.objectType
+      `SELECT v.object_id, v.object_type, v.field FROM ${this.tableName} v
+       LEFT JOIN EmbeddingRecord er ON v.object_id = er.objectId AND v.object_type = er.objectType
        WHERE er.status = 'pending_delete' OR er.id IS NULL`
     ) as any[];
     if (rows.length === 0) return 0;
     for (const row of rows) {
       await prisma.$executeRawUnsafe(
-        `DELETE FROM ${this.tableName} WHERE object_id = ? AND object_type = ?`,
-        row.object_id, row.object_type,
+        `DELETE FROM ${this.tableName} WHERE object_id = ? AND object_type = ? AND field = ?`,
+        row.object_id, row.object_type, row.field,
       );
     }
     return rows.length;
@@ -157,11 +191,8 @@ export class SqliteVecVectorStore implements VectorStore {
 
   /** 重建所有向量索引（删除后重建） */
   async rebuild(): Promise<number> {
-    // 从 Card 表获取所有卡片，重新生成 embedding（需要 provider）
     await prisma.$executeRawUnsafe(`DELETE FROM ${this.tableName}`);
-    const cards = await prisma.$queryRawUnsafe(
-      `SELECT id FROM Card`
-    ) as any[];
+    const cards = await prisma.$queryRawUnsafe(`SELECT id FROM Card`) as any[];
     return cards.length;
   }
 }

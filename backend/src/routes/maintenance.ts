@@ -64,16 +64,35 @@ export async function maintenanceRoutes(app: FastifyInstance) {
     const store = getVectorStore();
     try {
       const count = await prisma.$queryRawUnsafe<[{ cnt: number }]>(
-        'SELECT COUNT(*) as cnt FROM vec_embeddings',
+        'SELECT COUNT(*) as cnt FROM ai_search_vec',
       );
-      const embeddingRecords = await prisma.embeddingRecord.count({ where: { status: 'active' } });
       return {
         vectorStore: store.name,
         vectorCount: Number(count[0]?.cnt ?? 0),
-        embeddingRecords,
       };
     } catch {
-      return { vectorStore: store.name, vectorCount: 0, embeddingRecords: 0 };
+      return { vectorStore: store.name, vectorCount: 0 };
     }
+  });
+
+  // 向量模块列表
+  app.get('/api/maintenance/vector-modules', async () => {
+    const store = getVectorStore();
+    if ('listModules' in store) {
+      const modules = await (store as any).listModules();
+      return { modules };
+    }
+    return { modules: [{ module: 'ai-search', count: 0 }] };
+  });
+
+  // 模块内向量列表（分页）
+  app.get('/api/maintenance/vector-list', async (req) => {
+    const { module, offset, limit } = req.query as { module?: string; offset?: string; limit?: string };
+    const store = getVectorStore();
+    if ('listVectors' in store) {
+      const vectors = await (store as any).listVectors(module || 'ai-search', parseInt(offset || '0'), parseInt(limit || '50'));
+      return { vectors, module: module || 'ai-search' };
+    }
+    return { vectors: [], module: module || 'ai-search' };
   });
 }

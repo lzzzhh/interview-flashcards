@@ -105,14 +105,7 @@ button, [role="button"], select, input[type="file"], input[type="submit"] {
   z-index: 0;
   border-radius: inherit;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.36), transparent 38%),
-    repeating-linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.05) 0,
-      rgba(255, 255, 255, 0.05) 1px,
-      transparent 1px,
-      transparent 7px
-    );
+    linear-gradient(180deg, rgba(255, 255, 255, 0.36), transparent 38%);
   opacity: 0.58;
 }
 

@@ -14,12 +14,12 @@ export async function initFTS5(): Promise<void> {
   const db = (prisma as any).$queryRawUnsafe || prisma.$executeRawUnsafe;
   // Card FTS5
   try {
-    await db(`CREATE VIRTUAL TABLE IF NOT EXISTS card_fts USING fts5(cardId UNINDEXED, deckId UNINDEXED, question, answer, tags, tokenize='unicode61')`);
+    await db(`CREATE VIRTUAL TABLE IF NOT EXISTS card_fts USING fts5(cardId UNINDEXED, deckId UNINDEXED, question, answer, tags, searchKeywords, tokenize='unicode61')`);
   } catch { /* may already exist */ }
   try {
     await db(`CREATE TRIGGER IF NOT EXISTS card_fts_insert AFTER INSERT ON Card BEGIN
-      INSERT INTO card_fts(cardId, deckId, question, answer, tags)
-      VALUES (new.id, new.deckId, new.question, new.answer, new.tags);
+      INSERT INTO card_fts(cardId, deckId, question, answer, tags, searchKeywords)
+      VALUES (new.id, new.deckId, new.question, new.answer, new.tags, new.searchKeywords);
     END`);
   } catch {}
   try {
@@ -30,8 +30,8 @@ export async function initFTS5(): Promise<void> {
   try {
     await db(`CREATE TRIGGER IF NOT EXISTS card_fts_update AFTER UPDATE ON Card BEGIN
       DELETE FROM card_fts WHERE cardId = old.id;
-      INSERT INTO card_fts(cardId, deckId, question, answer, tags)
-      VALUES (new.id, new.deckId, new.question, new.answer, new.tags);
+      INSERT INTO card_fts(cardId, deckId, question, answer, tags, searchKeywords)
+      VALUES (new.id, new.deckId, new.question, new.answer, new.tags, new.searchKeywords);
     END`);
   } catch {}
 
@@ -56,7 +56,7 @@ export async function initFTS5(): Promise<void> {
 export async function rebuildFTS5(): Promise<void> {
   const db = (prisma as any).$queryRawUnsafe || prisma.$executeRawUnsafe;
   try { await db(`DELETE FROM card_fts`); } catch {}
-  try { await db(`INSERT INTO card_fts(cardId, deckId, question, answer, tags) SELECT id, deckId, question, answer, tags FROM Card`); } catch {}
+  try { await db(`INSERT INTO card_fts(cardId, deckId, question, answer, tags, searchKeywords) SELECT id, deckId, question, answer, tags, searchKeywords FROM Card`); } catch {}
   try { await db(`DELETE FROM source_chunk_fts`); } catch {}
   try { await db(`INSERT INTO source_chunk_fts(chunkId, sourceId, text) SELECT id, sourceId, text FROM SourceChunk`); } catch {}
 }
@@ -67,50 +67,21 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     const escaped = query.replace(/['"]/g, ' ').trim();
     if (!escaped) return [];
 
-    // For Chinese-containing queries
+    // For Chinese-containing queries → LIKE only (no FTS5, avoids column-name + ranking noise)
     if (/[\u4e00-\u9fff]/.test(escaped)) {
-      // Split: English/Latin terms → FTS5, Chinese terms → LIKE
-      const allTerms = escaped.split(/\s+/).filter(t => t.length > 0);
-      const hasLatin = allTerms.some(t => /[a-zA-Z]/.test(t));
-
-      if (hasLatin) {
-        // Mixed query: FTS5 for Latin/English terms, LIKE for Chinese terms
-        const latinTerms = allTerms.filter(t => /[a-zA-Z]/.test(t)).join(' ');
-        const cjkTerms = allTerms.filter(t => /[\u4e00-\u9fff]/.test(t));
-
-        // Run both in parallel
-        const [ftsResults, likeResults] = await Promise.all([
-          latinTerms ? fts5RawSearch(latinTerms, limit, deckId) : Promise.resolve([] as FTS5Result[]),
-          cjkTerms.length > 0 ? likeSearch(cjkTerms, limit) : Promise.resolve([] as FTS5Result[]),
-        ]);
-
-        // Merge: deduplicate, FTS5 first, then LIKE
-        const results = [...ftsResults];
-        const seen = new Set(results.map(r => r.cardId));
-        for (const lr of likeResults) {
-          if (!seen.has(lr.cardId)) {
-            results.push(lr);
-            seen.add(lr.cardId);
-          }
-        }
-        return results;
-      }
-
-      // Pure Chinese: LIKE with smart term extraction
       const terms = extractChineseTerms(escaped);
       console.log("likeSearch terms:", terms, "limit:", limit); const lsr = await likeSearch(terms, limit); console.log("likeSearch returned:", lsr.length); return lsr;
     }
 
-    // Pure English/Latin: use FTS5
-    let sql = '';
-    const params: any[] = [];
-    if (deckId) {
-      sql = 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? AND deckId = ? ORDER BY rank LIMIT ?';
-      params.push(escaped, deckId, limit);
-    } else {
-      sql = 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? ORDER BY rank LIMIT ?';
-      params.push(escaped, limit);
-    }
+    // Pure English/Latin: use FTS5 (quote terms to avoid column-name conflicts)
+    const engTerms = escaped.split(/\s+/).filter(t => t.length > 0);
+    const engQuoted = engTerms.map(t => `"${t.replace(/"/g, '""')}"`).join(' ');
+    if (!engQuoted) return [];
+
+    const sql = deckId
+      ? 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? AND deckId = ? ORDER BY rank LIMIT ?'
+      : 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? ORDER BY rank LIMIT ?';
+    const params: any[] = deckId ? [engQuoted, deckId, limit] : [engQuoted, limit];
 
     const rows = await prisma.$queryRawUnsafe(sql, ...params) as any[];
     return (rows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'fts5' }));
@@ -150,14 +121,23 @@ export async function sourceChunkSearch(query: string, limit: number = 10, sourc
 
 // ---- Internal Helpers ----
 
-/** Raw FTS5 search helper */
+/** Raw FTS5 search helper — quote each term to avoid column-name conflicts */
 async function fts5RawSearch(escaped: string, limit: number, deckId?: string): Promise<FTS5Result[]> {
+  // Quote each term for FTS5 MATCH: "term1" "term2" ...
+  const terms = escaped.split(/\s+/).filter(t => t.length > 0);
+  const quoted = terms.map(t => `"${t.replace(/"/g, '""')}"`).join(' ');
+  if (!quoted) return [];
+
   const sql = deckId
     ? 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? AND deckId = ? ORDER BY rank LIMIT ?'
     : 'SELECT cardId, rank FROM card_fts WHERE card_fts MATCH ? ORDER BY rank LIMIT ?';
-  const params: any[] = deckId ? [escaped, deckId, limit] : [escaped, limit];
-  const rows = await prisma.$queryRawUnsafe(sql, ...params) as any[];
-  return (rows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'fts5' }));
+  const params: any[] = deckId ? [quoted, deckId, limit] : [quoted, limit];
+  try {
+    const rows = await prisma.$queryRawUnsafe(sql, ...params) as any[];
+    return (rows || []).map((r: any) => ({ cardId: r.cardId, rank: r.rank, matchField: 'fts5' }));
+  } catch {
+    return [];
+  }
 }
 
 /** LIKE search helper: runs separate queries per term to avoid result crowding */

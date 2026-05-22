@@ -14,7 +14,7 @@ export default function ProgressBar({ current, total, mastered }: ProgressBarPro
   return (
     <div className="w-full">
       {/* Text */}
-      <div className="flex justify-between items-center mb-1 text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex justify-between items-center mb-1 text-xs text-gray-700 dark:text-gray-400">
         <span>
           第 {current + 1} / 共 {total} 张
         </span>
