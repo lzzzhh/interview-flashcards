@@ -127,8 +127,11 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   if (input.deckIds && input.deckIds.length > 0) {
     where.deckId = { in: input.deckIds };
   }
+  if (input.filters?.difficulty?.length) {
+    where.difficulty = { in: input.filters.difficulty };
+  }
 
-  const [cards, progresses] = await Promise.all([
+  let [cards, progresses] = await Promise.all([
     prisma.card.findMany({
       where,
       include: { deck: true },
@@ -137,6 +140,16 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
       where: { userId: USER_ID, cardId: { in: cardIds } },
     }),
   ]);
+
+  // Apply onlyDue filter after progress fetch
+  if (input.filters?.onlyDue) {
+    const dueCardIds = new Set(
+      progresses
+        .filter(p => p.state !== 'new' && new Date(p.nextReview) <= new Date())
+        .map(p => p.cardId)
+    );
+    cards = cards.filter(c => dueCardIds.has(c.id));
+  }
 
   const cardMap = new Map(cards.map(c => [c.id, c]));
   const progressMap = new Map(progresses.map(p => [p.cardId, p]));

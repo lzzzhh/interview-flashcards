@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Search, Loader2 } from 'lucide-react';
 import { hybridSearch, type SearchResult } from '../api/searchApi';
 import { useAppContext } from '../context/AppContext';
+import { API_BASE } from '../api/client';
 import type { Category } from '../types';
 
 interface Props {
@@ -25,7 +26,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
 
   // 进入页面时预热 bge-m3
   useEffect(() => {
-    fetch('http://localhost:3001/api/health/warmup', { method: 'POST' })
+    fetch(`${API_BASE}/health/warmup`, { method: 'POST' })
       .then(() => setWarmingUp(false))
       .catch(() => setWarmingUp(false));
   }, []);
@@ -97,7 +98,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
                       backgroundColor: r.matchType === 'due' ? 'rgba(234,88,12,0.2)' : 'rgba(100,156,255,0.15)',
                       color: r.matchType === 'due' ? 'var(--orange)' : 'var(--blue)',
                     }}>
-                      {r.matchType === 'due' ? '到期' : r.matchType === 'keyword' ? '关键词' : r.matchType === 'vector' ? '语义' : '混合'}
+                      {r.matchType === 'due' ? '到期' : r.matchType === 'keyword' ? '关键词' : r.matchType === 'vector' || r.matchType === 'semantic' ? '语义' : r.matchType === 'tag' ? '标签' : '混合'}
                     </span>
                   </div>
                   {r.snippet && (

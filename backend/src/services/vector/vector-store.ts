@@ -66,6 +66,8 @@ export class SqliteVecVectorStore implements VectorStore {
     // Indices
     try { await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_module ON ${this.tableName}(module)`); } catch {}
     try { await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS idx_${this.tableName}_object ON ${this.tableName}(object_id, field)`); } catch {}
+    // Unique constraint so INSERT OR REPLACE actually replaces duplicates
+    try { await prisma.$executeRawUnsafe(`CREATE UNIQUE INDEX IF NOT EXISTS idx_${this.tableName}_unique ON ${this.tableName}(module, object_id, object_type, field)`); } catch {}
   }
 
   /** 序列化向量为 JSON */

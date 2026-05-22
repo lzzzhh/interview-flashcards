@@ -112,8 +112,8 @@ export async function rebuildLocalEmbeddings(): Promise<{ total: number; synced:
   const store = getVectorStore();
   if (store.name === 'noop') return { total: 0, synced: 0 };
 
-  // 清空现有向量
-  try { await prisma.$executeRawUnsafe(`DELETE FROM vec_embeddings`); } catch {}
+  // 清空现有向量（使用 store 的表名而非硬编码）
+  try { await prisma.$executeRawUnsafe(`DELETE FROM ai_search_vec`); } catch {}
 
   const cards = await prisma.card.findMany({ select: { id: true } });
   const cardIds = cards.map(c => c.id);

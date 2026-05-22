@@ -1,6 +1,7 @@
 // src/components/AgentHubPage.tsx — Agent 中心入口
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, FileText, Briefcase, Search, Sparkles, Mic, ListChecks, X, Download, Loader2 } from 'lucide-react';
+import { API_BASE } from '../api/client';
 
 interface Props {
   onBack: () => void;
@@ -25,7 +26,7 @@ const AGENTS = [
 /** 检查模型是否已下载 */
 async function checkBgeM3(): Promise<{ available: boolean; reason?: string }> {
   try {
-    const res = await fetch('http://localhost:3001/api/models/bge-m3-status');
+    const res = await fetch(`${API_BASE}/models/bge-m3-status`);
     return await res.json();
   } catch {
     return { available: false, reason: 'ollama_unreachable' };
@@ -34,13 +35,13 @@ async function checkBgeM3(): Promise<{ available: boolean; reason?: string }> {
 
 /** 开始下载模型 */
 async function startPull(): Promise<{ ok: boolean; alreadyPulling?: boolean; status: string }> {
-  const res = await fetch('http://localhost:3001/api/models/pull-bge-m3', { method: 'POST' });
+  const res = await fetch(`${API_BASE}/models/pull-bge-m3`, { method: 'POST' });
   return await res.json();
 }
 
 /** 查询下载进度 */
 async function getPullStatus(): Promise<{ status: string; progress: number; message: string; error?: string }> {
-  const res = await fetch('http://localhost:3001/api/models/pull-status');
+  const res = await fetch(`${API_BASE}/models/pull-status`);
   return await res.json();
 }
 

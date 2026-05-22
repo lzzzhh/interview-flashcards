@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Search, Loader2, Dna, Zap, Database, Layers } from 'lucide-react';
 import { hybridSearch, type SearchResult } from '../api/searchApi';
-import { apiGet } from '../api/client';
+import { apiGet, API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
 
 interface Props {
@@ -51,7 +51,7 @@ export default function VectorDatabasePage({ onBack }: Props) {
       .finally(() => setModuleLoading(false));
 
     // 预热 bge-m3
-    fetch('http://localhost:3001/api/health/warmup', { method: 'POST' })
+    fetch(`${API_BASE}/health/warmup`, { method: 'POST' })
       .then(() => setWarmingUp(false))
       .catch(() => setWarmingUp(false));
   }, []);
