@@ -378,11 +378,19 @@ function printLearningPathEval(
   const avgPC = allMetrics.reduce((s, m) => s + m.planCoverage, 0) / allMetrics.length;
   const avgResults = allMetrics.reduce((s, m) => s + m.totalResults, 0) / allMetrics.length;
 
+  // New P7 metrics: StageBalance, Top10UsefulRate, PrerequisiteOrdering
+  const avgSB = allMetrics.reduce((s, m) => s + (m as any).stageBalance, 0) / Math.max(1, allMetrics.filter(m => (m as any).stageBalance !== undefined).length);
+  const avgTU = allMetrics.reduce((s, m) => s + (m as any).top10UsefulRate, 0) / Math.max(1, allMetrics.filter(m => (m as any).top10UsefulRate !== undefined).length);
+  const avgPO = allMetrics.reduce((s, m) => s + (m as any).prereqOrdering, 0) / Math.max(1, allMetrics.filter(m => (m as any).prereqOrdering !== undefined).length);
+
   console.log('  ── Aggregate ──');
   console.log(`  ConceptCoverage@20  ${(avgCC*100).toFixed(1)}%`);
   console.log(`  DeckAccuracy@20     ${(avgDA*100).toFixed(1)}%`);
   console.log(`  PlanCoverage        ${(avgPC*100).toFixed(1)}%`);
   console.log(`  Avg Results         ${avgResults.toFixed(1)}`);
+  if (!isNaN(avgSB)) console.log(`  StageBalance        ${(avgSB*100).toFixed(1)}%`);
+  if (!isNaN(avgTU)) console.log(`  Top10UsefulRate     ${(avgTU*100).toFixed(1)}%`);
+  if (!isNaN(avgPO)) console.log(`  PrereqOrdering      ${(avgPO*100).toFixed(1)}%`);
   console.log('');
 }
 

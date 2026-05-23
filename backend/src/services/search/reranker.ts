@@ -398,3 +398,79 @@ export function rerank(
 export function clearBigramCache(): void {
   bigramCache.clear();
 }
+
+// ════════════════════ Diversity Rerank ════════════════════
+
+/**
+ * 轻量概念簇 diversity：Top15 被同一概念占满时，从其他簇插入高分卡片。
+ * 只影响 rank 6-15，保留 Top5 不做 diversity（相关性优先）。
+ */
+export function applyDiversityRerank(
+  ranked: { cardId: string; finalScore: number }[],
+  cardTitles: Map<string, string>,
+): { cardId: string; finalScore: number }[] {
+  if (ranked.length < 10) return ranked;
+
+  // Extract concept clusters from titles (simple keyword overlap)
+  const clusterKey = (title: string): string => {
+    const t = title.toLowerCase();
+    // Group common prefixes
+    if (/rag|检索|retrieval/i.test(t)) return 'rag';
+    if (/微调|finetun|lora|peft|adapter/i.test(t)) return 'finetune';
+    if (/agent|智能体|auto.?gpt|react/i.test(t)) return 'agent';
+    if (/transformer|attention|自注意/i.test(t)) return 'transformer';
+    if (/cnn|卷积|conv/i.test(t)) return 'cnn';
+    if (/rnn|lstm|gru|循环/i.test(t)) return 'rnn';
+    if (/梯度|gradient|sgd|adam|优化/i.test(t)) return 'gradient';
+    if (/损失|loss|cross.?entropy|mse/i.test(t)) return 'loss';
+    if (/正则|regular|l1|l2|dropout/i.test(t)) return 'regularization';
+    if (/batch.?norm|layernorm|归一化/i.test(t)) return 'norm';
+    if (/ab.*测试|ab.*test|假设检验|hypothesis|p.?value/i.test(t)) return 'abtest';
+    if (/动态规划|dp|爬楼梯|背包|coin|house/i.test(t)) return 'dp';
+    if (/链表|linked.?list|反转/i.test(t)) return 'linkedlist';
+    if (/二叉树|binary.?tree|遍历|bst/i.test(t)) return 'tree';
+    if (/embedding|嵌入|向量/i.test(t)) return 'embedding';
+    return 'other_' + t.slice(0, 5);
+  };
+
+  // Keep top 5 untouched
+  const top5 = ranked.slice(0, 5);
+  const rest = ranked.slice(5);
+
+  // Build clusters for rest
+  const clusters = new Map<string, typeof rest>();
+  for (const r of rest) {
+    const key = clusterKey(cardTitles.get(r.cardId) || '');
+    if (!clusters.has(key)) clusters.set(key, []);
+    clusters.get(key)!.push(r);
+  }
+
+  // Interleave: round-robin from different clusters, by score within each cluster
+  const result: typeof ranked = [...top5];
+  const seen = new Set<string>();
+  const clusterKeys = [...clusters.keys()];
+
+  while (result.length < ranked.length) {
+    let added = false;
+    for (const key of clusterKeys) {
+      if (result.length >= ranked.length) break;
+      const items = clusters.get(key);
+      if (!items || items.length === 0) continue;
+      // Pick highest-score unseen from this cluster
+      const next = items.find(r => !seen.has(r.cardId));
+      if (next) {
+        result.push(next);
+        seen.add(next.cardId);
+        added = true;
+      }
+    }
+    if (!added) break; // all seen
+  }
+
+  // Append remaining unseen
+  for (const r of rest) {
+    if (!seen.has(r.cardId)) result.push(r);
+  }
+
+  return result;
+}

@@ -13,7 +13,7 @@ import { getVectorStore } from '../vector/vector-store';
 import { fts5Search } from './fts5-search';
 import { getEmbeddingProvider } from '../embedding-provider';
 import { textToVector } from '../vector/local-embedding';
-import { expandQuery } from './query-expander';
+import { expandQuery, normalizeQuery } from './query-expander';
 import { tokenizeBigrams } from './bigram';
 import {
   rerank,
@@ -23,7 +23,9 @@ import {
   computeStatsLexicalBoost,
   DEFAULT_PROFILE,
   type RerankProfile,
+  applyDiversityRerank,
 } from './reranker';
+import { buildStagedPlan, LEARNING_STAGES, type StagedPlan, type CardInfo } from './study-concept-graph';
 
 // ---- 类型 ----
 
@@ -74,6 +76,28 @@ const USER_ID = 'demo-user';
 const DEFAULT_MIN_SCORE = 0.30;
 const DEFAULT_MAX_RESULTS = 50;
 const DEFAULT_CANDIDATE_LIMIT = 300;
+
+/** Check if top results are dominated by a single concept cluster */
+function getDominantCluster(
+  ranked: { cardId: string; finalScore: number }[],
+  cardTitles: Map<string, string>,
+): { cluster: string; count: number } {
+  const counts = new Map<string, number>();
+  for (const r of ranked) {
+    const t = (cardTitles.get(r.cardId) || '').toLowerCase();
+    let key = 'other';
+    if (/rag|检索|retrieval/i.test(t)) key = 'rag';
+    else if (/微调|finetun|lora|peft/i.test(t)) key = 'finetune';
+    else if (/agent|智能体/i.test(t)) key = 'agent';
+    else if (/transformer|attention|自注意/i.test(t)) key = 'transformer';
+    else if (/梯度|gradient|sgd|adam|优化/i.test(t)) key = 'gradient';
+    else if (/ab.*测试|ab.*test|假设检验|hypothesis/i.test(t)) key = 'abtest';
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  let max = { cluster: 'other', count: 0 };
+  for (const [k, v] of counts) { if (v > max.count) max = { cluster: k, count: v }; }
+  return max;
+}
 
 interface RecallCandidate {
   cardId: string;
@@ -261,7 +285,28 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   // Re-sort after deck boost
   ranked.sort((a, b) => b.finalScore - a.finalScore);
 
-  // 8. Build final output
+  // 8c. Diversity rerank: if top15 dominated by single concept cluster, interleave
+  if (ranked.length > 15) {
+    const cardTitles = new Map(cards.map(c => [c.id, c.title || c.titleCn || '']));
+    const topCluster = getDominantCluster(ranked.slice(0, 15), cardTitles);
+    if (topCluster.count >= 8) {
+      const diversified = applyDiversityRerank(
+        ranked.map(r => ({ cardId: r.cardId, finalScore: r.finalScore })),
+        cardTitles,
+      );
+      // Map scores back
+      const scoreMap = new Map(ranked.map(r => [r.cardId, r.finalScore]));
+      ranked.length = 0;
+      for (const d of diversified) {
+        const orig = scoreMap.get(d.cardId);
+        if (orig !== undefined) {
+          ranked.push({ cardId: d.cardId, finalScore: orig, fieldBoost: 0, learningBoost: 0 });
+        }
+      }
+    }
+  }
+
+  // 9. Build final output
   const rankedMap = new Map(ranked.map((r, i) => [r.cardId, { ...r, rank: i + 1 }]));
 
   const results: CardMatch[] = [];
@@ -498,8 +543,8 @@ export async function learningPlanSearch(input: {
   query: string;
   deckIds?: string[];
   filters?: { difficulty?: string[]; onlyDue?: boolean };
-}): Promise<LearningPlanItem[]> {
-  // 1. 用大候选池跑搜索（topK=999，取全部结果）
+}): Promise<StagedPlan> {
+  // 1. 用大候选池跑搜索
   const matches = await hybridSearch({
     query: input.query,
     deckIds: input.deckIds,
@@ -507,26 +552,28 @@ export async function learningPlanSearch(input: {
     filters: input.filters,
   });
 
-  if (matches.length === 0) return [];
+  if (matches.length === 0) {
+    return { topic: input.query, stages: {} as any, totalCards: 0, stageBalance: 0 };
+  }
 
-  // 过滤：只保留有实际语义/关键词匹配的结果（score >= 0.08 且 deck 匹配相关概念）
+  // 2. 过滤相关结果
   const deckBoostSet = new Set<string>();
-  // 从 query expansion 推断目标牌组
   const { deckIds: expandedDecks } = expandQuery(input.query);
   for (const d of expandedDecks) deckBoostSet.add(d);
 
   const relevant = matches.filter(m => {
-    if (m.score >= 0.30) return true;  // 高分直接保留
-    if (m.score >= 0.20 && deckBoostSet.has(m.deckId)) return true;  // 目标牌组降分保留
+    if (m.score >= 0.30) return true;
+    if (m.score >= 0.20 && deckBoostSet.has(m.deckId)) return true;
     return false;
   });
 
-  if (relevant.length === 0) return [];
+  if (relevant.length === 0) {
+    return { topic: input.query, stages: {} as any, totalCards: 0, stageBalance: 0 };
+  }
 
-  // 限制最多 100 张（保持学习清单可管理）
   const capped = relevant.slice(0, 100);
 
-  // 2. 获取学习状态
+  // 3. 获取卡片详情 + 学习状态
   const cardIds = capped.map(c => c.cardId);
   const [progresses, cards] = await Promise.all([
     prisma.cardProgress.findMany({
@@ -540,45 +587,42 @@ export async function learningPlanSearch(input: {
 
   const progressMap = new Map(progresses.map(p => [p.cardId, p]));
   const cardMap = new Map(cards.map(c => [c.id, c]));
-  const now = Date.now();
 
-  // 3. 计算学习优先级
-  const plan: LearningPlanItem[] = [];
+  // 4. Build CardInfo list for stage classification
+  const cardInfos: CardInfo[] = [];
   for (const m of capped) {
     const card = cardMap.get(m.cardId);
-    const prog = progressMap.get(m.cardId);
-    const state = prog?.state || 'new';
-    const nextReview = prog?.nextReview ? new Date(prog.nextReview).getTime() : 0;
-
-    let priority: number;
-    if (state === 'new') {
-      priority = 0; // 最高优先：新卡片，还没学过
-    } else if (state !== 'new' && nextReview <= now) {
-      priority = 1; // 高优先：到期复习
-    } else if (state !== 'new' && nextReview <= now + 3 * 86400000) {
-      priority = 2; // 中优先：3天内到期
-    } else {
-      priority = 3; // 低优先：已掌握，间隔较长
-    }
-
-    const content = card?.question || card?.answer || '';
-    plan.push({
+    if (!card) continue;
+    cardInfos.push({
       cardId: m.cardId,
       title: m.title,
       deckId: m.deckId,
-      deckName: m.deckName || card?.deck?.name,
-      tags: m.tags,
       score: m.score,
-      state,
-      interval: prog?.intervalDays || 0,
-      nextReview,
-      priority,
-      snippet: content.slice(0, 100) + (content.length > 100 ? '...' : ''),
+      tags: m.tags,
+      searchKeywords: card.searchKeywords || undefined,
+      question: card.question || undefined,
+      answer: card.answer || undefined,
     });
   }
 
-  // 4. 按优先级排序：priority ASC（新卡优先），然后 score DESC
-  plan.sort((a, b) => a.priority - b.priority || b.score - a.score);
+  // 5. Build staged plan
+  const progInfo = new Map(
+    progresses.map(p => [p.cardId, {
+      state: p.state,
+      intervalDays: p.intervalDays,
+      nextReview: p.nextReview ? new Date(p.nextReview).getTime() : 0,
+    }])
+  );
+
+  const plan = buildStagedPlan(input.query, cardInfos, progInfo);
+
+  // Enrich with deck names
+  for (const stage of LEARNING_STAGES) {
+    for (const item of plan.stages[stage]) {
+      const card = cardMap.get(item.cardId);
+      if (card) item.deckName = card.deck.name;
+    }
+  }
 
   return plan;
 }

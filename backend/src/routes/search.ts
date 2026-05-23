@@ -33,6 +33,6 @@ export async function searchRoutes(app: FastifyInstance) {
       deckIds: body.deckIds,
       filters: body.filters,
     });
-    return { plan, total: plan.length };
+    return { plan, total: plan.totalCards };
   });
 }

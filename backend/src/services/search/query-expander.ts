@@ -290,6 +290,12 @@ const RULES: ExpansionEntry[] = [
   // Agent 幻觉专项（agent-10 buried）
   { pattern: /胡编乱造|胡说八道|幻觉|hallucination|瞎编|编造|说瞎话|不准确|不可靠|事实.*错误|生成.*错误/i,
     keywords: ['幻觉', 'hallucination', '事实性', 'factuality', '胡编乱造', 'RAG', '检索增强生成', '知识库', 'Agent', '可靠性', '可信'] },
+
+  // Rerank 消歧（agent-25 buried）
+  { pattern: /rerank|重排[序名]|re.?rank/i,
+    keywords: ['rerank', '重排序', 'cross-encoder', '精排', 'RAG', '检索', 'Agent', '语义排序', '搜索结果排序'] },
+  { pattern: /架构.*数据|数据.*架构|data.?centric|model.?centric/i,
+    keywords: ['data-centric', 'model-centric', '数据驱动', '模型驱动', '特征工程', '数据质量', '模型架构', '机器学习', '数据优先'] },
 ];
 
 /**
@@ -313,6 +319,17 @@ const KEYWORD_DECK_MAP: Record<string, string> = {
   'boosting': 'machine-learning', '集成学习': 'machine-learning', 'ensemble': 'machine-learning',
   'roc': 'machine-learning', 'auc': 'machine-learning',
   't-sne': 'machine-learning', 'dbscan': 'machine-learning',
+  '半监督': 'machine-learning', '主动学习': 'machine-learning', '迁移学习': 'machine-learning',
+  '不平衡': 'machine-learning', '冷启动': 'machine-learning', '特征重要性': 'machine-learning',
+  '降维': 'machine-learning', '可解释': 'machine-learning', 'shap': 'machine-learning',
+  '图神经网络': 'machine-learning', 'gnn': 'machine-learning', 'nlp': 'machine-learning',
+  '推荐系统': 'machine-learning', 'ctr': 'machine-learning', '广告': 'machine-learning',
+  '强化学习': 'machine-learning', 'dqn': 'machine-learning', 'ppo': 'machine-learning',
+  '自监督': 'machine-learning', '对比学习': 'machine-learning', 'simclr': 'machine-learning',
+  '知识蒸馏': 'machine-learning', 'mlops': 'machine-learning', '模型监控': 'machine-learning',
+  '概念漂移': 'machine-learning', 'smote': 'machine-learning', '联邦学习': 'machine-learning',
+  'star法则': 'workplace', '简历': 'workplace', '面试': 'workplace',
+  'rerank': 'agent', '重排序': 'agent', '架构': 'machine-learning', '数据驱动': 'machine-learning',
   // 统计学
   '贝叶斯': 'statistics', '置信区间': 'statistics', '假设检验': 'statistics',
   'p值': 'statistics', 'p-value': 'statistics', '大数定律': 'statistics',
