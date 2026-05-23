@@ -289,7 +289,7 @@ export const TEST_CASES: TestCase[] = [
 
   // ── 关键词-统计学 ──
 
-  { query: "MLE", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-100", "stats-109"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE"] },
+  { query: "MLE", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-195"], secondaryIds: ["stats-100", "stats-109"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE"] },
 
   { query: "P\u503c\u663e\u8457\u6027", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-134", "stats-162"], secondaryIds: ["stats-170"], acceptableDecks: ["statistics"], acceptableConcepts: ["P.*\u503c|\u663e\u8457\u6027"] },
 
