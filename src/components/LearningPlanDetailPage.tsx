@@ -42,10 +42,21 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
       const cardState = sm2?.state || 'new';
       const cfg = PRIORITY_CONFIG[cardState] || { label: 'unknown', color: TEXT_MUTED };
       // Use stored title from plan item, fall back to card lookup, then deck context
-      const cardTitle = item.title
-        || (card ? String((card as any).titleCn || (card as any).title || (card as any).question || '') : '');
+      const storedTitle = item.title;
+      const cardCn = card ? String((card as any).titleCn || '') : '';
+      const isLeetCode = item.deckId === 'leetcode' || item.cardId.startsWith('lc-');
+      let title: string;
+      if (storedTitle && storedTitle !== item.cardId && !storedTitle.startsWith(item.deckId + ' ·')) {
+        title = storedTitle;
+      } else if (isLeetCode && cardCn) {
+        const num = item.cardId.replace(/^lc-0*/, '');
+        title = `力扣#${num} ${cardCn}`;
+      } else {
+        title = storedTitle || cardCn
+          || (card ? String((card as any).title || (card as any).question || '') : '')
+          || `${category?.label || item.deckId} · ${item.cardId}`;
+      }
       const deckName = category?.label || item.deckId;
-      const title = cardTitle || `${deckName} · ${item.cardId}`;
       return {
         cardId: item.cardId,
         deckId: item.deckId,
