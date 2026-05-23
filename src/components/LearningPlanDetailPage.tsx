@@ -41,14 +41,16 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
       const sm2 = card?.sm2;
       const cardState = sm2?.state || 'new';
       const cfg = PRIORITY_CONFIG[cardState] || { label: 'unknown', color: TEXT_MUTED };
-      // Use stored title from plan item, fall back to card lookup
-      const title = item.title
-        || (card ? String((card as any).titleCn || (card as any).title || (card as any).question || item.cardId) : item.cardId);
+      // Use stored title from plan item, fall back to card lookup, then deck context
+      const cardTitle = item.title
+        || (card ? String((card as any).titleCn || (card as any).title || (card as any).question || '') : '');
+      const deckName = category?.label || item.deckId;
+      const title = cardTitle || `${deckName} · ${item.cardId}`;
       return {
         cardId: item.cardId,
         deckId: item.deckId,
         title: typeof title === 'string' ? title : String(title || ''),
-        deckName: category?.label || item.deckId,
+        deckName,
         state: cardState,
         interval: sm2?.interval || 0,
         stateLabel: cfg.label,
