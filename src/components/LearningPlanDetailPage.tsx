@@ -46,11 +46,13 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
       const cardCn = card ? String((card as any).titleCn || '') : '';
       const isLeetCode = item.deckId === 'leetcode' || item.cardId.startsWith('lc-');
       let title: string;
-      if (storedTitle && storedTitle !== item.cardId && !storedTitle.startsWith(item.deckId + ' ·')) {
-        title = storedTitle;
-      } else if (isLeetCode && cardCn) {
+      if (isLeetCode) {
         const num = item.cardId.replace(/^lc-0*/, '');
-        title = `力扣#${num} ${cardCn}`;
+        const cnName = storedTitle && storedTitle !== item.cardId && !storedTitle.startsWith(item.deckId + ' ·')
+          ? storedTitle.replace(/^力扣#\d+\s*/, '') : cardCn;
+        title = cnName ? `力扣#${num} ${cnName}` : (storedTitle || cardCn || `力扣#${num}`);
+      } else if (storedTitle && storedTitle !== item.cardId && !storedTitle.startsWith(item.deckId + ' ·')) {
+        title = storedTitle;
       } else {
         title = storedTitle || cardCn
           || (card ? String((card as any).title || (card as any).question || '') : '')
