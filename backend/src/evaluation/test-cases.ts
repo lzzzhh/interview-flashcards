@@ -393,7 +393,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "\u6811\u6a21\u578b\u7279\u5f81\u91cd\u8981\u6027\u600e\u4e48\u7b97", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["ml-13", "ml-176"], secondaryIds: ["ml-18"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7279\u5f81.*\u91cd\u8981|Permutation|S"] },
 
-  { query: "\u6a21\u578bServing\u600e\u4e48\u505a", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Serving|vLLM|Triton|"] },
+  { query: "\u6a21\u578bServing\u600e\u4e48\u505a", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Serving|vLLM|Triton"] },
 
   { query: "\u7edf\u8ba1\u5b66\u7684\u4e2d\u5fc3\u6781\u9650\u5b9a\u7406", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["stats-10", "stats-11"], secondaryIds: ["stats-114"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u4e2d\u5fc3\u6781\u9650|CLT|\u6b63\u6001"] },
 
@@ -547,7 +547,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "Stacking\u548cBlending\u533a\u522b", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-189", "ml-36"], secondaryIds: ["ml-40"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Stacking|Blending|\u96c6\u6210"] },
 
-  { query: "\u4e0d\u5e73\u8861\u6570\u636e\u600e\u4e48\u5904\u7406", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-143", "ml-16"], secondaryIds: ["ml-72"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u4e0d\u5e73\u8861|Imbalance|SMOTE|"] },
+  { query: "\u4e0d\u5e73\u8861\u6570\u636e\u600e\u4e48\u5904\u7406", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-143", "ml-16"], secondaryIds: ["ml-72"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u4e0d\u5e73\u8861|Imbalance|SMOTE"] },
 
   { query: "\u4e3a\u4ec0\u4e48\u5206\u7c7b\u7528\u4ea4\u53c9\u71b5\u4e0d\u7528MSE", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-53", "ml-54"], secondaryIds: ["ml-60"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u4ea4\u53c9\u71b5|MSE|Log.*Loss"] },
 
@@ -863,7 +863,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "\u591a\u4efb\u52a1\u5b66\u4e60vs\u5355\u4efb\u52a1\u8bad\u7ec3", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-150"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u591a\u4efb\u52a1|Multi.*task|\u5171\u4eab"] },
 
-  { query: "\u67b6\u6784\u548c\u6570\u636e\u54ea\u4e2a\u66f4\u91cd\u8981", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-104", "ml-110"], secondaryIds: ["ml-135"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u6570\u636e.*\u6a21\u578b|Data-centric|"] },
+  { query: "\u67b6\u6784\u548c\u6570\u636e\u54ea\u4e2a\u66f4\u91cd\u8981", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-104", "ml-110"], secondaryIds: ["ml-135"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u6570\u636e.*\u6a21\u578b|Data-centric"] },
 
   { query: "\u68af\u5ea6\u4e0b\u964d\u548c\u725b\u987f\u6cd5\u4f18\u5316\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-11", "ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u68af\u5ea6\u4e0b\u964d|\u725b\u987f\u6cd5|\u4e8c\u9636"] },
 
@@ -883,7 +883,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "Prompt\u5de5\u7a0b\u548cFine-tuning\u9009\u54ea\u4e2a", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-12", "llm-13"], secondaryIds: ["llm-16"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt|\u5fae\u8c03|ICL"] },
 
-  { query: "Seq2Seq\u548cTransformer\u67b6\u6784\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-38", "llm-4"], secondaryIds: ["llm-5"], acceptableDecks: ["llm"], acceptableConcepts: ["Seq2Seq|Transformer|"] },
+  { query: "Seq2Seq\u548cTransformer\u67b6\u6784\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-38", "llm-4"], secondaryIds: ["llm-5"], acceptableDecks: ["llm"], acceptableConcepts: ["Seq2Seq|Transformer"] },
 
   { query: "TPU\u548cGPU\u8bad\u7ec3\u4f18\u52bf\u52a3\u52bf", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-11", "llm-40"], secondaryIds: ["llm-48"], acceptableDecks: ["llm"], acceptableConcepts: ["TPU|GPU|\u786c\u4ef6|\u8bad\u7ec3"] },
 
@@ -951,7 +951,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "Chain-of-Thought\u5728GPT4\u4e2d", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-17"], secondaryIds: ["llm-25"], acceptableDecks: ["llm"], acceptableConcepts: ["COT|\u601d\u7ef4\u94fe|\u63a8\u7406"] },
 
-  { query: "Flash Attention\u600e\u4e48\u52a0\u901f", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-25"], secondaryIds: ["llm-40"], acceptableDecks: ["llm"], acceptableConcepts: ["Flash.*Attention|\u52a0\u901f|"] },
+  { query: "Flash Attention\u600e\u4e48\u52a0\u901f", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-25"], secondaryIds: ["llm-40"], acceptableDecks: ["llm"], acceptableConcepts: ["Flash.*Attention|\u52a0\u901f"] },
 
   { query: "OOM\u663e\u5b58\u4e0d\u8db3\u600e\u4e48\u6392\u67e5", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-40", "llm-47"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["OOM|\u663e\u5b58|\u5185\u5b58.*\u4e0d\u8db3"] },
 
@@ -967,7 +967,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "few-shot\u4e3a\u4ec0\u4e48\u7ed9\u4f8b\u5b50\u5c31\u80fd\u5b66", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-16", "llm-46"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Few.*shot|Prompt|\u4e0a\u4e0b\u6587"] },
 
-  { query: "vLLM PageAttention\u6279\u5904\u7406", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["vLLM|PagedAttention|"] },
+  { query: "vLLM PageAttention\u6279\u5904\u7406", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["vLLM|PagedAttention"] },
 
   { query: "\u5927\u6a21\u578b\u8bba\u6587\u770b\u4e0d\u8fc7\u6765\u6709\u4ec0\u4e48\u5fc5\u8bfb", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-10", "llm-24"], secondaryIds: ["llm-42"], acceptableDecks: ["llm"], acceptableConcepts: ["Transformer.*\u67b6\u6784|GPT."] },
 

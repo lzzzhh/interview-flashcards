@@ -25,6 +25,19 @@ export interface TestCase {
   secondaryIds?: string[];
   acceptableDecks: string[];
   acceptableConcepts: string[];
+
+  // ── v7 metadata fields (optional) ──
+
+  /** search = 关键词/概念/长句搜索, learning = 学习路径, regression = 回归/对抗 */
+  taskType?: 'search' | 'learning' | 'regression';
+  /** keyword = 精确术语, concept = 概念/同义表达, long = 长句自然语言, mixed = 中英混合, cross = 跨模块 */
+  queryType?: 'keyword' | 'concept' | 'long' | 'mixed' | 'cross';
+  /** easy = 高频术语精确匹配, medium = 需同义扩展, hard = 需长句理解+跨模块推理 */
+  difficulty?: 'easy' | 'medium' | 'hard';
+  /** pending = 未审, reviewed = 已人工确认, needs_fix = 需修正 */
+  reviewStatus?: 'pending' | 'reviewed' | 'needs_fix';
+  /** generated = 脚本生成未审核, manual = 人工标注, merged = 合并去重后 */
+  labelQuality?: 'generated' | 'manual' | 'merged';
 }
 
 /** 归一化后的期望（运行时从 primaryIds/secondaryIds/expectations 推导） */
