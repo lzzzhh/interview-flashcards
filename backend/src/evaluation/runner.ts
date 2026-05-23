@@ -100,7 +100,9 @@ async function runEvaluation() {
     const result = computeCaseResult(tc, hits, elapsed);
     const found = result.primaryHitTop15.length;
     const total = result.primaryRanks.length;
-    const ok = result.primaryMissing.length === 0 ? '✓' : '✗';
+    // Learning-path: don't mark as search failure (evaluated by LP Benchmark)
+    const isLP = tc.group === 'learning-path' || tc.group.startsWith('学习路径');
+    const ok = isLP ? ' ' : (result.primaryMissing.length === 0 ? '✓' : '✗');
     console.log(`  ${ok} ${label.padEnd(56)} top15=${found}/${total}  ${Math.round(elapsed)}ms`);
   }
 

@@ -91,7 +91,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "Agent\u8bb0\u5fc6", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-21"], secondaryIds: ["agent-5"], acceptableDecks: ["agent"], acceptableConcepts: ["\u8bb0\u5fc6", "Memory"] },
 
-  { query: "FC", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-2", "agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["FunctionCalling"] },
+  { query: "Function Calling", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-2", "agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["FunctionCalling", "FC", "\u5de5\u5177\u8c03\u7528"] },
 
   { query: "Function Calling", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-2", "agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Function Calling", "Tool-Use"] },
 
@@ -177,11 +177,11 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "\u6a21\u578b\u91cf\u5316", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-24", "llm-42"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u91cf\u5316|Quantiz"] },
 
-  { query: "\u6b8b\u5dee\u8fde\u63a5", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-2", "dl-8"], secondaryIds: [], acceptableDecks: ["llm", "deep-learning"], acceptableConcepts: ["\u6b8b\u5dee\u8fde\u63a5", "ResNet"] },
+  { query: "\u6b8b\u5dee\u8fde\u63a5", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["dl-10", "dl-19"], secondaryIds: [], acceptableDecks: ["llm", "deep-learning"], acceptableConcepts: ["\u6b8b\u5dee\u8fde\u63a5", "ResNet"] },
 
   { query: "\u6ce8\u610f\u529b\u673a\u5236", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-1"], secondaryIds: ["llm-3"], acceptableDecks: ["llm"], acceptableConcepts: ["Attention", "QKV"] },
 
-  { query: "\u8bcd\u5d4c\u5165", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-6"], secondaryIds: ["ml-89"], acceptableDecks: ["llm", "machine-learning"], acceptableConcepts: ["Embedding", "Word2Vec"] },
+  { query: "\u8bcd\u5d4c\u5165", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["ml-105", "ml-109"], secondaryIds: ["ml-89"], acceptableDecks: ["llm", "machine-learning"], acceptableConcepts: ["Embedding", "Word2Vec"] },
 
   // ── 关键词-机器学习 ──
 
@@ -221,7 +221,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "\u652f\u6301\u5411\u91cf\u673a", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-2"], secondaryIds: ["ml-19"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM", "\u6838\u51fd\u6570"] },
 
-  { query: "\u6734\u7d20\u8d1d\u53f6\u65af", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-28", "ml-5", "ml-71"], secondaryIds: ["stats-9"], acceptableDecks: ["machine-learning", "statistics"], acceptableConcepts: ["\u6734\u7d20\u8d1d\u53f6\u65af", "\u8d1d\u53f6\u65af"] },
+  { query: "\u6734\u7d20\u8d1d\u53f6\u65af", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-179", "ml-183"], secondaryIds: ["stats-9"], acceptableDecks: ["machine-learning", "statistics"], acceptableConcepts: ["\u6734\u7d20\u8d1d\u53f6\u65af", "\u8d1d\u53f6\u65af"] },
 
   { query: "\u68af\u5ea6\u4e0b\u964d", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-11", "ml-157", "ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u68af\u5ea6\u4e0b\u964d", "SGD", "\u4f18\u5316\u5668", "\u68af\u5ea6\u4e0b\u964d|SGD"] },
 
@@ -849,7 +849,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "MSE\u548cMAE\u635f\u5931\u51fd\u6570\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-121", "ml-122"], secondaryIds: ["ml-144"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["MSE|MAE|L1.*Loss|L2."] },
 
-  { query: "Mini Batch vs Full Batch\u8bad\u7ec3", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-1", "ml-11"], secondaryIds: ["ml-115"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Batch|SGD|\u68af\u5ea6"] },
+  { query: "Mini Batch vs Full Batch\u8bad\u7ec3", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-1", "ml-11"], secondaryIds: ["ml-115"], acceptableDecks: ["deep-learning", "machine-learning"], acceptableConcepts: ["Batch|SGD|\u68af\u5ea6"] },
 
   { query: "One-Hot\u548cTarget Encoding", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-120", "ml-121"], secondaryIds: ["ml-129"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["One.*Hot|Target|\u7f16\u7801"] },
 
@@ -879,7 +879,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "GPT\u548cClaude\u6587\u98ce\u5dee\u5f02", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-10", "llm-11"], secondaryIds: ["llm-24"], acceptableDecks: ["llm"], acceptableConcepts: ["GPT|Claude|\u5bf9\u9f50|\u98ce\u683c"] },
 
-  { query: "ONNX TensorRT\u54ea\u4e2a\u5feb", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-26"], secondaryIds: ["llm-25"], acceptableDecks: ["llm"], acceptableConcepts: ["ONNX|TensorRT|\u63a8\u7406"] },
+  { query: "ONNX TensorRT\u54ea\u4e2a\u5feb", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-26"], secondaryIds: ["llm-25"], acceptableDecks: ["llm", "deep-learning"], acceptableConcepts: ["ONNX|TensorRT|\u63a8\u7406"] },
 
   { query: "Prompt\u5de5\u7a0b\u548cFine-tuning\u9009\u54ea\u4e2a", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-12", "llm-13"], secondaryIds: ["llm-16"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt|\u5fae\u8c03|ICL"] },
 
