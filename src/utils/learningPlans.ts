@@ -5,6 +5,7 @@
 export interface LearningPlanItem {
   cardId: string;
   deckId: string;
+  title: string;
 }
 
 export interface LearningPlan {

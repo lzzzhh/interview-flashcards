@@ -41,11 +41,9 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
       const sm2 = card?.sm2;
       const cardState = sm2?.state || 'new';
       const cfg = PRIORITY_CONFIG[cardState] || { label: 'unknown', color: TEXT_MUTED };
-      const title = card
-        ? (card.category === 'leetcode'
-          ? String((card as any).titleCn || (card as any).title || '')
-          : String(card.question || ''))
-        : item.cardId;
+      // Use stored title from plan item, fall back to card lookup
+      const title = item.title
+        || (card ? String((card as any).titleCn || (card as any).title || (card as any).question || item.cardId) : item.cardId);
       return {
         cardId: item.cardId,
         deckId: item.deckId,

@@ -129,7 +129,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
     if (selected.length === 0) return;
     setGenerating(true);
     try {
-      const slimItems: LearningPlanItem[] = selected.map(({ cardId, deckId }) => ({ cardId, deckId }));
+      const slimItems: LearningPlanItem[] = selected.map(({ cardId, deckId, title }) => ({ cardId, deckId, title }));
       savePlan({
         id: `plan-${Date.now()}`,
         title: query.trim(),
