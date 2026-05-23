@@ -57,7 +57,7 @@ async function initProviders() {
 }
 
 function computeMetrics(results: CaseResult[]) {
-  const isLP = (g: string) => g === 'learning-path' || g.startsWith('学习路径');
+  const isLP = (g: string) => g === 'learning-path' || g.startsWith('学习路径') || g.startsWith('学习路径-');
   const searchResults = results.filter(r => !isLP(r.group));
 
   const groupMap = new Map<string, CaseResult[]>();
@@ -65,16 +65,36 @@ function computeMetrics(results: CaseResult[]) {
 
   const groups: GroupMetrics[] = [];
   for (const [g, rs] of groupMap) groups.push(computeGroupMetrics(g, rs));
-  const global = computeGlobalMetrics(groups);
+
+  // Use EXACT same weighted average as main runner
+  const searchCaseCount = groups.reduce((s, g) => s + g.caseCount, 0);
+  const searchTop15 = searchCaseCount > 0
+    ? groups.reduce((s, g) => s + g.hitRateTop15 * g.caseCount, 0) / searchCaseCount : 0;
+  const searchTop50 = searchCaseCount > 0
+    ? groups.reduce((s, g) => s + g.hitRateTop50 * g.caseCount, 0) / searchCaseCount : 0;
+  const searchMRR = searchCaseCount > 0
+    ? groups.reduce((s, g) => s + g.avgMRR * g.caseCount, 0) / searchCaseCount : 0;
+  const searchMissing = groups.reduce((s, g) => s + g.totalMissing, 0);
+  const searchBuried = groups.reduce((s, g) => s + g.totalBuried, 0);
+
+  const global: GlobalMetrics = {
+    group: '全部', caseCount: searchCaseCount,
+    hitRateTop15: searchTop15, hitRateTop50: searchTop50, hitRateTop100: 0,
+    avgPrecisionAt5: 0, avgMRR: searchMRR, avgDeckHitRateTop15: 0,
+    avgResponseTimeMs: 0, totalMissing: searchMissing, totalBuried: searchBuried,
+    totalPrimaries: groups.reduce((s, g) => s + g.totalPrimaries, 0), groups,
+  };
 
   // Blind spot subset
   const blindKeywords = ['shuffle', '参数太多', '损失函数不下', '数据太少', '生成模型', '数据和直觉',
     '噪声标签', 'Momentum', '传统ML', '协方差', '新功能是否对留存', 'CLIP', 'few-shot', 'Chain-of-Thought',
     'LangChain', 'ML里如何处理', 'ETL', '什么是指标体系', '为什么要shuffle'];
   const blindResults = searchResults.filter(r => blindKeywords.some(k => r.query.includes(k)));
-  const blindGroups = [computeGroupMetrics('blind-spot', blindResults)];
+  const blindSearchTop15 = blindResults.length > 0
+    ? blindResults.filter(r => r.primaryHitTop15.length > 0).length / blindResults.length : 0;
+  const blindMissing = blindResults.reduce((s, r) => s + r.primaryMissing.length, 0);
 
-  return { global, groups, blindSpot: computeGlobalMetrics(blindGroups) };
+  return { global, blindSpot: { hitRateTop15: blindSearchTop15, totalMissing: blindMissing, totalCases: blindResults.length } };
 }
 
 async function runConfig(config: AblationConfig) {
@@ -147,11 +167,11 @@ async function main() {
   }
 
   console.log('╠══════════════════════════════════════════════════════╣');
-  console.log('║ Blind Spot Subset                                   ║');
+  console.log('║ Blind Spot Subset (' + allResults[0].metrics.blindSpot.totalCases + ' cases)              ║');
 
   for (const { config, metrics } of allResults) {
     const b = metrics.blindSpot;
-    console.log(`║ ${config.name.padEnd(19)} ${(b.hitRateTop15*100).toFixed(1).padStart(5)}% ${(b.hitRateTop50*100).toFixed(1).padStart(5)}% ${b.avgMRR.toFixed(3).padStart(6)} ${String(b.totalMissing).padStart(4)} ${String(b.totalBuried).padStart(4)} ║`);
+    console.log(`║ ${config.name.padEnd(19)} ${(b.hitRateTop15*100).toFixed(1).padStart(5)}%   ---  ${String(b.totalMissing).padStart(4)}   --- ║`);
   }
 
   console.log('╚══════════════════════════════════════════════════════╝');
