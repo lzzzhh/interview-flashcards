@@ -96,7 +96,8 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
         body: JSON.stringify({ query: query.trim() }),
       });
       const data = await res.json();
-      setPlanItems((data.plan || []).map((p: any) => ({
+      const allCards = Object.values(data.plan?.stages || {}).flat() as any[];
+      setPlanItems(allCards.map((p: any) => ({
         cardId: p.cardId, deckId: p.deckId,
         title: p.title, deckName: p.deckName,
         state: p.state, interval: p.interval,
