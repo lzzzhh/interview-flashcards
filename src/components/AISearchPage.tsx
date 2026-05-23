@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Search, Loader2, ChevronDown, ChevronUp, CheckCircle2, Check, ZoomIn } from 'lucide-react';
-import { hybridSearch, type SearchResult } from '../api/searchApi';
+import { hybridSearch, fetchLearningPlan, type SearchResult } from '../api/searchApi';
 import { useAppContext } from '../context/AppContext';
 import { API_BASE } from '../api/client';
 import { savePlan, type LearningPlanItem } from '../utils/learningPlans';
@@ -52,6 +52,8 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const [planItems, setPlanItems] = useState<PlanItemDisplay[]>([]);
   const [planSaved, setPlanSaved] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [activeThreshold, setActiveThreshold] = useState(0.3);
 
@@ -89,23 +91,30 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
 
   const handleFetchPlan = async () => {
     if (planExpanded) { setPlanExpanded(false); return; }
+    if (!query.trim()) return;
+    setPlanLoading(true);
+    setPlanError(null);
     try {
-      const res = await fetch(`${API_BASE}/search/learning-plan`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim() }),
-      });
-      const data = await res.json();
+      const data = await fetchLearningPlan({ query: query.trim() });
       const allCards = Object.values(data.plan?.stages || {}).flat() as any[];
-      setPlanItems(allCards.map((p: any) => ({
-        cardId: p.cardId, deckId: p.deckId,
-        title: p.title, deckName: p.deckName,
-        state: p.state, interval: p.interval,
-        selected: true, snippet: p.snippet,
-      })));
-      setPlanExpanded(true);
-    } catch (e) {
+      if (allCards.length === 0) {
+        setPlanError('没有找到相关卡片，试试更具体的学习方向');
+      } else {
+        setPlanItems(allCards.map((p: any) => ({
+          cardId: p.cardId, deckId: p.deckId,
+          title: p.title, deckName: p.deckName,
+          state: p.state, interval: p.interval,
+          selected: true, snippet: p.snippet,
+        })));
+        setPlanExpanded(true);
+        setPlanError(null);
+      }
+    } catch (e: any) {
+      console.error('[Plan] fetch failed:', e);
+      setPlanError(e?.message || '生成学习清单失败，请检查后端是否启动');
       setPlanItems([]);
+    } finally {
+      setPlanLoading(false);
     }
   };
 
@@ -184,17 +193,21 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
 
               {showPlanCard && (
                 <div className="rounded-2xl border overflow-hidden" style={{ borderColor: `${AMBER}40`, backgroundColor: `${AMBER}08` }}>
-                  <button onClick={handleFetchPlan} className="w-full text-left px-4 py-3 flex items-center gap-3">
+                  <button onClick={handleFetchPlan} disabled={planLoading} className="w-full text-left px-4 py-3 flex items-center gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="text-[13px] font-bold" style={{ color: TEXT_PRIMARY }}>AI 为你推荐学习清单</h3>
                         <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${AMBER}18`, color: AMBER }}>AI</span>
                       </div>
-                      <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>
-                        {planExpanded ? `${planItems.length} 张卡片待选择` : '智能筛选相关卡片，按学习优先级排序'}
+                      <p className="text-[11px] mt-0.5" style={{ color: planError ? '#ef4444' : TEXT_MUTED }}>
+                        {planLoading ? '正在生成学习清单...' :
+                         planError ? planError :
+                         planExpanded ? `${planItems.length} 张卡片待选择` : '智能筛选相关卡片，按学习优先级排序'}
                       </p>
                     </div>
-                    {planExpanded ? <ChevronUp className="w-4 h-4 shrink-0" style={{ color: AMBER }} /> : <ChevronDown className="w-4 h-4 shrink-0" style={{ color: AMBER }} />}
+                    {planLoading ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" style={{ color: AMBER }} /> :
+                     planExpanded ? <ChevronUp className="w-4 h-4 shrink-0" style={{ color: AMBER }} /> :
+                     <ChevronDown className="w-4 h-4 shrink-0" style={{ color: AMBER }} />}
                   </button>
                   {planExpanded && (
                     <div className="border-t px-3 py-2 space-y-1 max-h-80 overflow-y-auto" style={{ borderColor: `${AMBER}20` }}>

@@ -31,3 +31,34 @@ export interface HybridSearchParams {
 export async function hybridSearch(params: HybridSearchParams): Promise<HybridSearchResponse> {
   return apiPost('/search/hybrid', params);
 }
+
+export interface LearningPlanResponse {
+  plan: {
+    topic: string;
+    stages: Record<string, {
+      cardId: string;
+      title: string;
+      deckId: string;
+      score: number;
+      stage: string;
+      stageIndex: number;
+      snippet: string;
+      state: string;
+      priority: number;
+      deckName: string;
+    }[]>;
+    totalCards: number;
+    stageBalance: number;
+  };
+  total: number;
+}
+
+export interface LearningPlanParams {
+  query: string;
+  deckIds?: string[];
+  filters?: Record<string, unknown>;
+}
+
+export async function fetchLearningPlan(params: LearningPlanParams): Promise<LearningPlanResponse> {
+  return apiPost('/search/learning-plan', params);
+}
