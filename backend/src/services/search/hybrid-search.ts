@@ -595,7 +595,7 @@ export async function learningPlanSearch(input: {
     if (!card) continue;
     cardInfos.push({
       cardId: m.cardId,
-      title: m.title,
+      title: card.titleCn || card.title || m.title,
       deckId: m.deckId,
       score: m.score,
       tags: m.tags,
