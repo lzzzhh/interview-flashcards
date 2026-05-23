@@ -1,7 +1,6 @@
 // backend/src/evaluation/test-cases.ts — 478 条 AI 搜索评测测试集
 //
-// Cleaned: P0-1 duplicate secondaryIds, P0-2 dl-4 overlap, P0-3 deck mismatches,
-//         P1 deduplication, P2 learning-path cross-deck coverage
+// Cleaned + label-audited + primaryId-fixed
 //
 // 牌组 ID：leetcode=力扣, statistics=统计学, machine-learning=机器学习
 //          deep-learning=深度学习, llm=大模型, agent=Agent
@@ -10,1077 +9,960 @@
 import type { TestCase } from './types';
 
 export const TEST_CASES: TestCase[] = [
+  { query: "AB实验平台学习路线", group: "learning-path", primaryIds: ["stats-102","stats-116"], secondaryIds: ["stats-118"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB.*实验|A/B|分流"] },
 
-  // ── learning-path ──
+  { query: "AI产品经理要学什么", group: "learning-path", primaryIds: ["agent-13","agent-21"], secondaryIds: ["agent-3"], acceptableDecks: ["agent"], acceptableConcepts: ["Agent|产品|Prompt"] },
 
-  { query: "AB\u5b9e\u9a8c\u5e73\u53f0\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["stats-102", "stats-116"], secondaryIds: ["stats-118"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB.*\u5b9e\u9a8c|A/B|\u5206\u6d41"] },
+  { query: "Agent开发学习路线", group: "learning-path", primaryIds: ["agent-21","agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["Agent|AutoGPT|Planni"] },
 
-  { query: "AI\u4ea7\u54c1\u7ecf\u7406\u8981\u5b66\u4ec0\u4e48", group: "learning-path", primaryIds: ["agent-13", "agent-21"], secondaryIds: ["agent-3"], acceptableDecks: ["agent"], acceptableConcepts: ["Agent|\u4ea7\u54c1|Prompt"] },
+  { query: "CICD流水线学习路线", group: "learning-path", primaryIds: ["stats-154","stats-176"], secondaryIds: ["stats-177"], acceptableDecks: ["statistics"], acceptableConcepts: ["CI|CD|Jenkins|GitLab"] },
 
-  { query: "Agent\u5f00\u53d1\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["agent-21", "agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["Agent|AutoGPT|Planni"] },
+  { query: "CV图像分类学习路线", group: "learning-path", primaryIds: ["dl-6","ml-155"], secondaryIds: ["ml-185"], acceptableDecks: ["deep-learning","machine-learning"], acceptableConcepts: ["CNN|图像|分类"] },
 
-  { query: "CICD\u6d41\u6c34\u7ebf\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["stats-154", "stats-176"], secondaryIds: ["stats-177"], acceptableDecks: ["statistics"], acceptableConcepts: ["CI|CD|Jenkins|GitLab"] },
+  { query: "LLM大模型学习路线", group: "learning-path", primaryIds: ["llm-10","llm-18"], secondaryIds: ["llm-21","dl-17"], acceptableDecks: ["deep-learning","llm"], acceptableConcepts: ["Transformer|GPT|LLM"] },
 
-  { query: "CV\u56fe\u50cf\u5206\u7c7b\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["dl-6", "ml-155"], secondaryIds: ["ml-185"], acceptableDecks: ["deep-learning", "machine-learning"], acceptableConcepts: ["CNN|\u56fe\u50cf|\u5206\u7c7b"] },
+  { query: "MLOps学习路线", group: "learning-path", primaryIds: ["ml-158","ml-160"], secondaryIds: ["ml-164"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["MLOps|部署|监控"] },
 
-  { query: "LLM\u5927\u6a21\u578b\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["llm-10", "llm-18"], secondaryIds: ["llm-21", "dl-17"], acceptableDecks: ["deep-learning", "llm"], acceptableConcepts: ["Transformer|GPT|LLM"] },
+  { query: "NLP文本分类学习路线", group: "learning-path", primaryIds: ["llm-10","ml-109"], secondaryIds: ["ml-110"], acceptableDecks: ["llm","machine-learning"], acceptableConcepts: ["NLP|BERT|文本.*分类"] },
 
-  { query: "MLOps\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["ml-158", "ml-160"], secondaryIds: ["ml-164"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["MLOps|\u90e8\u7f72|\u76d1\u63a7"] },
+  { query: "Prompt Engineering怎么入行", group: "learning-path", primaryIds: ["agent-13"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Prompt|提示词|Pe.*工程"] },
 
-  { query: "NLP\u6587\u672c\u5206\u7c7b\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["llm-10", "ml-109"], secondaryIds: ["ml-110"], acceptableDecks: ["llm", "machine-learning"], acceptableConcepts: ["NLP|BERT|\u6587\u672c.*\u5206\u7c7b"] },
+  { query: "RAG学习路线", group: "learning-path", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|检索.*增强"] },
 
-  { query: "Prompt Engineering\u600e\u4e48\u5165\u884c", group: "learning-path", primaryIds: ["agent-13"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Prompt|\u63d0\u793a\u8bcd|Pe.*\u5de5\u7a0b"] },
+  { query: "Snap AR做滤镜要学什么", group: "learning-path", primaryIds: ["vc-11"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["AR|滤镜|编程"] },
 
-  { query: "RAG\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["agent-10", "agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|\u68c0\u7d22.*\u589e\u5f3a"] },
+  { query: "为什么学NLP先学Transformer", group: "learning-path", primaryIds: ["llm-1","llm-2"], secondaryIds: ["llm-26","dl-25"], acceptableDecks: ["deep-learning","llm"], acceptableConcepts: ["Transformer|NLP|Atte"] },
 
-  { query: "Snap AR\u505a\u6ee4\u955c\u8981\u5b66\u4ec0\u4e48", group: "learning-path", primaryIds: ["vc-11"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["AR|\u6ee4\u955c|\u7f16\u7a0b"] },
+  { query: "什么是好的解释性文章", group: "learning-path", primaryIds: ["ml-137","ml-181"], secondaryIds: ["ml-73"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["可解释|XAI|SHAP|LIME"] },
 
-  { query: "\u4e3a\u4ec0\u4e48\u5b66NLP\u5148\u5b66Transformer", group: "learning-path", primaryIds: ["llm-1", "llm-2"], secondaryIds: ["llm-26", "dl-25"], acceptableDecks: ["deep-learning", "llm"], acceptableConcepts: ["Transformer|NLP|Atte"] },
+  { query: "从零学AI需要哪些数学", group: "learning-path", primaryIds: ["stats-15","stats-44"], secondaryIds: [], acceptableDecks: ["machine-learning","statistics"], acceptableConcepts: ["线性代数|概率|微积分"] },
 
-  { query: "\u4ec0\u4e48\u662f\u597d\u7684\u89e3\u91ca\u6027\u6587\u7ae0", group: "learning-path", primaryIds: ["ml-137", "ml-181"], secondaryIds: ["ml-73"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u53ef\u89e3\u91ca|XAI|SHAP|LIME"] },
+  { query: "分布式系统学习路线", group: "learning-path", primaryIds: ["stats-126"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["分布式|CAP|一致性"] },
 
-  { query: "\u4ece\u96f6\u5b66AI\u9700\u8981\u54ea\u4e9b\u6570\u5b66", group: "learning-path", primaryIds: ["stats-15", "stats-44"], secondaryIds: [], acceptableDecks: ["machine-learning", "statistics"], acceptableConcepts: ["\u7ebf\u6027\u4ee3\u6570|\u6982\u7387|\u5fae\u79ef\u5206"] },
+  { query: "到底怎么快速入门ML", group: "learning-path", primaryIds: ["ml-134","ml-136"], secondaryIds: ["ml-189"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["入门|机器学习|基础"] },
 
-  { query: "\u5206\u5e03\u5f0f\u7cfb\u7edf\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["stats-126"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5206\u5e03\u5f0f|CAP|\u4e00\u81f4\u6027"] },
+  { query: "后端转算法要补什么", group: "learning-path", primaryIds: ["ml-10","ml-134"], secondaryIds: ["ml-136","stats-101"], acceptableDecks: ["machine-learning","statistics"], acceptableConcepts: ["机器学习|统计|数学"] },
 
-  { query: "\u5230\u5e95\u600e\u4e48\u5feb\u901f\u5165\u95e8ML", group: "learning-path", primaryIds: ["ml-134", "ml-136"], secondaryIds: ["ml-189"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u5165\u95e8|\u673a\u5668\u5b66\u4e60|\u57fa\u7840"] },
+  { query: "因果推断学习路线", group: "learning-path", primaryIds: ["stats-136","stats-145"], secondaryIds: ["stats-6"], acceptableDecks: ["statistics"], acceptableConcepts: ["因果|Causal|Inference"] },
 
-  { query: "\u540e\u7aef\u8f6c\u7b97\u6cd5\u8981\u8865\u4ec0\u4e48", group: "learning-path", primaryIds: ["ml-10", "ml-134"], secondaryIds: ["ml-136", "stats-101"], acceptableDecks: ["machine-learning", "statistics"], acceptableConcepts: ["\u673a\u5668\u5b66\u4e60|\u7edf\u8ba1|\u6570\u5b66"] },
+  { query: "图神经网络学习路线", group: "learning-path", primaryIds: ["ml-102","ml-103"], secondaryIds: [], acceptableDecks: ["deep-learning","machine-learning"], acceptableConcepts: ["图.*神经|Graph.*Neural"] },
 
-  { query: "\u56e0\u679c\u63a8\u65ad\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["stats-136", "stats-145"], secondaryIds: ["stats-6"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u56e0\u679c|Causal|Inference"] },
+  { query: "大数据Spark学习路线", group: "learning-path", primaryIds: ["stats-149","stats-152"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["Spark|Hadoop|大数据"] },
 
-  { query: "\u56fe\u795e\u7ecf\u7f51\u7edc\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["ml-102", "ml-103"], secondaryIds: [], acceptableDecks: ["deep-learning", "machine-learning"], acceptableConcepts: ["\u56fe.*\u795e\u7ecf|Graph.*Neural"] },
+  { query: "大模型微调学习路线", group: "learning-path", primaryIds: ["llm-12","llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["微调|SFT|LoRA|适配"] },
 
-  { query: "\u5927\u6570\u636eSpark\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["stats-149", "stats-152"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["Spark|Hadoop|\u5927\u6570\u636e"] },
+  { query: "学AI先懂理论还是先会调包", group: "learning-path", primaryIds: ["ml-99"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["理论|实践|调包|框架"] },
 
-  { query: "\u5927\u6a21\u578b\u5fae\u8c03\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["llm-12", "llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["\u5fae\u8c03|SFT|LoRA|\u9002\u914d"] },
+  { query: "小众但卷的AI赛道有哪些", group: "learning-path", primaryIds: ["ml-57"], secondaryIds: [], acceptableDecks: ["llm","machine-learning"], acceptableConcepts: ["赛道|方向|趋势"] },
 
-  { query: "\u5b66AI\u5148\u61c2\u7406\u8bba\u8fd8\u662f\u5148\u4f1a\u8c03\u5305", group: "learning-path", primaryIds: ["ml-99"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7406\u8bba|\u5b9e\u8df5|\u8c03\u5305|\u6846\u67b6"] },
+  { query: "广告CTR预估学习路线", group: "learning-path", primaryIds: ["ml-176","ml-90"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["CTR|广告|预估"] },
 
-  { query: "\u5c0f\u4f17\u4f46\u5377\u7684AI\u8d5b\u9053\u6709\u54ea\u4e9b", group: "learning-path", primaryIds: ["ml-57"], secondaryIds: [], acceptableDecks: ["llm", "machine-learning"], acceptableConcepts: ["\u8d5b\u9053|\u65b9\u5411|\u8d8b\u52bf"] },
+  { query: "强化学习从入门到实践", group: "learning-path", primaryIds: ["ml-112","ml-113"], secondaryIds: ["ml-114"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["强化|RL|DQN|Policy"] },
 
-  { query: "\u5e7f\u544aCTR\u9884\u4f30\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["ml-176", "ml-90"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["CTR|\u5e7f\u544a|\u9884\u4f30"] },
+  { query: "想做算法工程师要学什么", group: "learning-path", primaryIds: ["ml-134","ml-136"], secondaryIds: ["ml-189","dl-10"], acceptableDecks: ["deep-learning","machine-learning"], acceptableConcepts: ["机器学习|深度学习|基础"] },
 
-  { query: "\u5f3a\u5316\u5b66\u4e60\u4ece\u5165\u95e8\u5230\u5b9e\u8df5", group: "learning-path", primaryIds: ["ml-112", "ml-113"], secondaryIds: ["ml-114"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u5f3a\u5316|RL|DQN|Policy"] },
+  { query: "想学推荐系统需要什么数学基础", group: "learning-path", primaryIds: ["ml-103","ml-11"], secondaryIds: ["ml-117","stats-124"], acceptableDecks: ["machine-learning","statistics"], acceptableConcepts: ["推荐|矩阵|优化"] },
 
-  { query: "\u60f3\u505a\u7b97\u6cd5\u5de5\u7a0b\u5e08\u8981\u5b66\u4ec0\u4e48", group: "learning-path", primaryIds: ["ml-134", "ml-136"], secondaryIds: ["ml-189", "dl-10"], acceptableDecks: ["deep-learning", "machine-learning"], acceptableConcepts: ["\u673a\u5668\u5b66\u4e60|\u6df1\u5ea6\u5b66\u4e60|\u57fa\u7840"] },
+  { query: "想进FAANG要学哪些技术", group: "learning-path", primaryIds: ["ml-113","ml-115"], secondaryIds: [], acceptableDecks: ["leetcode","machine-learning"], acceptableConcepts: ["算法|系统设计|FAANG"] },
 
-  { query: "\u60f3\u5b66\u63a8\u8350\u7cfb\u7edf\u9700\u8981\u4ec0\u4e48\u6570\u5b66\u57fa\u7840", group: "learning-path", primaryIds: ["ml-103", "ml-11"], secondaryIds: ["ml-117", "stats-124"], acceptableDecks: ["machine-learning", "statistics"], acceptableConcepts: ["\u63a8\u8350|\u77e9\u9635|\u4f18\u5316"] },
+  { query: "推荐系统学习路线", group: "learning-path", primaryIds: ["ml-103","ml-117"], secondaryIds: ["ml-133","stats-124"], acceptableDecks: ["machine-learning","statistics"], acceptableConcepts: ["推荐|协同过滤"] },
 
-  { query: "\u60f3\u8fdbFAANG\u8981\u5b66\u54ea\u4e9b\u6280\u672f", group: "learning-path", primaryIds: ["ml-113", "ml-115"], secondaryIds: [], acceptableDecks: ["leetcode", "machine-learning"], acceptableConcepts: ["\u7b97\u6cd5|\u7cfb\u7edf\u8bbe\u8ba1|FAANG"] },
+  { query: "时间序列预测学习路线", group: "learning-path", primaryIds: ["stats-86","stats-88"], secondaryIds: ["stats-91","ml-148"], acceptableDecks: ["machine-learning","statistics"], acceptableConcepts: ["时间序列|ARIMA|Prophet"] },
 
-  { query: "\u63a8\u8350\u7cfb\u7edf\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["ml-103", "ml-117"], secondaryIds: ["ml-133", "stats-124"], acceptableDecks: ["machine-learning", "statistics"], acceptableConcepts: ["\u63a8\u8350|\u534f\u540c\u8fc7\u6ee4"] },
+  { query: "本科生想做数据科学要掌握什么", group: "learning-path", primaryIds: ["ml-166","ml-167"], secondaryIds: [], acceptableDecks: ["machine-learning","statistics"], acceptableConcepts: ["数据科学|统计分析|Python"] },
 
-  { query: "\u65f6\u95f4\u5e8f\u5217\u9884\u6d4b\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["stats-86", "stats-88"], secondaryIds: ["stats-91", "ml-148"], acceptableDecks: ["machine-learning", "statistics"], acceptableConcepts: ["\u65f6\u95f4\u5e8f\u5217|ARIMA|Prophet"] },
+  { query: "模型部署从哪开始学", group: "learning-path", primaryIds: ["llm-21","llm-26"], secondaryIds: ["llm-25","ml-160"], acceptableDecks: ["llm","machine-learning"], acceptableConcepts: ["部署|推理|ONNX|vLLM"] },
 
-  { query: "\u672c\u79d1\u751f\u60f3\u505a\u6570\u636e\u79d1\u5b66\u8981\u638c\u63e1\u4ec0\u4e48", group: "learning-path", primaryIds: ["ml-166", "ml-167"], secondaryIds: [], acceptableDecks: ["machine-learning", "statistics"], acceptableConcepts: ["\u6570\u636e\u79d1\u5b66|\u7edf\u8ba1\u5206\u6790|Python"] },
+  { query: "统计学习方法书籍推荐", group: "learning-path", primaryIds: ["ml-126","ml-17"], secondaryIds: ["ml-19"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["统计学习|李航|SVM|决策树"] },
 
-  { query: "\u6a21\u578b\u90e8\u7f72\u4ece\u54ea\u5f00\u59cb\u5b66", group: "learning-path", primaryIds: ["llm-21", "llm-26"], secondaryIds: ["llm-25", "ml-160"], acceptableDecks: ["llm", "machine-learning"], acceptableConcepts: ["\u90e8\u7f72|\u63a8\u7406|ONNX|vLLM"] },
+  { query: "自学CS基础要学哪些课", group: "learning-path", primaryIds: ["ml-113","ml-115"], secondaryIds: [], acceptableDecks: ["leetcode","machine-learning"], acceptableConcepts: ["数据结构|算法|操作系统"] },
 
-  { query: "\u7edf\u8ba1\u5b66\u4e60\u65b9\u6cd5\u4e66\u7c4d\u63a8\u8350", group: "learning-path", primaryIds: ["ml-126", "ml-17"], secondaryIds: ["ml-19"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7edf\u8ba1\u5b66\u4e60|\u674e\u822a|SVM|\u51b3\u7b56\u6811"] },
+  { query: "转行DS技术栈清单", group: "learning-path", primaryIds: ["stats-101","stats-11"], secondaryIds: ["stats-118"], acceptableDecks: ["statistics"], acceptableConcepts: ["SQL|Python|可视化|统计"] },
 
-  { query: "\u81ea\u5b66CS\u57fa\u7840\u8981\u5b66\u54ea\u4e9b\u8bfe", group: "learning-path", primaryIds: ["ml-113", "ml-115"], secondaryIds: [], acceptableDecks: ["leetcode", "machine-learning"], acceptableConcepts: ["\u6570\u636e\u7ed3\u6784|\u7b97\u6cd5|\u64cd\u4f5c\u7cfb\u7edf"] },
+  { query: "风控建模学习路线", group: "learning-path", primaryIds: ["ml-103","ml-128"], secondaryIds: ["ml-146"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["风控|Fraud|异常.*检测"] },
 
-  { query: "\u8f6c\u884cDS\u6280\u672f\u6808\u6e05\u5355", group: "learning-path", primaryIds: ["stats-101", "stats-11"], secondaryIds: ["stats-118"], acceptableDecks: ["statistics"], acceptableConcepts: ["SQL|Python|\u53ef\u89c6\u5316|\u7edf\u8ba1"] },
+  { query: "Agent规划", group: "关键词-Agent", primaryIds: ["agent-4","agent-8","agent-5","agent-6"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["规划","Planning","Planning|规划|AutoGPT"] },
 
-  { query: "\u98ce\u63a7\u5efa\u6a21\u5b66\u4e60\u8def\u7ebf", group: "learning-path", primaryIds: ["ml-103", "ml-128"], secondaryIds: ["ml-146"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u98ce\u63a7|Fraud|\u5f02\u5e38.*\u68c0\u6d4b"] },
+  { query: "Agent记忆", group: "关键词-Agent", primaryIds: ["agent-21"], secondaryIds: ["agent-5"], acceptableDecks: ["agent"], acceptableConcepts: ["记忆","Memory"] },
 
-  // ── 关键词-Agent ──
+  { query: "Function Calling", group: "关键词-Agent", primaryIds: ["agent-2","agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["FunctionCalling","FC","工具调用"] },
 
-  { query: "Agent\u89c4\u5212", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-4", "agent-8", "agent-5", "agent-6"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["\u89c4\u5212", "Planning", "Planning|\u89c4\u5212|AutoGPT"] },
+  { query: "Function Calling", group: "关键词-Agent", primaryIds: ["agent-2","agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Function Calling","Tool-Use"] },
 
-  { query: "Agent\u8bb0\u5fc6", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-21"], secondaryIds: ["agent-5"], acceptableDecks: ["agent"], acceptableConcepts: ["\u8bb0\u5fc6", "Memory"] },
+  { query: "RAG", group: "关键词-Agent", primaryIds: ["agent-7"], secondaryIds: ["agent-22"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG","检索增强生成"] },
 
-  { query: "Function Calling", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-2", "agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["FunctionCalling", "FC", "\u5de5\u5177\u8c03\u7528"] },
+  { query: "Reranking", group: "关键词-Agent", primaryIds: ["agent-25"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Reranking","重排序"] },
 
-  { query: "Function Calling", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-2", "agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Function Calling", "Tool-Use"] },
+  { query: "Reranking重排序", group: "关键词-Agent", primaryIds: ["agent-25"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Rerank|重排"] },
 
-  { query: "RAG", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-7"], secondaryIds: ["agent-22"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG", "\u68c0\u7d22\u589e\u5f3a\u751f\u6210"] },
+  { query: "Tool Use", group: "关键词-Agent", primaryIds: ["agent-2","agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Tool Use","Function Calling","ToolUse"] },
 
-  { query: "Reranking", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-25"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Reranking", "\u91cd\u6392\u5e8f"] },
+  { query: "向量数据库", group: "关键词-Agent", primaryIds: ["agent-18"], secondaryIds: ["agent-19"], acceptableDecks: ["agent"], acceptableConcepts: ["向量数据库","Embedding"] },
 
-  { query: "Reranking\u91cd\u6392\u5e8f", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-25"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Rerank|\u91cd\u6392"] },
+  { query: "MCP", group: "关键词-VibeCoding", primaryIds: ["vc-5"], secondaryIds: ["vc-17"], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["MCP","协议"] },
 
-  { query: "Tool Use", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-2", "agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Tool Use", "Function Calling", "ToolUse"] },
+  { query: "MCP协议", group: "关键词-VibeCoding", primaryIds: ["vc-17","vc-5"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["MCP"] },
 
-  { query: "\u5411\u91cf\u6570\u636e\u5e93", group: "\u5173\u952e\u8bcd-Agent", primaryIds: ["agent-18"], secondaryIds: ["agent-19"], acceptableDecks: ["agent"], acceptableConcepts: ["\u5411\u91cf\u6570\u636e\u5e93", "Embedding"] },
+  { query: "Skill", group: "关键词-VibeCoding", primaryIds: ["vc-2","vc-1","vc-10"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["Skill","skill|command"] },
 
-  // ── 关键词-VibeCoding ──
+  { query: "Trie字典树", group: "关键词-力扣", primaryIds: ["lc-055"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["Trie|Prefix"] },
 
-  { query: "MCP", group: "\u5173\u952e\u8bcd-VibeCoding", primaryIds: ["vc-5"], secondaryIds: ["vc-17"], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["MCP", "\u534f\u8bae"] },
+  { query: "两数之和", group: "关键词-力扣", primaryIds: ["lc-001"], secondaryIds: ["lc-016"], acceptableDecks: ["leetcode"], acceptableConcepts: ["数组","哈希表"] },
 
-  { query: "MCP\u534f\u8bae", group: "\u5173\u952e\u8bcd-VibeCoding", primaryIds: ["vc-17", "vc-5"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["MCP"] },
+  { query: "二分查找", group: "关键词-力扣", primaryIds: ["lc-023","lc-024","lc-026"], secondaryIds: ["lc-040"], acceptableDecks: ["leetcode"], acceptableConcepts: ["二分查找","binary search","Search|Binary"] },
 
-  { query: "Skill", group: "\u5173\u952e\u8bcd-VibeCoding", primaryIds: ["vc-2", "vc-1", "vc-10"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["Skill", "skill|command"] },
+  { query: "二叉树的最近公共祖先", group: "关键词-力扣", primaryIds: ["lc-049"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["LCA|Lowest"] },
 
-  // ── 关键词-力扣 ──
+  { query: "动态规划", group: "关键词-力扣", primaryIds: ["lc-062","lc-067"], secondaryIds: ["lc-069"], acceptableDecks: ["leetcode"], acceptableConcepts: ["DP","动态规划"] },
 
-  { query: "Trie\u5b57\u5178\u6811", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-055"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["Trie|Prefix"] },
+  { query: "动态规划DP", group: "关键词-力扣", primaryIds: ["lc-062","lc-065"], secondaryIds: ["lc-067"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Climbing|Coin|House"] },
 
-  { query: "\u4e24\u6570\u4e4b\u548c", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-001"], secondaryIds: ["lc-016"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u6570\u7ec4", "\u54c8\u5e0c\u8868"] },
+  { query: "单调栈", group: "关键词-力扣", primaryIds: ["lc-035","lc-036","lc-030","lc-008","lc-029"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["单调栈","接雨水","Daily|Trapping|Min S"] },
 
-  { query: "\u4e8c\u5206\u67e5\u627e", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-023", "lc-024", "lc-026"], secondaryIds: ["lc-040"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u4e8c\u5206\u67e5\u627e", "binary search", "Search|Binary"] },
+  { query: "反转链表", group: "关键词-力扣", primaryIds: ["lc-033"], secondaryIds: ["lc-039"], acceptableDecks: ["leetcode"], acceptableConcepts: ["链表","反转"] },
 
-  { query: "\u4e8c\u53c9\u6811\u7684\u6700\u8fd1\u516c\u5171\u7956\u5148", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-049"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["LCA|Lowest"] },
+  { query: "回文串", group: "关键词-力扣", primaryIds: ["lc-018","lc-039"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["回文","palindrome","Palindr|回文"] },
 
-  { query: "\u52a8\u6001\u89c4\u5212", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-062", "lc-067"], secondaryIds: ["lc-069"], acceptableDecks: ["leetcode"], acceptableConcepts: ["DP", "\u52a8\u6001\u89c4\u5212"] },
+  { query: "字典树", group: "关键词-力扣", primaryIds: ["lc-055"], secondaryIds: ["lc-056"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Trie","前缀树"] },
 
-  { query: "\u52a8\u6001\u89c4\u5212DP", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-062", "lc-065"], secondaryIds: ["lc-067"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Climbing|Coin|House"] },
+  { query: "字典树Trie", group: "关键词-力扣", primaryIds: ["lc-055","lc-056"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["Trie"] },
 
-  { query: "\u5355\u8c03\u6808", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-035", "lc-036", "lc-030", "lc-008", "lc-029"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u5355\u8c03\u6808", "\u63a5\u96e8\u6c34", "Daily|Trapping|Min S"] },
+  { query: "岛屿DFS", group: "关键词-力扣", primaryIds: ["lc-052"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["Islands|岛屿"] },
 
-  { query: "\u53cd\u8f6c\u94fe\u8868", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-033"], secondaryIds: ["lc-039"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u94fe\u8868", "\u53cd\u8f6c"] },
+  { query: "岛屿问题", group: "关键词-力扣", primaryIds: ["lc-052"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["DFS","网格","岛屿"] },
 
-  { query: "\u56de\u6587\u4e32", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-018", "lc-039"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u56de\u6587", "palindrome", "Palindr|\u56de\u6587"] },
+  { query: "并查集", group: "关键词-力扣", primaryIds: ["lc-083","lc-084","lc-053","lc-052"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["并查集","Union Find","UnionFind"] },
 
-  { query: "\u5b57\u5178\u6811", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-055"], secondaryIds: ["lc-056"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Trie", "\u524d\u7f00\u6811"] },
+  { query: "拓扑排序", group: "关键词-力扣", primaryIds: ["lc-053"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["拓扑排序","BFS"] },
 
-  { query: "\u5b57\u5178\u6811Trie", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-055", "lc-056"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["Trie"] },
+  { query: "接雨水", group: "关键词-力扣", primaryIds: ["lc-008"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["双指针","单调栈"] },
 
-  { query: "\u5c9b\u5c7fDFS", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-052"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["Islands|\u5c9b\u5c7f"] },
+  { query: "滑动窗口", group: "关键词-力扣", primaryIds: ["lc-019","lc-022"], secondaryIds: ["lc-015","lc-016"], acceptableDecks: ["leetcode"], acceptableConcepts: ["滑动窗口","双指针","Sliding|滑动"] },
 
-  { query: "\u5c9b\u5c7f\u95ee\u9898", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-052", "lc-040"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["DFS", "\u7f51\u683c", "\u5c9b\u5c7f"] },
+  { query: "爬楼梯", group: "关键词-力扣", primaryIds: ["lc-062"], secondaryIds: ["lc-069"], acceptableDecks: ["leetcode"], acceptableConcepts: ["动态规划","斐波那契"] },
 
-  { query: "\u5e76\u67e5\u96c6", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-083", "lc-084", "lc-053", "lc-052"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u5e76\u67e5\u96c6", "Union Find", "UnionFind"] },
+  { query: "背包问题", group: "关键词-力扣", primaryIds: ["lc-073","lc-074","lc-076"], secondaryIds: ["lc-071"], acceptableDecks: ["leetcode"], acceptableConcepts: ["背包","Partition|Knapsack|B"] },
 
-  { query: "\u62d3\u6251\u6392\u5e8f", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-053"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u62d3\u6251\u6392\u5e8f", "BFS"] },
+  { query: "BERT", group: "关键词-大模型", primaryIds: ["llm-10"], secondaryIds: ["llm-17","llm-12"], acceptableDecks: ["llm"], acceptableConcepts: ["BERT","预训练","MLM"] },
 
-  { query: "\u63a5\u96e8\u6c34", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-008"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u53cc\u6307\u9488", "\u5355\u8c03\u6808"] },
+  { query: "BERT预训练", group: "关键词-大模型", primaryIds: ["llm-10"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["BERT"] },
 
-  { query: "\u6ed1\u52a8\u7a97\u53e3", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-019", "lc-022"], secondaryIds: ["lc-015", "lc-016"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u6ed1\u52a8\u7a97\u53e3", "\u53cc\u6307\u9488", "Sliding|\u6ed1\u52a8"] },
+  { query: "GPT", group: "关键词-大模型", primaryIds: ["llm-10","llm-7","llm-24"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["GPT","自回归","decoder"] },
 
-  { query: "\u722c\u697c\u68af", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-062"], secondaryIds: ["lc-069"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u52a8\u6001\u89c4\u5212", "\u6590\u6ce2\u90a3\u5951"] },
+  { query: "GPT大模型", group: "关键词-大模型", primaryIds: ["llm-10","llm-24"], secondaryIds: ["llm-39"], acceptableDecks: ["llm"], acceptableConcepts: ["GPT"] },
 
-  { query: "\u80cc\u5305\u95ee\u9898", group: "\u5173\u952e\u8bcd-\u529b\u6263", primaryIds: ["lc-073", "lc-074", "lc-076"], secondaryIds: ["lc-071"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u80cc\u5305", "Partition|Knapsack|B"] },
+  { query: "KV Cache推理加速", group: "关键词-大模型", primaryIds: ["llm-21","llm-26"], secondaryIds: ["llm-25"], acceptableDecks: ["llm"], acceptableConcepts: ["KV|vLLM|推理|PagedA"] },
 
-  // ── 关键词-大模型 ──
+  { query: "RLHF对齐", group: "关键词-大模型", primaryIds: ["llm-11","llm-14"], secondaryIds: ["llm-15"], acceptableDecks: ["llm"], acceptableConcepts: ["RLHF|DPO|对齐"] },
 
-  { query: "BERT", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-10"], secondaryIds: ["llm-17", "llm-12"], acceptableDecks: ["llm"], acceptableConcepts: ["BERT", "\u9884\u8bad\u7ec3", "MLM"] },
+  { query: "Transformer", group: "关键词-大模型", primaryIds: ["llm-1","llm-3","llm-2"], secondaryIds: ["llm-38"], acceptableDecks: ["llm"], acceptableConcepts: ["Transformer","Self-Attention","Transformer|Self-Att"] },
 
-  { query: "BERT\u9884\u8bad\u7ec3", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-10"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["BERT"] },
+  { query: "位置编码", group: "关键词-大模型", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Positional Encoding","位置编码|Positional"] },
 
-  { query: "GPT", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-10", "llm-7", "llm-24"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["GPT", "\u81ea\u56de\u5f52", "decoder"] },
+  { query: "多头注意力", group: "关键词-大模型", primaryIds: ["llm-3","llm-9"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Multi-Head Attention","Multi-Head"] },
 
-  { query: "GPT\u5927\u6a21\u578b", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-10", "llm-24"], secondaryIds: ["llm-39"], acceptableDecks: ["llm"], acceptableConcepts: ["GPT"] },
+  { query: "微调Fine-tuning", group: "关键词-大模型", primaryIds: ["llm-11","llm-12"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["微调|Finetun|SFT"] },
 
-  { query: "KV Cache\u63a8\u7406\u52a0\u901f", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-26"], secondaryIds: ["llm-25"], acceptableDecks: ["llm"], acceptableConcepts: ["KV|vLLM|\u63a8\u7406|PagedA"] },
+  { query: "模型量化", group: "关键词-大模型", primaryIds: ["llm-24","llm-42"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["量化|Quantiz"] },
 
-  { query: "RLHF\u5bf9\u9f50", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-11", "llm-14"], secondaryIds: ["llm-15"], acceptableDecks: ["llm"], acceptableConcepts: ["RLHF|DPO|\u5bf9\u9f50"] },
+  { query: "残差连接", group: "关键词-大模型", primaryIds: ["dl-10","dl-19"], secondaryIds: [], acceptableDecks: ["llm","deep-learning"], acceptableConcepts: ["残差连接","ResNet"] },
 
-  { query: "Transformer", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-1", "llm-3", "llm-2"], secondaryIds: ["llm-38"], acceptableDecks: ["llm"], acceptableConcepts: ["Transformer", "Self-Attention", "Transformer|Self-Att"] },
+  { query: "注意力机制", group: "关键词-大模型", primaryIds: ["llm-1"], secondaryIds: ["llm-3"], acceptableDecks: ["llm"], acceptableConcepts: ["Attention","QKV"] },
 
-  { query: "\u4f4d\u7f6e\u7f16\u7801", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Positional Encoding", "\u4f4d\u7f6e\u7f16\u7801|Positional"] },
+  { query: "词嵌入", group: "关键词-大模型", primaryIds: ["ml-105","ml-109"], secondaryIds: ["ml-89"], acceptableDecks: ["llm","machine-learning"], acceptableConcepts: ["Embedding","Word2Vec"] },
 
-  { query: "\u591a\u5934\u6ce8\u610f\u529b", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-3", "llm-9"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Multi-Head Attention", "Multi-Head"] },
+  { query: "Bagging Boosting", group: "关键词-机器学习", primaryIds: ["ml-32","ml-31"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["集成"] },
 
-  { query: "\u5fae\u8c03Fine-tuning", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-11", "llm-12"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["\u5fae\u8c03|Finetun|SFT"] },
+  { query: "Bagging Boosting Stacking", group: "关键词-机器学习", primaryIds: ["ml-32","ml-31","ml-36"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["集成学习"] },
 
-  { query: "\u6a21\u578b\u91cf\u5316", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-24", "llm-42"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u91cf\u5316|Quantiz"] },
+  { query: "K-Means", group: "关键词-机器学习", primaryIds: ["ml-21"], secondaryIds: ["ml-23"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["KMeans","聚类","肘部法则"] },
 
-  { query: "\u6b8b\u5dee\u8fde\u63a5", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["dl-10", "dl-19"], secondaryIds: [], acceptableDecks: ["llm", "deep-learning"], acceptableConcepts: ["\u6b8b\u5dee\u8fde\u63a5", "ResNet"] },
+  { query: "KMeans聚类", group: "关键词-机器学习", primaryIds: ["ml-124","ml-125"], secondaryIds: ["ml-21"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["K-Means|聚类"] },
 
-  { query: "\u6ce8\u610f\u529b\u673a\u5236", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["llm-1"], secondaryIds: ["llm-3"], acceptableDecks: ["llm"], acceptableConcepts: ["Attention", "QKV"] },
+  { query: "L1 L2", group: "关键词-机器学习", primaryIds: ["ml-10","ml-20"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["正则化"] },
 
-  { query: "\u8bcd\u5d4c\u5165", group: "\u5173\u952e\u8bcd-\u5927\u6a21\u578b", primaryIds: ["ml-105", "ml-109"], secondaryIds: ["ml-89"], acceptableDecks: ["llm", "machine-learning"], acceptableConcepts: ["Embedding", "Word2Vec"] },
+  { query: "L1 L2正则化", group: "关键词-机器学习", primaryIds: ["ml-10","ml-20"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["L1","L2","正则化"] },
 
-  // ── 关键词-机器学习 ──
+  { query: "Precision F1", group: "关键词-机器学习", primaryIds: ["ml-49","ml-51","ml-184"], secondaryIds: ["ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["F1","Precision|F1|精确率"] },
 
-  { query: "Bagging Boosting", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-32", "ml-31"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u96c6\u6210"] },
+  { query: "Precision Recall F1", group: "关键词-机器学习", primaryIds: ["ml-49","ml-51"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["精确率","召回率","F1"] },
 
-  { query: "Bagging Boosting Stacking", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-32", "ml-31", "ml-36"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u96c6\u6210\u5b66\u4e60"] },
+  { query: "Q-learning", group: "关键词-机器学习", primaryIds: ["ml-114"], secondaryIds: ["ml-115"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Q-learning","DQN","Q-Learning|DQN"] },
 
-  { query: "K-Means", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-21"], secondaryIds: ["ml-23"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["KMeans", "\u805a\u7c7b", "\u8098\u90e8\u6cd5\u5219"] },
+  { query: "交叉验证", group: "关键词-机器学习", primaryIds: ["ml-9"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["K折","交叉验证"] },
 
-  { query: "KMeans\u805a\u7c7b", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-124", "ml-125"], secondaryIds: ["ml-21"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["K-Means|\u805a\u7c7b"] },
+  { query: "偏差方差", group: "关键词-机器学习", primaryIds: ["ml-8"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["偏差","方差","泛化"] },
 
-  { query: "L1 L2", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-10", "ml-20"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u6b63\u5219\u5316"] },
+  { query: "偏差方差权衡", group: "关键词-机器学习", primaryIds: ["ml-188","ml-8"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["偏差.*方差|Bias.*Varianc"] },
 
-  { query: "L1 L2\u6b63\u5219\u5316", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-10", "ml-20"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["L1", "L2", "\u6b63\u5219\u5316"] },
+  { query: "决策树", group: "关键词-机器学习", primaryIds: ["ml-3"], secondaryIds: ["ml-17"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["决策树","信息增益","剪枝"] },
 
-  { query: "Precision F1", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-49", "ml-51", "ml-184"], secondaryIds: ["ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["F1", "Precision|F1|\u7cbe\u786e\u7387"] },
+  { query: "半监督学习", group: "关键词-机器学习", primaryIds: ["ml-111","ml-118","ml-122"], secondaryIds: ["ml-10","ml-146"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["半监督","标签传播","自监督|半监督"] },
 
-  { query: "Precision Recall F1", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-49", "ml-51"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7cbe\u786e\u7387", "\u53ec\u56de\u7387", "F1"] },
+  { query: "强化学习", group: "关键词-机器学习", primaryIds: ["ml-112"], secondaryIds: ["ml-117"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["强化学习","MDP","Q-learning","RL"] },
 
-  { query: "Q-learning", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-114"], secondaryIds: ["ml-115"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Q-learning", "DQN", "Q-Learning|DQN"] },
+  { query: "强化学习RL", group: "关键词-机器学习", primaryIds: ["ml-112","ml-117"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["强化学习|Reinforcement"] },
 
-  { query: "\u4ea4\u53c9\u9a8c\u8bc1", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-9"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["K\u6298", "\u4ea4\u53c9\u9a8c\u8bc1"] },
+  { query: "损失函数", group: "关键词-机器学习", primaryIds: ["ml-1","ml-53","ml-142","ml-143"], secondaryIds: ["ml-144"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["损失函数","交叉熵","MSE","损失函数|交叉熵"] },
 
-  { query: "\u504f\u5dee\u65b9\u5dee", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-8"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u504f\u5dee", "\u65b9\u5dee", "\u6cdb\u5316"] },
+  { query: "支持向量机", group: "关键词-机器学习", primaryIds: ["ml-2"], secondaryIds: ["ml-19"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM","核函数"] },
 
-  { query: "\u504f\u5dee\u65b9\u5dee\u6743\u8861", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-188", "ml-8"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u504f\u5dee.*\u65b9\u5dee|Bias.*Varianc"] },
+  { query: "朴素贝叶斯", group: "关键词-机器学习", primaryIds: ["ml-179","ml-183"], secondaryIds: ["stats-9"], acceptableDecks: ["machine-learning","statistics"], acceptableConcepts: ["朴素贝叶斯","贝叶斯"] },
 
-  { query: "\u51b3\u7b56\u6811", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-3"], secondaryIds: ["ml-17"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u51b3\u7b56\u6811", "\u4fe1\u606f\u589e\u76ca", "\u526a\u679d"] },
+  { query: "梯度下降", group: "关键词-机器学习", primaryIds: ["ml-11","ml-157","ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["梯度下降","SGD","优化器","梯度下降|SGD"] },
 
-  { query: "\u534a\u76d1\u7763\u5b66\u4e60", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-111", "ml-118", "ml-122"], secondaryIds: ["ml-10", "ml-146"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u534a\u76d1\u7763", "\u6807\u7b7e\u4f20\u64ad", "\u81ea\u76d1\u7763|\u534a\u76d1\u7763"] },
+  { query: "欠拟合", group: "关键词-机器学习", primaryIds: ["ml-7"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["欠拟合|underfit"] },
 
-  { query: "\u5f3a\u5316\u5b66\u4e60", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-112"], secondaryIds: ["ml-117"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u5f3a\u5316\u5b66\u4e60", "MDP", "Q-learning", "RL"] },
+  { query: "正则化", group: "关键词-机器学习", primaryIds: ["ml-10"], secondaryIds: ["ml-20"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["L1","L2","正则化"] },
 
-  { query: "\u5f3a\u5316\u5b66\u4e60RL", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-112", "ml-117"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u5f3a\u5316\u5b66\u4e60|Reinforcement"] },
+  { query: "特征工程", group: "关键词-机器学习", primaryIds: ["ml-13","ml-46","ml-129"], secondaryIds: ["ml-138"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["特征工程","特征选择","特征"] },
 
-  { query: "\u635f\u5931\u51fd\u6570", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-1", "ml-5", "ml-142"], secondaryIds: ["ml-144"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u635f\u5931\u51fd\u6570", "\u4ea4\u53c9\u71b5", "MSE", "\u635f\u5931\u51fd\u6570|\u4ea4\u53c9\u71b5"] },
+  { query: "特征缩放", group: "关键词-机器学习", primaryIds: ["ml-13","ml-45"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["特征缩放","归一化","标准化"] },
 
-  { query: "\u652f\u6301\u5411\u91cf\u673a", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-2"], secondaryIds: ["ml-19"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM", "\u6838\u51fd\u6570"] },
+  { query: "聚类算法", group: "关键词-机器学习", primaryIds: ["ml-21","ml-23"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["聚类","KMeans","DBSCAN"] },
 
-  { query: "\u6734\u7d20\u8d1d\u53f6\u65af", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-179", "ml-183"], secondaryIds: ["stats-9"], acceptableDecks: ["machine-learning", "statistics"], acceptableConcepts: ["\u6734\u7d20\u8d1d\u53f6\u65af", "\u8d1d\u53f6\u65af"] },
+  { query: "迁移学习", group: "关键词-机器学习", primaryIds: ["ml-149","ml-151","ml-177"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["迁移学习","fine-tune"] },
 
-  { query: "\u68af\u5ea6\u4e0b\u964d", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-11", "ml-157", "ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u68af\u5ea6\u4e0b\u964d", "SGD", "\u4f18\u5316\u5668", "\u68af\u5ea6\u4e0b\u964d|SGD"] },
+  { query: "迁移学习Transfer", group: "关键词-机器学习", primaryIds: ["ml-149","ml-151"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["迁移|Transfer"] },
 
-  { query: "\u6b20\u62df\u5408", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-7"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u6b20\u62df\u5408|underfit"] },
+  { query: "过拟合", group: "关键词-机器学习", primaryIds: ["ml-7"], secondaryIds: ["ml-8"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合","欠拟合","偏差方差"] },
 
-  { query: "\u6b63\u5219\u5316", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-10"], secondaryIds: ["ml-20"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["L1", "L2", "\u6b63\u5219\u5316"] },
+  { query: "逻辑回归", group: "关键词-机器学习", primaryIds: ["ml-1"], secondaryIds: ["ml-6"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["逻辑回归","损失函数"] },
 
-  { query: "\u7279\u5f81\u5de5\u7a0b", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-13", "ml-46", "ml-129"], secondaryIds: ["ml-138"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7279\u5f81\u5de5\u7a0b", "\u7279\u5f81\u9009\u62e9", "\u7279\u5f81"] },
+  { query: "降维", group: "关键词-机器学习", primaryIds: ["ml-22","ml-26"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["降维","PCA","t-SNE"] },
 
-  { query: "\u7279\u5f81\u7f29\u653e", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-13", "ml-45"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7279\u5f81\u7f29\u653e", "\u5f52\u4e00\u5316", "\u6807\u51c6\u5316"] },
+  { query: "降维PCA", group: "关键词-机器学习", primaryIds: ["ml-141","ml-22"], secondaryIds: ["ml-26"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["PCA|降维"] },
 
-  { query: "\u805a\u7c7b\u7b97\u6cd5", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-21", "ml-23"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u805a\u7c7b", "KMeans", "DBSCAN"] },
+  { query: "随机梯度下降", group: "关键词-机器学习", primaryIds: ["ml-157","ml-11"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SGD","梯度下降"] },
 
-  { query: "\u8fc1\u79fb\u5b66\u4e60", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-149", "ml-147"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u8fc1\u79fb\u5b66\u4e60", "fine-tune"] },
+  { query: "随机梯度下降SGD", group: "关键词-机器学习", primaryIds: ["ml-11","ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SGD|梯度下降"] },
 
-  { query: "\u8fc1\u79fb\u5b66\u4e60Transfer", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-149", "ml-151"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u8fc1\u79fb|Transfer"] },
+  { query: "随机森林", group: "关键词-机器学习", primaryIds: ["ml-18"], secondaryIds: ["ml-38"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["随机森林","特征重要性"] },
 
-  { query: "\u8fc7\u62df\u5408", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-7"], secondaryIds: ["ml-8"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u8fc7\u62df\u5408", "\u6b20\u62df\u5408", "\u504f\u5dee\u65b9\u5dee"] },
+  { query: "集成学习Bagging Boosting", group: "关键词-机器学习", primaryIds: ["ml-189","ml-32"], secondaryIds: ["ml-36"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Bagging|Boosting|集成"] },
 
-  { query: "\u903b\u8f91\u56de\u5f52", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-1"], secondaryIds: ["ml-6"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u903b\u8f91\u56de\u5f52", "\u635f\u5931\u51fd\u6570"] },
+  { query: "Adam优化器", group: "关键词-深度学习", primaryIds: ["dl-30"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Adam","优化器"] },
 
-  { query: "\u964d\u7ef4", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-22", "ml-26"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u964d\u7ef4", "PCA", "t-SNE"] },
+  { query: "BatchNorm归一化", group: "关键词-深度学习", primaryIds: ["dl-21","dl-22"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["BatchNorm|归一化"] },
 
-  { query: "\u964d\u7ef4PCA", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-141", "ml-22"], secondaryIds: ["ml-26"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["PCA|\u964d\u7ef4"] },
+  { query: "CNN卷积神经网络", group: "关键词-深度学习", primaryIds: ["dl-6"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|卷积"] },
 
-  { query: "\u968f\u673a\u68af\u5ea6\u4e0b\u964d", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-157", "ml-11"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SGD", "\u68af\u5ea6\u4e0b\u964d"] },
+  { query: "Dropout", group: "关键词-深度学习", primaryIds: ["dl-4"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Dropout","过拟合"] },
 
-  { query: "\u968f\u673a\u68af\u5ea6\u4e0b\u964dSGD", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-11", "ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SGD|\u68af\u5ea6\u4e0b\u964d"] },
+  { query: "GAN", group: "关键词-深度学习", primaryIds: ["dl-11","dl-12"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN"] },
 
-  { query: "\u968f\u673a\u68ee\u6797", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-18"], secondaryIds: ["ml-38"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u968f\u673a\u68ee\u6797", "\u7279\u5f81\u91cd\u8981\u6027"] },
+  { query: "GAN生成对抗", group: "关键词-深度学习", primaryIds: ["dl-11","dl-12"], secondaryIds: ["dl-14"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN","生成对抗"] },
 
-  { query: "\u96c6\u6210\u5b66\u4e60Bagging Boosting", group: "\u5173\u952e\u8bcd-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-189", "ml-32"], secondaryIds: ["ml-36"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Bagging|Boosting|\u96c6\u6210"] },
+  { query: "GAN生成对抗网络", group: "关键词-深度学习", primaryIds: ["dl-11","dl-12"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN"] },
 
-  // ── 关键词-深度学习 ──
+  { query: "RNN", group: "关键词-深度学习", primaryIds: ["dl-9","dl-10"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["RNN","LSTM","GRU"] },
 
-  { query: "Adam\u4f18\u5316\u5668", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-30"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Adam", "\u4f18\u5316\u5668"] },
+  { query: "RNN循环神经网络", group: "关键词-深度学习", primaryIds: ["dl-24","dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["RNN|LSTM"] },
 
-  { query: "BatchNorm\u5f52\u4e00\u5316", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-21", "dl-22"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["BatchNorm|\u5f52\u4e00\u5316"] },
+  { query: "卷积神经网络", group: "关键词-深度学习", primaryIds: ["dl-14"], secondaryIds: ["dl-6","dl-18"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN","卷积"] },
 
-  { query: "CNN\u5377\u79ef\u795e\u7ecf\u7f51\u7edc", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-6"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|\u5377\u79ef"] },
+  { query: "反向传播", group: "关键词-深度学习", primaryIds: ["dl-5"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["反向传播","backpropagation"] },
 
-  { query: "Dropout", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-4"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Dropout", "\u8fc7\u62df\u5408"] },
+  { query: "归一化", group: "关键词-深度学习", primaryIds: ["dl-3","dl-22"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["BatchNorm","LayerNorm"] },
 
-  { query: "GAN", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-11", "dl-12"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN"] },
+  { query: "梯度消失", group: "关键词-深度学习", primaryIds: ["dl-2"], secondaryIds: ["dl-1"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["梯度消失","激活函数"] },
 
-  { query: "GAN\u751f\u6210\u5bf9\u6297", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-11", "dl-12"], secondaryIds: ["dl-14"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN", "\u751f\u6210\u5bf9\u6297"] },
+  { query: "残差网络", group: "关键词-深度学习", primaryIds: ["dl-8"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ResNet","跳跃连接"] },
 
-  { query: "GAN\u751f\u6210\u5bf9\u6297\u7f51\u7edc", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-11", "dl-12"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN"] },
+  { query: "激活函数", group: "关键词-深度学习", primaryIds: ["dl-1","dl-31","dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["激活函数","ReLU","sigmoid"] },
 
-  { query: "RNN", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-9", "dl-10"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["RNN", "LSTM", "GRU"] },
+  { query: "MLE", group: "关键词-统计学", primaryIds: ["stats-195"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE"] },
 
-  { query: "RNN\u5faa\u73af\u795e\u7ecf\u7f51\u7edc", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-24", "dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["RNN|LSTM"] },
+  { query: "P值显著性", group: "关键词-统计学", primaryIds: ["stats-134","stats-162"], secondaryIds: ["stats-170"], acceptableDecks: ["statistics"], acceptableConcepts: ["P.*值|显著性"] },
 
-  { query: "\u5377\u79ef\u795e\u7ecf\u7f51\u7edc", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-14"], secondaryIds: ["dl-6", "dl-18"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN", "\u5377\u79ef"] },
+  { query: "余弦相似度", group: "关键词-统计学", primaryIds: ["stats-16","ml-59"], secondaryIds: ["ml-47","agent-19"], acceptableDecks: ["statistics","machine-learning","agent"], acceptableConcepts: ["余弦相似度","余弦"] },
 
-  { query: "\u53cd\u5411\u4f20\u64ad", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-5"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u53cd\u5411\u4f20\u64ad", "backpropagation"] },
+  { query: "假设检验", group: "关键词-统计学", primaryIds: ["stats-24","stats-105","stats-107"], secondaryIds: ["stats-25","stats-119"], acceptableDecks: ["statistics"], acceptableConcepts: ["p值","假设检验","假设检验|t.*检验"] },
 
-  { query: "\u5f52\u4e00\u5316", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-3", "dl-22"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["BatchNorm", "LayerNorm"] },
+  { query: "先验后验", group: "关键词-统计学", primaryIds: ["stats-9","stats-15"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["贝叶斯","先验","后验"] },
 
-  { query: "\u68af\u5ea6\u6d88\u5931", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-2"], secondaryIds: ["dl-1"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u68af\u5ea6\u6d88\u5931", "\u6fc0\u6d3b\u51fd\u6570"] },
+  { query: "协方差", group: "关键词-统计学", primaryIds: ["stats-17","stats-146"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["协方差","相关系数"] },
 
-  { query: "\u6b8b\u5dee\u7f51\u7edc", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-8"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ResNet", "\u8df3\u8dc3\u8fde\u63a5"] },
+  { query: "卡方检验", group: "关键词-统计学", primaryIds: ["stats-27","stats-28"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["卡方检验","独立性检验","卡方"] },
 
-  { query: "\u6fc0\u6d3b\u51fd\u6570", group: "\u5173\u952e\u8bcd-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-1", "dl-31", "dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u6fc0\u6d3b\u51fd\u6570", "ReLU", "sigmoid"] },
+  { query: "大数定律", group: "关键词-统计学", primaryIds: ["stats-10"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["大数定律","中心极限定理"] },
 
-  // ── 关键词-统计学 ──
+  { query: "数据倾斜", group: "关键词-统计学", primaryIds: ["stats-187"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["数据倾斜|倾斜"] },
 
-  { query: "MLE", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-195"], secondaryIds: ["stats-100", "stats-109"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE"] },
+  { query: "方差分析", group: "关键词-统计学", primaryIds: ["stats-29"], secondaryIds: ["stats-30"], acceptableDecks: ["statistics"], acceptableConcepts: ["ANOVA","方差分析"] },
 
-  { query: "P\u503c\u663e\u8457\u6027", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-134", "stats-162"], secondaryIds: ["stats-170"], acceptableDecks: ["statistics"], acceptableConcepts: ["P.*\u503c|\u663e\u8457\u6027"] },
+  { query: "方差分析ANOVA", group: "关键词-统计学", primaryIds: ["stats-106","stats-146"], secondaryIds: ["stats-32"], acceptableDecks: ["statistics"], acceptableConcepts: ["ANOVA|方差分析"] },
 
-  { query: "\u4f59\u5f26\u76f8\u4f3c\u5ea6", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-16", "ml-59"], secondaryIds: ["ml-47", "agent-19"], acceptableDecks: ["statistics", "machine-learning", "agent"], acceptableConcepts: ["\u4f59\u5f26\u76f8\u4f3c\u5ea6", "\u4f59\u5f26"] },
+  { query: "最大似然估计", group: "关键词-统计学", primaryIds: ["stats-100","stats-109"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE","似然函数"] },
 
-  { query: "\u5047\u8bbe\u68c0\u9a8c", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-24", "stats-105", "stats-107"], secondaryIds: ["stats-25", "stats-119"], acceptableDecks: ["statistics"], acceptableConcepts: ["p\u503c", "\u5047\u8bbe\u68c0\u9a8c", "\u5047\u8bbe\u68c0\u9a8c|t.*\u68c0\u9a8c"] },
+  { query: "最大似然估计MLE", group: "关键词-统计学", primaryIds: ["stats-195","stats-39"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE|似然"] },
 
-  { query: "\u5148\u9a8c\u540e\u9a8c", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-9", "stats-15"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u8d1d\u53f6\u65af", "\u5148\u9a8c", "\u540e\u9a8c"] },
+  { query: "正态分布", group: "关键词-统计学", primaryIds: ["stats-11","stats-101","stats-114"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["正态分布","高斯"] },
 
-  { query: "\u534f\u65b9\u5dee", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-17", "stats-146"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u534f\u65b9\u5dee", "\u76f8\u5173\u7cfb\u6570"] },
+  { query: "线性回归", group: "关键词-统计学", primaryIds: ["stats-47","stats-49"], secondaryIds: ["stats-54"], acceptableDecks: ["statistics"], acceptableConcepts: ["线性回归","OLS"] },
 
-  { query: "\u5361\u65b9\u68c0\u9a8c", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-27", "stats-28"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5361\u65b9\u68c0\u9a8c", "\u72ec\u7acb\u6027\u68c0\u9a8c", "\u5361\u65b9"] },
+  { query: "置信区间", group: "关键词-统计学", primaryIds: ["stats-8"], secondaryIds: ["stats-7"], acceptableDecks: ["statistics"], acceptableConcepts: ["置信区间","标准误差"] },
 
-  { query: "\u5927\u6570\u5b9a\u5f8b", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-10"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5927\u6570\u5b9a\u5f8b", "\u4e2d\u5fc3\u6781\u9650\u5b9a\u7406"] },
+  { query: "贝叶斯定理", group: "关键词-统计学", primaryIds: ["stats-9","stats-15","stats-39"], secondaryIds: ["stats-41"], acceptableDecks: ["statistics"], acceptableConcepts: ["贝叶斯","条件概率","先验","后验"] },
 
-  { query: "\u6570\u636e\u503e\u659c", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-187"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u6570\u636e\u503e\u659c|\u503e\u659c"] },
+  { query: "STAR法则", group: "关键词-职场", primaryIds: ["wp-7"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["STAR","面试"] },
 
-  { query: "\u65b9\u5dee\u5206\u6790", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-29"], secondaryIds: ["stats-30"], acceptableDecks: ["statistics"], acceptableConcepts: ["ANOVA", "\u65b9\u5dee\u5206\u6790"] },
+  { query: "向上管理", group: "关键词-职场", primaryIds: ["wp-2"], secondaryIds: ["wp-3"], acceptableDecks: ["workplace"], acceptableConcepts: ["向上管理","沟通"] },
 
-  { query: "\u65b9\u5dee\u5206\u6790ANOVA", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-106", "stats-146"], secondaryIds: ["stats-32"], acceptableDecks: ["statistics"], acceptableConcepts: ["ANOVA|\u65b9\u5dee\u5206\u6790"] },
+  { query: "述职", group: "关键词-职场", primaryIds: ["wp-3","wp-8"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["述职","汇报"] },
 
-  { query: "\u6700\u5927\u4f3c\u7136\u4f30\u8ba1", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-100", "stats-109"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE", "\u4f3c\u7136\u51fd\u6570"] },
+  { query: "述职汇报", group: "关键词-职场", primaryIds: ["wp-3","wp-7"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["述职|汇报"] },
 
-  { query: "\u6700\u5927\u4f3c\u7136\u4f30\u8ba1MLE", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-195", "stats-39"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE|\u4f3c\u7136"] },
+  { query: "复盘", group: "关键词-黑话", primaryIds: ["jargon-6"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["复盘","Review"] },
 
-  { query: "\u6b63\u6001\u5206\u5e03", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-11", "stats-101", "stats-114"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u6b63\u6001\u5206\u5e03", "\u9ad8\u65af"] },
+  { query: "底层逻辑", group: "关键词-黑话", primaryIds: ["jargon-5"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["底层逻辑","认知","逻辑"] },
 
-  { query: "\u7ebf\u6027\u56de\u5f52", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-47", "stats-49"], secondaryIds: ["stats-54"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u7ebf\u6027\u56de\u5f52", "OLS"] },
+  { query: "赋能", group: "关键词-黑话", primaryIds: ["jargon-2"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["赋能","Empower"] },
 
-  { query: "\u7f6e\u4fe1\u533a\u95f4", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-8"], secondaryIds: ["stats-7"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u7f6e\u4fe1\u533a\u95f4", "\u6807\u51c6\u8bef\u5dee"] },
+  { query: "迭代", group: "关键词-黑话", primaryIds: ["jargon-24","jargon-37"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["迭代"] },
 
-  { query: "\u8d1d\u53f6\u65af\u5b9a\u7406", group: "\u5173\u952e\u8bcd-\u7edf\u8ba1\u5b66", primaryIds: ["stats-9", "stats-15", "stats-39"], secondaryIds: ["stats-41"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u8d1d\u53f6\u65af", "\u6761\u4ef6\u6982\u7387", "\u5148\u9a8c", "\u540e\u9a8c"] },
+  { query: "闭环", group: "关键词-黑话", primaryIds: ["jargon-3"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["闭环","Closed Loop"] },
 
-  // ── 关键词-职场 ──
+  { query: "颗粒度", group: "关键词-黑话", primaryIds: ["jargon-1"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["颗粒度","对齐"] },
 
-  { query: "STAR\u6cd5\u5219", group: "\u5173\u952e\u8bcd-\u804c\u573a", primaryIds: ["wp-7"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["STAR", "\u9762\u8bd5"] },
+  { query: "A Gentle Introduction to Reinforcement Learning", group: "回归-对抗", primaryIds: ["ml-112","ml-113"], secondaryIds: ["ml-117"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["强化|DQN|Reward|RL"] },
 
-  { query: "\u5411\u4e0a\u7ba1\u7406", group: "\u5173\u952e\u8bcd-\u804c\u573a", primaryIds: ["wp-2"], secondaryIds: ["wp-3"], acceptableDecks: ["workplace"], acceptableConcepts: ["\u5411\u4e0a\u7ba1\u7406", "\u6c9f\u901a"] },
+  { query: "Agent反复调用同一个工具怎么办", group: "回归-对抗", primaryIds: ["agent-21","agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["工具.*调用|循环|Agent"] },
 
-  { query: "\u8ff0\u804c", group: "\u5173\u952e\u8bcd-\u804c\u573a", primaryIds: ["wp-3", "wp-8"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["\u8ff0\u804c", "\u6c47\u62a5"] },
+  { query: "Attention Mask是什么", group: "回归-对抗", primaryIds: ["llm-1","llm-2"], secondaryIds: ["llm-26"], acceptableDecks: ["llm"], acceptableConcepts: ["Mask|Attention|Paddi"] },
 
-  { query: "\u8ff0\u804c\u6c47\u62a5", group: "\u5173\u952e\u8bcd-\u804c\u573a", primaryIds: ["wp-3", "wp-7"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["\u8ff0\u804c|\u6c47\u62a5"] },
+  { query: "Convolutional Neural Networks beginners", group: "回归-对抗", primaryIds: ["dl-6"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|convolution|卷积"] },
 
-  // ── 关键词-黑话 ──
+  { query: "ML里如何处理缺失值", group: "回归-对抗", primaryIds: ["ml-141","ml-15"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["缺失值|Missing|NaN|Impu"] },
 
-  { query: "\u590d\u76d8", group: "\u5173\u952e\u8bcd-\u9ed1\u8bdd", primaryIds: ["jargon-6"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["\u590d\u76d8", "Review"] },
+  { query: "ROC曲线是干什么的", group: "回归-对抗", primaryIds: ["ml-153","ml-50"], secondaryIds: ["ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["ROC|AUC|分类.*评估"] },
 
-  { query: "\u5e95\u5c42\u903b\u8f91", group: "\u5173\u952e\u8bcd-\u9ed1\u8bdd", primaryIds: ["jargon-5"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["\u5e95\u5c42\u903b\u8f91", "\u8ba4\u77e5", "\u903b\u8f91"] },
+  { query: "SVM核函数怎么选", group: "回归-对抗", primaryIds: ["ml-19","ml-2"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|核函数|RBF"] },
 
-  { query: "\u8d4b\u80fd", group: "\u5173\u952e\u8bcd-\u9ed1\u8bdd", primaryIds: ["jargon-2"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["\u8d4b\u80fd", "Empower"] },
+  { query: "Self-Reflection让Agent自纠错", group: "回归-对抗", primaryIds: ["agent-14"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Self.*Reflect|纠错|反思"] },
 
-  { query: "\u8fed\u4ee3", group: "\u5173\u952e\u8bcd-\u9ed1\u8bdd", primaryIds: ["jargon-24", "jargon-37"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["\u8fed\u4ee3"] },
+  { query: "Sparse vs Dense向量", group: "回归-对抗", primaryIds: ["agent-19","agent-24"], secondaryIds: ["agent-9"], acceptableDecks: ["agent"], acceptableConcepts: ["稀疏|稠密|Embedding"] },
 
-  { query: "\u95ed\u73af", group: "\u5173\u952e\u8bcd-\u9ed1\u8bdd", primaryIds: ["jargon-3"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["\u95ed\u73af", "Closed Loop"] },
+  { query: "Type I Error 和 Type II Error", group: "回归-对抗", primaryIds: ["stats-120","stats-134"], secondaryIds: ["stats-25"], acceptableDecks: ["statistics"], acceptableConcepts: ["Type.*Error|第一类|显著性"] },
 
-  { query: "\u9897\u7c92\u5ea6", group: "\u5173\u952e\u8bcd-\u9ed1\u8bdd", primaryIds: ["jargon-1"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["\u9897\u7c92\u5ea6", "\u5bf9\u9f50"] },
+  { query: "What is Backpropagation", group: "回归-对抗", primaryIds: ["dl-5"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Backprop|反向.*传播"] },
 
-  // ── 回归-对抗 ──
+  { query: "为什么需要RAG", group: "回归-对抗", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|检索|幻觉"] },
 
-  { query: "A Gentle Introduction to Reinforcement Learning", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["ml-112", "ml-113"], secondaryIds: ["ml-117"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u5f3a\u5316|DQN|Reward|RL"] },
+  { query: "什么是Confounder", group: "回归-对抗", primaryIds: ["stats-136","stats-145"], secondaryIds: ["stats-6"], acceptableDecks: ["statistics"], acceptableConcepts: ["混杂|Confound|因果"] },
 
-  { query: "Agent\u53cd\u590d\u8c03\u7528\u540c\u4e00\u4e2a\u5de5\u5177\u600e\u4e48\u529e", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["agent-21", "agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["\u5de5\u5177.*\u8c03\u7528|\u5faa\u73af|Agent"] },
+  { query: "什么是正态分布", group: "回归-对抗", primaryIds: ["stats-101","stats-11"], secondaryIds: ["stats-111"], acceptableDecks: ["statistics"], acceptableConcepts: ["正态|高斯|分布"] },
 
-  { query: "Attention Mask\u662f\u4ec0\u4e48", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["llm-1", "llm-2"], secondaryIds: ["llm-26"], acceptableDecks: ["llm"], acceptableConcepts: ["Mask|Attention|Paddi"] },
+  { query: "什么是自注意力", group: "回归-对抗", primaryIds: ["llm-1","llm-2"], secondaryIds: ["llm-9"], acceptableDecks: ["llm"], acceptableConcepts: ["Self.*Attention|自注意力"] },
 
-  { query: "Convolutional Neural Networks beginners", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["dl-6"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|convolution|\u5377\u79ef"] },
+  { query: "向量数据库选型", group: "回归-对抗", primaryIds: ["agent-18"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["向量.*数据库|Pinecone|Mil"] },
 
-  { query: "ML\u91cc\u5982\u4f55\u5904\u7406\u7f3a\u5931\u503c", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["ml-141", "ml-15"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7f3a\u5931\u503c|Missing|NaN|Impu"] },
+  { query: "大模型能不能用来做搜索", group: "回归-对抗", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|搜索|检索"] },
 
-  { query: "ROC\u66f2\u7ebf\u662f\u5e72\u4ec0\u4e48\u7684", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["ml-153", "ml-50"], secondaryIds: ["ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["ROC|AUC|\u5206\u7c7b.*\u8bc4\u4f30"] },
+  { query: "对话生成的上下文管理怎么做", group: "回归-对抗", primaryIds: ["agent-10"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["上下文|记忆|Window"] },
 
-  { query: "SVM\u6838\u51fd\u6570\u600e\u4e48\u9009", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["ml-19", "ml-2"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|\u6838\u51fd\u6570|RBF"] },
+  { query: "怎么搞懂反向传播", group: "回归-对抗", primaryIds: ["dl-2","dl-5"], secondaryIds: ["ml-1","ml-106"], acceptableDecks: ["deep-learning","machine-learning"], acceptableConcepts: ["反向.*传播|BP|梯度"] },
 
-  { query: "Self-Reflection\u8ba9Agent\u81ea\u7ea0\u9519", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["agent-14"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Self.*Reflect|\u7ea0\u9519|\u53cd\u601d"] },
+  { query: "怎么评估一个Agent好不好", group: "回归-对抗", primaryIds: ["agent-15","agent-24"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["评估|Agent.*评估"] },
 
-  { query: "Sparse vs Dense\u5411\u91cf", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["agent-19", "agent-24"], secondaryIds: ["agent-9"], acceptableDecks: ["agent"], acceptableConcepts: ["\u7a00\u758f|\u7a20\u5bc6|Embedding"] },
+  { query: "数据隐私和模型训练矛盾", group: "回归-对抗", primaryIds: ["ml-188"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["隐私|Federated|差分"] },
 
-  { query: "Type I Error \u548c Type II Error", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["stats-120", "stats-134"], secondaryIds: ["stats-25"], acceptableDecks: ["statistics"], acceptableConcepts: ["Type.*Error|\u7b2c\u4e00\u7c7b|\u663e\u8457\u6027"] },
+  { query: "树模型特征重要性怎么算", group: "回归-对抗", primaryIds: ["ml-13","ml-176"], secondaryIds: ["ml-18"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["特征.*重要|Permutation|S"] },
 
-  { query: "What is Backpropagation", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["dl-5"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Backprop|\u53cd\u5411.*\u4f20\u64ad"] },
+  { query: "模型Serving怎么做", group: "回归-对抗", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Serving|vLLM|Triton"] },
 
-  { query: "\u4e3a\u4ec0\u4e48\u9700\u8981RAG", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["agent-10", "agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|\u68c0\u7d22|\u5e7b\u89c9"] },
+  { query: "统计学的中心极限定理", group: "回归-对抗", primaryIds: ["stats-10","stats-11"], secondaryIds: ["stats-114"], acceptableDecks: ["statistics"], acceptableConcepts: ["中心极限|CLT|正态"] },
 
-  { query: "\u4ec0\u4e48\u662fConfounder", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["stats-136", "stats-145"], secondaryIds: ["stats-6"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u6df7\u6742|Confound|\u56e0\u679c"] },
+  { query: "设计一个像GPT那样的对话Agent需要考虑什么", group: "回归-对抗", primaryIds: ["agent-21","agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["Agent|GPT|对话|Token"] },
 
-  { query: "\u4ec0\u4e48\u662f\u6b63\u6001\u5206\u5e03", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["stats-101", "stats-11"], secondaryIds: ["stats-111"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u6b63\u6001|\u9ad8\u65af|\u5206\u5e03"] },
+  { query: "过拟合欠拟合如何判断", group: "回归-对抗", primaryIds: ["ml-188","ml-7"], secondaryIds: ["ml-77"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合|欠拟合|偏差.*方差"] },
 
-  { query: "\u4ec0\u4e48\u662f\u81ea\u6ce8\u610f\u529b", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["llm-1", "llm-2"], secondaryIds: ["llm-9"], acceptableDecks: ["llm"], acceptableConcepts: ["Self.*Attention|\u81ea\u6ce8\u610f\u529b"] },
+  { query: "怎么在实际工作中把大模型的能力集成到自己的业务系统里", group: "复杂-Agent", primaryIds: ["agent-7"], secondaryIds: ["agent-21","agent-2"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG","Agentic RAG","Function Calling"] },
 
-  { query: "\u5411\u91cf\u6570\u636e\u5e93\u9009\u578b", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["agent-18"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["\u5411\u91cf.*\u6570\u636e\u5e93|Pinecone|Mil"] },
+  { query: "海量数据里找相似向量最快的方案是什么", group: "复杂-Agent", primaryIds: ["agent-18"], secondaryIds: ["agent-26","agent-9"], acceptableDecks: ["agent"], acceptableConcepts: ["向量数据库","ANN","混合检索"] },
 
-  { query: "\u5927\u6a21\u578b\u80fd\u4e0d\u80fd\u7528\u6765\u505a\u641c\u7d22", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["agent-10", "agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|\u641c\u7d22|\u68c0\u7d22"] },
+  { query: "作为一个面试官，我想问几个关于 MCP 协议的好问题", group: "复杂-VibeCoding", primaryIds: ["vc-5"], secondaryIds: ["vc-17"], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["MCP","协议"] },
 
-  { query: "\u5bf9\u8bdd\u751f\u6210\u7684\u4e0a\u4e0b\u6587\u7ba1\u7406\u600e\u4e48\u505a", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["agent-10"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["\u4e0a\u4e0b\u6587|\u8bb0\u5fc6|Window"] },
+  { query: "二叉树的四种遍历方式分别是什么，各自的应用场景", group: "复杂-力扣", primaryIds: ["lc-043"], secondaryIds: ["lc-040","lc-041"], acceptableDecks: ["leetcode"], acceptableConcepts: ["二叉树","遍历","前序","中序"] },
 
-  { query: "\u600e\u4e48\u641e\u61c2\u53cd\u5411\u4f20\u64ad", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["dl-2", "dl-5"], secondaryIds: ["ml-1", "ml-106"], acceptableDecks: ["deep-learning", "machine-learning"], acceptableConcepts: ["\u53cd\u5411.*\u4f20\u64ad|BP|\u68af\u5ea6"] },
+  { query: "动态规划的解题框架是什么，有什么经典例题可以举例说明", group: "复杂-力扣", primaryIds: ["lc-062"], secondaryIds: ["lc-069","lc-071","lc-073"], acceptableDecks: ["leetcode"], acceptableConcepts: ["动态规划","爬楼梯","编辑距离"] },
 
-  { query: "\u600e\u4e48\u8bc4\u4f30\u4e00\u4e2aAgent\u597d\u4e0d\u597d", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["agent-15", "agent-24"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["\u8bc4\u4f30|Agent.*\u8bc4\u4f30"] },
+  { query: "大模型推理太慢了，有哪些加速手段可以用", group: "复杂-大模型", primaryIds: ["llm-21","llm-24"], secondaryIds: ["llm-25","llm-26"], acceptableDecks: ["llm"], acceptableConcepts: ["KV Cache","量化","推理加速"] },
 
-  { query: "\u6570\u636e\u9690\u79c1\u548c\u6a21\u578b\u8bad\u7ec3\u77db\u76fe", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["ml-188"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u9690\u79c1|Federated|\u5dee\u5206"] },
+  { query: "怎么理解大模型 alignment 对齐这回事，为什么要做 RLHF", group: "复杂-大模型", primaryIds: ["llm-14"], secondaryIds: ["llm-11","llm-15"], acceptableDecks: ["llm"], acceptableConcepts: ["RLHF","对齐","预训练"] },
 
-  { query: "\u6811\u6a21\u578b\u7279\u5f81\u91cd\u8981\u6027\u600e\u4e48\u7b97", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["ml-13", "ml-176"], secondaryIds: ["ml-18"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7279\u5f81.*\u91cd\u8981|Permutation|S"] },
+  { query: "给我讲一下从 word2vec 到 BERT 到 GPT 的发展脉络", group: "复杂-大模型", primaryIds: ["llm-10"], secondaryIds: ["llm-8","llm-7"], acceptableDecks: ["llm"], acceptableConcepts: ["BERT","GPT","Transformer"] },
 
-  { query: "\u6a21\u578bServing\u600e\u4e48\u505a", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Serving|vLLM|Triton"] },
+  { query: "请详细解释一下 Transformer 的自注意力机制是怎么计算的，Q K V 分别代表什么", group: "复杂-大模型", primaryIds: ["llm-1","llm-3"], secondaryIds: ["llm-2"], acceptableDecks: ["llm"], acceptableConcepts: ["Self-Attention","QKV","Multi-Head"] },
 
-  { query: "\u7edf\u8ba1\u5b66\u7684\u4e2d\u5fc3\u6781\u9650\u5b9a\u7406", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["stats-10", "stats-11"], secondaryIds: ["stats-114"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u4e2d\u5fc3\u6781\u9650|CLT|\u6b63\u6001"] },
+  { query: "有 100 万条数据但是标注只有 1 万条，这种情况该怎么办", group: "复杂-机器学习", primaryIds: ["ml-10"], secondaryIds: ["ml-9","ml-16"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["半监督","正则化","迁移学习"] },
 
-  { query: "\u8bbe\u8ba1\u4e00\u4e2a\u50cfGPT\u90a3\u6837\u7684\u5bf9\u8bddAgent\u9700\u8981\u8003\u8651\u4ec0\u4e48", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["agent-21", "agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["Agent|GPT|\u5bf9\u8bdd|Token"] },
+  { query: "能不能帮我系统梳理一下集成学习从 bagging 到 boosting 到 stacking 的演变", group: "复杂-机器学习", primaryIds: ["ml-32"], secondaryIds: ["ml-31","ml-36"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Bagging","Boosting","Stacking"] },
 
-  { query: "\u8fc7\u62df\u5408\u6b20\u62df\u5408\u5982\u4f55\u5224\u65ad", group: "\u56de\u5f52-\u5bf9\u6297", primaryIds: ["ml-188", "ml-7"], secondaryIds: ["ml-77"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u8fc7\u62df\u5408|\u6b20\u62df\u5408|\u504f\u5dee.*\u65b9\u5dee"] },
+  { query: "面试官问我怎么评估一个分类模型的好坏，我应该从哪些角度回答", group: "复杂-机器学习", primaryIds: ["ml-49","ml-50"], secondaryIds: ["ml-51","ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["精确率","召回率","ROC","AUC"] },
 
-  // ── 复杂-Agent ──
+  { query: "Stable Diffusion 为什么在 latent space 扩散而不是像素空间", group: "复杂-深度学习", primaryIds: ["dl-16"], secondaryIds: ["dl-15"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Stable Diffusion","Latent Space"] },
 
-  { query: "\u600e\u4e48\u5728\u5b9e\u9645\u5de5\u4f5c\u4e2d\u628a\u5927\u6a21\u578b\u7684\u80fd\u529b\u96c6\u6210\u5230\u81ea\u5df1\u7684\u4e1a\u52a1\u7cfb\u7edf\u91cc", group: "\u590d\u6742-Agent", primaryIds: ["agent-7"], secondaryIds: ["agent-21", "agent-2"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG", "Agentic RAG", "Function Calling"] },
+  { query: "我在训练深度学习模型时发现训练 loss 一直降但验证 loss 不降，这是什么问题，怎么解决", group: "复杂-深度学习", primaryIds: ["ml-7"], secondaryIds: ["dl-4","ml-9"], acceptableDecks: ["machine-learning","deep-learning"], acceptableConcepts: ["过拟合","Dropout","交叉验证"] },
 
-  { query: "\u6d77\u91cf\u6570\u636e\u91cc\u627e\u76f8\u4f3c\u5411\u91cf\u6700\u5feb\u7684\u65b9\u6848\u662f\u4ec0\u4e48", group: "\u590d\u6742-Agent", primaryIds: ["agent-18"], secondaryIds: ["agent-26", "agent-9"], acceptableDecks: ["agent"], acceptableConcepts: ["\u5411\u91cf\u6570\u636e\u5e93", "ANN", "\u6df7\u5408\u68c0\u7d22"] },
+  { query: "AB 测试做了之后发现实验组和对照组没有显著差异，可能的原因有哪些", group: "复杂-统计学", primaryIds: ["stats-26"], secondaryIds: ["stats-31","stats-25"], acceptableDecks: ["statistics"], acceptableConcepts: ["假设检验","统计功效","样本量"] },
 
-  // ── 复杂-VibeCoding ──
+  { query: "想刷动态规划，推荐几道题", group: "学习路径-力扣", primaryIds: ["lc-062"], secondaryIds: ["lc-063","lc-064","lc-067"], acceptableDecks: ["leetcode"], acceptableConcepts: ["动态规划","DP"] },
 
-  { query: "\u4f5c\u4e3a\u4e00\u4e2a\u9762\u8bd5\u5b98\uff0c\u6211\u60f3\u95ee\u51e0\u4e2a\u5173\u4e8e MCP \u534f\u8bae\u7684\u597d\u95ee\u9898", group: "\u590d\u6742-VibeCoding", primaryIds: ["vc-5"], secondaryIds: ["vc-17"], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["MCP", "\u534f\u8bae"] },
+  { query: "我 Transformer 不太懂，帮我找相关卡片", group: "学习路径-大模型", primaryIds: ["llm-1"], secondaryIds: ["llm-3","llm-4","llm-9"], acceptableDecks: ["llm"], acceptableConcepts: ["Transformer","Attention","位置编码"] },
 
-  // ── 复杂-力扣 ──
+  { query: "假如我想学习决策树，我应该学习哪些卡片", group: "学习路径-机器学习", primaryIds: ["ml-3"], secondaryIds: ["ml-16","ml-17"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["决策树","随机森林","集成学习"] },
 
-  { query: "\u4e8c\u53c9\u6811\u7684\u56db\u79cd\u904d\u5386\u65b9\u5f0f\u5206\u522b\u662f\u4ec0\u4e48\uff0c\u5404\u81ea\u7684\u5e94\u7528\u573a\u666f", group: "\u590d\u6742-\u529b\u6263", primaryIds: ["lc-043"], secondaryIds: ["lc-040", "lc-041"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u4e8c\u53c9\u6811", "\u904d\u5386", "\u524d\u5e8f", "\u4e2d\u5e8f"] },
+  { query: "现在想入门深度学习，需要看哪些基础卡片", group: "学习路径-深度学习", primaryIds: ["dl-1"], secondaryIds: ["dl-2","dl-3","dl-5"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["深度学习","反向传播","激活函数"] },
 
-  { query: "\u52a8\u6001\u89c4\u5212\u7684\u89e3\u9898\u6846\u67b6\u662f\u4ec0\u4e48\uff0c\u6709\u4ec0\u4e48\u7ecf\u5178\u4f8b\u9898\u53ef\u4ee5\u4e3e\u4f8b\u8bf4\u660e", group: "\u590d\u6742-\u529b\u6263", primaryIds: ["lc-062"], secondaryIds: ["lc-069", "lc-071", "lc-073"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u52a8\u6001\u89c4\u5212", "\u722c\u697c\u68af", "\u7f16\u8f91\u8ddd\u79bb"] },
+  { query: "如何系统地学习假设检验", group: "学习路径-统计学", primaryIds: ["stats-24","stats-25"], secondaryIds: ["stats-26","stats-27"], acceptableDecks: ["statistics"], acceptableConcepts: ["假设检验","p值","t检验"] },
 
-  // ── 复杂-大模型 ──
+  { query: "Agent和LLM到底什么关系", group: "概念-Agent", primaryIds: ["agent-1","agent-2"], secondaryIds: ["agent-21","llm-16"], acceptableDecks: ["agent","llm"], acceptableConcepts: ["Agent|LLM|关系"] },
 
-  { query: "\u5927\u6a21\u578b\u63a8\u7406\u592a\u6162\u4e86\uff0c\u6709\u54ea\u4e9b\u52a0\u901f\u624b\u6bb5\u53ef\u4ee5\u7528", group: "\u590d\u6742-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-24"], secondaryIds: ["llm-25", "llm-26"], acceptableDecks: ["llm"], acceptableConcepts: ["KV Cache", "\u91cf\u5316", "\u63a8\u7406\u52a0\u901f"] },
+  { query: "Agent长期记忆怎么设计", group: "概念-Agent", primaryIds: ["agent-21"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["记忆|Memory|Agentic"] },
 
-  { query: "\u600e\u4e48\u7406\u89e3\u5927\u6a21\u578b alignment \u5bf9\u9f50\u8fd9\u56de\u4e8b\uff0c\u4e3a\u4ec0\u4e48\u8981\u505a RLHF", group: "\u590d\u6742-\u5927\u6a21\u578b", primaryIds: ["llm-14"], secondaryIds: ["llm-11", "llm-15"], acceptableDecks: ["llm"], acceptableConcepts: ["RLHF", "\u5bf9\u9f50", "\u9884\u8bad\u7ec3"] },
+  { query: "RAG 的检索结果要不要重新排个序", group: "概念-Agent", primaryIds: ["agent-25"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Reranking","重排序"] },
 
-  { query: "\u7ed9\u6211\u8bb2\u4e00\u4e0b\u4ece word2vec \u5230 BERT \u5230 GPT \u7684\u53d1\u5c55\u8109\u7edc", group: "\u590d\u6742-\u5927\u6a21\u578b", primaryIds: ["llm-10"], secondaryIds: ["llm-8", "llm-7"], acceptableDecks: ["llm"], acceptableConcepts: ["BERT", "GPT", "Transformer"] },
+  { query: "ReAct和普通对话模型区别", group: "概念-Agent", primaryIds: ["agent-1","agent-21"], secondaryIds: ["agent-3"], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct|推理|Agent"] },
 
-  { query: "\u8bf7\u8be6\u7ec6\u89e3\u91ca\u4e00\u4e0b Transformer \u7684\u81ea\u6ce8\u610f\u529b\u673a\u5236\u662f\u600e\u4e48\u8ba1\u7b97\u7684\uff0cQ K V \u5206\u522b\u4ee3\u8868\u4ec0\u4e48", group: "\u590d\u6742-\u5927\u6a21\u578b", primaryIds: ["llm-1", "llm-3"], secondaryIds: ["llm-2"], acceptableDecks: ["llm"], acceptableConcepts: ["Self-Attention", "QKV", "Multi-Head"] },
+  { query: "怎么知道 RAG 搜出来的东西靠不靠谱", group: "概念-Agent", primaryIds: ["agent-15"], secondaryIds: ["agent-17"], acceptableDecks: ["agent"], acceptableConcepts: ["评估","幻觉"] },
 
-  // ── 复杂-机器学习 ──
+  { query: "怎么让Agent执行多步骤任务", group: "概念-Agent", primaryIds: ["agent-5","agent-6"], secondaryIds: ["agent-8"], acceptableDecks: ["agent"], acceptableConcepts: ["Planning|AutoGPT|步骤"] },
 
-  { query: "\u6709 100 \u4e07\u6761\u6570\u636e\u4f46\u662f\u6807\u6ce8\u53ea\u6709 1 \u4e07\u6761\uff0c\u8fd9\u79cd\u60c5\u51b5\u8be5\u600e\u4e48\u529e", group: "\u590d\u6742-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-10"], secondaryIds: ["ml-9", "ml-16"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u534a\u76d1\u7763", "\u6b63\u5219\u5316", "\u8fc1\u79fb\u5b66\u4e60"] },
+  { query: "怎么让大模型自己去调 API", group: "概念-Agent", primaryIds: ["agent-2"], secondaryIds: ["agent-3"], acceptableDecks: ["agent"], acceptableConcepts: ["Function Calling","Tool-Use"] },
 
-  { query: "\u80fd\u4e0d\u80fd\u5e2e\u6211\u7cfb\u7edf\u68b3\u7406\u4e00\u4e0b\u96c6\u6210\u5b66\u4e60\u4ece bagging \u5230 boosting \u5230 stacking \u7684\u6f14\u53d8", group: "\u590d\u6742-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-32"], secondaryIds: ["ml-31", "ml-36"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Bagging", "Boosting", "Stacking"] },
+  { query: "怎么评估RAG系统好不好", group: "概念-Agent", primaryIds: ["agent-15","agent-24"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["RAG.*评估|检索质量"] },
 
-  { query: "\u9762\u8bd5\u5b98\u95ee\u6211\u600e\u4e48\u8bc4\u4f30\u4e00\u4e2a\u5206\u7c7b\u6a21\u578b\u7684\u597d\u574f\uff0c\u6211\u5e94\u8be5\u4ece\u54ea\u4e9b\u89d2\u5ea6\u56de\u7b54", group: "\u590d\u6742-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-49", "ml-50"], secondaryIds: ["ml-51", "ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7cbe\u786e\u7387", "\u53ec\u56de\u7387", "ROC", "AUC"] },
+  { query: "agent 和 skill 的核心区别在哪", group: "概念-VibeCoding", primaryIds: ["vc-2","vc-1"], secondaryIds: ["vc-3"], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["Agent","Skill","sub-agent"] },
 
-  // ── 复杂-深度学习 ──
+  { query: "怎么给 AI 写项目规则文件", group: "概念-VibeCoding", primaryIds: ["vc-6"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["CLAUDE.md","AGENTS.md"] },
 
-  { query: "Stable Diffusion \u4e3a\u4ec0\u4e48\u5728 latent space \u6269\u6563\u800c\u4e0d\u662f\u50cf\u7d20\u7a7a\u95f4", group: "\u590d\u6742-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-16"], secondaryIds: ["dl-15"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Stable Diffusion", "Latent Space"] },
+  { query: "二叉树的最近公共祖先", group: "概念-力扣", primaryIds: ["lc-049"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["LCA","二叉树"] },
 
-  { query: "\u6211\u5728\u8bad\u7ec3\u6df1\u5ea6\u5b66\u4e60\u6a21\u578b\u65f6\u53d1\u73b0\u8bad\u7ec3 loss \u4e00\u76f4\u964d\u4f46\u9a8c\u8bc1 loss \u4e0d\u964d\uff0c\u8fd9\u662f\u4ec0\u4e48\u95ee\u9898\uff0c\u600e\u4e48\u89e3\u51b3", group: "\u590d\u6742-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["ml-7"], secondaryIds: ["dl-4", "ml-9"], acceptableDecks: ["machine-learning", "deep-learning"], acceptableConcepts: ["\u8fc7\u62df\u5408", "Dropout", "\u4ea4\u53c9\u9a8c\u8bc1"] },
+  { query: "二叉树遍历递归和非递归哪个好", group: "概念-力扣", primaryIds: ["lc-040","lc-043"], secondaryIds: ["lc-044"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Binary Tree.*Travers"] },
 
-  // ── 复杂-统计学 ──
+  { query: "刷动态规划一直搞不懂状态转移", group: "概念-力扣", primaryIds: ["lc-062","lc-065"], secondaryIds: ["lc-067"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Climbing|Coin|House"] },
 
-  { query: "AB \u6d4b\u8bd5\u505a\u4e86\u4e4b\u540e\u53d1\u73b0\u5b9e\u9a8c\u7ec4\u548c\u5bf9\u7167\u7ec4\u6ca1\u6709\u663e\u8457\u5dee\u5f02\uff0c\u53ef\u80fd\u7684\u539f\u56e0\u6709\u54ea\u4e9b", group: "\u590d\u6742-\u7edf\u8ba1\u5b66", primaryIds: ["stats-26"], secondaryIds: ["stats-31", "stats-25"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5047\u8bbe\u68c0\u9a8c", "\u7edf\u8ba1\u529f\u6548", "\u6837\u672c\u91cf"] },
+  { query: "十字链表有什么用", group: "概念-力扣", primaryIds: ["lc-010","lc-011"], secondaryIds: ["lc-026"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Matrix|Set Zero|Spir"] },
 
-  // ── 学习路径-力扣 ──
+  { query: "合并有序数组", group: "概念-力扣", primaryIds: ["lc-013"], secondaryIds: ["lc-038"], acceptableDecks: ["leetcode"], acceptableConcepts: ["合并","有序数组"] },
 
-  { query: "\u60f3\u5237\u52a8\u6001\u89c4\u5212\uff0c\u63a8\u8350\u51e0\u9053\u9898", group: "\u5b66\u4e60\u8def\u5f84-\u529b\u6263", primaryIds: ["lc-062"], secondaryIds: ["lc-063", "lc-064", "lc-067"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u52a8\u6001\u89c4\u5212", "DP"] },
+  { query: "图的最短路径算法比较", group: "概念-力扣", primaryIds: ["lc-050","lc-051"], secondaryIds: ["lc-069"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Path|Dijkstra|最短"] },
 
-  // ── 学习路径-大模型 ──
+  { query: "数组题双指针和前缀和怎么选", group: "概念-力扣", primaryIds: ["lc-001","lc-004"], secondaryIds: ["lc-005"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Two Sum|Subarray|Mov"] },
 
-  { query: "\u6211 Transformer \u4e0d\u592a\u61c2\uff0c\u5e2e\u6211\u627e\u76f8\u5173\u5361\u7247", group: "\u5b66\u4e60\u8def\u5f84-\u5927\u6a21\u578b", primaryIds: ["llm-1"], secondaryIds: ["llm-3", "llm-4", "llm-9"], acceptableDecks: ["llm"], acceptableConcepts: ["Transformer", "Attention", "\u4f4d\u7f6e\u7f16\u7801"] },
+  { query: "最长不重复子串", group: "概念-力扣", primaryIds: ["lc-019"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["无重复字符","滑动窗口"] },
 
-  // ── 学习路径-机器学习 ──
+  { query: "面试考链表老写bug怎么办", group: "概念-力扣", primaryIds: ["lc-032","lc-033"], secondaryIds: ["lc-034"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Reverse.*Linked|Cycl"] },
 
-  { query: "\u5047\u5982\u6211\u60f3\u5b66\u4e60\u51b3\u7b56\u6811\uff0c\u6211\u5e94\u8be5\u5b66\u4e60\u54ea\u4e9b\u5361\u7247", group: "\u5b66\u4e60\u8def\u5f84-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-3"], secondaryIds: ["ml-16", "ml-17"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u51b3\u7b56\u6811", "\u968f\u673a\u68ee\u6797", "\u96c6\u6210\u5b66\u4e60"] },
+  { query: "Encoder Decoder架构", group: "概念-大模型", primaryIds: ["llm-8"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Encoder.*Decoder|Seq"] },
 
-  // ── 学习路径-深度学习 ──
+  { query: "KV cache为什么要用", group: "概念-大模型", primaryIds: ["llm-21","llm-26"], secondaryIds: ["llm-25"], acceptableDecks: ["llm"], acceptableConcepts: ["KV|Cache|推理"] },
 
-  { query: "\u73b0\u5728\u60f3\u5165\u95e8\u6df1\u5ea6\u5b66\u4e60\uff0c\u9700\u8981\u770b\u54ea\u4e9b\u57fa\u7840\u5361\u7247", group: "\u5b66\u4e60\u8def\u5f84-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-1"], secondaryIds: ["dl-2", "dl-3", "dl-5"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u6df1\u5ea6\u5b66\u4e60", "\u53cd\u5411\u4f20\u64ad", "\u6fc0\u6d3b\u51fd\u6570"] },
+  { query: "RLHF怎么让模型对齐人类偏好", group: "概念-大模型", primaryIds: ["llm-14","llm-15"], secondaryIds: ["llm-20"], acceptableDecks: ["llm"], acceptableConcepts: ["RLHF|DPO|奖励"] },
 
-  // ── 学习路径-统计学 ──
+  { query: "为什么 transformer 比 rnn 训练得快", group: "概念-大模型", primaryIds: ["llm-7"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["并行化","Transformer"] },
 
-  { query: "\u5982\u4f55\u7cfb\u7edf\u5730\u5b66\u4e60\u5047\u8bbe\u68c0\u9a8c", group: "\u5b66\u4e60\u8def\u5f84-\u7edf\u8ba1\u5b66", primaryIds: ["stats-24", "stats-25"], secondaryIds: ["stats-26", "stats-27"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5047\u8bbe\u68c0\u9a8c", "p\u503c", "t\u68c0\u9a8c"] },
+  { query: "为什么Transformer比RNN快", group: "概念-大模型", primaryIds: ["llm-1","llm-2"], secondaryIds: ["llm-38","dl-9"], acceptableDecks: ["llm","deep-learning"], acceptableConcepts: ["并行|Transformer|Self-"] },
 
-  // ── 概念-Agent ──
+  { query: "为什么Transformer用位置编码", group: "概念-大模型", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["位置编码|Positional|RoPE"] },
 
-  { query: "Agent\u548cLLM\u5230\u5e95\u4ec0\u4e48\u5173\u7cfb", group: "\u6982\u5ff5-Agent", primaryIds: ["agent-1", "agent-2"], secondaryIds: ["agent-21", "llm-16"], acceptableDecks: ["agent", "llm"], acceptableConcepts: ["Agent|LLM|\u5173\u7cfb"] },
+  { query: "为什么大模型部署用KV cache", group: "概念-大模型", primaryIds: ["llm-21","llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["KV.*Cache|推理.*加速|Pag"] },
 
-  { query: "Agent\u957f\u671f\u8bb0\u5fc6\u600e\u4e48\u8bbe\u8ba1", group: "\u6982\u5ff5-Agent", primaryIds: ["agent-21"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["\u8bb0\u5fc6|Memory|Agentic"] },
+  { query: "多模态大模型原理", group: "概念-大模型", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["多模态|视觉|VL"] },
 
-  { query: "RAG \u7684\u68c0\u7d22\u7ed3\u679c\u8981\u4e0d\u8981\u91cd\u65b0\u6392\u4e2a\u5e8f", group: "\u6982\u5ff5-Agent", primaryIds: ["agent-25"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Reranking", "\u91cd\u6392\u5e8f"] },
+  { query: "大模型为什么胡编乱造", group: "概念-大模型", primaryIds: ["agent-10","agent-11"], secondaryIds: [], acceptableDecks: ["llm","agent"], acceptableConcepts: ["幻觉|事实性|RAG"] },
 
-  { query: "ReAct\u548c\u666e\u901a\u5bf9\u8bdd\u6a21\u578b\u533a\u522b", group: "\u6982\u5ff5-Agent", primaryIds: ["agent-1", "agent-21"], secondaryIds: ["agent-3"], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct|\u63a8\u7406|Agent"] },
+  { query: "大模型微调灾难性遗忘", group: "概念-大模型", primaryIds: ["llm-18"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["灾难|Catastrophic|遗忘"] },
 
-  { query: "\u600e\u4e48\u77e5\u9053 RAG \u641c\u51fa\u6765\u7684\u4e1c\u897f\u9760\u4e0d\u9760\u8c31", group: "\u6982\u5ff5-Agent", primaryIds: ["agent-15"], secondaryIds: ["agent-17"], acceptableDecks: ["agent"], acceptableConcepts: ["\u8bc4\u4f30", "\u5e7b\u89c9"] },
+  { query: "微调和从头训练有什么区别", group: "概念-大模型", primaryIds: ["llm-11","llm-12"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["微调|Pretrain|SFT"] },
 
-  { query: "\u600e\u4e48\u8ba9Agent\u6267\u884c\u591a\u6b65\u9aa4\u4efb\u52a1", group: "\u6982\u5ff5-Agent", primaryIds: ["agent-5", "agent-6"], secondaryIds: ["agent-8"], acceptableDecks: ["agent"], acceptableConcepts: ["Planning|AutoGPT|\u6b65\u9aa4"] },
+  { query: "怎么在不改大模型参数的情况下让它学会新任务", group: "概念-大模型", primaryIds: ["llm-12"], secondaryIds: ["llm-16","llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA","PEFT","微调"] },
 
-  { query: "\u600e\u4e48\u8ba9\u5927\u6a21\u578b\u81ea\u5df1\u53bb\u8c03 API", group: "\u6982\u5ff5-Agent", primaryIds: ["agent-2"], secondaryIds: ["agent-3"], acceptableDecks: ["agent"], acceptableConcepts: ["Function Calling", "Tool-Use"] },
+  { query: "怎么让大模型回答更准确", group: "概念-大模型", primaryIds: ["llm-14","llm-16"], secondaryIds: ["llm-20"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt|COT|RAG|RLHF"] },
 
-  { query: "\u600e\u4e48\u8bc4\u4f30RAG\u7cfb\u7edf\u597d\u4e0d\u597d", group: "\u6982\u5ff5-Agent", primaryIds: ["agent-15", "agent-24"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["RAG.*\u8bc4\u4f30|\u68c0\u7d22\u8d28\u91cf"] },
+  { query: "模型怎么知道每个 token 在句子里的位置", group: "概念-大模型", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["位置编码","Transformer"] },
 
-  // ── 概念-VibeCoding ──
+  { query: "量化对模型性能影响多大", group: "概念-大模型", primaryIds: ["llm-24","llm-42"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["量化|AWQ|GPTQ"] },
 
-  { query: "agent \u548c skill \u7684\u6838\u5fc3\u533a\u522b\u5728\u54ea", group: "\u6982\u5ff5-VibeCoding", primaryIds: ["vc-2", "vc-1"], secondaryIds: ["vc-3"], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["Agent", "Skill", "sub-agent"] },
+  { query: "EM算法核心思想", group: "概念-机器学习", primaryIds: ["ml-125","ml-134"], secondaryIds: ["ml-138"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["EM|GMM|高斯混合"] },
 
-  { query: "\u600e\u4e48\u7ed9 AI \u5199\u9879\u76ee\u89c4\u5219\u6587\u4ef6", group: "\u6982\u5ff5-VibeCoding", primaryIds: ["vc-6"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["CLAUDE.md", "AGENTS.md"] },
+  { query: "Stacking和Blending区别", group: "概念-机器学习", primaryIds: ["ml-189","ml-36"], secondaryIds: ["ml-40"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Stacking|Blending|集成"] },
 
-  // ── 概念-力扣 ──
+  { query: "不平衡数据怎么处理", group: "概念-机器学习", primaryIds: ["ml-143","ml-16"], secondaryIds: ["ml-72"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["不平衡|Imbalance|SMOTE"] },
 
-  { query: "\u4e8c\u53c9\u6811\u7684\u6700\u8fd1\u516c\u5171\u7956\u5148", group: "\u6982\u5ff5-\u529b\u6263", primaryIds: ["lc-049"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["LCA", "\u4e8c\u53c9\u6811"] },
+  { query: "为什么分类用交叉熵不用MSE", group: "概念-机器学习", primaryIds: ["ml-53","ml-54"], secondaryIds: ["ml-60"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["交叉熵|MSE|Log.*Loss"] },
 
-  { query: "\u4e8c\u53c9\u6811\u904d\u5386\u9012\u5f52\u548c\u975e\u9012\u5f52\u54ea\u4e2a\u597d", group: "\u6982\u5ff5-\u529b\u6263", primaryIds: ["lc-040", "lc-043"], secondaryIds: ["lc-044"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Binary Tree.*Travers"] },
+  { query: "为什么要shuffle数据", group: "概念-机器学习", primaryIds: ["ml-109","ml-122"], secondaryIds: ["ml-155"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["shuffle|epoch|训练"] },
 
-  { query: "\u5237\u52a8\u6001\u89c4\u5212\u4e00\u76f4\u641e\u4e0d\u61c2\u72b6\u6001\u8f6c\u79fb", group: "\u6982\u5ff5-\u529b\u6263", primaryIds: ["lc-062", "lc-065"], secondaryIds: ["lc-067"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Climbing|Coin|House"] },
+  { query: "交叉验证K怎么选", group: "概念-机器学习", primaryIds: ["ml-176","ml-187"], secondaryIds: ["ml-44"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["K.*Fold|交叉验证|Cross"] },
 
-  { query: "\u5341\u5b57\u94fe\u8868\u6709\u4ec0\u4e48\u7528", group: "\u6982\u5ff5-\u529b\u6263", primaryIds: ["lc-010", "lc-011"], secondaryIds: ["lc-026"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Matrix|Set Zero|Spir"] },
+  { query: "什么是冷启动问题", group: "概念-机器学习", primaryIds: ["ml-87"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["冷启动|Cold Start"] },
 
-  { query: "\u5408\u5e76\u6709\u5e8f\u6570\u7ec4", group: "\u6982\u5ff5-\u529b\u6263", primaryIds: ["lc-013"], secondaryIds: ["lc-038"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u5408\u5e76", "\u6709\u5e8f\u6570\u7ec4"] },
+  { query: "参数太多模型太复杂怎么办", group: "概念-机器学习", primaryIds: ["ml-10","ml-139"], secondaryIds: ["ml-7"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合|正则化|复杂度"] },
 
-  { query: "\u56fe\u7684\u6700\u77ed\u8def\u5f84\u7b97\u6cd5\u6bd4\u8f83", group: "\u6982\u5ff5-\u529b\u6263", primaryIds: ["lc-050", "lc-051"], secondaryIds: ["lc-069"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Path|Dijkstra|\u6700\u77ed"] },
+  { query: "多个模型的结果怎么融合起来", group: "概念-机器学习", primaryIds: ["ml-31"], secondaryIds: ["ml-36","ml-32"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["集成学习","Bagging","Boosting"] },
 
-  { query: "\u6570\u7ec4\u9898\u53cc\u6307\u9488\u548c\u524d\u7f00\u548c\u600e\u4e48\u9009", group: "\u6982\u5ff5-\u529b\u6263", primaryIds: ["lc-001", "lc-004"], secondaryIds: ["lc-005"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Two Sum|Subarray|Mov"] },
+  { query: "怎么判断模型是不是学过头了", group: "概念-机器学习", primaryIds: ["ml-7"], secondaryIds: ["ml-9"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合","交叉验证"] },
 
-  { query: "\u6700\u957f\u4e0d\u91cd\u590d\u5b50\u4e32", group: "\u6982\u5ff5-\u529b\u6263", primaryIds: ["lc-019"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u65e0\u91cd\u590d\u5b57\u7b26", "\u6ed1\u52a8\u7a97\u53e3"] },
+  { query: "怎么判断聚类结果好不好", group: "概念-机器学习", primaryIds: ["ml-21","ml-23"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["聚类.*评估|轮廓|Silhouette"] },
 
-  { query: "\u9762\u8bd5\u8003\u94fe\u8868\u8001\u5199bug\u600e\u4e48\u529e", group: "\u6982\u5ff5-\u529b\u6263", primaryIds: ["lc-032", "lc-033"], secondaryIds: ["lc-034"], acceptableDecks: ["leetcode"], acceptableConcepts: ["Reverse.*Linked|Cycl"] },
+  { query: "损失函数不下降了怎么办", group: "概念-机器学习", primaryIds: ["ml-1","ml-53","ml-142","ml-143"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["学习率|收敛|局部最优"] },
 
-  // ── 概念-大模型 ──
+  { query: "数据太少训练不好怎么办", group: "概念-机器学习", primaryIds: ["ml-149","ml-151"], secondaryIds: ["ml-180"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["数据增强|迁移|少样本"] },
 
-  { query: "Encoder Decoder\u67b6\u6784", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-8"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Encoder.*Decoder|Seq"] },
+  { query: "机器学习模型上线后衰减", group: "概念-机器学习", primaryIds: ["ml-156","ml-157"], secondaryIds: ["ml-158"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["漂移|衰减|Drift|监控|MLOps"] },
 
-  { query: "KV cache\u4e3a\u4ec0\u4e48\u8981\u7528", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-26"], secondaryIds: ["llm-25"], acceptableDecks: ["llm"], acceptableConcepts: ["KV|Cache|\u63a8\u7406"] },
+  { query: "样本不均衡怎么处理", group: "概念-机器学习", primaryIds: ["ml-16"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["类别不均衡","SMOTE"] },
 
-  { query: "RLHF\u600e\u4e48\u8ba9\u6a21\u578b\u5bf9\u9f50\u4eba\u7c7b\u504f\u597d", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-14", "llm-15"], secondaryIds: ["llm-20"], acceptableDecks: ["llm"], acceptableConcepts: ["RLHF|DPO|\u5956\u52b1"] },
+  { query: "模型在训练集准上线差怎么排查", group: "概念-机器学习", primaryIds: ["ml-158","ml-7"], secondaryIds: ["ml-77"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合|泛化|分布"] },
 
-  { query: "\u4e3a\u4ec0\u4e48 transformer \u6bd4 rnn \u8bad\u7ec3\u5f97\u5feb", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-7"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u5e76\u884c\u5316", "Transformer"] },
+  { query: "特征太多怎么挑选重要的", group: "概念-机器学习", primaryIds: ["ml-138","ml-181"], secondaryIds: ["ml-41"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["特征选择|Permutation|SHA"] },
 
-  { query: "\u4e3a\u4ec0\u4e48Transformer\u6bd4RNN\u5feb", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-1", "llm-2"], secondaryIds: ["llm-38", "dl-9"], acceptableDecks: ["llm", "deep-learning"], acceptableConcepts: ["\u5e76\u884c|Transformer|Self-"] },
+  { query: "特征工程完整流程", group: "概念-机器学习", primaryIds: ["ml-13","ml-138"], secondaryIds: ["ml-41"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["特征.*工程|特征.*选择|特征.*缩放"] },
 
-  { query: "\u4e3a\u4ec0\u4e48Transformer\u7528\u4f4d\u7f6e\u7f16\u7801", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u4f4d\u7f6e\u7f16\u7801|Positional|RoPE"] },
+  { query: "生成模型和判别模型区别", group: "概念-机器学习", primaryIds: ["ml-110","ml-111"], secondaryIds: ["ml-169"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["生成|判别|GAN|贝叶斯"] },
 
-  { query: "\u4e3a\u4ec0\u4e48\u5927\u6a21\u578b\u90e8\u7f72\u7528KV cache", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["KV.*Cache|\u63a8\u7406.*\u52a0\u901f|Pag"] },
+  { query: "训练集表现很好但测试集很差是怎么回事", group: "概念-机器学习", primaryIds: ["ml-7"], secondaryIds: ["ml-8","ml-4"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合","泛化","偏差方差"] },
 
-  { query: "\u591a\u6a21\u6001\u5927\u6a21\u578b\u539f\u7406", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u591a\u6a21\u6001|\u89c6\u89c9|VL"] },
+  { query: "风控建模一般用什么算法", group: "概念-机器学习", primaryIds: ["ml-128"], secondaryIds: ["ml-146"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["风控|异常|Fraud|Anomaly"] },
 
-  { query: "\u5927\u6a21\u578b\u4e3a\u4ec0\u4e48\u80e1\u7f16\u4e71\u9020", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["agent-10", "agent-11"], secondaryIds: [], acceptableDecks: ["llm", "agent"], acceptableConcepts: ["\u5e7b\u89c9|\u4e8b\u5b9e\u6027|RAG"] },
+  { query: "Diffusion去噪过程", group: "概念-深度学习", primaryIds: ["dl-15","dl-16"], secondaryIds: ["dl-27"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["扩散|Diffusion|DDPM"] },
 
-  { query: "\u5927\u6a21\u578b\u5fae\u8c03\u707e\u96be\u6027\u9057\u5fd8", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-18"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u707e\u96be|Catastrophic|\u9057\u5fd8"] },
+  { query: "LSTM怎么解决长期记忆问题", group: "概念-深度学习", primaryIds: ["dl-24","dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["LSTM|GRU|长期"] },
 
-  { query: "\u5fae\u8c03\u548c\u4ece\u5934\u8bad\u7ec3\u6709\u4ec0\u4e48\u533a\u522b", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-11", "llm-12"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["\u5fae\u8c03|Pretrain|SFT"] },
+  { query: "softmax输出为什么和为1", group: "概念-深度学习", primaryIds: ["dl-31","dl-32"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["softmax"] },
 
-  { query: "\u600e\u4e48\u5728\u4e0d\u6539\u5927\u6a21\u578b\u53c2\u6570\u7684\u60c5\u51b5\u4e0b\u8ba9\u5b83\u5b66\u4f1a\u65b0\u4efb\u52a1", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-12"], secondaryIds: ["llm-16", "llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA", "PEFT", "\u5fae\u8c03"] },
+  { query: "卷积层到底在提取什么信息", group: "概念-深度学习", primaryIds: ["dl-6"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|卷积核|特征图"] },
 
-  { query: "\u600e\u4e48\u8ba9\u5927\u6a21\u578b\u56de\u7b54\u66f4\u51c6\u786e", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-14", "llm-16"], secondaryIds: ["llm-20"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt|COT|RAG|RLHF"] },
+  { query: "残差网络为什么要跳跃连接", group: "概念-深度学习", primaryIds: ["dl-8"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ResNet|残差|Skip.*Conn"] },
 
-  { query: "\u6a21\u578b\u600e\u4e48\u77e5\u9053\u6bcf\u4e2a token \u5728\u53e5\u5b50\u91cc\u7684\u4f4d\u7f6e", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u4f4d\u7f6e\u7f16\u7801", "Transformer"] },
+  { query: "生成器和判别器是怎么互相博弈的", group: "概念-深度学习", primaryIds: ["dl-11"], secondaryIds: ["dl-12"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN","生成对抗"] },
 
-  { query: "\u91cf\u5316\u5bf9\u6a21\u578b\u6027\u80fd\u5f71\u54cd\u591a\u5927", group: "\u6982\u5ff5-\u5927\u6a21\u578b", primaryIds: ["llm-24", "llm-42"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u91cf\u5316|AWQ|GPTQ"] },
+  { query: "神经网络为什么不能太深也不能太浅", group: "概念-深度学习", primaryIds: ["dl-2"], secondaryIds: ["dl-8"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["梯度消失","梯度爆炸","ResNet"] },
 
-  // ── 概念-机器学习 ──
+  { query: "神经网络为什么要加激活函数", group: "概念-深度学习", primaryIds: ["dl-1","dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["激活函数|非线性"] },
 
-  { query: "EM\u7b97\u6cd5\u6838\u5fc3\u601d\u60f3", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-125", "ml-134"], secondaryIds: ["ml-138"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["EM|GMM|\u9ad8\u65af\u6df7\u5408"] },
+  { query: "训练和推理时 dropout 行为一样吗", group: "概念-深度学习", primaryIds: ["dl-4"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Dropout","训练推理"] },
 
-  { query: "Stacking\u548cBlending\u533a\u522b", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-189", "ml-36"], secondaryIds: ["ml-40"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Stacking|Blending|\u96c6\u6210"] },
+  { query: "AB测试怎么判断显著", group: "概念-统计学", primaryIds: ["stats-102","stats-116"], secondaryIds: ["stats-118"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB|A/B|显著|P值"] },
 
-  { query: "\u4e0d\u5e73\u8861\u6570\u636e\u600e\u4e48\u5904\u7406", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-143", "ml-16"], secondaryIds: ["ml-72"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u4e0d\u5e73\u8861|Imbalance|SMOTE"] },
+  { query: "EDA数据探索怎么做", group: "概念-统计学", primaryIds: ["stats-52"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["EDA|描述|可视化"] },
 
-  { query: "\u4e3a\u4ec0\u4e48\u5206\u7c7b\u7528\u4ea4\u53c9\u71b5\u4e0d\u7528MSE", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-53", "ml-54"], secondaryIds: ["ml-60"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u4ea4\u53c9\u71b5|MSE|Log.*Loss"] },
+  { query: "SQL怎么优化慢查询", group: "概念-统计学", primaryIds: ["stats-180","stats-183"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["SQL.*优化|索引|慢查询"] },
 
-  { query: "\u4e3a\u4ec0\u4e48\u8981shuffle\u6570\u636e", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-109", "ml-122"], secondaryIds: ["ml-155"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["shuffle|epoch|\u8bad\u7ec3"] },
+  { query: "pandas处理大数据内存溢出", group: "概念-统计学", primaryIds: ["stats-180","stats-187"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["内存|溢出|大数据"] },
 
-  { query: "\u4ea4\u53c9\u9a8c\u8bc1K\u600e\u4e48\u9009", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-176", "ml-187"], secondaryIds: ["ml-44"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["K.*Fold|\u4ea4\u53c9\u9a8c\u8bc1|Cross"] },
+  { query: "为什么样本方差分母是 n 减 1", group: "概念-统计学", primaryIds: ["stats-2"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["方差","自由度"] },
 
-  { query: "\u4ec0\u4e48\u662f\u51b7\u542f\u52a8\u95ee\u9898", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-87"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u51b7\u542f\u52a8|Cold Start"] },
+  { query: "什么时候用图数据库", group: "概念-统计学", primaryIds: ["stats-3"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["图|Graph|Neo4j"] },
 
-  { query: "\u53c2\u6570\u592a\u591a\u6a21\u578b\u592a\u590d\u6742\u600e\u4e48\u529e", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-10", "ml-139"], secondaryIds: ["ml-7"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u8fc7\u62df\u5408|\u6b63\u5219\u5316|\u590d\u6742\u5ea6"] },
+  { query: "什么是指标体系北极星", group: "概念-统计学", primaryIds: ["stats-116","stats-163"], secondaryIds: ["stats-164"], acceptableDecks: ["statistics"], acceptableConcepts: ["北极星|North Star|AARRR"] },
 
-  { query: "\u591a\u4e2a\u6a21\u578b\u7684\u7ed3\u679c\u600e\u4e48\u878d\u5408\u8d77\u6765", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-31"], secondaryIds: ["ml-36", "ml-32"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u96c6\u6210\u5b66\u4e60", "Bagging", "Boosting"] },
+  { query: "怎么判断两个变量之间有没有关系", group: "概念-统计学", primaryIds: ["stats-115","stats-138"], secondaryIds: ["stats-140","ml-1"], acceptableDecks: ["statistics","machine-learning"], acceptableConcepts: ["相关|回归"] },
 
-  { query: "\u600e\u4e48\u5224\u65ad\u6a21\u578b\u662f\u4e0d\u662f\u5b66\u8fc7\u5934\u4e86", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-7"], secondaryIds: ["ml-9"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u8fc7\u62df\u5408", "\u4ea4\u53c9\u9a8c\u8bc1"] },
+  { query: "怎么判断两组数据有没有显著差异", group: "概念-统计学", primaryIds: ["stats-26"], secondaryIds: ["stats-28"], acceptableDecks: ["statistics"], acceptableConcepts: ["t检验","假设检验"] },
 
-  { query: "\u600e\u4e48\u5224\u65ad\u805a\u7c7b\u7ed3\u679c\u597d\u4e0d\u597d", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-21", "ml-23"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u805a\u7c7b.*\u8bc4\u4f30|\u8f6e\u5ed3|Silhouette"] },
+  { query: "怎么设计数据指标体系", group: "概念-统计学", primaryIds: ["stats-167","stats-168","jargon-33"], secondaryIds: ["stats-159"], acceptableDecks: ["statistics"], acceptableConcepts: ["指标|Metric|North Star"] },
 
-  { query: "\u635f\u5931\u51fd\u6570\u4e0d\u4e0b\u964d\u4e86\u600e\u4e48\u529e", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-12", "ml-59"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u5b66\u4e60\u7387|\u6536\u655b|\u5c40\u90e8\u6700\u4f18"] },
+  { query: "怎样用数据来更新我们的信念", group: "概念-统计学", primaryIds: ["stats-9"], secondaryIds: ["stats-39"], acceptableDecks: ["statistics"], acceptableConcepts: ["贝叶斯","先验后验"] },
 
-  { query: "\u6570\u636e\u592a\u5c11\u8bad\u7ec3\u4e0d\u597d\u600e\u4e48\u529e", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-149", "ml-151"], secondaryIds: ["ml-180"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u6570\u636e\u589e\u5f3a|\u8fc1\u79fb|\u5c11\u6837\u672c"] },
+  { query: "数据和直觉不一致听谁的", group: "概念-统计学", primaryIds: ["stats-134","stats-154"], secondaryIds: ["stats-156"], acceptableDecks: ["statistics"], acceptableConcepts: ["数据驱动|决策"] },
 
-  { query: "\u673a\u5668\u5b66\u4e60\u6a21\u578b\u4e0a\u7ebf\u540e\u8870\u51cf", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-156", "ml-157"], secondaryIds: ["ml-158"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u6f02\u79fb|\u8870\u51cf|Drift|\u76d1\u63a7|MLOps"] },
+  { query: "时间序列季节性怎么处理", group: "概念-统计学", primaryIds: ["stats-88","stats-90","stats-91"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["季节|时间序列|ARIMA|Prophe"] },
 
-  { query: "\u6837\u672c\u4e0d\u5747\u8861\u600e\u4e48\u5904\u7406", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-16"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7c7b\u522b\u4e0d\u5747\u8861", "SMOTE"] },
+  { query: "样本量要多大才算够", group: "概念-统计学", primaryIds: ["stats-118","stats-119"], secondaryIds: ["stats-161"], acceptableDecks: ["statistics"], acceptableConcepts: ["样本量|功效|Power"] },
 
-  { query: "\u6a21\u578b\u5728\u8bad\u7ec3\u96c6\u51c6\u4e0a\u7ebf\u5dee\u600e\u4e48\u6392\u67e5", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-158", "ml-7"], secondaryIds: ["ml-77"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u8fc7\u62df\u5408|\u6cdb\u5316|\u5206\u5e03"] },
+  { query: "相关和因果怎么区分", group: "概念-统计学", primaryIds: ["stats-115","stats-136"], secondaryIds: ["stats-140"], acceptableDecks: ["statistics"], acceptableConcepts: ["因果|相关|混淆"] },
 
-  { query: "\u7279\u5f81\u592a\u591a\u600e\u4e48\u6311\u9009\u91cd\u8981\u7684", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-138", "ml-181"], secondaryIds: ["ml-41"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7279\u5f81\u9009\u62e9|Permutation|SHA"] },
+  { query: "第一类错误和第二类错误谁更严重", group: "概念-统计学", primaryIds: ["stats-120","stats-134"], secondaryIds: ["stats-25"], acceptableDecks: ["statistics"], acceptableConcepts: ["第一类|Type I|显著性"] },
 
-  { query: "\u7279\u5f81\u5de5\u7a0b\u5b8c\u6574\u6d41\u7a0b", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-13", "ml-138"], secondaryIds: ["ml-41"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7279\u5f81.*\u5de5\u7a0b|\u7279\u5f81.*\u9009\u62e9|\u7279\u5f81.*\u7f29\u653e"] },
+  { query: "马尔可夫链怎么收敛", group: "概念-统计学", primaryIds: ["stats-103","stats-109"], secondaryIds: ["stats-199"], acceptableDecks: ["statistics"], acceptableConcepts: ["马尔可夫|Markov|MCMC"] },
 
-  { query: "\u751f\u6210\u6a21\u578b\u548c\u5224\u522b\u6a21\u578b\u533a\u522b", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-110", "ml-111"], secondaryIds: ["ml-169"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u751f\u6210|\u5224\u522b|GAN|\u8d1d\u53f6\u65af"] },
+  { query: "怎么拒绝不合理的需求", group: "概念-职场", primaryIds: ["wp-1","wp-20"], secondaryIds: ["wp-4"], acceptableDecks: ["workplace"], acceptableConcepts: ["拒绝|需求|不合理"] },
 
-  { query: "\u8bad\u7ec3\u96c6\u8868\u73b0\u5f88\u597d\u4f46\u6d4b\u8bd5\u96c6\u5f88\u5dee\u662f\u600e\u4e48\u56de\u4e8b", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-7"], secondaryIds: ["ml-8", "ml-4"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u8fc7\u62df\u5408", "\u6cdb\u5316", "\u504f\u5dee\u65b9\u5dee"] },
+  { query: "怎么给领导汇报进度", group: "概念-职场", primaryIds: ["wp-3","wp-7"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["汇报|延期|进度"] },
 
-  { query: "\u98ce\u63a7\u5efa\u6a21\u4e00\u822c\u7528\u4ec0\u4e48\u7b97\u6cd5", group: "\u6982\u5ff5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-103", "ml-128"], secondaryIds: ["ml-146"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u98ce\u63a7|\u5f02\u5e38|Fraud|Anomaly"] },
+  { query: "怎么跟领导汇报工作进展", group: "概念-职场", primaryIds: ["wp-8"], secondaryIds: ["wp-3"], acceptableDecks: ["workplace"], acceptableConcepts: ["汇报","向上沟通"] },
 
-  // ── 概念-深度学习 ──
+  { query: "怎么面试中谈薪资", group: "概念-职场", primaryIds: ["wp-10","wp-29"], secondaryIds: ["wp-49"], acceptableDecks: ["workplace"], acceptableConcepts: ["薪资|涨薪|薪酬"] },
 
-  { query: "Diffusion\u53bb\u566a\u8fc7\u7a0b", group: "\u6982\u5ff5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-15", "dl-16"], secondaryIds: ["dl-27"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u6269\u6563|Diffusion|DDPM"] },
+  { query: "空降新团队怎么快速融入", group: "概念-职场", primaryIds: ["wp-21"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["新人|融入|入职"] },
 
-  { query: "LSTM\u600e\u4e48\u89e3\u51b3\u957f\u671f\u8bb0\u5fc6\u95ee\u9898", group: "\u6982\u5ff5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-24", "dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["LSTM|GRU|\u957f\u671f"] },
+  { query: "面试的时候怎么介绍自己的项目经历比较好", group: "概念-职场", primaryIds: ["wp-7"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["面试","项目","STAR"] },
 
-  { query: "softmax\u8f93\u51fa\u4e3a\u4ec0\u4e48\u548c\u4e3a1", group: "\u6982\u5ff5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-31", "dl-32"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["softmax"] },
+  { query: "互联网公司常说的底层能力指什么", group: "概念-黑话", primaryIds: ["jargon-5"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["底层逻辑","方法论"] },
 
-  { query: "\u5377\u79ef\u5c42\u5230\u5e95\u5728\u63d0\u53d6\u4ec0\u4e48\u4fe1\u606f", group: "\u6982\u5ff5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-6"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|\u5377\u79ef\u6838|\u7279\u5f81\u56fe"] },
+  { query: "项目做完之后要总结一下经验", group: "概念-黑话", primaryIds: ["jargon-6"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["复盘","回顾"] },
 
-  { query: "\u6b8b\u5dee\u7f51\u7edc\u4e3a\u4ec0\u4e48\u8981\u8df3\u8dc3\u8fde\u63a5", group: "\u6982\u5ff5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-8"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ResNet|\u6b8b\u5dee|Skip.*Conn"] },
+  { query: "Agent ReAct推理模式", group: "混合-Agent", primaryIds: ["agent-1","agent-6"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct|推理|Planning"] },
 
-  { query: "\u751f\u6210\u5668\u548c\u5224\u522b\u5668\u662f\u600e\u4e48\u4e92\u76f8\u535a\u5f08\u7684", group: "\u6982\u5ff5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-11"], secondaryIds: ["dl-12"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN", "\u751f\u6210\u5bf9\u6297"] },
+  { query: "Chunking策略Sentences还是固定长度", group: "混合-Agent", primaryIds: ["agent-23","agent-8"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["分块|Chunk|Sliding"] },
 
-  { query: "\u795e\u7ecf\u7f51\u7edc\u4e3a\u4ec0\u4e48\u4e0d\u80fd\u592a\u6df1\u4e5f\u4e0d\u80fd\u592a\u6d45", group: "\u6982\u5ff5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-2"], secondaryIds: ["dl-8"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u68af\u5ea6\u6d88\u5931", "\u68af\u5ea6\u7206\u70b8", "ResNet"] },
+  { query: "Hybrid Search 混合检索", group: "混合-Agent", primaryIds: ["agent-26"], secondaryIds: ["agent-9"], acceptableDecks: ["agent"], acceptableConcepts: ["混合检索","Hybrid Search"] },
 
-  { query: "\u795e\u7ecf\u7f51\u7edc\u4e3a\u4ec0\u4e48\u8981\u52a0\u6fc0\u6d3b\u51fd\u6570", group: "\u6982\u5ff5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-1", "dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u6fc0\u6d3b\u51fd\u6570|\u975e\u7ebf\u6027"] },
+  { query: "RAG Retrieval检索流程", group: "混合-Agent", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|检索.*管道"] },
 
-  { query: "\u8bad\u7ec3\u548c\u63a8\u7406\u65f6 dropout \u884c\u4e3a\u4e00\u6837\u5417", group: "\u6982\u5ff5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-4"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Dropout", "\u8bad\u7ec3\u63a8\u7406"] },
+  { query: "ReAct 框架 Reasoning Acting", group: "混合-Agent", primaryIds: ["agent-1"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct","推理行动"] },
 
-  // ── 概念-统计学 ──
+  { query: "Reranker重排序模型", group: "混合-Agent", primaryIds: ["agent-25"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Rerank|Cross.*Encode"] },
 
-  { query: "AB\u6d4b\u8bd5\u600e\u4e48\u5224\u65ad\u663e\u8457", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-102", "stats-116"], secondaryIds: ["stats-118"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB|A/B|\u663e\u8457|P\u503c"] },
+  { query: "CLAUDE.md 和 AGENTS.md 优先级", group: "混合-VibeCoding", primaryIds: ["vc-6"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["CLAUDE.md","AGENTS.md"] },
 
-  { query: "EDA\u6570\u636e\u63a2\u7d22\u600e\u4e48\u505a", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-52"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["EDA|\u63cf\u8ff0|\u53ef\u89c6\u5316"] },
+  { query: "MCP server client 架构", group: "混合-VibeCoding", primaryIds: ["vc-5"], secondaryIds: ["vc-17"], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["MCP","server","client"] },
 
-  { query: "SQL\u600e\u4e48\u4f18\u5316\u6162\u67e5\u8be2", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-180", "stats-183"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["SQL.*\u4f18\u5316|\u7d22\u5f15|\u6162\u67e5\u8be2"] },
+  { query: "DFS 和 BFS 遍历二叉树", group: "混合-力扣", primaryIds: ["lc-043"], secondaryIds: ["lc-040","lc-041"], acceptableDecks: ["leetcode"], acceptableConcepts: ["DFS","BFS","二叉树"] },
 
-  { query: "pandas\u5904\u7406\u5927\u6570\u636e\u5185\u5b58\u6ea2\u51fa", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-180", "stats-187"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5185\u5b58|\u6ea2\u51fa|\u5927\u6570\u636e"] },
+  { query: "LRU Cache 实现", group: "混合-力扣", primaryIds: ["lc-087"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["LRU","缓存"] },
 
-  { query: "\u4e3a\u4ec0\u4e48\u6837\u672c\u65b9\u5dee\u5206\u6bcd\u662f n \u51cf 1", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-2"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u65b9\u5dee", "\u81ea\u7531\u5ea6"] },
+  { query: "Attention机制的Q K V到底是什么", group: "混合-大模型", primaryIds: ["llm-1","llm-2"], secondaryIds: ["llm-26"], acceptableDecks: ["llm"], acceptableConcepts: ["Attention|Query.*Val"] },
 
-  { query: "\u4ec0\u4e48\u65f6\u5019\u7528\u56fe\u6570\u636e\u5e93", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-3"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u56fe|Graph|Neo4j"] },
+  { query: "BERT fine-tuning怎么调参数", group: "混合-大模型", primaryIds: ["llm-10","llm-12"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["BERT|微调"] },
 
-  { query: "\u4ec0\u4e48\u662f\u6307\u6807\u4f53\u7cfb\u5317\u6781\u661f", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-116", "stats-163"], secondaryIds: ["stats-164"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5317\u6781\u661f|North Star|AARRR"] },
+  { query: "CLIP多模态对比学习", group: "混合-大模型", primaryIds: ["llm-4","llm-8"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["CLIP|多模态|对比"] },
 
-  { query: "\u600e\u4e48\u5224\u65ad\u4e24\u4e2a\u53d8\u91cf\u4e4b\u95f4\u6709\u6ca1\u6709\u5173\u7cfb", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-115", "stats-138"], secondaryIds: ["stats-140", "ml-1"], acceptableDecks: ["statistics", "machine-learning"], acceptableConcepts: ["\u76f8\u5173|\u56de\u5f52"] },
+  { query: "FlashAttention GPU显存优化", group: "混合-大模型", primaryIds: ["llm-40"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Flash.*Attention|显存."] },
 
-  { query: "\u600e\u4e48\u5224\u65ad\u4e24\u7ec4\u6570\u636e\u6709\u6ca1\u6709\u663e\u8457\u5dee\u5f02", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-26"], secondaryIds: ["stats-28"], acceptableDecks: ["statistics"], acceptableConcepts: ["t\u68c0\u9a8c", "\u5047\u8bbe\u68c0\u9a8c"] },
+  { query: "KV Cache 推理加速", group: "混合-大模型", primaryIds: ["llm-21"], secondaryIds: ["llm-26"], acceptableDecks: ["llm"], acceptableConcepts: ["KV Cache","推理加速"] },
 
-  { query: "\u600e\u4e48\u8bbe\u8ba1\u6570\u636e\u6307\u6807\u4f53\u7cfb", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-116", "stats-130"], secondaryIds: ["stats-159"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u6307\u6807|Metric|North Star"] },
+  { query: "LoRA 和全量 finetune 对比", group: "混合-大模型", primaryIds: ["llm-12"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA","全参数微调"] },
 
-  { query: "\u600e\u6837\u7528\u6570\u636e\u6765\u66f4\u65b0\u6211\u4eec\u7684\u4fe1\u5ff5", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-9"], secondaryIds: ["stats-39"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u8d1d\u53f6\u65af", "\u5148\u9a8c\u540e\u9a8c"] },
+  { query: "LoRA微调和Full Fine-tuning", group: "混合-大模型", primaryIds: ["llm-12","llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA|微调|Adapter"] },
 
-  { query: "\u6570\u636e\u548c\u76f4\u89c9\u4e0d\u4e00\u81f4\u542c\u8c01\u7684", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-134", "stats-154"], secondaryIds: ["stats-156"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u6570\u636e\u9a71\u52a8|\u51b3\u7b56"] },
+  { query: "OOM排查调batch size显存", group: "混合-大模型", primaryIds: ["llm-38","llm-40"], secondaryIds: ["llm-47"], acceptableDecks: ["llm"], acceptableConcepts: ["OOM|显存|Batch"] },
 
-  { query: "\u65f6\u95f4\u5e8f\u5217\u5b63\u8282\u6027\u600e\u4e48\u5904\u7406", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-86", "stats-88"], secondaryIds: ["stats-90"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5b63\u8282|\u65f6\u95f4\u5e8f\u5217|ARIMA|Prophe"] },
+  { query: "Pipeline并行 Gradient Accumulation", group: "混合-大模型", primaryIds: ["llm-48","llm-7"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["并行|Pipeline|梯度.*累积"] },
 
-  { query: "\u6837\u672c\u91cf\u8981\u591a\u5927\u624d\u7b97\u591f", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-118", "stats-119"], secondaryIds: ["stats-161"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u6837\u672c\u91cf|\u529f\u6548|Power"] },
+  { query: "Positonal Encoding和RoPE区别", group: "混合-大模型", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["位置编码|RoPE|Posit"] },
 
-  { query: "\u76f8\u5173\u548c\u56e0\u679c\u600e\u4e48\u533a\u5206", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-115", "stats-136"], secondaryIds: ["stats-140"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u56e0\u679c|\u76f8\u5173|\u6df7\u6dc6"] },
+  { query: "Qwen模型Prompt优化", group: "混合-大模型", primaryIds: ["llm-16","llm-40"], secondaryIds: ["llm-46"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt|优化"] },
 
-  { query: "\u7b2c\u4e00\u7c7b\u9519\u8bef\u548c\u7b2c\u4e8c\u7c7b\u9519\u8bef\u8c01\u66f4\u4e25\u91cd", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-120", "stats-134"], secondaryIds: ["stats-25"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u7b2c\u4e00\u7c7b|Type I|\u663e\u8457\u6027"] },
+  { query: "RLHF reward model 训练", group: "混合-大模型", primaryIds: ["llm-14"], secondaryIds: ["llm-15"], acceptableDecks: ["llm"], acceptableConcepts: ["RLHF","reward model"] },
 
-  { query: "\u9a6c\u5c14\u53ef\u592b\u94fe\u600e\u4e48\u6536\u655b", group: "\u6982\u5ff5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-103", "stats-109"], secondaryIds: ["stats-199"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u9a6c\u5c14\u53ef\u592b|Markov|MCMC"] },
+  { query: "Self-Attention QKV 计算", group: "混合-大模型", primaryIds: ["llm-1"], secondaryIds: ["llm-2","llm-9"], acceptableDecks: ["llm"], acceptableConcepts: ["Self-Attention","QKV"] },
 
-  // ── 概念-职场 ──
+  { query: "Speculative解码投机推理", group: "混合-大模型", primaryIds: ["llm-25"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Speculat|推测.*解码|投机"] },
 
-  { query: "\u600e\u4e48\u62d2\u7edd\u4e0d\u5408\u7406\u7684\u9700\u6c42", group: "\u6982\u5ff5-\u804c\u573a", primaryIds: ["wp-1", "wp-20"], secondaryIds: ["wp-4"], acceptableDecks: ["workplace"], acceptableConcepts: ["\u62d2\u7edd|\u9700\u6c42|\u4e0d\u5408\u7406"] },
+  { query: "Transformer Self-Attention机制", group: "混合-大模型", primaryIds: ["llm-1","llm-2"], secondaryIds: ["llm-38"], acceptableDecks: ["llm"], acceptableConcepts: ["Self.*Attention|Tran"] },
 
-  { query: "\u600e\u4e48\u7ed9\u9886\u5bfc\u6c47\u62a5\u8fdb\u5ea6", group: "\u6982\u5ff5-\u804c\u573a", primaryIds: ["wp-3", "wp-7"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["\u6c47\u62a5|\u5ef6\u671f|\u8fdb\u5ea6"] },
+  { query: "vLLM PagedAttention加速原理", group: "混合-大模型", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["vLLM|PagedAtt"] },
 
-  { query: "\u600e\u4e48\u8ddf\u9886\u5bfc\u6c47\u62a5\u5de5\u4f5c\u8fdb\u5c55", group: "\u6982\u5ff5-\u804c\u573a", primaryIds: ["wp-8"], secondaryIds: ["wp-3"], acceptableDecks: ["workplace"], acceptableConcepts: ["\u6c47\u62a5", "\u5411\u4e0a\u6c9f\u901a"] },
+  { query: "AUC PR-AUC区别什么情况用哪个", group: "混合-机器学习", primaryIds: ["ml-9","ml-49","ml-137"], secondaryIds: ["ml-133"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["AUC|PR|ROC"] },
 
-  { query: "\u600e\u4e48\u9762\u8bd5\u4e2d\u8c08\u85aa\u8d44", group: "\u6982\u5ff5-\u804c\u573a", primaryIds: ["wp-10", "wp-29"], secondaryIds: ["wp-49"], acceptableDecks: ["workplace"], acceptableConcepts: ["\u85aa\u8d44|\u6da8\u85aa|\u85aa\u916c"] },
+  { query: "Adam和SGD选哪个", group: "混合-机器学习", primaryIds: ["ml-58"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Adam|SGD|优化器"] },
 
-  { query: "\u7a7a\u964d\u65b0\u56e2\u961f\u600e\u4e48\u5feb\u901f\u878d\u5165", group: "\u6982\u5ff5-\u804c\u573a", primaryIds: ["wp-21"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["\u65b0\u4eba|\u878d\u5165|\u5165\u804c"] },
+  { query: "Cross Entropy交叉熵Loss", group: "混合-机器学习", primaryIds: ["ml-142","ml-143"], secondaryIds: ["ml-144"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["交叉熵|Cross.*Entropy|L"] },
 
-  { query: "\u9762\u8bd5\u7684\u65f6\u5019\u600e\u4e48\u4ecb\u7ecd\u81ea\u5df1\u7684\u9879\u76ee\u7ecf\u5386\u6bd4\u8f83\u597d", group: "\u6982\u5ff5-\u804c\u573a", primaryIds: ["wp-7"], secondaryIds: [], acceptableDecks: ["workplace"], acceptableConcepts: ["\u9762\u8bd5", "\u9879\u76ee", "STAR"] },
+  { query: "Data Augmentation数据增强", group: "混合-机器学习", primaryIds: ["ml-180"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["数据.*增强|Augment"] },
 
-  // ── 概念-黑话 ──
+  { query: "K-Means 聚类 K 值选择", group: "混合-机器学习", primaryIds: ["ml-21"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["KMeans","肘部法则"] },
 
-  { query: "\u4e92\u8054\u7f51\u516c\u53f8\u5e38\u8bf4\u7684\u5e95\u5c42\u80fd\u529b\u6307\u4ec0\u4e48", group: "\u6982\u5ff5-\u9ed1\u8bdd", primaryIds: ["jargon-5"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["\u5e95\u5c42\u903b\u8f91", "\u65b9\u6cd5\u8bba"] },
+  { query: "KMeans的K值怎么选Elbow", group: "混合-机器学习", primaryIds: ["ml-125","ml-21"], secondaryIds: ["ml-24"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["K.*Means|Elbow|轮廓"] },
 
-  { query: "\u9879\u76ee\u505a\u5b8c\u4e4b\u540e\u8981\u603b\u7ed3\u4e00\u4e0b\u7ecf\u9a8c", group: "\u6982\u5ff5-\u9ed1\u8bdd", primaryIds: ["jargon-6"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["\u590d\u76d8", "\u56de\u987e"] },
+  { query: "Label Encoding ordinal", group: "混合-机器学习", primaryIds: ["ml-14","ml-135","ml-178"], secondaryIds: ["ml-121"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["编码|Label|类别"] },
 
-  // ── 混合-Agent ──
+  { query: "LightGBM和XGBoost哪个好", group: "混合-机器学习", primaryIds: ["ml-31","ml-33"], secondaryIds: ["ml-34"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["LightGBM|XGBoost|GBD"] },
 
-  { query: "Agent ReAct\u63a8\u7406\u6a21\u5f0f", group: "\u6df7\u5408-Agent", primaryIds: ["agent-1", "agent-6"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct|\u63a8\u7406|Planning"] },
+  { query: "One-hot Encoding有什么问题", group: "混合-机器学习", primaryIds: ["ml-14","ml-28","ml-42"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["One.*Hot|编码|高维"] },
 
-  { query: "Chunking\u7b56\u7565Sentences\u8fd8\u662f\u56fa\u5b9a\u957f\u5ea6", group: "\u6df7\u5408-Agent", primaryIds: ["agent-23", "agent-8"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["\u5206\u5757|Chunk|Sliding"] },
+  { query: "PCA variance explained计算", group: "混合-机器学习", primaryIds: ["ml-141","ml-22"], secondaryIds: ["ml-26"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["PCA|方差.*解释|SVD"] },
 
-  { query: "Hybrid Search \u6df7\u5408\u68c0\u7d22", group: "\u6df7\u5408-Agent", primaryIds: ["agent-26"], secondaryIds: ["agent-9"], acceptableDecks: ["agent"], acceptableConcepts: ["\u6df7\u5408\u68c0\u7d22", "Hybrid Search"] },
+  { query: "PCA 降维原理", group: "混合-机器学习", primaryIds: ["ml-22"], secondaryIds: ["ml-26","ml-48"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["PCA","降维"] },
 
-  { query: "RAG Retrieval\u68c0\u7d22\u6d41\u7a0b", group: "\u6df7\u5408-Agent", primaryIds: ["agent-10", "agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|\u68c0\u7d22.*\u7ba1\u9053"] },
+  { query: "Precision Recall F1怎么算", group: "混合-机器学习", primaryIds: ["ml-184","ml-49"], secondaryIds: ["ml-88"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Precision|Recall|F1"] },
 
-  { query: "ReAct \u6846\u67b6 Reasoning Acting", group: "\u6df7\u5408-Agent", primaryIds: ["agent-1"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct", "\u63a8\u7406\u884c\u52a8"] },
+  { query: "ROC AUC 怎么理解", group: "混合-机器学习", primaryIds: ["ml-50"], secondaryIds: ["ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["ROC","AUC"] },
 
-  { query: "Reranker\u91cd\u6392\u5e8f\u6a21\u578b", group: "\u6df7\u5408-Agent", primaryIds: ["agent-25"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Rerank|Cross.*Encode"] },
+  { query: "ROC AUC曲线解释", group: "混合-机器学习", primaryIds: ["ml-9","ml-49","ml-137"], secondaryIds: ["ml-133"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["ROC|AUC|PR"] },
 
-  // ── 混合-VibeCoding ──
+  { query: "Random Forest过拟合怎么办", group: "混合-机器学习", primaryIds: ["ml-18","ml-31"], secondaryIds: ["ml-38"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["随机森林|过拟合|n_estim"] },
 
-  { query: "CLAUDE.md \u548c AGENTS.md \u4f18\u5148\u7ea7", group: "\u6df7\u5408-VibeCoding", primaryIds: ["vc-6"], secondaryIds: [], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["CLAUDE.md", "AGENTS.md"] },
+  { query: "SVM Kernel核函数选择", group: "混合-机器学习", primaryIds: ["ml-19","ml-2"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|核函数|Kernel"] },
 
-  { query: "MCP server client \u67b6\u6784", group: "\u6df7\u5408-VibeCoding", primaryIds: ["vc-5"], secondaryIds: ["vc-17"], acceptableDecks: ["vibe-coding"], acceptableConcepts: ["MCP", "server", "client"] },
+  { query: "SVM kernel 选择", group: "混合-机器学习", primaryIds: ["ml-2"], secondaryIds: ["ml-19"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM","kernel"] },
 
-  // ── 混合-力扣 ──
+  { query: "Self-Supervised自监督学习", group: "混合-机器学习", primaryIds: ["ml-118","ml-119"], secondaryIds: ["ml-122"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["自监督|对比|SimCLR"] },
 
-  { query: "DFS \u548c BFS \u904d\u5386\u4e8c\u53c9\u6811", group: "\u6df7\u5408-\u529b\u6263", primaryIds: ["lc-043"], secondaryIds: ["lc-040", "lc-041"], acceptableDecks: ["leetcode"], acceptableConcepts: ["DFS", "BFS", "\u4e8c\u53c9\u6811"] },
+  { query: "XGBoost 和 LightGBM 对比", group: "混合-机器学习", primaryIds: ["ml-33","ml-34"], secondaryIds: ["ml-31"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["XGBoost","LightGBM","GBDT"] },
 
-  { query: "LRU Cache \u5b9e\u73b0", group: "\u6df7\u5408-\u529b\u6263", primaryIds: ["lc-087"], secondaryIds: [], acceptableDecks: ["leetcode"], acceptableConcepts: ["LRU", "\u7f13\u5b58"] },
+  { query: "XGBoost调参技巧", group: "混合-机器学习", primaryIds: ["ml-31","ml-33"], secondaryIds: ["ml-37"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["XGBoost|调参|Hyperpar"] },
 
-  // ── 混合-大模型 ──
+  { query: "t-SNE vs PCA 可视化", group: "混合-机器学习", primaryIds: ["ml-26"], secondaryIds: ["ml-22"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["t-SNE","PCA"] },
 
-  { query: "Attention\u673a\u5236\u7684Q K V\u5230\u5e95\u662f\u4ec0\u4e48", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-1", "llm-2"], secondaryIds: ["llm-26"], acceptableDecks: ["llm"], acceptableConcepts: ["Attention|Query.*Val"] },
+  { query: "Adam 和 SGD 选哪个", group: "混合-深度学习", primaryIds: ["dl-30"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Adam","SGD","优化器"] },
 
-  { query: "BERT fine-tuning\u600e\u4e48\u8c03\u53c2\u6570", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-10", "llm-12"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["BERT|\u5fae\u8c03"] },
+  { query: "Batch Normalization公式", group: "混合-深度学习", primaryIds: ["dl-21","dl-22"], secondaryIds: ["dl-3"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Batch.*Norm|归一化"] },
 
-  { query: "CLIP\u591a\u6a21\u6001\u5bf9\u6bd4\u5b66\u4e60", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-4", "llm-8"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["CLIP|\u591a\u6a21\u6001|\u5bf9\u6bd4"] },
+  { query: "BatchNorm vs LayerNorm", group: "混合-深度学习", primaryIds: ["dl-3"], secondaryIds: ["dl-22"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["BatchNorm","LayerNorm"] },
 
-  { query: "FlashAttention GPU\u663e\u5b58\u4f18\u5316", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-40"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Flash.*Attention|\u663e\u5b58."] },
+  { query: "Diffusion Model 前向加噪过程", group: "混合-深度学习", primaryIds: ["dl-15"], secondaryIds: ["dl-27"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["扩散模型","Diffusion"] },
 
-  { query: "KV Cache \u63a8\u7406\u52a0\u901f", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-21"], secondaryIds: ["llm-26"], acceptableDecks: ["llm"], acceptableConcepts: ["KV Cache", "\u63a8\u7406\u52a0\u901f"] },
+  { query: "GAN Discriminator生成器判别器", group: "混合-深度学习", primaryIds: ["dl-11","dl-12"], secondaryIds: ["dl-14"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN|生成.*对抗"] },
 
-  { query: "LoRA \u548c\u5168\u91cf finetune \u5bf9\u6bd4", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-12"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA", "\u5168\u53c2\u6570\u5fae\u8c03"] },
+  { query: "GAN mode collapse 怎么解决", group: "混合-深度学习", primaryIds: ["dl-12"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN","模式坍塌"] },
 
-  { query: "LoRA\u5fae\u8c03\u548cFull Fine-tuning", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-12", "llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA|\u5fae\u8c03|Adapter"] },
+  { query: "GELU激活函数公式推导", group: "混合-深度学习", primaryIds: ["dl-1","dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GELU|激活|Swish|ReLU"] },
 
-  { query: "OOM\u6392\u67e5\u8c03batch size\u663e\u5b58", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-38", "llm-40"], secondaryIds: ["llm-47"], acceptableDecks: ["llm"], acceptableConcepts: ["OOM|\u663e\u5b58|Batch"] },
+  { query: "LSTM GRU区别和选择", group: "混合-深度学习", primaryIds: ["dl-24","dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["LSTM|GRU|RNN"] },
 
-  { query: "Pipeline\u5e76\u884c Gradient Accumulation", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-48", "llm-7"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u5e76\u884c|Pipeline|\u68af\u5ea6.*\u7d2f\u79ef"] },
+  { query: "Layer Normalization位置应用", group: "混合-深度学习", primaryIds: ["dl-22","dl-3"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Layer.*Norm|Batch.*N"] },
 
-  { query: "Positonal Encoding\u548cRoPE\u533a\u522b", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u4f4d\u7f6e\u7f16\u7801|RoPE|Posit"] },
+  { query: "ReLU LeakyReLU区别", group: "混合-深度学习", primaryIds: ["dl-1","dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ReLU|Leaky|激活"] },
 
-  { query: "Qwen\u6a21\u578bPrompt\u4f18\u5316", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-16", "llm-40"], secondaryIds: ["llm-46"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt|\u4f18\u5316"] },
+  { query: "ResNet残差网络Skip Connection", group: "混合-深度学习", primaryIds: ["dl-8"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ResNet|残差|Skip"] },
 
-  { query: "RLHF reward model \u8bad\u7ec3", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-14"], secondaryIds: ["llm-15"], acceptableDecks: ["llm"], acceptableConcepts: ["RLHF", "reward model"] },
+  { query: "Sigmoid 和 Softmax 区别", group: "混合-深度学习", primaryIds: ["dl-31"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["sigmoid","softmax"] },
 
-  { query: "Self-Attention QKV \u8ba1\u7b97", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-1"], secondaryIds: ["llm-2", "llm-9"], acceptableDecks: ["llm"], acceptableConcepts: ["Self-Attention", "QKV"] },
+  { query: "Bootstrap 和 Permutation Test", group: "混合-统计学", primaryIds: ["stats-37"], secondaryIds: ["stats-38"], acceptableDecks: ["statistics"], acceptableConcepts: ["Bootstrap","置换检验"] },
 
-  { query: "Speculative\u89e3\u7801\u6295\u673a\u63a8\u7406", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-25"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Speculat|\u63a8\u6d4b.*\u89e3\u7801|\u6295\u673a"] },
+  { query: "MCMC 采样原理", group: "混合-统计学", primaryIds: ["stats-43"], secondaryIds: ["stats-44"], acceptableDecks: ["statistics"], acceptableConcepts: ["MCMC","采样"] },
 
-  { query: "Transformer Self-Attention\u673a\u5236", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-1", "llm-2"], secondaryIds: ["llm-38"], acceptableDecks: ["llm"], acceptableConcepts: ["Self.*Attention|Tran"] },
+  { query: "Window Function窗口函数SQL", group: "混合-统计学", primaryIds: ["stats-178","stats-179"], secondaryIds: ["stats-180"], acceptableDecks: ["statistics"], acceptableConcepts: ["Window|窗口|SQL"] },
 
-  { query: "vLLM PagedAttention\u52a0\u901f\u539f\u7406", group: "\u6df7\u5408-\u5927\u6a21\u578b", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["vLLM|PagedAtt"] },
+  { query: "p-value 的误解", group: "混合-统计学", primaryIds: ["stats-24"], secondaryIds: ["stats-25"], acceptableDecks: ["statistics"], acceptableConcepts: ["p值","显著性"] },
 
-  // ── 混合-机器学习 ──
+  { query: "OKR 和 KPI 的区别", group: "混合-黑话", primaryIds: ["jargon-35"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["OKR","KPI","绩效"] },
 
-  { query: "AUC PR-AUC\u533a\u522b\u4ec0\u4e48\u60c5\u51b5\u7528\u54ea\u4e2a", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-109", "ml-126"], secondaryIds: ["ml-133"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["AUC|PR|ROC"] },
+  { query: "how to evaluate retrieval augmented generation", group: "英文-Agent", primaryIds: ["agent-22","agent-15"], secondaryIds: ["agent-7"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG","evaluation"] },
 
-  { query: "Adam\u548cSGD\u9009\u54ea\u4e2a", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-58"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Adam|SGD|\u4f18\u5316\u5668"] },
+  { query: "binary tree traversal preorder inorder postorder", group: "英文-力扣", primaryIds: ["lc-043","lc-040"], secondaryIds: ["lc-041"], acceptableDecks: ["leetcode"], acceptableConcepts: ["binary tree","traversal","DFS"] },
 
-  { query: "Cross Entropy\u4ea4\u53c9\u71b5Loss", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-142", "ml-143"], secondaryIds: ["ml-144"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u4ea4\u53c9\u71b5|Cross.*Entropy|L"] },
+  { query: "self attention mechanism transformer", group: "英文-大模型", primaryIds: ["llm-1","llm-3"], secondaryIds: ["llm-9"], acceptableDecks: ["llm"], acceptableConcepts: ["self-attention","Transformer"] },
 
-  { query: "Data Augmentation\u6570\u636e\u589e\u5f3a", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-180"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u6570\u636e.*\u589e\u5f3a|Augment"] },
+  { query: "gradient descent optimization", group: "英文-机器学习", primaryIds: ["ml-11","ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["gradient descent","SGD","optimization"] },
 
-  { query: "K-Means \u805a\u7c7b K \u503c\u9009\u62e9", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-21"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["KMeans", "\u8098\u90e8\u6cd5\u5219"] },
+  { query: "overfitting vs underfitting deep learning", group: "英文-机器学习", primaryIds: ["ml-7"], secondaryIds: ["ml-8","dl-4"], acceptableDecks: ["machine-learning","deep-learning"], acceptableConcepts: ["overfitting","underfitting"] },
 
-  { query: "KMeans\u7684K\u503c\u600e\u4e48\u9009Elbow", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-125", "ml-21"], secondaryIds: ["ml-24"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["K.*Means|Elbow|\u8f6e\u5ed3"] },
+  { query: "RAG和Fine-tuning什么时候用哪个", group: "跨模块-Agent", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|微调|对比"] },
 
-  { query: "Label Encoding ordinal", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-108", "ml-120"], secondaryIds: ["ml-121"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7f16\u7801|Label|\u7c7b\u522b"] },
+  { query: "ReAct和Plan-and-Execute区别", group: "跨模块-Agent", primaryIds: ["agent-1","agent-6"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct|Planning|Plan."] },
 
-  { query: "LightGBM\u548cXGBoost\u54ea\u4e2a\u597d", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-31", "ml-33"], secondaryIds: ["ml-34"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["LightGBM|XGBoost|GBD"] },
+  { query: "Vibe Coding和Agent开发区别", group: "跨模块-Agent", primaryIds: ["agent-21","agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["Vibe|Agent|Coding|编程"] },
 
-  { query: "One-hot Encoding\u6709\u4ec0\u4e48\u95ee\u9898", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-120", "ml-121"], secondaryIds: ["ml-14"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["One.*Hot|\u7f16\u7801|\u9ad8\u7ef4"] },
+  { query: "函数调用和DSL工具选择", group: "跨模块-Agent", primaryIds: ["agent-2","agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Function Calling|DSL"] },
 
-  { query: "PCA variance explained\u8ba1\u7b97", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-141", "ml-22"], secondaryIds: ["ml-26"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["PCA|\u65b9\u5dee.*\u89e3\u91ca|SVD"] },
+  { query: "结构化输出JSON Mode对比", group: "跨模块-Agent", primaryIds: ["agent-2"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["JSON.*Mode|Structure"] },
 
-  { query: "PCA \u964d\u7ef4\u539f\u7406", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-22"], secondaryIds: ["ml-26", "ml-48"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["PCA", "\u964d\u7ef4"] },
+  { query: "AUC和F1衡量指标的区别", group: "跨模块-ML", primaryIds: ["ml-9","ml-49","ml-185"], secondaryIds: ["ml-133"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["AUC|F1|PR|ROC"] },
 
-  { query: "Precision Recall F1\u600e\u4e48\u7b97", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-184", "ml-49"], secondaryIds: ["ml-88"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Precision|Recall|F1"] },
+  { query: "Bagging和Boosting核心差异", group: "跨模块-ML", primaryIds: ["ml-189","ml-32"], secondaryIds: ["ml-36"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Bagging|Boosting|集成"] },
 
-  { query: "ROC AUC \u600e\u4e48\u7406\u89e3", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-50"], secondaryIds: ["ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["ROC", "AUC"] },
+  { query: "GBDT和随机森林本质区别", group: "跨模块-ML", primaryIds: ["ml-126","ml-17"], secondaryIds: ["ml-18"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["GBDT|随机森林|决策"] },
 
-  { query: "ROC AUC\u66f2\u7ebf\u89e3\u91ca", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-109", "ml-126"], secondaryIds: ["ml-133"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["ROC|AUC|PR"] },
+  { query: "KMeans和DBSCAN选择", group: "跨模块-ML", primaryIds: ["ml-123","ml-124"], secondaryIds: ["ml-125"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["DBSCAN|K.*Means|聚类"] },
 
-  { query: "Random Forest\u8fc7\u62df\u5408\u600e\u4e48\u529e", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-18", "ml-31"], secondaryIds: ["ml-38"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u968f\u673a\u68ee\u6797|\u8fc7\u62df\u5408|n_estim"] },
+  { query: "L1 L2 Dropout 正则化选哪个", group: "跨模块-ML", primaryIds: ["ml-10"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["L1.*L2|Dropout|正则化"] },
 
-  { query: "SVM Kernel\u6838\u51fd\u6570\u9009\u62e9", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-19", "ml-2"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|\u6838\u51fd\u6570|Kernel"] },
+  { query: "MSE和MAE损失函数对比", group: "跨模块-ML", primaryIds: ["ml-1","ml-53","ml-142","ml-143"], secondaryIds: ["ml-144"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["MSE|MAE|L1.*Loss|L2."] },
 
-  { query: "SVM kernel \u9009\u62e9", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-2"], secondaryIds: ["ml-19"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM", "kernel"] },
+  { query: "Mini Batch vs Full Batch训练", group: "跨模块-ML", primaryIds: ["ml-1","ml-11","ml-58"], secondaryIds: ["ml-115"], acceptableDecks: ["deep-learning","machine-learning"], acceptableConcepts: ["Batch|SGD|梯度"] },
 
-  { query: "Self-Supervised\u81ea\u76d1\u7763\u5b66\u4e60", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-118", "ml-119"], secondaryIds: ["ml-122"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u81ea\u76d1\u7763|\u5bf9\u6bd4|SimCLR"] },
+  { query: "One-Hot和Target Encoding", group: "跨模块-ML", primaryIds: ["ml-14","ml-135","ml-178"], secondaryIds: ["ml-129"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["One.*Hot|Target|编码"] },
 
-  { query: "XGBoost \u548c LightGBM \u5bf9\u6bd4", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-33", "ml-34"], secondaryIds: ["ml-31"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["XGBoost", "LightGBM", "GBDT"] },
+  { query: "Precision vs Recall业务取舍", group: "跨模块-ML", primaryIds: ["ml-49","ml-88"], secondaryIds: ["ml-90"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Precision|Recall|业务"] },
 
-  { query: "XGBoost\u8c03\u53c2\u6280\u5de7", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-31", "ml-33"], secondaryIds: ["ml-37"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["XGBoost|\u8c03\u53c2|Hyperpar"] },
+  { query: "SGD vs AdamW什么时候用", group: "跨模块-ML", primaryIds: ["ml-58"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SGD|Adam|优化器"] },
 
-  { query: "t-SNE vs PCA \u53ef\u89c6\u5316", group: "\u6df7\u5408-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-26"], secondaryIds: ["ml-22"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["t-SNE", "PCA"] },
+  { query: "SVM和逻辑回归谁更好", group: "跨模块-ML", primaryIds: ["ml-1","ml-19"], secondaryIds: ["ml-2"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|逻辑回归"] },
 
-  // ── 混合-深度学习 ──
+  { query: "回归任务和分类任务Loss", group: "跨模块-ML", primaryIds: ["ml-1","ml-155"], secondaryIds: ["ml-185"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["回归|分类|MSE|交叉熵"] },
 
-  { query: "Adam \u548c SGD \u9009\u54ea\u4e2a", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-30"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Adam", "SGD", "\u4f18\u5316\u5668"] },
+  { query: "多任务学习vs单任务训练", group: "跨模块-ML", primaryIds: ["ml-150"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["多任务|Multi.*task|共享"] },
 
-  { query: "Batch Normalization\u516c\u5f0f", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-21", "dl-22"], secondaryIds: ["dl-3"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Batch.*Norm|\u5f52\u4e00\u5316"] },
+  { query: "架构和数据哪个更重要", group: "跨模块-ML", primaryIds: ["ml-104","ml-110"], secondaryIds: ["ml-135"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["数据.*模型|Data-centric"] },
 
-  { query: "BatchNorm vs LayerNorm", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-3"], secondaryIds: ["dl-22"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["BatchNorm", "LayerNorm"] },
+  { query: "梯度下降和牛顿法优化对比", group: "跨模块-ML", primaryIds: ["ml-11","ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["梯度下降|牛顿法|二阶"] },
 
-  { query: "Diffusion Model \u524d\u5411\u52a0\u566a\u8fc7\u7a0b", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-15"], secondaryIds: ["dl-27"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u6269\u6563\u6a21\u578b", "Diffusion"] },
+  { query: "白盒模型和黑盒模型可解释", group: "跨模块-ML", primaryIds: ["ml-137","ml-181"], secondaryIds: ["ml-73"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["可解释|SHAP|黑盒|白盒"] },
 
-  { query: "GAN Discriminator\u751f\u6210\u5668\u5224\u522b\u5668", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-11", "dl-12"], secondaryIds: ["dl-14"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN|\u751f\u6210.*\u5bf9\u6297"] },
+  { query: "离线强化学习和在线强化学习", group: "跨模块-ML", primaryIds: ["ml-113","ml-153"], secondaryIds: ["ml-163"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["在线|离线|RL|Batch.*RL"] },
 
-  { query: "GAN mode collapse \u600e\u4e48\u89e3\u51b3", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-12"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GAN", "\u6a21\u5f0f\u574d\u584c"] },
+  { query: "离线评估和在线实验的差异", group: "跨模块-ML", primaryIds: ["ml-137","ml-153","ml-163"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["离线.*评估|在线.*实验|AB"] },
 
-  { query: "GELU\u6fc0\u6d3b\u51fd\u6570\u516c\u5f0f\u63a8\u5bfc", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-1", "dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GELU|\u6fc0\u6d3b|Swish|ReLU"] },
+  { query: "BERT和GPT训练目标不同", group: "跨模块-大模型", primaryIds: ["llm-10"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["BERT.*GPT|自编码|自回归"] },
 
-  { query: "LSTM GRU\u533a\u522b\u548c\u9009\u62e9", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-24", "dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["LSTM|GRU|RNN"] },
+  { query: "GPT和Claude文风差异", group: "跨模块-大模型", primaryIds: ["llm-10","llm-11"], secondaryIds: ["llm-24"], acceptableDecks: ["llm"], acceptableConcepts: ["GPT|Claude|对齐|风格"] },
 
-  { query: "Layer Normalization\u4f4d\u7f6e\u5e94\u7528", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-22", "dl-3"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["Layer.*Norm|Batch.*N"] },
+  { query: "ONNX TensorRT哪个快", group: "跨模块-大模型", primaryIds: ["llm-21","llm-26","llm-23"], secondaryIds: ["llm-25"], acceptableDecks: ["llm","deep-learning"], acceptableConcepts: ["ONNX|TensorRT|推理"] },
 
-  { query: "ReLU LeakyReLU\u533a\u522b", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-1", "dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ReLU|Leaky|\u6fc0\u6d3b"] },
+  { query: "Prompt工程和Fine-tuning选哪个", group: "跨模块-大模型", primaryIds: ["llm-12","llm-13"], secondaryIds: ["llm-16"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt|微调|ICL"] },
 
-  { query: "ResNet\u6b8b\u5dee\u7f51\u7edcSkip Connection", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-8"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ResNet|\u6b8b\u5dee|Skip"] },
+  { query: "Seq2Seq和Transformer架构对比", group: "跨模块-大模型", primaryIds: ["llm-38","llm-4"], secondaryIds: ["llm-5"], acceptableDecks: ["llm"], acceptableConcepts: ["Seq2Seq|Transformer"] },
 
-  { query: "Sigmoid \u548c Softmax \u533a\u522b", group: "\u6df7\u5408-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-31"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["sigmoid", "softmax"] },
+  { query: "TPU和GPU训练优势劣势", group: "跨模块-大模型", primaryIds: ["llm-11","llm-40"], secondaryIds: ["llm-48"], acceptableDecks: ["llm"], acceptableConcepts: ["TPU|GPU|硬件|训练"] },
 
-  // ── 混合-统计学 ──
+  { query: "微调LoRA和全量微调的区别", group: "跨模块-大模型", primaryIds: ["llm-12","llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA|全量|微调"] },
 
-  { query: "Bootstrap \u548c Permutation Test", group: "\u6df7\u5408-\u7edf\u8ba1\u5b66", primaryIds: ["stats-37"], secondaryIds: ["stats-38"], acceptableDecks: ["statistics"], acceptableConcepts: ["Bootstrap", "\u7f6e\u6362\u68c0\u9a8c"] },
+  { query: "自编码模型和自回归模型区别", group: "跨模块-大模型", primaryIds: ["llm-10","llm-24"], secondaryIds: ["llm-39"], acceptableDecks: ["llm"], acceptableConcepts: ["自编码|自回归|BERT|GPT"] },
 
-  { query: "MCMC \u91c7\u6837\u539f\u7406", group: "\u6df7\u5408-\u7edf\u8ba1\u5b66", primaryIds: ["stats-43"], secondaryIds: ["stats-44"], acceptableDecks: ["statistics"], acceptableConcepts: ["MCMC", "\u91c7\u6837"] },
+  { query: "贪心搜索和束搜索对比", group: "跨模块-大模型", primaryIds: ["llm-22"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["贪心|Beam|解码"] },
 
-  { query: "Window Function\u7a97\u53e3\u51fd\u6570SQL", group: "\u6df7\u5408-\u7edf\u8ba1\u5b66", primaryIds: ["stats-178", "stats-179"], secondaryIds: ["stats-180"], acceptableDecks: ["statistics"], acceptableConcepts: ["Window|\u7a97\u53e3|SQL"] },
+  { query: "预训练和微调模型的差异", group: "跨模块-大模型", primaryIds: ["llm-11","llm-12"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["预训练|微调|Pretrain"] },
 
-  { query: "p-value \u7684\u8bef\u89e3", group: "\u6df7\u5408-\u7edf\u8ba1\u5b66", primaryIds: ["stats-24"], secondaryIds: ["stats-25"], acceptableDecks: ["statistics"], acceptableConcepts: ["p\u503c", "\u663e\u8457\u6027"] },
+  { query: "BatchNorm和LayerNorm什么时候用哪个", group: "跨模块-深度vs大模型", primaryIds: ["dl-21","dl-22"], secondaryIds: ["dl-3","llm-38"], acceptableDecks: ["deep-learning","llm"], acceptableConcepts: ["Batch.*Norm|Layer.*N"] },
 
-  // ── 混合-黑话 ──
+  { query: "RNN和Transformer大不同", group: "跨模块-深度vs大模型", primaryIds: ["dl-24","dl-7"], secondaryIds: ["dl-9","llm-38"], acceptableDecks: ["deep-learning","llm"], acceptableConcepts: ["RNN|LSTM|Transformer"] },
 
-  { query: "OKR \u548c KPI \u7684\u533a\u522b", group: "\u6df7\u5408-\u9ed1\u8bdd", primaryIds: ["jargon-35"], secondaryIds: [], acceptableDecks: ["jargon"], acceptableConcepts: ["OKR", "KPI", "\u7ee9\u6548"] },
+  { query: "ReLU Sigmoid中间状态推导", group: "跨模块-深度学习", primaryIds: ["dl-1","dl-24"], secondaryIds: ["dl-31"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ReLU|Sigmoid|Tanh|激活"] },
 
-  // ── 英文-Agent ──
+  { query: "ETL ELT数据集成区别", group: "跨模块-统计", primaryIds: ["stats-116","stats-125"], secondaryIds: ["stats-185"], acceptableDecks: ["statistics"], acceptableConcepts: ["ETL|ELT|数据.*仓库"] },
 
-  { query: "how to evaluate retrieval augmented generation", group: "\u82f1\u6587-Agent", primaryIds: ["agent-22", "agent-15"], secondaryIds: ["agent-7"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG", "evaluation"] },
+  { query: "KL散度和JS散度对比", group: "跨模块-统计", primaryIds: ["stats-194"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["KL.*散度|JS|相对熵"] },
 
-  // ── 英文-力扣 ──
+  { query: "SQL和NoSQL数据库选型", group: "跨模块-统计", primaryIds: ["stats-178","stats-180"], secondaryIds: ["stats-182"], acceptableDecks: ["statistics"], acceptableConcepts: ["SQL|NoSQL|关系型"] },
 
-  { query: "binary tree traversal preorder inorder postorder", group: "\u82f1\u6587-\u529b\u6263", primaryIds: ["lc-043", "lc-040"], secondaryIds: ["lc-041"], acceptableDecks: ["leetcode"], acceptableConcepts: ["binary tree", "traversal", "DFS"] },
+  { query: "Streaming和Batch数据处理", group: "跨模块-统计", primaryIds: ["stats-150","stats-187"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["流式|批处理|Kafka|Spark"] },
 
-  // ── 英文-大模型 ──
+  { query: "如何设计一个实验评估", group: "跨模块-统计", primaryIds: ["stats-102","stats-116"], secondaryIds: ["stats-118"], acceptableDecks: ["statistics"], acceptableConcepts: ["实验|AB|随机"] },
 
-  { query: "self attention mechanism transformer", group: "\u82f1\u6587-\u5927\u6a21\u578b", primaryIds: ["llm-1", "llm-3"], secondaryIds: ["llm-9"], acceptableDecks: ["llm"], acceptableConcepts: ["self-attention", "Transformer"] },
+  { query: "最大似然和最大后验区别", group: "跨模块-统计", primaryIds: ["stats-111","stats-195"], secondaryIds: ["stats-39"], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE|MAP|似然|后验"] },
 
-  // ── 英文-机器学习 ──
+  { query: "Agent 开发里面 ReAct 模式和 Function Calling 到底有什么区别，什么时候用哪个", group: "长句-Agent", primaryIds: ["agent-2"], secondaryIds: ["agent-3","agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct","Function Calling","Tool Use"] },
 
-  { query: "gradient descent optimization", group: "\u82f1\u6587-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-11", "ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["gradient descent", "SGD", "optimization"] },
+  { query: "AutoGPT怎么自己规划执行任务", group: "长句-Agent", primaryIds: ["agent-21","agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["AutoGPT|Planning|Age"] },
 
-  { query: "overfitting vs underfitting deep learning", group: "\u82f1\u6587-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-7"], secondaryIds: ["ml-8", "dl-4"], acceptableDecks: ["machine-learning", "deep-learning"], acceptableConcepts: ["overfitting", "underfitting"] },
+  { query: "HNSW索引向量数据库", group: "长句-Agent", primaryIds: ["agent-10","agent-12"], secondaryIds: ["agent-15"], acceptableDecks: ["agent"], acceptableConcepts: ["向量.*数据库|HNSW|ANN|检索"] },
 
-  // ── 跨模块-Agent ──
+  { query: "JSON Mode和Function Calling区别", group: "长句-Agent", primaryIds: ["agent-2"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["JSON.*Mode|Function "] },
 
-  { query: "RAG\u548cFine-tuning\u4ec0\u4e48\u65f6\u5019\u7528\u54ea\u4e2a", group: "\u8de8\u6a21\u5757-Agent", primaryIds: ["agent-10", "agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|\u5fae\u8c03|\u5bf9\u6bd4"] },
+  { query: "LangChain和LlamaIndex对比", group: "长句-Agent", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["LangChain|LlamaIndex"] },
 
-  { query: "ReAct\u548cPlan-and-Execute\u533a\u522b", group: "\u8de8\u6a21\u5757-Agent", primaryIds: ["agent-1", "agent-6"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct|Planning|Plan."] },
+  { query: "RAG检索和生成怎么结合的", group: "长句-Agent", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|检索|生成|Pipeline"] },
 
-  { query: "Vibe Coding\u548cAgent\u5f00\u53d1\u533a\u522b", group: "\u8de8\u6a21\u5757-Agent", primaryIds: ["agent-21", "agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["Vibe|Agent|Coding|\u7f16\u7a0b"] },
+  { query: "我们想在公司内部搭建一个基于 RAG 的知识库问答系统，从技术选型到落地有什么需要注意的地方", group: "长句-Agent", primaryIds: ["agent-7"], secondaryIds: ["agent-15","agent-18","agent-22"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG","检索增强生成","知识库"] },
 
-  { query: "\u51fd\u6570\u8c03\u7528\u548cDSL\u5de5\u5177\u9009\u62e9", group: "\u8de8\u6a21\u5757-Agent", primaryIds: ["agent-2", "agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Function Calling|DSL"] },
+  { query: "智能客服意图识别怎么做", group: "长句-Agent", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|分类|意图"] },
 
-  { query: "\u7ed3\u6784\u5316\u8f93\u51faJSON Mode\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-Agent", primaryIds: ["agent-2"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["JSON.*Mode|Structure"] },
+  { query: "用AI回复客户邮件隐私怎么保证", group: "长句-Agent", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|安全|幻觉"] },
 
-  // ── 跨模块-ML ──
+  { query: "力扣里面二叉树相关的题目我做得不太好，尤其是递归遍历老是写错，有哪些经典题可以练手", group: "长句-力扣", primaryIds: ["lc-043"], secondaryIds: ["lc-040","lc-041","lc-039"], acceptableDecks: ["leetcode"], acceptableConcepts: ["二叉树","遍历","递归"] },
 
-  { query: "AUC\u548cF1\u8861\u91cf\u6307\u6807\u7684\u533a\u522b", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-109", "ml-126"], secondaryIds: ["ml-133"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["AUC|F1|PR|ROC"] },
+  { query: "最近在刷数组相关的题，哈希表和双指针这两类经常搞混，什么时候用哈希什么时候用双指针", group: "长句-力扣", primaryIds: ["lc-001"], secondaryIds: ["lc-002","lc-005"], acceptableDecks: ["leetcode"], acceptableConcepts: ["哈希表","双指针","数组"] },
 
-  { query: "Bagging\u548cBoosting\u6838\u5fc3\u5dee\u5f02", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-189", "ml-32"], secondaryIds: ["ml-36"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Bagging|Boosting|\u96c6\u6210"] },
+  { query: "8G显存部署大模型有什么轻量化方案", group: "长句-大模型", primaryIds: ["llm-24","llm-40"], secondaryIds: ["llm-42"], acceptableDecks: ["llm"], acceptableConcepts: ["量化|压缩|部署|显存"] },
 
-  { query: "GBDT\u548c\u968f\u673a\u68ee\u6797\u672c\u8d28\u533a\u522b", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-126", "ml-17"], secondaryIds: ["ml-18"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["GBDT|\u968f\u673a\u68ee\u6797|\u51b3\u7b56"] },
+  { query: "Chain-of-Thought在GPT4中", group: "长句-大模型", primaryIds: ["llm-21","llm-17"], secondaryIds: ["llm-25"], acceptableDecks: ["llm"], acceptableConcepts: ["COT|思维链|推理"] },
 
-  { query: "KMeans\u548cDBSCAN\u9009\u62e9", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-123", "ml-124"], secondaryIds: ["ml-125"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["DBSCAN|K.*Means|\u805a\u7c7b"] },
+  { query: "Flash Attention怎么加速", group: "长句-大模型", primaryIds: ["llm-21","llm-25"], secondaryIds: ["llm-40"], acceptableDecks: ["llm"], acceptableConcepts: ["Flash.*Attention|加速"] },
 
-  { query: "L1 L2 Dropout \u6b63\u5219\u5316\u9009\u54ea\u4e2a", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-10"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["L1.*L2|Dropout|\u6b63\u5219\u5316"] },
+  { query: "OOM显存不足怎么排查", group: "长句-大模型", primaryIds: ["llm-40","llm-47"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["OOM|显存|内存.*不足"] },
 
-  { query: "MSE\u548cMAE\u635f\u5931\u51fd\u6570\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-121", "ml-122"], secondaryIds: ["ml-144"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["MSE|MAE|L1.*Loss|L2."] },
+  { query: "PEFT方法LoRA Adapter对比", group: "长句-大模型", primaryIds: ["llm-12","llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA|Adapter|PEFT|微调"] },
 
-  { query: "Mini Batch vs Full Batch\u8bad\u7ec3", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-1", "ml-11"], secondaryIds: ["ml-115"], acceptableDecks: ["deep-learning", "machine-learning"], acceptableConcepts: ["Batch|SGD|\u68af\u5ea6"] },
+  { query: "RoPE和其他位置编码冲突吗", group: "长句-大模型", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["RoPE|位置编码|ALiBi"] },
 
-  { query: "One-Hot\u548cTarget Encoding", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-120", "ml-121"], secondaryIds: ["ml-129"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["One.*Hot|Target|\u7f16\u7801"] },
+  { query: "Speculative Decoding推理加速", group: "长句-大模型", primaryIds: ["llm-21","llm-25"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Speculative|推测.*解码|推"] },
 
-  { query: "Precision vs Recall\u4e1a\u52a1\u53d6\u820d", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-49", "ml-88"], secondaryIds: ["ml-90"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Precision|Recall|\u4e1a\u52a1"] },
+  { query: "TPU和GPU训练架构差异", group: "长句-大模型", primaryIds: ["llm-11","llm-40"], secondaryIds: ["llm-48"], acceptableDecks: ["llm"], acceptableConcepts: ["TPU|GPU|训练|并行"] },
 
-  { query: "SGD vs AdamW\u4ec0\u4e48\u65f6\u5019\u7528", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-58"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SGD|Adam|\u4f18\u5316\u5668"] },
+  { query: "Transformer为什么除以根号dk", group: "长句-大模型", primaryIds: ["llm-2"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["缩放|√|方差|点积"] },
 
-  { query: "SVM\u548c\u903b\u8f91\u56de\u5f52\u8c01\u66f4\u597d", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-1", "ml-19"], secondaryIds: ["ml-2"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|\u903b\u8f91\u56de\u5f52"] },
+  { query: "few-shot为什么给例子就能学", group: "长句-大模型", primaryIds: ["llm-16","llm-46"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Few.*shot|Prompt|上下文"] },
 
-  { query: "\u56de\u5f52\u4efb\u52a1\u548c\u5206\u7c7b\u4efb\u52a1Loss", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-1", "ml-155"], secondaryIds: ["ml-185"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u56de\u5f52|\u5206\u7c7b|MSE|\u4ea4\u53c9\u71b5"] },
+  { query: "vLLM PageAttention批处理", group: "长句-大模型", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["vLLM|PagedAttention"] },
 
-  { query: "\u591a\u4efb\u52a1\u5b66\u4e60vs\u5355\u4efb\u52a1\u8bad\u7ec3", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-150"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u591a\u4efb\u52a1|Multi.*task|\u5171\u4eab"] },
+  { query: "大模型论文看不过来有什么必读", group: "长句-大模型", primaryIds: ["llm-10","llm-24"], secondaryIds: ["llm-42"], acceptableDecks: ["llm"], acceptableConcepts: ["Transformer.*架构|GPT."] },
 
-  { query: "\u67b6\u6784\u548c\u6570\u636e\u54ea\u4e2a\u66f4\u91cd\u8981", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-104", "ml-110"], secondaryIds: ["ml-135"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u6570\u636e.*\u6a21\u578b|Data-centric"] },
+  { query: "微调应该冻结哪些层", group: "长句-大模型", primaryIds: ["llm-12","llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["微调|LoRA|冻结|Adapter"] },
 
-  { query: "\u68af\u5ea6\u4e0b\u964d\u548c\u725b\u987f\u6cd5\u4f18\u5316\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-11", "ml-57"], secondaryIds: ["ml-58"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u68af\u5ea6\u4e0b\u964d|\u725b\u987f\u6cd5|\u4e8c\u9636"] },
+  { query: "想了解一下现在主流的 prompt engineering 技巧有哪些，有没有什么套路可以参考", group: "长句-大模型", primaryIds: ["llm-14"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt","CoT","Few-shot"] },
 
-  { query: "\u767d\u76d2\u6a21\u578b\u548c\u9ed1\u76d2\u6a21\u578b\u53ef\u89e3\u91ca", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-137", "ml-181"], secondaryIds: ["ml-73"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u53ef\u89e3\u91ca|SHAP|\u9ed1\u76d2|\u767d\u76d2"] },
+  { query: "我们团队想把一个大模型部署到生产环境，但是推理速度太慢了，有没有什么加速的方案可以推荐一下", group: "长句-大模型", primaryIds: ["llm-15"], secondaryIds: ["llm-16","llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["推理加速","量化","KV Cache"] },
 
-  { query: "\u79bb\u7ebf\u5f3a\u5316\u5b66\u4e60\u548c\u5728\u7ebf\u5f3a\u5316\u5b66\u4e60", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-113", "ml-153"], secondaryIds: ["ml-163"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u5728\u7ebf|\u79bb\u7ebf|RL|Batch.*RL"] },
+  { query: "数据并行模型并行流水线并行", group: "长句-大模型", primaryIds: ["llm-47","llm-48"], secondaryIds: ["llm-7"], acceptableDecks: ["llm"], acceptableConcepts: ["并行|ZeRO|分布式"] },
 
-  { query: "\u79bb\u7ebf\u8bc4\u4f30\u548c\u5728\u7ebf\u5b9e\u9a8c\u7684\u5dee\u5f02", group: "\u8de8\u6a21\u5757-ML", primaryIds: ["ml-108", "ml-137"], secondaryIds: ["ml-153"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u79bb\u7ebf.*\u8bc4\u4f30|\u5728\u7ebf.*\u5b9e\u9a8c|AB"] },
+  { query: "改简历准备大厂技术面", group: "长句-学习路径", primaryIds: ["ml-134","ml-136"], secondaryIds: ["ml-189"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["面试|简历|机器学习"] },
 
-  // ── 跨模块-大模型 ──
+  { query: "机器学习面试记了又忘怎么办", group: "长句-学习路径", primaryIds: ["ml-110","ml-112"], secondaryIds: ["ml-119"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["面试|复习|核心"] },
 
-  { query: "BERT\u548cGPT\u8bad\u7ec3\u76ee\u6807\u4e0d\u540c", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-10"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["BERT.*GPT|\u81ea\u7f16\u7801|\u81ea\u56de\u5f52"] },
+  { query: "特征工程零散怎么系统学", group: "长句-学习路径", primaryIds: ["ml-138","ml-141"], secondaryIds: ["ml-41"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["特征.*工程|特征.*选择|降维"] },
 
-  { query: "GPT\u548cClaude\u6587\u98ce\u5dee\u5f02", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-10", "llm-11"], secondaryIds: ["llm-24"], acceptableDecks: ["llm"], acceptableConcepts: ["GPT|Claude|\u5bf9\u9f50|\u98ce\u683c"] },
+  { query: "Batch Size对收敛有什么影响", group: "长句-机器学习", primaryIds: ["ml-58"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Batch.*Size|SGD|收敛"] },
 
-  { query: "ONNX TensorRT\u54ea\u4e2a\u5feb", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-26"], secondaryIds: ["llm-25"], acceptableDecks: ["llm", "deep-learning"], acceptableConcepts: ["ONNX|TensorRT|\u63a8\u7406"] },
+  { query: "Contrastive Learning InfoNCE推导", group: "长句-机器学习", primaryIds: ["ml-119","ml-122"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["对比.*学习|InfoNCE|SimCL"] },
 
-  { query: "Prompt\u5de5\u7a0b\u548cFine-tuning\u9009\u54ea\u4e2a", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-12", "llm-13"], secondaryIds: ["llm-16"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt|\u5fae\u8c03|ICL"] },
+  { query: "DBSCAN和KMeans对比", group: "长句-机器学习", primaryIds: ["ml-123","ml-124"], secondaryIds: ["ml-125"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["DBSCAN|K.*Means|聚类"] },
 
-  { query: "Seq2Seq\u548cTransformer\u67b6\u6784\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-38", "llm-4"], secondaryIds: ["llm-5"], acceptableDecks: ["llm"], acceptableConcepts: ["Seq2Seq|Transformer"] },
+  { query: "Early Stopping防过拟合原理", group: "长句-机器学习", primaryIds: ["ml-7","ml-77"], secondaryIds: ["ml-78"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Early.*Stop|早停|过拟合"] },
 
-  { query: "TPU\u548cGPU\u8bad\u7ec3\u4f18\u52bf\u52a3\u52bf", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-11", "llm-40"], secondaryIds: ["llm-48"], acceptableDecks: ["llm"], acceptableConcepts: ["TPU|GPU|\u786c\u4ef6|\u8bad\u7ec3"] },
+  { query: "Imbalanced Dataset采样策略", group: "长句-机器学习", primaryIds: ["ml-105","ml-135"], secondaryIds: ["ml-143"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["不平衡|SMOTE|采样"] },
 
-  { query: "\u5fae\u8c03LoRA\u548c\u5168\u91cf\u5fae\u8c03\u7684\u533a\u522b", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-12", "llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA|\u5168\u91cf|\u5fae\u8c03"] },
+  { query: "MLflow和WandB怎么管理实验", group: "长句-机器学习", primaryIds: ["ml-162"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["MLflow|实验.*管理|模型.*版本"] },
 
-  { query: "\u81ea\u7f16\u7801\u6a21\u578b\u548c\u81ea\u56de\u5f52\u6a21\u578b\u533a\u522b", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-10", "llm-24"], secondaryIds: ["llm-39"], acceptableDecks: ["llm"], acceptableConcepts: ["\u81ea\u7f16\u7801|\u81ea\u56de\u5f52|BERT|GPT"] },
+  { query: "Momentum为什么能加速收敛", group: "长句-机器学习", primaryIds: ["ml-120","ml-58"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["动量|SGD|优化器|Adam"] },
 
-  { query: "\u8d2a\u5fc3\u641c\u7d22\u548c\u675f\u641c\u7d22\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-22", "llm-25"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u8d2a\u5fc3|Beam|\u89e3\u7801"] },
+  { query: "Precision Recall trade-off可视化", group: "长句-机器学习", primaryIds: ["ml-49","ml-50"], secondaryIds: ["ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Precision.*Recall|PR"] },
 
-  { query: "\u9884\u8bad\u7ec3\u548c\u5fae\u8c03\u6a21\u578b\u7684\u5dee\u5f02", group: "\u8de8\u6a21\u5757-\u5927\u6a21\u578b", primaryIds: ["llm-11", "llm-12"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["\u9884\u8bad\u7ec3|\u5fae\u8c03|Pretrain"] },
+  { query: "WOE编码和OneHot区别", group: "长句-机器学习", primaryIds: ["ml-14","ml-42"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["WOE|One.*Hot|特征.*编码"] },
 
-  // ── 跨模块-深度vs大模型 ──
+  { query: "Weight Decay和L2等价吗", group: "长句-机器学习", primaryIds: ["ml-10"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Weight.*Decay|L1.*L2"] },
 
-  { query: "BatchNorm\u548cLayerNorm\u4ec0\u4e48\u65f6\u5019\u7528\u54ea\u4e2a", group: "\u8de8\u6a21\u5757-\u6df1\u5ea6vs\u5927\u6a21\u578b", primaryIds: ["dl-21", "dl-22"], secondaryIds: ["dl-3", "llm-38"], acceptableDecks: ["deep-learning", "llm"], acceptableConcepts: ["Batch.*Norm|Layer.*N"] },
+  { query: "XGBoost调参不如默认值怎么办", group: "长句-机器学习", primaryIds: ["ml-31","ml-33"], secondaryIds: ["ml-34"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["XGBoost|LightGBM|调参"] },
 
-  { query: "RNN\u548cTransformer\u5927\u4e0d\u540c", group: "\u8de8\u6a21\u5757-\u6df1\u5ea6vs\u5927\u6a21\u578b", primaryIds: ["dl-24", "dl-7"], secondaryIds: ["dl-9", "llm-38"], acceptableDecks: ["deep-learning", "llm"], acceptableConcepts: ["RNN|LSTM|Transformer"] },
+  { query: "传统ML还有没有必要学", group: "长句-机器学习", primaryIds: ["ml-18","ml-19"], secondaryIds: ["ml-2"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|随机森林|大模型.*对比"] },
 
-  // ── 跨模块-深度学习 ──
+  { query: "几十万条数据冷启动推荐系统怎么做", group: "长句-机器学习", primaryIds: ["ml-103","ml-117"], secondaryIds: ["ml-133"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["冷启动|矩阵分解|推荐"] },
 
-  { query: "ReLU Sigmoid\u4e2d\u95f4\u72b6\u6001\u63a8\u5bfc", group: "\u8de8\u6a21\u5757-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-1", "dl-24"], secondaryIds: ["dl-31"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["ReLU|Sigmoid|Tanh|\u6fc0\u6d3b"] },
+  { query: "噪声标签怎么训练模型", group: "长句-机器学习", primaryIds: ["ml-144"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["噪声.*标签|鲁棒|清洗"] },
 
-  // ── 跨模块-统计 ──
+  { query: "在线推理离线批处理架构区别", group: "长句-机器学习", primaryIds: ["ml-104","ml-110"], secondaryIds: ["ml-160"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["推理|批处理|架构|部署"] },
 
-  { query: "ETL ELT\u6570\u636e\u96c6\u6210\u533a\u522b", group: "\u8de8\u6a21\u5757-\u7edf\u8ba1", primaryIds: ["stats-116", "stats-125"], secondaryIds: ["stats-185"], acceptableDecks: ["statistics"], acceptableConcepts: ["ETL|ELT|\u6570\u636e.*\u4ed3\u5e93"] },
+  { query: "对比学习为什么不需要标注", group: "长句-机器学习", primaryIds: ["ml-118","ml-119"], secondaryIds: ["ml-122"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["对比学习|自监督|SimCLR|Info"] },
 
-  { query: "KL\u6563\u5ea6\u548cJS\u6563\u5ea6\u5bf9\u6bd4", group: "\u8de8\u6a21\u5757-\u7edf\u8ba1", primaryIds: ["stats-194"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["KL.*\u6563\u5ea6|JS|\u76f8\u5bf9\u71b5"] },
+  { query: "我有个数据集样本特别不均衡，正样本只有百分之五，这种情况一般怎么处理比较好", group: "长句-机器学习", primaryIds: ["ml-16"], secondaryIds: ["ml-17","ml-50"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["样本不均衡","SMOTE","类别权重"] },
 
-  { query: "SQL\u548cNoSQL\u6570\u636e\u5e93\u9009\u578b", group: "\u8de8\u6a21\u5757-\u7edf\u8ba1", primaryIds: ["stats-178", "stats-180"], secondaryIds: ["stats-182"], acceptableDecks: ["statistics"], acceptableConcepts: ["SQL|NoSQL|\u5173\u7cfb\u578b"] },
+  { query: "最近在复习机器学习基础，想问一下偏差和方差到底怎么理解，有什么直观的例子吗", group: "长句-机器学习", primaryIds: ["ml-8"], secondaryIds: ["ml-7"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["偏差方差","bias-variance","过拟合"] },
 
-  { query: "Streaming\u548cBatch\u6570\u636e\u5904\u7406", group: "\u8de8\u6a21\u5757-\u7edf\u8ba1", primaryIds: ["stats-150", "stats-187"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u6d41\u5f0f|\u6279\u5904\u7406|Kafka|Spark"] },
+  { query: "树模型家族怎么选", group: "长句-机器学习", primaryIds: ["ml-126","ml-17"], secondaryIds: ["ml-18"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["决策树|随机森林|GBDT|XGBoos"] },
 
-  { query: "\u5982\u4f55\u8bbe\u8ba1\u4e00\u4e2a\u5b9e\u9a8c\u8bc4\u4f30", group: "\u8de8\u6a21\u5757-\u7edf\u8ba1", primaryIds: ["stats-102", "stats-116"], secondaryIds: ["stats-118"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5b9e\u9a8c|AB|\u968f\u673a"] },
+  { query: "正样本只有3%直接训练会不会有问题", group: "长句-机器学习", primaryIds: ["ml-143","ml-16"], secondaryIds: ["ml-72"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["不平衡|SMOTE|类别.*加权"] },
 
-  { query: "\u6700\u5927\u4f3c\u7136\u548c\u6700\u5927\u540e\u9a8c\u533a\u522b", group: "\u8de8\u6a21\u5757-\u7edf\u8ba1", primaryIds: ["stats-111", "stats-195"], secondaryIds: ["stats-39"], acceptableDecks: ["statistics"], acceptableConcepts: ["MLE|MAP|\u4f3c\u7136|\u540e\u9a8c"] },
+  { query: "深度学习金融风控可解释性", group: "长句-机器学习", primaryIds: ["ml-134","ml-137"], secondaryIds: ["ml-181"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["可解释|SHAP|LIME|Fairne"] },
 
-  // ── 长句-Agent ──
+  { query: "现场推导逻辑回归梯度卡住了怎么办", group: "长句-机器学习", primaryIds: ["ml-1"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["逻辑回归.*损失|梯度.*推导"] },
 
-  { query: "Agent \u5f00\u53d1\u91cc\u9762 ReAct \u6a21\u5f0f\u548c Function Calling \u5230\u5e95\u6709\u4ec0\u4e48\u533a\u522b\uff0c\u4ec0\u4e48\u65f6\u5019\u7528\u54ea\u4e2a", group: "\u957f\u53e5-Agent", primaryIds: ["agent-2"], secondaryIds: ["agent-3", "agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct", "Function Calling", "Tool Use"] },
+  { query: "过拟合训练99测试80怎么排查", group: "长句-机器学习", primaryIds: ["ml-10","ml-7"], secondaryIds: ["ml-77"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合|Dropout|正则化"] },
 
-  { query: "AutoGPT\u600e\u4e48\u81ea\u5df1\u89c4\u5212\u6267\u884c\u4efb\u52a1", group: "\u957f\u53e5-Agent", primaryIds: ["agent-21", "agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["AutoGPT|Planning|Age"] },
+  { query: "面试官如果问我 SVM 的原理和核函数怎么选，我该怎么回答比较好", group: "长句-机器学习", primaryIds: ["ml-2"], secondaryIds: ["ml-19","ml-20"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM","核函数","kernel"] },
 
-  { query: "HNSW\u7d22\u5f15\u5411\u91cf\u6570\u636e\u5e93", group: "\u957f\u53e5-Agent", primaryIds: ["agent-10", "agent-12"], secondaryIds: ["agent-15"], acceptableDecks: ["agent"], acceptableConcepts: ["\u5411\u91cf.*\u6570\u636e\u5e93|HNSW|ANN|\u68c0\u7d22"] },
+  { query: "BPTT在RNN中怎么工作", group: "长句-深度学习", primaryIds: ["dl-5","dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["RNN|BPTT|反向.*传播"] },
 
-  { query: "JSON Mode\u548cFunction Calling\u533a\u522b", group: "\u957f\u53e5-Agent", primaryIds: ["agent-2"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["JSON.*Mode|Function "] },
+  { query: "GELU激活函数数学公式优势", group: "长句-深度学习", primaryIds: ["dl-1","dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GELU|Swish|激活"] },
 
-  { query: "LangChain\u548cLlamaIndex\u5bf9\u6bd4", group: "\u957f\u53e5-Agent", primaryIds: ["agent-10", "agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["LangChain|LlamaIndex"] },
+  { query: "LSTM和GRU本质区别是什么", group: "长句-深度学习", primaryIds: ["dl-24","dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["LSTM|GRU|RNN"] },
 
-  { query: "RAG\u68c0\u7d22\u548c\u751f\u6210\u600e\u4e48\u7ed3\u5408\u7684", group: "\u957f\u53e5-Agent", primaryIds: ["agent-10", "agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|\u68c0\u7d22|\u751f\u6210|Pipeline"] },
+  { query: "图像分割手机端部署选什么模型", group: "长句-深度学习", primaryIds: ["dl-6"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|分割|轻量化|模型.*压缩"] },
 
-  { query: "\u6211\u4eec\u60f3\u5728\u516c\u53f8\u5185\u90e8\u642d\u5efa\u4e00\u4e2a\u57fa\u4e8e RAG \u7684\u77e5\u8bc6\u5e93\u95ee\u7b54\u7cfb\u7edf\uff0c\u4ece\u6280\u672f\u9009\u578b\u5230\u843d\u5730\u6709\u4ec0\u4e48\u9700\u8981\u6ce8\u610f\u7684\u5730\u65b9", group: "\u957f\u53e5-Agent", primaryIds: ["agent-7"], secondaryIds: ["agent-15", "agent-18", "agent-22"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG", "\u68c0\u7d22\u589e\u5f3a\u751f\u6210", "\u77e5\u8bc6\u5e93"] },
+  { query: "我在做图像分类任务，模型训练了好几个小时一直在震荡不收敛，可能是什么原因", group: "长句-深度学习", primaryIds: ["dl-2"], secondaryIds: ["dl-1","dl-5"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["梯度消失","激活函数","学习率"] },
 
-  { query: "\u667a\u80fd\u5ba2\u670d\u610f\u56fe\u8bc6\u522b\u600e\u4e48\u505a", group: "\u957f\u53e5-Agent", primaryIds: ["agent-10", "agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|\u5206\u7c7b|\u610f\u56fe"] },
+  { query: "梯度消失梯度爆炸通俗解释", group: "长句-深度学习", primaryIds: ["dl-2"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["梯度.*消失|梯度.*爆炸|BatchN"] },
 
-  { query: "\u7528AI\u56de\u590d\u5ba2\u6237\u90ae\u4ef6\u9690\u79c1\u600e\u4e48\u4fdd\u8bc1", group: "\u957f\u53e5-Agent", primaryIds: ["agent-10", "agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|\u5b89\u5168|\u5e7b\u89c9"] },
+  { query: "能不能用通俗易懂的方式给我解释一下 Batch Normalization 到底做了什么事情", group: "长句-深度学习", primaryIds: ["dl-3"], secondaryIds: ["dl-2"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["BatchNorm","归一化"] },
 
-  // ── 长句-力扣 ──
+  { query: "AB测试转化率提升只有0.5%怎么判断显著", group: "长句-统计学", primaryIds: ["stats-119","stats-174"], secondaryIds: ["stats-31"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB.*测试|A/B.*显著|样本量"] },
 
-  { query: "\u529b\u6263\u91cc\u9762\u4e8c\u53c9\u6811\u76f8\u5173\u7684\u9898\u76ee\u6211\u505a\u5f97\u4e0d\u592a\u597d\uff0c\u5c24\u5176\u662f\u9012\u5f52\u904d\u5386\u8001\u662f\u5199\u9519\uff0c\u6709\u54ea\u4e9b\u7ecf\u5178\u9898\u53ef\u4ee5\u7ec3\u624b", group: "\u957f\u53e5-\u529b\u6263", primaryIds: ["lc-043"], secondaryIds: ["lc-040", "lc-041", "lc-039"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u4e8c\u53c9\u6811", "\u904d\u5386", "\u9012\u5f52"] },
+  { query: "CAP理论为什么不能三者兼得", group: "长句-统计学", primaryIds: ["stats-126"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["CAP|分布式|一致"] },
 
-  { query: "\u6700\u8fd1\u5728\u5237\u6570\u7ec4\u76f8\u5173\u7684\u9898\uff0c\u54c8\u5e0c\u8868\u548c\u53cc\u6307\u9488\u8fd9\u4e24\u7c7b\u7ecf\u5e38\u641e\u6df7\uff0c\u4ec0\u4e48\u65f6\u5019\u7528\u54c8\u5e0c\u4ec0\u4e48\u65f6\u5019\u7528\u53cc\u6307\u9488", group: "\u957f\u53e5-\u529b\u6263", primaryIds: ["lc-001"], secondaryIds: ["lc-002", "lc-005"], acceptableDecks: ["leetcode"], acceptableConcepts: ["\u54c8\u5e0c\u8868", "\u53cc\u6307\u9488", "\u6570\u7ec4"] },
+  { query: "ETL流程pipeline最佳实践", group: "长句-统计学", primaryIds: ["stats-149","stats-152"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["ETL|pipeline|数据"] },
 
-  // ── 长句-大模型 ──
+  { query: "SQL全表扫描怎么加索引", group: "长句-统计学", primaryIds: ["stats-180","stats-183"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["索引|SQL.*优化|全表"] },
 
-  { query: "8G\u663e\u5b58\u90e8\u7f72\u5927\u6a21\u578b\u6709\u4ec0\u4e48\u8f7b\u91cf\u5316\u65b9\u6848", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-24", "llm-40"], secondaryIds: ["llm-42"], acceptableDecks: ["llm"], acceptableConcepts: ["\u91cf\u5316|\u538b\u7f29|\u90e8\u7f72|\u663e\u5b58"] },
+  { query: "Spark join操作特别慢怎么办", group: "长句-统计学", primaryIds: ["stats-180","stats-187"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["数据倾斜|Spark|优化"] },
 
-  { query: "Chain-of-Thought\u5728GPT4\u4e2d", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-17"], secondaryIds: ["llm-25"], acceptableDecks: ["llm"], acceptableConcepts: ["COT|\u601d\u7ef4\u94fe|\u63a8\u7406"] },
+  { query: "pandas百万数据内存溢出怎么办", group: "长句-统计学", primaryIds: ["stats-180","stats-187"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["pandas|内存|大数据"] },
 
-  { query: "Flash Attention\u600e\u4e48\u52a0\u901f", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-25"], secondaryIds: ["llm-40"], acceptableDecks: ["llm"], acceptableConcepts: ["Flash.*Attention|\u52a0\u901f"] },
+  { query: "协方差和相关系数公式老搞混", group: "长句-统计学", primaryIds: ["stats-115","stats-146"], secondaryIds: ["stats-17"], acceptableDecks: ["statistics"], acceptableConcepts: ["协方差|相关系数|标准化"] },
 
-  { query: "OOM\u663e\u5b58\u4e0d\u8db3\u600e\u4e48\u6392\u67e5", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-40", "llm-47"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["OOM|\u663e\u5b58|\u5185\u5b58.*\u4e0d\u8db3"] },
+  { query: "新功能是否对留存有正向影响", group: "长句-统计学", primaryIds: ["stats-136","stats-145"], secondaryIds: ["stats-164"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB.*测试|因果|留存"] },
 
-  { query: "PEFT\u65b9\u6cd5LoRA Adapter\u5bf9\u6bd4", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-12", "llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["LoRA|Adapter|PEFT|\u5fae\u8c03"] },
+  { query: "时间序列节假日效应怎么处理", group: "长句-统计学", primaryIds: ["stats-88","stats-90"], secondaryIds: ["stats-91"], acceptableDecks: ["statistics"], acceptableConcepts: ["季节|节假日|ARIMA|Prophet"] },
 
-  { query: "RoPE\u548c\u5176\u4ed6\u4f4d\u7f6e\u7f16\u7801\u51b2\u7a81\u5417", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-4"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["RoPE|\u4f4d\u7f6e\u7f16\u7801|ALiBi"] },
+  { query: "面试被问到中心极限定理，我其实一直没完全理解它的实际应用场景，能帮我梳理一下吗", group: "长句-统计学", primaryIds: ["stats-10"], secondaryIds: ["stats-11"], acceptableDecks: ["statistics"], acceptableConcepts: ["中心极限定理","大数定律","抽样分布"] },
 
-  { query: "Speculative Decoding\u63a8\u7406\u52a0\u901f", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-21", "llm-25"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Speculative|\u63a8\u6d4b.*\u89e3\u7801|\u63a8"] },
+  { query: "领导让我分析一下新功能上线前后用户留存有没有显著变化，我应该用什么统计方法", group: "长句-统计学", primaryIds: ["stats-24"], secondaryIds: ["stats-25","stats-26"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB测试","假设检验","显著性"] },
 
-  { query: "TPU\u548cGPU\u8bad\u7ec3\u67b6\u6784\u5dee\u5f02", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-11", "llm-40"], secondaryIds: ["llm-48"], acceptableDecks: ["llm"], acceptableConcepts: ["TPU|GPU|\u8bad\u7ec3|\u5e76\u884c"] },
+  { query: "下周要跟领导做季度述职汇报了，怎么把工作成果讲得有条理又有亮点，有什么推荐的框架吗", group: "长句-职场", primaryIds: ["wp-3"], secondaryIds: ["wp-8"], acceptableDecks: ["workplace"], acceptableConcepts: ["汇报","向上沟通","述职"] },
 
-  { query: "Transformer\u4e3a\u4ec0\u4e48\u9664\u4ee5\u6839\u53f7dk", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-2"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["\u7f29\u653e|\u221a|\u65b9\u5dee|\u70b9\u79ef"] },
-
-  { query: "few-shot\u4e3a\u4ec0\u4e48\u7ed9\u4f8b\u5b50\u5c31\u80fd\u5b66", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-16", "llm-46"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["Few.*shot|Prompt|\u4e0a\u4e0b\u6587"] },
-
-  { query: "vLLM PageAttention\u6279\u5904\u7406", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-26"], secondaryIds: [], acceptableDecks: ["llm"], acceptableConcepts: ["vLLM|PagedAttention"] },
-
-  { query: "\u5927\u6a21\u578b\u8bba\u6587\u770b\u4e0d\u8fc7\u6765\u6709\u4ec0\u4e48\u5fc5\u8bfb", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-10", "llm-24"], secondaryIds: ["llm-42"], acceptableDecks: ["llm"], acceptableConcepts: ["Transformer.*\u67b6\u6784|GPT."] },
-
-  { query: "\u5fae\u8c03\u5e94\u8be5\u51bb\u7ed3\u54ea\u4e9b\u5c42", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-12", "llm-13"], secondaryIds: ["llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["\u5fae\u8c03|LoRA|\u51bb\u7ed3|Adapter"] },
-
-  { query: "\u60f3\u4e86\u89e3\u4e00\u4e0b\u73b0\u5728\u4e3b\u6d41\u7684 prompt engineering \u6280\u5de7\u6709\u54ea\u4e9b\uff0c\u6709\u6ca1\u6709\u4ec0\u4e48\u5957\u8def\u53ef\u4ee5\u53c2\u8003", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-14"], secondaryIds: ["llm-13"], acceptableDecks: ["llm"], acceptableConcepts: ["Prompt", "CoT", "Few-shot"] },
-
-  { query: "\u6211\u4eec\u56e2\u961f\u60f3\u628a\u4e00\u4e2a\u5927\u6a21\u578b\u90e8\u7f72\u5230\u751f\u4ea7\u73af\u5883\uff0c\u4f46\u662f\u63a8\u7406\u901f\u5ea6\u592a\u6162\u4e86\uff0c\u6709\u6ca1\u6709\u4ec0\u4e48\u52a0\u901f\u7684\u65b9\u6848\u53ef\u4ee5\u63a8\u8350\u4e00\u4e0b", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-15"], secondaryIds: ["llm-16", "llm-17"], acceptableDecks: ["llm"], acceptableConcepts: ["\u63a8\u7406\u52a0\u901f", "\u91cf\u5316", "KV Cache"] },
-
-  { query: "\u6570\u636e\u5e76\u884c\u6a21\u578b\u5e76\u884c\u6d41\u6c34\u7ebf\u5e76\u884c", group: "\u957f\u53e5-\u5927\u6a21\u578b", primaryIds: ["llm-47", "llm-48"], secondaryIds: ["llm-7"], acceptableDecks: ["llm"], acceptableConcepts: ["\u5e76\u884c|ZeRO|\u5206\u5e03\u5f0f"] },
-
-  // ── 长句-学习路径 ──
-
-  { query: "\u6539\u7b80\u5386\u51c6\u5907\u5927\u5382\u6280\u672f\u9762", group: "\u957f\u53e5-\u5b66\u4e60\u8def\u5f84", primaryIds: ["ml-134", "ml-136"], secondaryIds: ["ml-189"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u9762\u8bd5|\u7b80\u5386|\u673a\u5668\u5b66\u4e60"] },
-
-  { query: "\u673a\u5668\u5b66\u4e60\u9762\u8bd5\u8bb0\u4e86\u53c8\u5fd8\u600e\u4e48\u529e", group: "\u957f\u53e5-\u5b66\u4e60\u8def\u5f84", primaryIds: ["ml-110", "ml-112"], secondaryIds: ["ml-119"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u9762\u8bd5|\u590d\u4e60|\u6838\u5fc3"] },
-
-  { query: "\u7279\u5f81\u5de5\u7a0b\u96f6\u6563\u600e\u4e48\u7cfb\u7edf\u5b66", group: "\u957f\u53e5-\u5b66\u4e60\u8def\u5f84", primaryIds: ["ml-138", "ml-141"], secondaryIds: ["ml-41"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u7279\u5f81.*\u5de5\u7a0b|\u7279\u5f81.*\u9009\u62e9|\u964d\u7ef4"] },
-
-  // ── 长句-机器学习 ──
-
-  { query: "Batch Size\u5bf9\u6536\u655b\u6709\u4ec0\u4e48\u5f71\u54cd", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-58"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Batch.*Size|SGD|\u6536\u655b"] },
-
-  { query: "Contrastive Learning InfoNCE\u63a8\u5bfc", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-119", "ml-122"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u5bf9\u6bd4.*\u5b66\u4e60|InfoNCE|SimCL"] },
-
-  { query: "DBSCAN\u548cKMeans\u5bf9\u6bd4", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-123", "ml-124"], secondaryIds: ["ml-125"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["DBSCAN|K.*Means|\u805a\u7c7b"] },
-
-  { query: "Early Stopping\u9632\u8fc7\u62df\u5408\u539f\u7406", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-7", "ml-77"], secondaryIds: ["ml-78"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Early.*Stop|\u65e9\u505c|\u8fc7\u62df\u5408"] },
-
-  { query: "Imbalanced Dataset\u91c7\u6837\u7b56\u7565", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-105", "ml-135"], secondaryIds: ["ml-143"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u4e0d\u5e73\u8861|SMOTE|\u91c7\u6837"] },
-
-  { query: "MLflow\u548cWandB\u600e\u4e48\u7ba1\u7406\u5b9e\u9a8c", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-162"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["MLflow|\u5b9e\u9a8c.*\u7ba1\u7406|\u6a21\u578b.*\u7248\u672c"] },
-
-  { query: "Momentum\u4e3a\u4ec0\u4e48\u80fd\u52a0\u901f\u6536\u655b", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-120", "ml-58"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u52a8\u91cf|SGD|\u4f18\u5316\u5668|Adam"] },
-
-  { query: "Precision Recall trade-off\u53ef\u89c6\u5316", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-49", "ml-50"], secondaryIds: ["ml-56"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Precision.*Recall|PR"] },
-
-  { query: "WOE\u7f16\u7801\u548cOneHot\u533a\u522b", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-14", "ml-42"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["WOE|One.*Hot|\u7279\u5f81.*\u7f16\u7801"] },
-
-  { query: "Weight Decay\u548cL2\u7b49\u4ef7\u5417", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-10"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["Weight.*Decay|L1.*L2"] },
-
-  { query: "XGBoost\u8c03\u53c2\u4e0d\u5982\u9ed8\u8ba4\u503c\u600e\u4e48\u529e", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-31", "ml-33"], secondaryIds: ["ml-34"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["XGBoost|LightGBM|\u8c03\u53c2"] },
-
-  { query: "\u4f20\u7edfML\u8fd8\u6709\u6ca1\u6709\u5fc5\u8981\u5b66", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-18", "ml-19"], secondaryIds: ["ml-2"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|\u968f\u673a\u68ee\u6797|\u5927\u6a21\u578b.*\u5bf9\u6bd4"] },
-
-  { query: "\u51e0\u5341\u4e07\u6761\u6570\u636e\u51b7\u542f\u52a8\u63a8\u8350\u7cfb\u7edf\u600e\u4e48\u505a", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-103", "ml-117"], secondaryIds: ["ml-133"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u51b7\u542f\u52a8|\u77e9\u9635\u5206\u89e3|\u63a8\u8350"] },
-
-  { query: "\u566a\u58f0\u6807\u7b7e\u600e\u4e48\u8bad\u7ec3\u6a21\u578b", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-144"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u566a\u58f0.*\u6807\u7b7e|\u9c81\u68d2|\u6e05\u6d17"] },
-
-  { query: "\u5728\u7ebf\u63a8\u7406\u79bb\u7ebf\u6279\u5904\u7406\u67b6\u6784\u533a\u522b", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-104", "ml-110"], secondaryIds: ["ml-160"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u63a8\u7406|\u6279\u5904\u7406|\u67b6\u6784|\u90e8\u7f72"] },
-
-  { query: "\u5bf9\u6bd4\u5b66\u4e60\u4e3a\u4ec0\u4e48\u4e0d\u9700\u8981\u6807\u6ce8", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-118", "ml-119"], secondaryIds: ["ml-122"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u5bf9\u6bd4\u5b66\u4e60|\u81ea\u76d1\u7763|SimCLR|Info"] },
-
-  { query: "\u6211\u6709\u4e2a\u6570\u636e\u96c6\u6837\u672c\u7279\u522b\u4e0d\u5747\u8861\uff0c\u6b63\u6837\u672c\u53ea\u6709\u767e\u5206\u4e4b\u4e94\uff0c\u8fd9\u79cd\u60c5\u51b5\u4e00\u822c\u600e\u4e48\u5904\u7406\u6bd4\u8f83\u597d", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-16"], secondaryIds: ["ml-17", "ml-50"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u6837\u672c\u4e0d\u5747\u8861", "SMOTE", "\u7c7b\u522b\u6743\u91cd"] },
-
-  { query: "\u6700\u8fd1\u5728\u590d\u4e60\u673a\u5668\u5b66\u4e60\u57fa\u7840\uff0c\u60f3\u95ee\u4e00\u4e0b\u504f\u5dee\u548c\u65b9\u5dee\u5230\u5e95\u600e\u4e48\u7406\u89e3\uff0c\u6709\u4ec0\u4e48\u76f4\u89c2\u7684\u4f8b\u5b50\u5417", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-8"], secondaryIds: ["ml-7"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u504f\u5dee\u65b9\u5dee", "bias-variance", "\u8fc7\u62df\u5408"] },
-
-  { query: "\u6811\u6a21\u578b\u5bb6\u65cf\u600e\u4e48\u9009", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-126", "ml-17"], secondaryIds: ["ml-18"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u51b3\u7b56\u6811|\u968f\u673a\u68ee\u6797|GBDT|XGBoos"] },
-
-  { query: "\u6b63\u6837\u672c\u53ea\u67093%\u76f4\u63a5\u8bad\u7ec3\u4f1a\u4e0d\u4f1a\u6709\u95ee\u9898", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-143", "ml-16"], secondaryIds: ["ml-72"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u4e0d\u5e73\u8861|SMOTE|\u7c7b\u522b.*\u52a0\u6743"] },
-
-  { query: "\u6df1\u5ea6\u5b66\u4e60\u91d1\u878d\u98ce\u63a7\u53ef\u89e3\u91ca\u6027", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-134", "ml-137"], secondaryIds: ["ml-181"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u53ef\u89e3\u91ca|SHAP|LIME|Fairne"] },
-
-  { query: "\u73b0\u573a\u63a8\u5bfc\u903b\u8f91\u56de\u5f52\u68af\u5ea6\u5361\u4f4f\u4e86\u600e\u4e48\u529e", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-1"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u903b\u8f91\u56de\u5f52.*\u635f\u5931|\u68af\u5ea6.*\u63a8\u5bfc"] },
-
-  { query: "\u8fc7\u62df\u5408\u8bad\u7ec399\u6d4b\u8bd580\u600e\u4e48\u6392\u67e5", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-10", "ml-7"], secondaryIds: ["ml-77"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["\u8fc7\u62df\u5408|Dropout|\u6b63\u5219\u5316"] },
-
-  { query: "\u9762\u8bd5\u5b98\u5982\u679c\u95ee\u6211 SVM \u7684\u539f\u7406\u548c\u6838\u51fd\u6570\u600e\u4e48\u9009\uff0c\u6211\u8be5\u600e\u4e48\u56de\u7b54\u6bd4\u8f83\u597d", group: "\u957f\u53e5-\u673a\u5668\u5b66\u4e60", primaryIds: ["ml-2"], secondaryIds: ["ml-19", "ml-20"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM", "\u6838\u51fd\u6570", "kernel"] },
-
-  // ── 长句-深度学习 ──
-
-  { query: "BPTT\u5728RNN\u4e2d\u600e\u4e48\u5de5\u4f5c", group: "\u957f\u53e5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-5", "dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["RNN|BPTT|\u53cd\u5411.*\u4f20\u64ad"] },
-
-  { query: "GELU\u6fc0\u6d3b\u51fd\u6570\u6570\u5b66\u516c\u5f0f\u4f18\u52bf", group: "\u957f\u53e5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-1", "dl-24"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["GELU|Swish|\u6fc0\u6d3b"] },
-
-  { query: "LSTM\u548cGRU\u672c\u8d28\u533a\u522b\u662f\u4ec0\u4e48", group: "\u957f\u53e5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-24", "dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["LSTM|GRU|RNN"] },
-
-  { query: "\u56fe\u50cf\u5206\u5272\u624b\u673a\u7aef\u90e8\u7f72\u9009\u4ec0\u4e48\u6a21\u578b", group: "\u957f\u53e5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-6"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|\u5206\u5272|\u8f7b\u91cf\u5316|\u6a21\u578b.*\u538b\u7f29"] },
-
-  { query: "\u6211\u5728\u505a\u56fe\u50cf\u5206\u7c7b\u4efb\u52a1\uff0c\u6a21\u578b\u8bad\u7ec3\u4e86\u597d\u51e0\u4e2a\u5c0f\u65f6\u4e00\u76f4\u5728\u9707\u8361\u4e0d\u6536\u655b\uff0c\u53ef\u80fd\u662f\u4ec0\u4e48\u539f\u56e0", group: "\u957f\u53e5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-2"], secondaryIds: ["dl-1", "dl-5"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u68af\u5ea6\u6d88\u5931", "\u6fc0\u6d3b\u51fd\u6570", "\u5b66\u4e60\u7387"] },
-
-  { query: "\u68af\u5ea6\u6d88\u5931\u68af\u5ea6\u7206\u70b8\u901a\u4fd7\u89e3\u91ca", group: "\u957f\u53e5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-2"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["\u68af\u5ea6.*\u6d88\u5931|\u68af\u5ea6.*\u7206\u70b8|BatchN"] },
-
-  { query: "\u80fd\u4e0d\u80fd\u7528\u901a\u4fd7\u6613\u61c2\u7684\u65b9\u5f0f\u7ed9\u6211\u89e3\u91ca\u4e00\u4e0b Batch Normalization \u5230\u5e95\u505a\u4e86\u4ec0\u4e48\u4e8b\u60c5", group: "\u957f\u53e5-\u6df1\u5ea6\u5b66\u4e60", primaryIds: ["dl-3"], secondaryIds: ["dl-2"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["BatchNorm", "\u5f52\u4e00\u5316"] },
-
-  // ── 长句-统计学 ──
-
-  { query: "AB\u6d4b\u8bd5\u8f6c\u5316\u7387\u63d0\u5347\u53ea\u67090.5%\u600e\u4e48\u5224\u65ad\u663e\u8457", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-119", "stats-174"], secondaryIds: ["stats-31"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB.*\u6d4b\u8bd5|A/B.*\u663e\u8457|\u6837\u672c\u91cf"] },
-
-  { query: "CAP\u7406\u8bba\u4e3a\u4ec0\u4e48\u4e0d\u80fd\u4e09\u8005\u517c\u5f97", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-126"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["CAP|\u5206\u5e03\u5f0f|\u4e00\u81f4"] },
-
-  { query: "ETL\u6d41\u7a0bpipeline\u6700\u4f73\u5b9e\u8df5", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-149", "stats-152"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["ETL|pipeline|\u6570\u636e"] },
-
-  { query: "SQL\u5168\u8868\u626b\u63cf\u600e\u4e48\u52a0\u7d22\u5f15", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-180", "stats-183"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["\u7d22\u5f15|SQL.*\u4f18\u5316|\u5168\u8868"] },
-
-  { query: "Spark join\u64cd\u4f5c\u7279\u522b\u6162\u600e\u4e48\u529e", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-144", "stats-180"], secondaryIds: ["stats-187"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u6570\u636e\u503e\u659c|Spark|\u4f18\u5316"] },
-
-  { query: "pandas\u767e\u4e07\u6570\u636e\u5185\u5b58\u6ea2\u51fa\u600e\u4e48\u529e", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-180", "stats-187"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["pandas|\u5185\u5b58|\u5927\u6570\u636e"] },
-
-  { query: "\u534f\u65b9\u5dee\u548c\u76f8\u5173\u7cfb\u6570\u516c\u5f0f\u8001\u641e\u6df7", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-115", "stats-146"], secondaryIds: ["stats-17"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u534f\u65b9\u5dee|\u76f8\u5173\u7cfb\u6570|\u6807\u51c6\u5316"] },
-
-  { query: "\u65b0\u529f\u80fd\u662f\u5426\u5bf9\u7559\u5b58\u6709\u6b63\u5411\u5f71\u54cd", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-136", "stats-145"], secondaryIds: ["stats-164"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB.*\u6d4b\u8bd5|\u56e0\u679c|\u7559\u5b58"] },
-
-  { query: "\u65f6\u95f4\u5e8f\u5217\u8282\u5047\u65e5\u6548\u5e94\u600e\u4e48\u5904\u7406", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-88", "stats-90"], secondaryIds: ["stats-91"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u5b63\u8282|\u8282\u5047\u65e5|ARIMA|Prophet"] },
-
-  { query: "\u9762\u8bd5\u88ab\u95ee\u5230\u4e2d\u5fc3\u6781\u9650\u5b9a\u7406\uff0c\u6211\u5176\u5b9e\u4e00\u76f4\u6ca1\u5b8c\u5168\u7406\u89e3\u5b83\u7684\u5b9e\u9645\u5e94\u7528\u573a\u666f\uff0c\u80fd\u5e2e\u6211\u68b3\u7406\u4e00\u4e0b\u5417", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-10"], secondaryIds: ["stats-11"], acceptableDecks: ["statistics"], acceptableConcepts: ["\u4e2d\u5fc3\u6781\u9650\u5b9a\u7406", "\u5927\u6570\u5b9a\u5f8b", "\u62bd\u6837\u5206\u5e03"] },
-
-  { query: "\u9886\u5bfc\u8ba9\u6211\u5206\u6790\u4e00\u4e0b\u65b0\u529f\u80fd\u4e0a\u7ebf\u524d\u540e\u7528\u6237\u7559\u5b58\u6709\u6ca1\u6709\u663e\u8457\u53d8\u5316\uff0c\u6211\u5e94\u8be5\u7528\u4ec0\u4e48\u7edf\u8ba1\u65b9\u6cd5", group: "\u957f\u53e5-\u7edf\u8ba1\u5b66", primaryIds: ["stats-24"], secondaryIds: ["stats-25", "stats-26"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB\u6d4b\u8bd5", "\u5047\u8bbe\u68c0\u9a8c", "\u663e\u8457\u6027"] },
-
-  // ── 长句-职场 ──
-
-  { query: "\u4e0b\u5468\u8981\u8ddf\u9886\u5bfc\u505a\u5b63\u5ea6\u8ff0\u804c\u6c47\u62a5\u4e86\uff0c\u600e\u4e48\u628a\u5de5\u4f5c\u6210\u679c\u8bb2\u5f97\u6709\u6761\u7406\u53c8\u6709\u4eae\u70b9\uff0c\u6709\u4ec0\u4e48\u63a8\u8350\u7684\u6846\u67b6\u5417", group: "\u957f\u53e5-\u804c\u573a", primaryIds: ["wp-3"], secondaryIds: ["wp-8"], acceptableDecks: ["workplace"], acceptableConcepts: ["\u6c47\u62a5", "\u5411\u4e0a\u6c9f\u901a", "\u8ff0\u804c"] },
-
-  { query: "\u6700\u8fd1\u60f3\u8df3\u69fd\u4f46\u662f\u7b80\u5386\u6295\u51fa\u53bb\u90fd\u6ca1\u6709\u56de\u97f3\uff0c\u60f3\u8bf7\u6559\u4e00\u4e0b\u600e\u4e48\u5199\u7b80\u5386\u624d\u80fd\u8ba9 HR \u773c\u524d\u4e00\u4eae", group: "\u957f\u53e5-\u804c\u573a", primaryIds: ["wp-7"], secondaryIds: ["wp-6", "wp-5"], acceptableDecks: ["workplace"], acceptableConcepts: ["\u7b80\u5386", "\u9762\u8bd5", "STAR\u6cd5\u5219"] },
+  { query: "最近想跳槽但是简历投出去都没有回音，想请教一下怎么写简历才能让 HR 眼前一亮", group: "长句-职场", primaryIds: ["wp-7"], secondaryIds: ["wp-6","wp-5"], acceptableDecks: ["workplace"], acceptableConcepts: ["简历","面试","STAR法则"] },
 
 ];
