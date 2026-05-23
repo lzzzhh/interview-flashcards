@@ -155,6 +155,96 @@ async function main() {
     }
   }
 
+  // 8. Normalized schema: benchmarkScope required (info only — merged at runtime)
+  let missingScope = 0, missingIntent = 0;
+  for (let i = 0; i < TEST_CASES.length; i++) {
+    const tc = TEST_CASES[i];
+    if (!tc) continue;
+    if (!tc.benchmarkScope) missingScope++;
+    if (!tc.intentType) missingIntent++;
+  }
+  if (missingScope > 0) {
+    console.log(`  [info] ${missingScope}/${TEST_CASES.length} cases: benchmarkScope merged at runtime from benchmark-classification.ts`);
+  }
+  if (missingIntent > 0) {
+    console.log(`  [info] ${missingIntent}/${TEST_CASES.length} cases: intentType merged at runtime from benchmark-classification.ts`);
+  }
+
+  // 9. Excluded cases: excludeReason required
+  for (let i = 0; i < TEST_CASES.length; i++) {
+    const tc = TEST_CASES[i];
+    if (!tc) continue;
+    if (tc.benchmarkScope === 'excluded' && !tc.excludeReason) {
+      issues.push({
+        severity: 'error', category: 'excluded_no_reason', index: i,
+        query: tc.query, group: tc.group,
+        detail: 'benchmarkScope=excluded but excludeReason not set',
+      });
+    }
+  }
+
+  // 10. Search cases: intentType must be card search
+  for (let i = 0; i < TEST_CASES.length; i++) {
+    const tc = TEST_CASES[i];
+    if (!tc) continue;
+    if (tc.benchmarkScope === 'search') {
+      const validIntents = ['card_lookup', 'concept_card_search', 'card_collection_search'];
+      if (tc.intentType && !validIntents.includes(tc.intentType)) {
+        issues.push({
+          severity: 'error', category: 'search_invalid_intent', index: i,
+          query: tc.query, group: tc.group,
+          detail: `benchmarkScope=search but intentType=${tc.intentType} (must be card_lookup/concept_card_search/card_collection_search)`,
+        });
+      }
+      const hasPrimary = tc.primaryIds && tc.primaryIds.length > 0;
+      const hasConcepts = tc.acceptableConcepts && tc.acceptableConcepts.length > 0;
+      if (!hasPrimary && !hasConcepts) {
+        issues.push({
+          severity: 'error', category: 'search_no_expectation', index: i,
+          query: tc.query, group: tc.group,
+          detail: 'benchmarkScope=search but no primaryIds or acceptableConcepts',
+        });
+      }
+    }
+  }
+
+  // 11. Learning plan cases: intentType and acceptableConcepts required
+  for (let i = 0; i < TEST_CASES.length; i++) {
+    const tc = TEST_CASES[i];
+    if (!tc) continue;
+    if (tc.benchmarkScope === 'learning_plan') {
+      if (tc.intentType && tc.intentType !== 'learning_plan') {
+        issues.push({
+          severity: 'error', category: 'lp_invalid_intent', index: i,
+          query: tc.query, group: tc.group,
+          detail: `benchmarkScope=learning_plan but intentType=${tc.intentType} (must be learning_plan)`,
+        });
+      }
+      if (!tc.acceptableConcepts || tc.acceptableConcepts.length === 0) {
+        issues.push({
+          severity: 'error', category: 'lp_no_concepts', index: i,
+          query: tc.query, group: tc.group,
+          detail: 'benchmarkScope=learning_plan but no acceptableConcepts',
+        });
+      }
+    }
+  }
+
+  // 12. Ambiguous queries should not enter search benchmark
+  for (let i = 0; i < TEST_CASES.length; i++) {
+    const tc = TEST_CASES[i];
+    if (!tc) continue;
+    if (tc.benchmarkScope === 'search' && tc.intentType === 'ambiguous') {
+      if (!tc.normalizedQuery || tc.labelQuality !== 'verified') {
+        issues.push({
+          severity: 'error', category: 'ambiguous_in_search', index: i,
+          query: tc.query, group: tc.group,
+          detail: 'intentType=ambiguous in search benchmark — must set normalizedQuery + labelQuality=verified, or move to excluded',
+        });
+      }
+    }
+  }
+
   // ── Report ──
   const errors = issues.filter(i => i.severity === 'error');
   const warnings = issues.filter(i => i.severity === 'warning');

@@ -54,11 +54,10 @@ export async function initFTS5(): Promise<void> {
 
 /** 重建 FTS5 索引 */
 export async function rebuildFTS5(): Promise<void> {
-  const db = (prisma as any).$queryRawUnsafe || prisma.$executeRawUnsafe;
-  try { await db(`DELETE FROM card_fts`); } catch {}
-  try { await db(`INSERT INTO card_fts(cardId, deckId, question, answer, tags, searchKeywords) SELECT id, deckId, question, answer, tags, searchKeywords FROM Card`); } catch {}
-  try { await db(`DELETE FROM source_chunk_fts`); } catch {}
-  try { await db(`INSERT INTO source_chunk_fts(chunkId, sourceId, text) SELECT id, sourceId, text FROM SourceChunk`); } catch {}
+  try { await prisma.$executeRawUnsafe(`DELETE FROM card_fts`); } catch {}
+  try { await prisma.$executeRawUnsafe(`INSERT INTO card_fts(cardId, deckId, question, answer, tags, searchKeywords) SELECT id, deckId, COALESCE(question,''), COALESCE(answer,''), COALESCE(tags,''), COALESCE(searchKeywords,'') FROM Card`); } catch {}
+  try { await prisma.$executeRawUnsafe(`DELETE FROM source_chunk_fts`); } catch {}
+  try { await prisma.$executeRawUnsafe(`INSERT INTO source_chunk_fts(chunkId, sourceId, text) SELECT id, sourceId, text FROM SourceChunk`); } catch {}
 }
 
 /** FTS5 关键词搜索 */
@@ -70,7 +69,7 @@ export async function fts5Search(query: string, limit: number = 20, deckId?: str
     // For Chinese-containing queries → LIKE only (no FTS5, avoids column-name + ranking noise)
     if (/[\u4e00-\u9fff]/.test(escaped)) {
       const terms = extractChineseTerms(escaped);
-      console.log("likeSearch terms:", terms, "limit:", limit); const lsr = await likeSearch(terms, limit); console.log("likeSearch returned:", lsr.length); return lsr;
+      if (!process.env.EVAL_SUPPRESS_DEBUG) console.log("likeSearch terms:", terms, "limit:", limit); const lsr = await likeSearch(terms, limit); if (!process.env.EVAL_SUPPRESS_DEBUG) console.log("likeSearch returned:", lsr.length); return lsr;
     }
 
     // Pure English/Latin: use FTS5 (quote terms to avoid column-name conflicts)

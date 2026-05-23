@@ -34,6 +34,9 @@ import { TEST_CASES } from './test-cases';
 import { computeCaseResult, computeGroupMetrics, computeGlobalMetrics, computeThresholdCase, computeThresholdMetrics, computeLearningPathMetrics } from './metrics';
 import { printReport, printThresholdReport } from './report';
 import type { CaseResult, GroupMetrics, GlobalMetrics, ThresholdCaseResult, ThresholdMetrics } from './types';
+import { isLearningPath, printBenchmarkHeader, BASELINE_SEARCH_CONFIG } from './eval-config';
+import { toCsvRows, writeCsv } from './eval-csv';
+import { getMeta, DEFAULT_META } from './benchmark-classification';
 
 const THRESHOLDS = [0.20, 0.25, 0.30, 0.35, 0.40];
 
@@ -77,6 +80,36 @@ async function runEvaluation() {
   console.log('\n[eval] 初始化搜索组件...');
   await initProviders();
 
+  // Print benchmark header with normalized counts
+  const searchCases = TEST_CASES.filter(tc => getMeta(tc.query).benchmarkScope === 'search');
+  const lpCases = TEST_CASES.filter(tc => getMeta(tc.query).benchmarkScope === 'learning_plan');
+  const excludedCases = TEST_CASES.filter(tc => getMeta(tc.query).benchmarkScope === 'excluded');
+  const cgCases = TEST_CASES.filter(tc => tc.group === 'coverage-gap' || tc.group?.startsWith('coverage_gap'));
+
+  // Merge metadata into test cases
+  for (const tc of TEST_CASES) {
+    const meta = getMeta(tc.query);
+    tc.benchmarkScope = meta.benchmarkScope;
+    tc.intentType = meta.intentType;
+    tc.excludeReason = meta.excludeReason;
+    tc.normalizedQuery = tc.normalizedQuery || meta.normalizedQuery;
+    tc.labelQuality = tc.labelQuality || meta.labelQuality;
+    tc.source = tc.source || meta.source;
+  }
+
+  // Excluded by reason
+  const excludedByReason: Record<string, number> = {};
+  for (const tc of excludedCases) {
+    const r = tc.excludeReason || 'unspecified';
+    excludedByReason[r] = (excludedByReason[r] || 0) + 1;
+  }
+
+  printBenchmarkHeader(TEST_CASES.length, searchCases.length, lpCases.length, cgCases.length, {
+    'runner': 'main-runner (runner.ts)',
+    'excluded cases': String(excludedCases.length),
+    'excluded by reason': Object.entries(excludedByReason).map(([k,v]) => `${k}=${v}`).join(', '),
+  });
+
   console.log(`\n[eval] 运行 ${TEST_CASES.length} 条测试用例 (candidateLimit=500)...\n`);
 
   // 一次性获取大候选池（不需要重复调 API）
@@ -89,7 +122,14 @@ async function runEvaluation() {
     const t0 = performance.now();
     let hits: any[];
     try {
-      hits = await hybridSearch({ query: tc.query, maxResults: 100, minScore: 0, candidateLimit: 500 });
+      // Use normalizedQuery if available, otherwise raw query
+      const searchQuery = tc.normalizedQuery || tc.query;
+      hits = await hybridSearch({
+        query: searchQuery,
+        maxResults: BASELINE_SEARCH_CONFIG.maxResults,
+        minScore: BASELINE_SEARCH_CONFIG.minScore,
+        candidateLimit: BASELINE_SEARCH_CONFIG.candidateLimit,
+      });
     } catch (err: any) {
       console.error(`${label} 搜索失败:`, err.message);
       hits = [];
@@ -100,9 +140,9 @@ async function runEvaluation() {
     const result = computeCaseResult(tc, hits, elapsed);
     const found = result.primaryHitTop15.length;
     const total = result.primaryRanks.length;
-    // Learning-path: don't mark as search failure (evaluated by LP Benchmark)
-    const isLP = tc.group === 'learning-path' || tc.group.startsWith('学习路径');
-    const ok = isLP ? ' ' : (result.primaryMissing.length === 0 ? '✓' : '✗');
+    // Only mark ✗ for search-benchmark cases (LP and excluded get ' ')
+    const isSearch = tc.benchmarkScope === 'search';
+    const ok = isSearch ? (result.primaryMissing.length === 0 ? '✓' : '✗') : ' ';
     console.log(`  ${ok} ${label.padEnd(56)} top15=${found}/${total}  ${Math.round(elapsed)}ms`);
   }
 
@@ -158,6 +198,15 @@ async function runEvaluation() {
 
   // ═══════════ Consolidated Summary ═══════════
   printConsolidatedSummary(global, caseResults, thresholdResults);
+
+  // ═══════════ CSV Export (for runner parity) ═══════════
+  const pidMap = new Map<string, string>();
+  const sidMap = new Map<string, string>();
+  for (const tc of TEST_CASES) {
+    pidMap.set(tc.query, (tc.primaryIds || []).join('|'));
+    sidMap.set(tc.query, (tc.secondaryIds || []).join('|'));
+  }
+  writeCsv('/tmp/runner_main.csv', toCsvRows(caseResults), pidMap, sidMap);
 
   // ═══════════ Learning-Path Evaluation ═══════════
   printLearningPathEval(allHits, caseResults);
@@ -405,35 +454,58 @@ function printConsolidatedSummary(
 ): void {
   const t30 = thresholdResults.find(t => t.threshold === 0.30);
 
-  // Split into search (excl learning-path) vs learning-plan groups
-  const isLP = (g: string) => g === 'learning-path' || g.startsWith('学习路径-') || g.startsWith('学习路径');
-  const searchGroups = global.groups.filter(g => !isLP(g.group));
-  const lpGroups = global.groups.filter(g => isLP(g.group));
+  // Split by benchmarkScope
+  const searchResults = caseResults.filter(r => {
+    const tc = TEST_CASES.find(c => c && c.query === r.query);
+    return tc?.benchmarkScope === 'search';
+  });
+  const lpResults = caseResults.filter(r => {
+    const tc = TEST_CASES.find(c => c && c.query === r.query);
+    return tc?.benchmarkScope === 'learning_plan';
+  });
+  const excludedResults = caseResults.filter(r => {
+    const tc = TEST_CASES.find(c => c && c.query === r.query);
+    return tc?.benchmarkScope === 'excluded';
+  });
 
-  // Aggregate search-only metrics
-  const searchCaseCount = searchGroups.reduce((s, g) => s + g.caseCount, 0);
+  // Aggregate search-only metrics (simple averages across search results)
+  const searchCaseCount = searchResults.length;
   const searchTop15 = searchCaseCount > 0
-    ? searchGroups.reduce((s, g) => s + g.hitRateTop15 * g.caseCount, 0) / searchCaseCount
-    : 0;
+    ? searchResults.filter(r => r.primaryHitTop15.length > 0).length / searchCaseCount : 0;
   const searchTop50 = searchCaseCount > 0
-    ? searchGroups.reduce((s, g) => s + g.hitRateTop50 * g.caseCount, 0) / searchCaseCount
-    : 0;
+    ? searchResults.filter(r => r.primaryHitTop50.length > 0).length / searchCaseCount : 0;
   const searchTop100 = searchCaseCount > 0
-    ? searchGroups.reduce((s, g) => s + g.hitRateTop100 * g.caseCount, 0) / searchCaseCount
-    : 0;
+    ? searchResults.filter(r => r.primaryHitTop100.length > 0).length / searchCaseCount : 0;
   const searchMRR = searchCaseCount > 0
-    ? searchGroups.reduce((s, g) => s + g.avgMRR * g.caseCount, 0) / searchCaseCount
-    : 0;
+    ? searchResults.reduce((s, r) => {
+        const ranks = r.expectationRanks?.filter(rk => rk > 0) || r.primaryRanks.filter(rk => rk > 0);
+        return s + (ranks.length > 0 ? 1 / Math.min(...ranks) : 0);
+      }, 0) / searchCaseCount : 0;
   const searchP5 = searchCaseCount > 0
-    ? searchGroups.reduce((s, g) => s + g.avgPrecisionAt5 * g.caseCount, 0) / searchCaseCount
-    : 0;
-  const searchMissing = searchGroups.reduce((s, g) => s + g.totalMissing, 0);
-  const searchBuried = searchGroups.reduce((s, g) => s + g.totalBuried, 0);
+    ? searchResults.reduce((s, r) => {
+        const top5 = r.rankedIds.slice(0, 5);
+        const expSet = new Set((r.expectations || []).filter(e => e.grade >= 1).map(e => e.cardId));
+        if (expSet.size === 0) return s;
+        let hits = 0;
+        for (const id of top5) { if (expSet.has(id)) hits++; }
+        return s + (hits / Math.min(5, expSet.size));
+      }, 0) / searchCaseCount : 0;
+  const searchMissing = searchResults.reduce((s, r) => s + r.primaryMissing.length, 0);
+  const searchBuried = searchResults.reduce((s, r) => s + r.primaryBuried.length, 0);
 
-  const lpCaseCount = lpGroups.reduce((s, g) => s + g.caseCount, 0);
+  const lpCaseCount = lpResults.length;
+
+  // Excluded summary
+  const excludedCount = excludedResults.length;
+  const excludedByReasonSummary: Record<string, number> = {};
+  for (const r of excludedResults) {
+    const tc = TEST_CASES.find(c => c && c.query === r.query);
+    const reason = tc?.excludeReason || 'unspecified';
+    excludedByReasonSummary[reason] = (excludedByReasonSummary[reason] || 0) + 1;
+  }
 
   console.log('═'.repeat(60));
-  console.log('              BENCHMARK SUMMARY');
+  console.log('        NORMALIZED BENCHMARK SUMMARY');
   console.log('═'.repeat(60));
   console.log('');
 
@@ -449,23 +521,23 @@ function printConsolidatedSummary(
   console.log(`  Buried       ${searchBuried}`);
   console.log('');
 
+  // ═ Excluded Summary ═
+  if (excludedCount > 0) {
+    console.log('  ── Excluded ──');
+    console.log(`  Cases        ${excludedCount}`);
+    const reasons = Object.entries(excludedByReasonSummary).sort((a,b) => b[1]-a[1]);
+    for (const [reason, count] of reasons) {
+      console.log(`    ${reason.padEnd(22)} ${count}`);
+    }
+    console.log('');
+  }
+
   // ═ Learning Plan Benchmark ═
   if (lpCaseCount > 0) {
-    const lpResults = caseResults.filter(r => isLP(r.group));
-    const avgCC = lpResults.reduce((s, r) => {
+    const lpResultsForDisplay = caseResults.filter(r => {
       const tc = TEST_CASES.find(c => c && c.query === r.query);
-      if (!tc) return s;
-      const allSub = (tc.acceptableConcepts || []).flatMap((c: string) => c.split('|').map(x => x.trim()).filter(Boolean));
-      const unique = [...new Set(allSub)];
-      const covered = unique.filter(sub => {
-        const sl = sub.toLowerCase();
-        return r.rankedIds.slice(0, 20).some((id, i) => {
-          // Check if this result covers the concept
-          return false; // simplified — full metric needs card details
-        });
-      });
-      return s + (covered.length / Math.max(1, unique.length));
-    }, 0) / lpCaseCount;
+      return tc?.benchmarkScope === 'learning_plan';
+    });
     console.log('  ── Learning Plan Benchmark ──');
     console.log(`  Cases        ${lpCaseCount}`);
     console.log(`  (see LEARNING-PATH EVALUATION block for detailed CC/DA/PC)`);
@@ -482,20 +554,12 @@ function printConsolidatedSummary(
     console.log('');
   }
 
-  // ── Missing by Group (top 10, search only) ──
-  console.log('  Missing by Group (top 10, search) ──');
-  const gm = searchGroups
-    .filter(g => g.totalMissing > 0)
-    .sort((a, b) => b.totalMissing - a.totalMissing)
-    .slice(0, 10);
-  for (const g of gm) {
-    console.log(`    ${g.group.padEnd(26)} Missing=${String(g.totalMissing).padStart(3)}  Buried=${String(g.totalBuried).padStart(3)}`);
-  }
-  console.log('');
-
-  // ── Buried targets ──
+  // ── Buried targets (search only) ──
   const buriedHits = caseResults
-    .filter(r => !isLP(r.group) && r.primaryBuried.length > 0)
+    .filter(r => {
+      const tc = TEST_CASES.find(c => c && c.query === r.query);
+      return tc?.benchmarkScope === 'search' && r.primaryBuried.length > 0;
+    })
     .sort((a, b) => {
       // Sort by lowest buried rank (worst first = closest to top 15)
       const aMin = Math.min(...a.primaryBuried.map(id => {

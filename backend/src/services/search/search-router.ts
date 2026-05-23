@@ -1,8 +1,10 @@
 // backend/src/services/search/search-router.ts
-// v8: Intent-based search routing
+// v8: Intent-based search routing — REJECTED (2026-05-23)
 //
-// Routes queries to the right search strategy based on QueryUnderstanding.
-// Preserves v7 hybridSearch as the default for exact_lookup.
+// Experiment conclusion: All LLM rewrite configs degrade vs bge-m3 baseline.
+// Baseline 85.8% Top15 → best LLM rewrite 82.8% (−3.0pp).
+// This module is kept as experimental infrastructure but NOT wired into production.
+// See docs/v8-llm-rewrite-ablation-rejected.md for full results.
 
 import { hybridSearch } from './hybrid-search';
 import type { QueryUnderstanding, FirstPassSummary } from './query-understanding';

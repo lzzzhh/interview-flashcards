@@ -9,7 +9,14 @@
     "lint": "tsc --noEmit",
     "evaluate": "tsx src/evaluation/runner.ts",
     "evaluate:validate": "tsx src/evaluation/validate.ts",
-    "evaluate:v8-ablation": "tsx src/evaluation/v8-ablation-runner.ts"
+    "evaluate:v8-ablation": "tsx src/evaluation/v8-ablation-runner.ts",
+    "evaluate:gate": "tsx src/evaluation/release-gate.ts",
+    "evaluate:smoke-new-cards": "tsx src/evaluation/smoke-new-cards.ts",
+    "readiness:check": "tsx src/ingestion/readiness-cli.ts check",
+    "readiness:fix": "tsx src/ingestion/readiness-cli.ts fix",
+    "readiness:fix-all": "tsx src/ingestion/readiness-cli.ts fix-all",
+    "readiness:gaps": "tsx src/ingestion/readiness-cli.ts gaps",
+    "readiness:audit": "tsx src/ingestion/readiness-cli.ts audit"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",

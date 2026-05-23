@@ -1,8 +1,8 @@
 // backend/src/services/search/query-understanding.ts
-// v8: Rule-based + LLM Query Understanding
+// v8: Rule-based + LLM Query Understanding — REJECTED (2026-05-23)
 //
-// Intent recognition, concept extraction, rewrite decision.
-// Rules handle 80% for free; LLM handles ambiguous/diagnostic/long queries.
+// Experiment: All LLM rewrite configs degrade vs bge-m3 baseline.
+// See docs/v8-llm-rewrite-ablation-rejected.md for full results.
 
 // ── Types ──
 
@@ -230,7 +230,7 @@ export async function llmIntentClassify(
       max_tokens: 500,
     });
 
-    const text = response.content || response.message?.content || '';
+    const text = response.text || response.content || response.message?.content || '';
     // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;

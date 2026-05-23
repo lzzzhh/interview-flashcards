@@ -32,13 +32,18 @@ export async function syncCardEmbedding(cardId: string): Promise<void> {
   // 尝试外部 API
   if (provider) {
     try {
-      const res = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts: [text] });
+      const model = (provider as any).defaultModel;
+      // Guard: never use OpenAI default model with Ollama
+      if (model === 'text-embedding-3-small') {
+        throw new Error('embedding model not configured — refusing to send text-embedding-3-small');
+      }
+      const res = await provider.embed({ model: model || 'bge-m3', texts: [text] });
       if (res.embeddings.length > 0) {
         await store.upsert(cardId, 'card', res.embeddings[0]);
         return;
       }
-    } catch {
-      // 降级到本地向量
+    } catch (e: any) {
+      console.error(`[embedding-sync] External API failed for ${cardId}: ${e?.message?.slice(0,100)}`);
     }
   }
 
@@ -60,7 +65,11 @@ export async function syncCardEmbeddings(cardIds: string[]): Promise<number> {
     const texts = cards.map(c => buildCardIndexText(c)).filter(t => t.trim());
     if (texts.length === 0) return 0;
     try {
-      const res = await provider.embed({ model: (provider as any).defaultModel || 'text-embedding-3-small', texts });
+      const model = (provider as any).defaultModel;
+      if (model === 'text-embedding-3-small') {
+        throw new Error('embedding model not configured');
+      }
+      const res = await provider.embed({ model: model || 'bge-m3', texts });
       const items: { objectId: string; objectType: string; vector: number[] }[] = [];
       for (let i = 0; i < res.embeddings.length; i++) {
         const card = cards[i];

@@ -37,7 +37,19 @@ export interface TestCase {
   /** pending = 未审, reviewed = 已人工确认, needs_fix = 需修正 */
   reviewStatus?: 'pending' | 'reviewed' | 'needs_fix';
   /** generated = 脚本生成未审核, manual = 人工标注, merged = 合并去重后 */
-  labelQuality?: 'generated' | 'manual' | 'merged';
+  labelQuality?: 'generated' | 'manual' | 'merged' | 'verified' | 'needs_review' | 'weak';
+  /** Where this test case came from */
+  source?: 'legacy' | 'coverage_gap_resolved' | 'manual_review';
+
+  // ── v8 normalization metadata ──
+  /** search = card search benchmark, learning_plan = learning path, excluded = not a card search task */
+  benchmarkScope?: 'search' | 'learning_plan' | 'excluded';
+  /** What kind of user intent this query represents */
+  intentType?: 'card_lookup' | 'concept_card_search' | 'card_collection_search' | 'learning_plan' | 'ambiguous' | 'not_card_search_intent';
+  /** Why excluded, if benchmarkScope=excluded */
+  excludeReason?: 'open_qa' | 'career_advice' | 'business_decision' | 'diagnostic_qa' | 'too_ambiguous' | 'out_of_scope';
+  /** For search queries with awkward phrasing, the normalized equivalent */
+  normalizedQuery?: string;
 }
 
 /** 归一化后的期望（运行时从 primaryIds/secondaryIds/expectations 推导） */

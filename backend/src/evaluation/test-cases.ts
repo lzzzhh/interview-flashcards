@@ -85,9 +85,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "Agent记忆", group: "关键词-Agent", primaryIds: ["agent-21"], secondaryIds: ["agent-5"], acceptableDecks: ["agent"], acceptableConcepts: ["记忆","Memory"] },
 
-  { query: "Function Calling", group: "关键词-Agent", primaryIds: ["agent-2","agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["FunctionCalling","FC","工具调用"] },
-
-  { query: "Function Calling", group: "关键词-Agent", primaryIds: ["agent-2","agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Function Calling","Tool-Use"] },
+  { query: "Function Calling", group: "关键词-Agent", primaryIds: ["agent-2","agent-3"], secondaryIds: [], acceptableDecks: ["agent"], acceptableConcepts: ["Function Calling|FC|FunctionCalling|Tool-Use|工具调用"] },
 
   { query: "RAG", group: "关键词-Agent", primaryIds: ["agent-7"], secondaryIds: ["agent-22"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG","检索增强生成"] },
 
@@ -525,7 +523,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "训练集表现很好但测试集很差是怎么回事", group: "概念-机器学习", primaryIds: ["ml-7"], secondaryIds: ["ml-8","ml-4"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合","泛化","偏差方差"] },
 
-  { query: "风控建模一般用什么算法", group: "概念-机器学习", primaryIds: ["ml-128"], secondaryIds: ["ml-146"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["风控|异常|Fraud|Anomaly"] },
+  { query: "风控建模一般用什么算法", group: "概念-机器学习", primaryIds: ["ml-199","ml-200"], secondaryIds: ["ml-201","ml-146"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["风控|异常|Fraud|Anomaly"] },
 
   { query: "Diffusion去噪过程", group: "概念-深度学习", primaryIds: ["dl-15","dl-16"], secondaryIds: ["dl-27"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["扩散|Diffusion|DDPM"] },
 
@@ -555,9 +553,9 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "为什么样本方差分母是 n 减 1", group: "概念-统计学", primaryIds: ["stats-2"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["方差","自由度"] },
 
-  { query: "什么时候用图数据库", group: "概念-统计学", primaryIds: ["stats-3"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["图|Graph|Neo4j"] },
+  { query: "什么时候用图数据库", group: "概念-统计学", primaryIds: ["dl-33","dl-34"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["图|Graph|Neo4j"] },
 
-  { query: "什么是指标体系北极星", group: "概念-统计学", primaryIds: ["stats-116","stats-163"], secondaryIds: ["stats-164"], acceptableDecks: ["statistics"], acceptableConcepts: ["北极星|North Star|AARRR"] },
+  { query: "什么是指标体系北极星", group: "概念-统计学", primaryIds: ["wp-77","wp-78"], secondaryIds: ["stats-164"], acceptableDecks: ["statistics"], acceptableConcepts: ["北极星|North Star|AARRR"] },
 
   { query: "怎么判断两个变量之间有没有关系", group: "概念-统计学", primaryIds: ["stats-115","stats-138"], secondaryIds: ["stats-140","ml-1"], acceptableDecks: ["statistics","machine-learning"], acceptableConcepts: ["相关|回归"] },
 
@@ -833,7 +831,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "智能客服意图识别怎么做", group: "长句-Agent", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|分类|意图"] },
 
-  { query: "用AI回复客户邮件隐私怎么保证", group: "长句-Agent", primaryIds: ["agent-10","agent-11"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|安全|幻觉"] },
+  { query: "用AI回复客户邮件隐私怎么保证", group: "长句-Agent", primaryIds: ["agent-27","agent-28"], secondaryIds: ["agent-12"], acceptableDecks: ["agent"], acceptableConcepts: ["RAG|安全|幻觉"] },
 
   { query: "力扣里面二叉树相关的题目我做得不太好，尤其是递归遍历老是写错，有哪些经典题可以练手", group: "长句-力扣", primaryIds: ["lc-043"], secondaryIds: ["lc-040","lc-041","lc-039"], acceptableDecks: ["leetcode"], acceptableConcepts: ["二叉树","遍历","递归"] },
 
@@ -871,9 +869,9 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "数据并行模型并行流水线并行", group: "长句-大模型", primaryIds: ["llm-47","llm-48"], secondaryIds: ["llm-7"], acceptableDecks: ["llm"], acceptableConcepts: ["并行|ZeRO|分布式"] },
 
-  { query: "改简历准备大厂技术面", group: "长句-学习路径", primaryIds: ["ml-134","ml-136"], secondaryIds: ["ml-189"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["面试|简历|机器学习"] },
+  { query: "改简历准备大厂技术面", group: "长句-学习路径", primaryIds: ["wp-80","wp-81"], secondaryIds: ["ml-189"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["面试|简历|机器学习"] },
 
-  { query: "机器学习面试记了又忘怎么办", group: "长句-学习路径", primaryIds: ["ml-110","ml-112"], secondaryIds: ["ml-119"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["面试|复习|核心"] },
+  { query: "机器学习面试记了又忘怎么办", group: "长句-学习路径", primaryIds: ["ml-202","ml-203"], secondaryIds: ["ml-119"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["面试|复习|核心"] },
 
   { query: "特征工程零散怎么系统学", group: "长句-学习路径", primaryIds: ["ml-138","ml-141"], secondaryIds: ["ml-41"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["特征.*工程|特征.*选择|降维"] },
 
@@ -899,7 +897,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "XGBoost调参不如默认值怎么办", group: "长句-机器学习", primaryIds: ["ml-31","ml-33"], secondaryIds: ["ml-34"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["XGBoost|LightGBM|调参"] },
 
-  { query: "传统ML还有没有必要学", group: "长句-机器学习", primaryIds: ["ml-18","ml-19"], secondaryIds: ["ml-2"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|随机森林|大模型.*对比"] },
+  { query: "传统ML还有没有必要学", group: "长句-机器学习", primaryIds: ["ml-205","ml-206"], secondaryIds: ["ml-207","ml-2"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["SVM|随机森林|大模型.*对比"] },
 
   { query: "几十万条数据冷启动推荐系统怎么做", group: "长句-机器学习", primaryIds: ["ml-103","ml-117"], secondaryIds: ["ml-133"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["冷启动|矩阵分解|推荐"] },
 
@@ -931,7 +929,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "LSTM和GRU本质区别是什么", group: "长句-深度学习", primaryIds: ["dl-24","dl-7"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["LSTM|GRU|RNN"] },
 
-  { query: "图像分割手机端部署选什么模型", group: "长句-深度学习", primaryIds: ["dl-6"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|分割|轻量化|模型.*压缩"] },
+  { query: "图像分割手机端部署选什么模型", group: "长句-深度学习", primaryIds: ["dl-36","dl-37"], secondaryIds: [], acceptableDecks: ["deep-learning"], acceptableConcepts: ["CNN|分割|轻量化|模型.*压缩"] },
 
   { query: "我在做图像分类任务，模型训练了好几个小时一直在震荡不收敛，可能是什么原因", group: "长句-深度学习", primaryIds: ["dl-2"], secondaryIds: ["dl-1","dl-5"], acceptableDecks: ["deep-learning"], acceptableConcepts: ["梯度消失","激活函数","学习率"] },
 
@@ -941,9 +939,9 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "AB测试转化率提升只有0.5%怎么判断显著", group: "长句-统计学", primaryIds: ["stats-119","stats-174"], secondaryIds: ["stats-31"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB.*测试|A/B.*显著|样本量"] },
 
-  { query: "CAP理论为什么不能三者兼得", group: "长句-统计学", primaryIds: ["stats-126"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["CAP|分布式|一致"] },
+  { query: "CAP理论为什么不能三者兼得", group: "长句-统计学", primaryIds: ["ml-190","ml-191"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["CAP|分布式|一致"] },
 
-  { query: "ETL流程pipeline最佳实践", group: "长句-统计学", primaryIds: ["stats-149","stats-152"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["ETL|pipeline|数据"] },
+  { query: "ETL流程pipeline最佳实践", group: "长句-统计学", primaryIds: ["ml-197","ml-196"], secondaryIds: ["stats-153"], acceptableDecks: ["statistics"], acceptableConcepts: ["ETL|pipeline|数据"] },
 
   { query: "SQL全表扫描怎么加索引", group: "长句-统计学", primaryIds: ["stats-180","stats-183"], secondaryIds: [], acceptableDecks: ["statistics"], acceptableConcepts: ["索引|SQL.*优化|全表"] },
 

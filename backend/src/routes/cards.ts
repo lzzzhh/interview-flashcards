@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
 import { syncCardEmbedding, deleteCardEmbedding } from '../services/vector/embedding-sync';
 import { CreateCardSchema, UpdateCardSchema, validate } from './schemas';
+import { generateSearchKeywords } from '../services/ingestion/search-readiness';
 
 export async function cardRoutes(app: FastifyInstance) {
   // POST /api/cards — 新增卡片
@@ -15,6 +16,14 @@ export async function cardRoutes(app: FastifyInstance) {
     const exists = await prisma.card.findUnique({ where: { id: body.id } });
     if (exists) return reply.status(409).send({ error: 'Card already exists' });
 
+    // Auto-generate searchKeywords from card content
+    const searchKeywords = generateSearchKeywords({
+      title: body.title, titleCn: body.titleCn,
+      question: body.question, answer: body.answer,
+      tags: body.tags, description: body.description,
+      subTopic: body.subTopic, deckId: body.deckId,
+    });
+
     const card = await prisma.card.create({
       data: {
         id: body.id, deckId: body.deckId, type: body.type || 'qa',
@@ -25,10 +34,15 @@ export async function cardRoutes(app: FastifyInstance) {
         tags: body.tags ? JSON.stringify(body.tags) : null,
         subTopic: body.subTopic || null, source: body.source || null,
         codes: body.codes ? JSON.stringify(body.codes) : null,
+        searchKeywords: searchKeywords || null,
       },
     });
-    // 异步同步 embedding（不阻塞请求）
-    syncCardEmbedding(card.id).catch(() => {});
+
+    // Sync embedding (triggers bge-m3 vector upsert)
+    syncCardEmbedding(card.id).catch((e) => {
+      console.error(`[cards] embedding sync failed for ${card.id}:`, e?.message?.slice(0, 100));
+    });
+
     return card;
   });
 
@@ -39,6 +53,18 @@ export async function cardRoutes(app: FastifyInstance) {
     const body = v.success ? v.data : (req.body as any);
     const card = await prisma.card.findUnique({ where: { id: cardId } });
     if (!card) return reply.status(404).send({ error: 'Not found' });
+
+    // Re-generate searchKeywords on update
+    const searchKeywords = generateSearchKeywords({
+      title: body.title ?? card.title,
+      titleCn: body.titleCn ?? card.titleCn,
+      question: body.question ?? card.question,
+      answer: body.answer ?? card.answer,
+      tags: body.tags ?? card.tags,
+      description: body.description ?? card.description,
+      subTopic: body.subTopic ?? card.subTopic,
+      deckId: card.deckId,
+    });
 
     const updated = await prisma.card.update({
       where: { id: cardId },
@@ -53,10 +79,15 @@ export async function cardRoutes(app: FastifyInstance) {
         tags: body.tags ? JSON.stringify(body.tags) : card.tags,
         subTopic: body.subTopic ?? card.subTopic,
         source: body.source ?? card.source,
+        searchKeywords: searchKeywords || null,
       },
     });
-    // 异步同步 embedding
-    syncCardEmbedding(cardId).catch(() => {});
+
+    // Sync embedding
+    syncCardEmbedding(cardId).catch((e) => {
+      console.error(`[cards] embedding sync failed for ${cardId}:`, e?.message?.slice(0, 100));
+    });
+
     return updated;
   });
 
@@ -66,12 +97,10 @@ export async function cardRoutes(app: FastifyInstance) {
     const card = await prisma.card.findUnique({ where: { id: cardId } });
     if (!card) return reply.status(404).send({ error: 'Not found' });
 
-    // 删除关联的 progress 和 logs
     await prisma.cardProgress.deleteMany({ where: { cardId } });
     await prisma.reviewLog.deleteMany({ where: { cardId } });
     await prisma.card.delete({ where: { id: cardId } });
 
-    // 异步清理 embedding
     deleteCardEmbedding(cardId).catch(() => {});
 
     return { deleted: true };

@@ -1,8 +1,6 @@
 // backend/src/services/search/query-rewriter.ts
-// v8: Rewrite-assisted recall second pass
-//
-// Builds multi-source search texts from QueryUnderstanding.
-// Raw query always preserved. Expanded concepts feed separate channels.
+// v8: Rewrite-assisted recall second pass — REJECTED (2026-05-23)
+// See docs/v8-llm-rewrite-ablation-rejected.md
 
 import { hybridSearch } from './hybrid-search';
 import type { QueryUnderstanding } from './query-understanding';
