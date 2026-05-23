@@ -38,39 +38,63 @@ export function validateExportCards(items: unknown[]): { valid: ExportCard[]; er
   return { valid, errors };
 }
 
-const MAX_BACKUPS = 10;
+const MAX_BACKUPS = 2; // was 10 — reduced to prevent localStorage overflow with 754+ cards
 const BACKUP_KEY_PREFIX = 'fc-backup-v2-';
 
 /** 创建 localStorage 备份轮换（保存所有当前数据快照） */
 export function createLocalBackup(): void {
-  const snapshot: Record<string, unknown> = {};
+  try {
+    const snapshot: Record<string, unknown> = {};
 
-  // Collect all fc-* keys
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && (key.startsWith('fc-') || key === 'reviewLogs')) {
-      try {
-        snapshot[key] = JSON.parse(localStorage.getItem(key) || 'null');
-      } catch {
-        snapshot[key] = localStorage.getItem(key);
+    // Collect all fc-* keys
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('fc-') || key === 'reviewLogs')) {
+        // Skip backup keys themselves to avoid compounding
+        if (key.startsWith(BACKUP_KEY_PREFIX)) continue;
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) snapshot[key] = JSON.parse(raw);
+        } catch {
+          snapshot[key] = localStorage.getItem(key);
+        }
+      }
+    }
+
+    const dataSize = JSON.stringify(snapshot).length;
+    // If data would exceed ~4MB, skip backup to prevent quota errors
+    if (dataSize > 4_000_000) {
+      console.warn('[backup] Data too large for localStorage backup, skipping. Size:', (dataSize / 1_000_000).toFixed(1), 'MB');
+      // Clean up old backups to free space
+      for (let i = 1; i <= MAX_BACKUPS + 5; i++) {
+        localStorage.removeItem(`${BACKUP_KEY_PREFIX}${i}`);
+      }
+      return;
+    }
+
+    // Rotate: find next slot
+    const keys = findBackupSlots();
+    const nextSlot = (keys.length > 0 ? Math.min(...keys) : 0) + 1;
+    const slot = nextSlot > MAX_BACKUPS ? 1 : nextSlot;
+
+    // Remove oldest overflow
+    for (let i = MAX_BACKUPS + 1; i <= MAX_BACKUPS + 5; i++) {
+      localStorage.removeItem(`${BACKUP_KEY_PREFIX}${i}`);
+    }
+
+    localStorage.setItem(`${BACKUP_KEY_PREFIX}${slot}`, JSON.stringify({
+      timestamp: new Date().toISOString(),
+      data: snapshot,
+    }));
+  } catch (e: any) {
+    // QuotaExceededError — clear old backups and skip
+    if (e?.name === 'QuotaExceededError' || e?.message?.includes('quota')) {
+      console.warn('[backup] localStorage quota exceeded, clearing old backups');
+      for (let i = 1; i <= MAX_BACKUPS + 5; i++) {
+        localStorage.removeItem(`${BACKUP_KEY_PREFIX}${i}`);
       }
     }
   }
-
-  // Rotate: find next slot
-  const keys = findBackupSlots();
-  const nextSlot = (keys.length > 0 ? Math.min(...keys) : 0) + 1;
-  const slot = nextSlot > MAX_BACKUPS ? 1 : nextSlot;
-
-  // Remove oldest overflow
-  for (let i = MAX_BACKUPS + 1; i <= MAX_BACKUPS + 5; i++) {
-    localStorage.removeItem(`${BACKUP_KEY_PREFIX}${i}`);
-  }
-
-  localStorage.setItem(`${BACKUP_KEY_PREFIX}${slot}`, JSON.stringify({
-    timestamp: new Date().toISOString(),
-    data: snapshot,
-  }));
 }
 
 /** 列出所有备份 */
