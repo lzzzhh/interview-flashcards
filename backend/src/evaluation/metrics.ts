@@ -248,3 +248,107 @@ export function computeThresholdMetrics(
     precisionAt5: 0, // filled by runner
   };
 }
+
+// ════════════════════ Learning-Path Metrics ════════════════════
+
+/** 学习阶段关键词 */
+const STAGE_KEYWORDS: Record<string, RegExp[]> = {
+  '基础入门': [/入门|基础|概述|介绍|什么是|定义|概念|初学|新手|简介|理解/i],
+  '核心方法': [/核心|主要|关键|算法|方法|原理|机制|实现|技术|模型|架构/i],
+  '对比选择': [/对比|区别|比较|vs|选择|优劣|适用|场景|差异|不同/i],
+  '面试考点': [/面试|常见|考点|总结|必考|经典|重点|考察/i],
+  '复习练习': [/复习|回顾|刷题|练习|巩固|整理|清单/i],
+};
+
+export interface LearningPathMetrics {
+  query: string;
+  group: string;
+  /** Top20 中不重复的核心概念覆盖数 / 期望概念数 */
+  conceptCoverage: number;
+  conceptCoverageRate: number;
+  expectedConcepts: string[];
+  coveredConcepts: string[];
+  /** Top20 中目标牌组的卡片占比 */
+  deckAccuracy: number;
+  targetDecks: string[];
+  /** 学习阶段覆盖率 */
+  planCoverage: number;
+  coveredStages: string[];
+  /** 总结果数 */
+  totalResults: number;
+}
+
+/**
+ * 计算学习路径专属评测指标。
+ * 不再使用 primaryId Top15 作为标准，改用概念覆盖、牌组准确度、阶段覆盖。
+ */
+export function computeLearningPathMetrics(
+  tc: TestCase,
+  hits: SearchHit[],
+  cardDetails?: Array<{ cardId: string; title: string; titleCn?: string | null; searchKeywords?: string | null; deckId: string }>,
+): LearningPathMetrics {
+  const top20 = hits.slice(0, 20);
+  const expectedConcepts = tc.acceptableConcepts || [];
+  const targetDecks = tc.acceptableDecks || [];
+
+  // 1. ConceptCoverage@20
+  const top20Text = top20.map(h => {
+    const detail = cardDetails?.find(c => c.cardId === h.cardId);
+    const text = [
+      detail?.title || '',
+      detail?.titleCn || '',
+      detail?.searchKeywords || '',
+      h.title || '',
+    ].join(' ').toLowerCase();
+    return text;
+  });
+
+  const coveredConcepts: string[] = [];
+  for (const concept of expectedConcepts) {
+    // Split pipe-separated concepts: "推荐|协同过滤" → ["推荐", "协同过滤"]
+    const subConcepts = concept.split('|').map(s => s.trim()).filter(Boolean);
+    for (const sub of subConcepts) {
+      const sl = sub.toLowerCase();
+      if (top20Text.some(t => t.includes(sl))) {
+        coveredConcepts.push(sub);
+      }
+    }
+  }
+
+  // Total expected = sum of all sub-concepts
+  const allSubConcepts = expectedConcepts.flatMap(c => c.split('|').map(s => s.trim()).filter(Boolean));
+  const uniqueExpected = [...new Set(allSubConcepts)];
+
+  const conceptCoverage = coveredConcepts.length;
+  const conceptCoverageRate = uniqueExpected.length > 0
+    ? conceptCoverage / uniqueExpected.length
+    : 0;
+
+  // 2. DeckAccuracy@20
+  const targetDeckSet = new Set(targetDecks);
+  const inTargetDeck = top20.filter(h => targetDeckSet.has(h.deckId)).length;
+  const deckAccuracy = top20.length > 0 ? inTargetDeck / top20.length : 0;
+
+  // 3. PlanCoverage: how many learning stages have >=1 result
+  const coveredStages: string[] = [];
+  for (const [stage, patterns] of Object.entries(STAGE_KEYWORDS)) {
+    if (top20Text.some(t => patterns.some(p => p.test(t)))) {
+      coveredStages.push(stage);
+    }
+  }
+  const planCoverage = coveredStages.length / Object.keys(STAGE_KEYWORDS).length;
+
+  return {
+    query: tc.query,
+    group: tc.group,
+    conceptCoverage,
+    conceptCoverageRate,
+    expectedConcepts,
+    coveredConcepts,
+    deckAccuracy,
+    targetDecks,
+    planCoverage,
+    coveredStages,
+    totalResults: hits.length,
+  };
+}

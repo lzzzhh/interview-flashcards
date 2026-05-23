@@ -180,7 +180,7 @@ const RULES: ExpansionEntry[] = [
     keywords: ['缺失值', '异常值', '数据清洗', '归一化', '标准化', '特征缩放', 'One-Hot', '编码', '数据预处理', 'data preprocessing'] },
 
   // 模型部署
-  { pattern: /模型部署|上线|deploy|模型.*线上|推理服务|模型.*生产/i,
+  { pattern: /模型(?:部署|上线|.*线上|.*生产)|deploy|推理服务/i,
     keywords: ['模型部署', 'deployment', '推理加速', '量化', '模型压缩', 'ONNX', 'TensorRT', '模型服务', 'MLOps'] },
 
   // 损失函数相关
@@ -236,6 +236,60 @@ const RULES: ExpansionEntry[] = [
   // 集成学习专项（学习清单用）
   { pattern: /集成学习|ensemble|集成方法|bagging.*boosting|多模型.*融合|模型.*集成/i,
     keywords: ['集成学习', 'ensemble learning', 'Bagging', 'Boosting', 'Stacking', 'Blending', '随机森林', 'GBDT', 'XGBoost', '模型融合', '投票'] },
+
+  // ==== Targeted Repair: 统计学弱项 ====
+
+  // 样本量/统计功效/最小检测效应
+  { pattern: /样本量|sample.?size|功效|power.*anal|MDE|最低.*检出|最少.*样本|需要多少.*样本|样本.*不够|样本.*不足|样本.*多大/i,
+    keywords: ['样本量', 'sample size', '统计功效', 'statistical power', '功效分析', 'power analysis', 'MDE', 'minimum detectable effect', '第二类错误', 'type II error', '效应量', 'effect size', 'Cohen d'] },
+
+  // p值专项（stats-24 buried）
+  { pattern: /p.?value|p.?值|显著性水平|显著水平|统计推断|显著性检验|显著.*检验|统计.*显著|留存.*显著|上线.*前后.*变化|转化率.*变化|转化.*提升|提升.*显著/i,
+    keywords: ['p值', 'p-value', '假设检验', '显著性水平', '显著性差异', '统计推断', '统计显著', 'type I error', 'type II error', '误读', 'misinterpretation', '留存率', '转化率'] },
+
+  // 留存率/转化率 变化相关（stats-24 关联场景）
+  { pattern: /留存率|retention|转化率|conversion.*rate|漏斗|funnel|上线前后|灰度/i,
+    keywords: ['留存率', 'retention', '转化率', 'conversion rate', 'AB测试', 'A/B test', '假设检验', 'p值', '显著性', '漏斗分析', '比例检验', 'proportion test', '卡方检验'] },
+
+  // t检验专项（stats-26）
+  { pattern: /t.?[检核].*|独立样本|配对样本|单样本.*检验|两组.*比较|两组.*对比|实验组.*对照组|对照组.*实验组|组间.*差异|怎么.*判断.*差异|判断.*两组/i,
+    keywords: ['t检验', 't-test', '独立样本t检验', '配对t检验', '单样本t检验', '假设检验', 'p值', '显著性', '两组对比', '组间差异', '均值比较', 't分布', '自由度'] },
+
+  // 卡方检验专项
+  { pattern: /卡方|chi.?squ|列联表|contingency|独立性检验|拟合优度|goodness.*fit|分类.*检验|比例.*检验/i,
+    keywords: ['卡方检验', 'chi-square', '列联表', 'contingency table', '独立性检验', '拟合优度', 'goodness of fit', '比例检验', '分类变量', '交叉表'] },
+
+  // 贝叶斯AB测试 / 统计效能
+  { pattern: /贝叶斯.*AB|bayesian.*AB|贝叶斯.*测试|贝叶斯.*实验|统计效能|统计.*效率|检验.*效率/i,
+    keywords: ['贝叶斯AB测试', 'Bayesian AB testing', '贝塔-二项式', 'beta-binomial', '统计功效', '样本量', '先验', '后验', '贝叶斯更新'] },
+
+  // 第一类/第二类错误 混淆（stats-25）
+  { pattern: /第[一二]类|type.*[iI]+|假阳性|假阴性|alpha.*beta|错误率|误判|显著性.*错误/i,
+    keywords: ['type I error', 'type II error', '第一类错误', '第二类错误', '假阳性', '假阴性', 'alpha', 'beta', '统计功效', 'power', '显著性水平', 'p值'] },
+
+  // 效应量 / 标准化差异
+  { pattern: /效应量|effect.?size|cohen|标准化.*差异|标准化.*均值.*差|hedges|glass.*delta/i,
+    keywords: ['效应量', 'effect size', 'Cohen d', '标准化均值差', 'p值', '统计功效', '样本量', '显著性'] },
+
+  // 方差分析 ANOVA
+  { pattern: /ANOVA|方差分析|F.?检验|单因素|多因素|组间.*方差|组内.*方差/i,
+    keywords: ['ANOVA', '方差分析', 'F检验', '组间方差', '组内方差', '单因素', '多因素', '交互效应', '主效应', '假设检验', 'p值'] },
+
+  // 正态性检验
+  { pattern: /正态性|normality|shapiro|kolmogorov|KS.*test|正态.*检验|正态.*分布.*检验|QQ.*图/i,
+    keywords: ['正态性检验', 'normality test', 'Shapiro-Wilk', 'Kolmogorov-Smirnov', 'KS检验', 'QQ图', '正态分布', '偏度', '峰度'] },
+
+  // 多重比较校正
+  { pattern: /多重.*比较|multiple.*compar|bonferroni|fdr|fwer|holm|BH.*correction/i,
+    keywords: ['多重比较', 'multiple comparison', 'Bonferroni', 'FDR', 'FWER', 'p值调整', '假阳性', 'type I error', '显著性'] },
+
+  // 混杂/Simpson悖论
+  { pattern: /混杂|confound|simpson.*悖论|辛普森|分段.*分析|分层.*分析|调节.*变量/i,
+    keywords: ['混杂因子', 'confounding', "Simpson's paradox", '辛普森悖论', '分层分析', '因果推断', 'AB测试', '调节变量'] },
+
+  // Agent 幻觉专项（agent-10 buried）
+  { pattern: /胡编乱造|胡说八道|幻觉|hallucination|瞎编|编造|说瞎话|不准确|不可靠|事实.*错误|生成.*错误/i,
+    keywords: ['幻觉', 'hallucination', '事实性', 'factuality', '胡编乱造', 'RAG', '检索增强生成', '知识库', 'Agent', '可靠性', '可信'] },
 ];
 
 /**
@@ -265,6 +319,11 @@ const KEYWORD_DECK_MAP: Record<string, string> = {
   '中心极限定理': 'statistics', 'bootstrap': 'statistics', 'mcmc': 'statistics',
   '方差分析': 'statistics', 'anova': 'statistics', '正态分布': 'statistics',
   '泊松': 'statistics', '伯努利': 'statistics', 'ab测试': 'statistics',
+  '样本量': 'statistics', 't检验': 'statistics', '卡方检验': 'statistics',
+  '统计功效': 'statistics', '效应量': 'statistics', '留存率': 'statistics',
+  '转化率': 'statistics', '比例检验': 'statistics', '统计推断': 'statistics',
+  '因果推断': 'statistics', '漏斗分析': 'statistics', 'first type error': 'statistics',
+  'type ii error': 'statistics', 'cohen d': 'statistics',
   // 深度学习
   '反向传播': 'deep-learning', 'cnn': 'deep-learning', '卷积': 'deep-learning',
   'rnn': 'deep-learning', 'lstm': 'deep-learning', 'gan': 'deep-learning',
@@ -307,29 +366,50 @@ function inferDeckIds(keywords: string[]): string[] {
 
 /**
  * 扩展用户输入 query，返回追加的关键词和建议牌组。
+ * 先运行 normalizeQuery 清洗噪音，再对 normalized 文本做规则扩展。
  */
-export function expandQuery(rawQuery: string): { keywords: string[]; deckIds: string[] } {
-  const keywords = new Set<string>();
+export function expandQuery(rawQuery: string): {
+  keywords: string[];
+  deckIds: string[];
+  normalizedQuery: string;
+  isStudyIntent: boolean;
+} {
   const q = rawQuery.trim();
-  if (!q) return { keywords: [], deckIds: [] };
+  if (!q) return { keywords: [], deckIds: [], normalizedQuery: '', isStudyIntent: false };
 
-  // 1. 学习意图核心概念抽取
+  // 0. 噪音清洗
+  const { normalized, isNoisy, concepts, isStudyIntent } = normalizeQuery(q);
+
+  // 1. 学习意图核心概念抽取（对原始 query 也做，捕获口语化表达）
   const learningIntents = extractLearningConcepts(q);
+  const keywordSet = new Set<string>();
   for (const kw of learningIntents) {
-    keywords.add(kw.toLowerCase());
+    keywordSet.add(kw.toLowerCase());
   }
 
-  // 2. 规则词典扩展
+  // 2. 概念段也作为关键词候选
+  for (const seg of concepts) {
+    keywordSet.add(seg.toLowerCase());
+  }
+
+  // 3. 规则词典扩展（对 normalized query + 原始 query 都试）
+  // 长句噪音 query 先对 normalized 做规则匹配；短 query 直接对原始做
+  const targetText = isNoisy ? (normalized + ' ' + q) : q;
   for (const rule of RULES) {
-    if (rule.pattern.test(q)) {
+    if (rule.pattern.test(targetText)) {
       for (const kw of rule.keywords) {
-        keywords.add(kw.toLowerCase());
+        keywordSet.add(kw.toLowerCase());
       }
     }
   }
 
-  const kwList = [...keywords];
-  return { keywords: kwList, deckIds: inferDeckIds(kwList) };
+  const kwList = [...keywordSet];
+  return {
+    keywords: kwList,
+    deckIds: inferDeckIds(kwList),
+    normalizedQuery: normalized,
+    isStudyIntent,
+  };
 }
 
 // ── 学习意图概念抽取 ──
@@ -359,4 +439,78 @@ function extractLearningConcepts(query: string): string[] {
     }
   }
   return [...new Set(results)];
+}
+
+// ── 长句噪音清洗 (normalizeQuery) ──
+
+/** 背景噪音词：去掉口语填充、场景描述、无关修饰 */
+const NOISE_PATTERNS: RegExp[] = [
+  /领导.*?让我/i, /面试官.*?问/i, /面试.*?(?:被问到|被问|遇到|时候)/i,
+  /项目里.*?需要/i, /项目.*?遇到/i, /业务上.*?需要/i, /业务.*?遇到/i,
+  /在.*?做.*?时候/i, /最近.*?在.*?做/i, /最近.*?在.*?学/i, /之前.*?做过/i,
+  /应该怎么/i, /应该怎样/i, /应该.*?如何/i, /该怎么/i, /该怎样/i,
+  /怎么.*?才能/i, /如何.*?才能/i, /怎样才能/i, /怎样.*?才能/i,
+  /有没有.*?什么.*?(?:建议|方法|思路|推荐|说法)/i,
+  /有什么.*?(?:建议|推荐|方法|思路)/i,
+  /想请教.*?一下/i, /请教.*?一下/i, /帮忙.*?看看/i,
+  /假如/i, /假设.*?我想/i, /假设.*?我要/i, /如果.*?我想/i, /如果.*?我要/i,
+  /大家.*?觉得/i, /你们.*?觉得/i, /一般.*?怎么/i, /通常.*?怎么/i,
+  /求.*?推荐/i, /求.*?建议/i,
+];
+
+/** 概念分隔词：用这些词把长句切成独立概念段 */
+const CONCEPT_SEPARATORS = /[，,、;；。\n]|还有|以及|或者|和(?!.*方差|.*协方差|.*偏差)|另外/i;
+
+/**
+ * 清洗用户输入的原始 query，返回：
+ * - normalized: 去噪音后的核心查询文本
+ * - isNoisy: 是否检测到噪音成分
+ * - concepts: 拆解出的独立概念段
+ */
+export function normalizeQuery(rawQuery: string): {
+  normalized: string;
+  isNoisy: boolean;
+  concepts: string[];
+  isStudyIntent: boolean;
+} {
+  let q = rawQuery.trim();
+  if (!q) return { normalized: '', isNoisy: false, concepts: [], isStudyIntent: false };
+
+  let isNoisy = false;
+  let isStudyIntent = false;
+
+  // 检测学习意图
+  const STUDY_PATTERNS = [
+    /(?:想|要|准备|打算|如何|怎么)?(?:系统(?:地|的)?)?(?:学习|入门|了解|掌握|搞懂)/i,
+    /(?:怎么|如何|怎样).*(?:学|入门|上手|掌握)/i,
+    /(?:学习|入门).*(?:路线|路径|方法|规划|计划)/i,
+    /(?:从零|从头|零基础).*(?:学|入门)/i,
+    /(?:想做|想学|想转|想做).*(?:算法|数据|开发|工程|分析|科学)/i,
+  ];
+  for (const p of STUDY_PATTERNS) {
+    if (p.test(q)) { isStudyIntent = true; break; }
+  }
+
+  // 去掉背景噪音
+  for (const p of NOISE_PATTERNS) {
+    if (p.test(q)) {
+      q = q.replace(p, ' ').trim().replace(/\s{2,}/g, ' ');
+      isNoisy = true;
+    }
+  }
+
+  // 去掉问号后缀
+  q = q.replace(/[？?吗呢啊呀吧]+$/, '').trim();
+
+  // 拆解概念段
+  const segments = q.split(CONCEPT_SEPARATORS)
+    .map(s => s.trim())
+    .filter(s => s.length >= 2 && !/^(?:的|了|是|在|和|与|或|有|用|去|来|会|能|要|可以|应该|怎么|如何|怎样|什么|哪些|哪个|为什么|因为|所以|但是|而且|然后|之后|以前|现在|这个|那个|这些|那些|一个|一下|一些|那种)$/.test(s));
+
+  return {
+    normalized: q,
+    isNoisy,
+    concepts: segments.length > 1 ? segments : (q ? [q] : []),
+    isStudyIntent,
+  };
 }

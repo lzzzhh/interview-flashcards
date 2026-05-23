@@ -19,6 +19,10 @@ import {
   rerank,
   type CardForRerank,
   type RerankCandidate,
+  detectProfile,
+  computeStatsLexicalBoost,
+  DEFAULT_PROFILE,
+  type RerankProfile,
 } from './reranker';
 
 // ---- 类型 ----
@@ -39,6 +43,8 @@ interface HybridSearchInput {
     onlyDue?: boolean;
     includeWeakCards?: boolean;
   };
+  /** 强制使用指定 profile（用于 ablation 测试） */
+  overrideProfile?: RerankProfile;
 }
 
 interface CardMatch {
@@ -53,6 +59,15 @@ interface CardMatch {
   due?: boolean;
   lapses?: number;
   snippet?: string;
+  /** Score breakdown for buried diagnosis */
+  scoreBreakdown?: {
+    vectorScore: number;
+    keywordScore: number;
+    fieldBoost: number;
+    learningBoost: number;
+    deckBoost: number;
+    lexicalBoost: number;
+  };
 }
 
 const USER_ID = 'demo-user';
@@ -77,8 +92,14 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const candidateLimit = Math.min(input.candidateLimit ?? DEFAULT_CANDIDATE_LIMIT, 1000);
 
   // 1. Query expansion
-  const { keywords: expandedKW, deckIds: expandedDeckIds } = expandQuery(input.query);
-  const allQueryText = [input.query, ...expandedKW].join(' ');
+  const { keywords: expandedKW, deckIds: expandedDeckIds, normalizedQuery, isStudyIntent } = expandQuery(input.query);
+  // For study intent: use lower threshold, higher max results
+  const effectiveMinScore = isStudyIntent ? Math.min(input.minScore ?? 0.20, 0.25) : (input.minScore ?? DEFAULT_MIN_SCORE);
+  const effectiveMaxResults = isStudyIntent ? Math.max(input.maxResults ?? 100, 100) : (input.maxResults ?? DEFAULT_MAX_RESULTS);
+
+  const allQueryText = [input.query, normalizedQuery || '', ...expandedKW].filter(Boolean).join(' ');
+  // Limit to avoid OOM on LIKE search with excessive keywords
+  const allQueryTextTrimmed = allQueryText.slice(0, 2000);
 
   // 2. 多路召回（并行）— 召回池大小由 candidateLimit 控制
   const poolSize = candidateLimit;
@@ -90,10 +111,10 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     skwPool,
     vecPool,
   ] = await Promise.all([
-    recallFTS5(allQueryText, poolSize, input.deckIds),
-    recallByTags(allQueryText, expandedKW, tagPoolSize),
-    recallBySearchKeywords(allQueryText, expandedKW, tagPoolSize),
-    recallVector(allQueryText, candidateLimit),
+    recallFTS5(allQueryTextTrimmed, poolSize, input.deckIds),
+    recallByTags(allQueryTextTrimmed, expandedKW, tagPoolSize),
+    recallBySearchKeywords(allQueryTextTrimmed, expandedKW, tagPoolSize),
+    recallVector(allQueryTextTrimmed, candidateLimit),
   ]);
 
   // 3. Union + dedup
@@ -167,7 +188,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const progressMap = new Map(progresses.map(p => [p.cardId, p]));
 
   // 5. 查询 bigram tokens
-  const queryBigrams = tokenizeBigrams(allQueryText);
+  const queryBigrams = tokenizeBigrams(allQueryTextTrimmed);
 
   // 6. Build reranker candidates
   const rerankInput: RerankCandidate[] = [];
@@ -205,15 +226,36 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     });
   }
 
-  // 7. Rerank
-  const ranked = rerank(rerankInput, cardDetails);
+  // 7. Detect rerank profile + compute stats lexical boosts
+  const profile = input.overrideProfile
+    || detectProfile(input.query, normalizedQuery || '', expandedKW, expandedDeckIds);
+  const extraBoosts = new Map<string, number>();
+  const queryLower = (input.query + ' ' + (normalizedQuery || '')).toLowerCase();
 
-  // 7b. Deck matching boost: 卡片牌组命中 query expansion 建议的牌组时 +0.25
+  if (profile.statsLexicalBoost) {
+    for (const card of cards) {
+      const boost = computeStatsLexicalBoost(
+        queryLower,
+        card.title || card.titleCn || '',
+        card.searchKeywords || '',
+        card.tags ? safeJsonParse(card.tags) : [],
+        card.question || '',
+        card.answer || '',
+        card.deckId,
+      );
+      if (boost > 0) extraBoosts.set(card.id, boost);
+    }
+  }
+
+  // 8. Rerank
+  const ranked = rerank(rerankInput, cardDetails, profile, extraBoosts);
+
+  // 8b. Deck matching boost: use profile's deckBoost value
   const deckBoostSet = new Set(expandedDeckIds);
   for (const r of ranked) {
     const card = cardMap.get(r.cardId);
     if (card && deckBoostSet.has(card.deckId)) {
-      r.finalScore += 0.20;
+      r.finalScore += profile.deckBoost;
     }
   }
   // Re-sort after deck boost
@@ -259,6 +301,8 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     const content = card.question || card.answer || card.description || '';
     const snippet = content.slice(0, 120) + (content.length > 120 ? '...' : '');
 
+    const lexicalBoost = extraBoosts.get(card.id) || 0;
+
     results.push({
       cardId: card.id,
       title: card.title || card.titleCn || card.question || card.id,
@@ -271,13 +315,21 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
       due: prog ? (prog.state !== 'new' && prog.nextReview <= new Date()) : false,
       lapses: prog?.lapses,
       snippet,
+      scoreBreakdown: {
+        vectorScore: c.vectorScore,
+        keywordScore: c.keywordScore,
+        fieldBoost: rankInfo.fieldBoost,
+        learningBoost: rankInfo.learningBoost,
+        deckBoost: deckBoostSet.has(card.deckId) ? profile.deckBoost : 0,
+        lexicalBoost,
+      },
     });
   }
 
   // Sort by finalScore descending, then apply threshold and limit
   results.sort((a, b) => b.score - a.score);
-  const filtered = minScore > 0 ? results.filter(r => r.score >= minScore) : results;
-  return filtered.slice(0, maxResults);
+  const filtered = effectiveMinScore > 0 ? results.filter(r => r.score >= effectiveMinScore) : results;
+  return filtered.slice(0, effectiveMaxResults);
 }
 
 // ---- 召回通道 ----
