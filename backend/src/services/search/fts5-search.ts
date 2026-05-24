@@ -149,8 +149,8 @@ async function likeSearch(terms: string[], limit: number): Promise<FTS5Result[]>
 
   for (const t of terms.slice(0, 4)) { // max 4 terms
     const rows = await prisma.$queryRawUnsafe(
-      `SELECT id as cardId, 1 as rank FROM Card WHERE question LIKE ? OR titleCn LIKE ? OR title LIKE ? OR answer LIKE ? OR tags LIKE ? LIMIT ?`,
-      `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, limit,
+      `SELECT id as cardId, 1 as rank FROM Card WHERE question LIKE ? OR titleCn LIKE ? OR title LIKE ? OR answer LIKE ? OR description LIKE ? OR approach LIKE ? OR tags LIKE ? OR searchKeywords LIKE ? OR subTopic LIKE ? LIMIT ?`,
+      `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, limit,
     ) as any[];
     for (const row of (rows || [])) {
       if (!seen.has(row.cardId)) {
