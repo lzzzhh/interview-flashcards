@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, Clock, Zap, TrendingUp, ChevronDown } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, Clock, ChevronDown } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { loadReviewLogs, getStreak, getTodayReviewed, getRecentAccuracy } from '../utils/reviewLogs';
@@ -77,12 +77,9 @@ export default function StatsPage({ onBack }: Props) {
               <p className="text-[16px] font-bold mt-0.5" style={{ color: TEXT_PRIMARY }}>{todayCount}<span className="text-[11px] font-normal ml-0.5" style={{ color: TEXT_MUTED }}>张</span></p>
             </div>
           </div>
-        </div>
-        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-          <div className="grid grid-cols-3 gap-3">
-            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="新卡数" value={totalNew} color={BLUE} />
-            <StatBoxSmall icon={<TrendingUp className="w-4 h-4" />} label="正确率" value={`${accuracy}%`} color={GREEN} />
-            <StatBoxSmall icon={<Zap className="w-4 h-4" />} label="学习中的" value={globalStats.learningCount} color="#CBD5E1" />
+          <div className="mt-3 flex justify-between text-[11px] px-1" style={{ color: TEXT_MUTED }}>
+            <span>正确率 {accuracy}%</span>
+            <span>新卡 {totalNew} · 学习中 {globalStats.learningCount}</span>
           </div>
         </div>
 
