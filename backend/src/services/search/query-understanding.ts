@@ -50,7 +50,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
       const match = q.match(pattern);
       if (match) {
         const topicRaw = (match[1] || '').trim();
-        const concept = conceptLookup(topicRaw);
+        const concept = await conceptLookup(topicRaw);
         if (concept) {
           const rewritten = await llmRewrite(topicRaw, q, concept);
           return buildResult(group.intent, concept.topic, concept, q, rewritten || concept.keywords.join(' '), `regex+dict: topic="${topicRaw}"`);
@@ -63,9 +63,9 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   }
 
   // ── Step 2: Try dict match from full query ──
-  const dictMatch = matchAnyTopic(q);
+  const dictMatch = await matchAnyTopic(q);
   if (dictMatch) {
-    const concept = conceptLookup(dictMatch.topic);
+    const concept = await conceptLookup(dictMatch.topic);
     return buildResult('lookup', concept?.topic || dictMatch.topic, concept, q, q, `dict match: "${dictMatch.topic}"`);
   }
 
@@ -110,7 +110,7 @@ async function llmRewrite(
 // ── LLM full parse ──
 
 async function llmFullParse(query: string): Promise<ParsedSearchQuery | null> {
-  const knownTopics = getAllTopics().join(', ');
+  const knownTopics = (await getAllTopics()).join(', ');
   const prompt = `你是搜索意图解析器。分析查询并返回JSON。
 
 已知话题：${knownTopics}
@@ -144,7 +144,7 @@ async function llmFullParse(query: string): Promise<ParsedSearchQuery | null> {
     const rewritten = (parsed.rewrittenQuery || '').trim();
     if (rewritten && (rewritten.length === 0 || rewritten.length > 300 || /^(我想|我要|我想学|怎么学|帮我|给我|请问)/.test(rewritten))) return null;
     const intent = (['study', 'review', 'lookup', 'practice', 'plan'].includes(parsed.intent) ? parsed.intent : 'lookup') as SearchIntent;
-    const concept = conceptLookup(parsed.topic.trim());
+    const concept = await conceptLookup(parsed.topic.trim());
     return buildResult(
       intent,
       concept?.topic || parsed.topic.trim(),
@@ -160,10 +160,10 @@ async function llmFullParse(query: string): Promise<ParsedSearchQuery | null> {
 
 // ── Helpers ──
 
-function matchAnyTopic(query: string): { topic: string } | null {
+async function matchAnyTopic(query: string): Promise<{ topic: string } | null> {
   const words = query.split(/\s+/).filter(w => w.length >= 2);
   for (const word of words) {
-    const concept = conceptLookup(word);
+    const concept = await conceptLookup(word);
     if (concept) return { topic: word };
   }
   return null;

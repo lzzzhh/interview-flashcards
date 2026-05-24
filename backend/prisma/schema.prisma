@@ -207,3 +207,19 @@ model AppConfig {
   key   String @id
   value String
 }
+
+// ============ 搜索 topic 词典（从 Card.tags 聚合） ============
+
+model SearchTopic {
+  id        String   @id @default(cuid())
+  name      String   @unique    // canonical topic name, e.g., "数组"
+  deckHint  String?            // suggested deck, e.g., "leetcode"
+  keywords  String              // JSON array of expansion keywords
+  subtopics String              // JSON array of subtopics
+  tagCount  Int      @default(0) // how many cards have tags matching this topic
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enabled])
+}
