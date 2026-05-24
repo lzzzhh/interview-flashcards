@@ -14,6 +14,7 @@ import { fts5Search } from './fts5-search';
 import { getEmbeddingProvider } from '../embedding-provider';
 import { textToVector } from '../vector/local-embedding';
 import { understandQuery, type ParsedSearchQuery } from './query-understanding';
+import { expandQuery } from './query-expander';
 import { tokenizeBigrams } from './bigram';
 import {
   rerank,
@@ -117,10 +118,25 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const minScore = input.minScore ?? DEFAULT_MIN_SCORE;
   const candidateLimit = Math.min(input.candidateLimit ?? DEFAULT_CANDIDATE_LIMIT, 1000);
 
-  // 1. Query understanding
+  // 1. Query understanding (for intent/topic/debug)
   const parsed = await understandQuery(input.query);
   const { intent, topic, canonicalTopic, deckHint, coreKeywords, expandedKeywords, lowPriorityKeywords, subtopics, recallText, rerankText, rewrittenQuery } = parsed;
   const isStudyIntent = intent === 'study' || intent === 'plan' || intent === 'recommend_cards';
+
+  // 1b. Old expandQuery for backward-compatible recall (430 eval cases), filtered
+  const LEGACY_LOW_PRIORITY = new Set(['机器学习', '算法', '数据结构', '分类', '回归', '模型', '深度学习', '人工智能', '统计学', '数据挖掘', '代码', '面试', '特征工程']);
+  const LEGACY_STOPWORDS = new Set(['学习', '学', '怎么学', '教程', '方法', '推荐', '卡片', '几张', '知识点', '总结', '资料', '路线', '计划', '入门', '实战', '案例']);
+  const { keywords: oldKW, normalizedQuery: oldNorm } = expandQuery(input.query);
+  const legacyLowPriority: string[] = [];
+  const legacyFiltered: string[] = [];
+  for (const kw of oldKW) {
+    if (LEGACY_STOPWORDS.has(kw)) continue;
+    if (LEGACY_LOW_PRIORITY.has(kw)) { legacyLowPriority.push(kw); continue; }
+    legacyFiltered.push(kw);
+  }
+  // Combine: canonicalTopic + coreKeywords + expandedKeywords + legacyFiltered (NOT legacyLowPriority, NOT raw query)
+  const combined = [canonicalTopic, ...coreKeywords, ...expandedKeywords, ...legacyFiltered].filter(Boolean);
+  const allQueryTextRecall = [...new Set(combined)].filter(k => !LEGACY_STOPWORDS.has(k)).join(' ').slice(0, 2000);
   // For study intent: use lower threshold, higher max results
   const effectiveMinScore = isStudyIntent ? Math.min(input.minScore ?? 0.20, 0.25) : (input.minScore ?? DEFAULT_MIN_SCORE);
   const effectiveMaxResults = isStudyIntent ? Math.max(input.maxResults ?? 100, 100) : (input.maxResults ?? DEFAULT_MAX_RESULTS);
@@ -134,7 +150,8 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     console.log('[search] rerankText:', rerankText);
   }
 
-  const allQueryTextRecall = recallText.slice(0, 2000);
+  // allQueryTextRecall: tiered keywords + raw query for extractChineseTerms bigram expansion
+  const allQueryTextRecall = [recallText, parsed.rawQuery].filter(Boolean).join(' ').slice(0, 2000);
   const deckIds = deckHint ? [deckHint] : undefined;
 
   // 2. 多路召回（并行）— 召回池大小由 candidateLimit 控制
@@ -148,9 +165,9 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     vecPool,
   ] = await Promise.all([
     recallFTS5(allQueryTextRecall, poolSize, deckIds),
-    recallByTags(allQueryTextRecall, expandedKeywords.slice(0, 8), tagPoolSize),
-    recallBySearchKeywords(allQueryTextRecall, expandedKeywords.slice(0, 8), tagPoolSize),
-    recallVector(rerankText, candidateLimit),
+    recallByTags(allQueryTextRecall, expandedKeywords.slice(0, 12), tagPoolSize),
+    recallBySearchKeywords(allQueryTextRecall, expandedKeywords.slice(0, 12), tagPoolSize),
+    recallVector(allQueryTextRecall, candidateLimit),
   ]);
 
   // 3. Union + dedup

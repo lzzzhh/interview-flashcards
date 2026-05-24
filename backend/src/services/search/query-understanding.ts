@@ -128,9 +128,11 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   const lowPriorityKeywords = concept?.lowPriorityKeywords || [];
 
   // ── Step 8: Build recall/rerank text ──
-  const allExpanded = [...coreKeywords, ...expandedKeywords];
-  const recallText = allExpanded.filter(k => !STOPWORDS.has(k)).join(' ');
-  const rerankText = [...coreKeywords, ...expandedKeywords.slice(0, 5)].filter(k => !STOPWORDS.has(k)).join(' ');
+  // IMPORTANT: always include topicRaw + sanitized raw query as fallback terms
+  const rawNoStopwords = q.split(/[\s，,。！!？?]+/).filter(w => w.length >= 2 && !STOPWORDS.has(w));
+  const allExpanded = [...coreKeywords, ...expandedKeywords, ...rawNoStopwords];
+  const recallText = [...new Set(allExpanded.filter(k => !STOPWORDS.has(k)))].join(' ');
+  const rerankText = [...new Set([...coreKeywords, ...expandedKeywords.slice(0, 5), ...rawNoStopwords.slice(0, 2)].filter(k => !STOPWORDS.has(k)))].join(' ');
 
   // ── Step 9: Filtered stopwords ──
   const filteredStopwords = [...STOPWORDS].filter(s => q.includes(s));
