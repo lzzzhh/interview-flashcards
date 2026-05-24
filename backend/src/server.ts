@@ -12,6 +12,7 @@ import { cardDraftRoutes } from './routes/card-drafts';
 import { jobPrepRoutes } from './routes/job-prep';
 import { maintenanceRoutes } from './routes/maintenance';
 import { settingsRoutes } from './routes/settings';
+import { statsRoutes } from './routes/stats';
 import { initFTS5 } from './services/search/fts5-search';
 import { setLLMProvider, OpenAIChatProvider } from './services/llm-provider';
 import { setEmbeddingProvider, OpenAIEmbeddingProvider, getEmbeddingProvider } from './services/embedding-provider';
@@ -98,6 +99,7 @@ async function start() {
   await app.register(jobPrepRoutes);
   await app.register(maintenanceRoutes);
   await app.register(settingsRoutes);
+  await app.register(statsRoutes);
 
   // 初始化 FTS5 索引
   initFTS5().catch(() => {});
