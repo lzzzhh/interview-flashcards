@@ -1,0 +1,9219 @@
+// Complete Benchmark Dataset — all 477 cases with all fields
+// Generated: 2026-05-24T04:00:15.683Z
+// 
+// benchmarkScope: search (430) | learning_plan (41) | excluded (7)
+// intentType: card_lookup | concept_card_search | card_collection_search | learning_plan
+// excludeReason: open_qa | career_advice | business_decision | too_ambiguous
+
+export const ALL_CASES = [
+  {
+    "query": "AB实验平台学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "stats-102",
+      "stats-116"
+    ],
+    "secondaryIds": [
+      "stats-118"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "AB.*实验|A/B|分流"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "AI产品经理要学什么",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "agent-13",
+      "agent-21"
+    ],
+    "secondaryIds": [
+      "agent-3"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Agent|产品|Prompt"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Agent开发学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "agent-21",
+      "agent-3"
+    ],
+    "secondaryIds": [
+      "agent-4"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Agent|AutoGPT|Planni"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "CICD流水线学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "stats-154",
+      "stats-176"
+    ],
+    "secondaryIds": [
+      "stats-177"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "CI|CD|Jenkins|GitLab"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "CV图像分类学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "dl-6",
+      "ml-155"
+    ],
+    "secondaryIds": [
+      "ml-185"
+    ],
+    "acceptableDecks": [
+      "deep-learning",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "CNN|图像|分类"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "LLM大模型学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "llm-10",
+      "llm-18"
+    ],
+    "secondaryIds": [
+      "llm-21",
+      "dl-17"
+    ],
+    "acceptableDecks": [
+      "deep-learning",
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Transformer|GPT|LLM"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "MLOps学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-158",
+      "ml-160"
+    ],
+    "secondaryIds": [
+      "ml-164"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "MLOps|部署|监控"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "NLP文本分类学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "llm-10",
+      "ml-109"
+    ],
+    "secondaryIds": [
+      "ml-110"
+    ],
+    "acceptableDecks": [
+      "llm",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "NLP|BERT|文本.*分类"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Prompt Engineering怎么入行",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "agent-13"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Prompt|提示词|Pe.*工程"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RAG学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "agent-10",
+      "agent-11"
+    ],
+    "secondaryIds": [
+      "agent-12"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG|检索.*增强"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Snap AR做滤镜要学什么",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "vc-11"
+    ],
+    "acceptableDecks": [
+      "vibe-coding"
+    ],
+    "acceptableConcepts": [
+      "AR|滤镜|编程"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "为什么学NLP先学Transformer",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "llm-1",
+      "llm-2"
+    ],
+    "secondaryIds": [
+      "llm-26",
+      "dl-25"
+    ],
+    "acceptableDecks": [
+      "deep-learning",
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Transformer|NLP|Atte"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "什么是好的解释性文章",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-137",
+      "ml-181"
+    ],
+    "secondaryIds": [
+      "ml-73"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "可解释|XAI|SHAP|LIME"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "从零学AI需要哪些数学",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "stats-15",
+      "stats-44"
+    ],
+    "acceptableDecks": [
+      "machine-learning",
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "线性代数|概率|微积分"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "分布式系统学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "stats-126"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "分布式|CAP|一致性"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "到底怎么快速入门ML",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-134",
+      "ml-136"
+    ],
+    "secondaryIds": [
+      "ml-189"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "入门|机器学习|基础"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "后端转算法要补什么",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-10",
+      "ml-134"
+    ],
+    "secondaryIds": [
+      "ml-136",
+      "stats-101"
+    ],
+    "acceptableDecks": [
+      "machine-learning",
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "机器学习|统计|数学"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "因果推断学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "stats-136",
+      "stats-145"
+    ],
+    "secondaryIds": [
+      "stats-6"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "因果|Causal|Inference"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "图神经网络学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-102",
+      "ml-103"
+    ],
+    "acceptableDecks": [
+      "deep-learning",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "图.*神经|Graph.*Neural"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "大数据Spark学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "stats-149",
+      "stats-152"
+    ],
+    "secondaryIds": [
+      "stats-153"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "Spark|Hadoop|大数据"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "大模型微调学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "llm-12",
+      "llm-13"
+    ],
+    "secondaryIds": [
+      "llm-17"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "微调|SFT|LoRA|适配"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "学AI先懂理论还是先会调包",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-99"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "理论|实践|调包|框架"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "小众但卷的AI赛道有哪些",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-57"
+    ],
+    "acceptableDecks": [
+      "llm",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "赛道|方向|趋势"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "广告CTR预估学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-176",
+      "ml-90"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "CTR|广告|预估"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "强化学习从入门到实践",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-112",
+      "ml-113"
+    ],
+    "secondaryIds": [
+      "ml-114"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "强化|RL|DQN|Policy"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "想做算法工程师要学什么",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-134",
+      "ml-136"
+    ],
+    "secondaryIds": [
+      "ml-189",
+      "dl-10"
+    ],
+    "acceptableDecks": [
+      "deep-learning",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "机器学习|深度学习|基础"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "想学推荐系统需要什么数学基础",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-103",
+      "ml-11"
+    ],
+    "secondaryIds": [
+      "ml-117",
+      "stats-124"
+    ],
+    "acceptableDecks": [
+      "machine-learning",
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "推荐|矩阵|优化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "想进FAANG要学哪些技术",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-113",
+      "ml-115"
+    ],
+    "acceptableDecks": [
+      "leetcode",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "算法|系统设计|FAANG"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "推荐系统学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-103",
+      "ml-117"
+    ],
+    "secondaryIds": [
+      "ml-133",
+      "stats-124"
+    ],
+    "acceptableDecks": [
+      "machine-learning",
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "推荐|协同过滤"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "时间序列预测学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "stats-86",
+      "stats-88"
+    ],
+    "secondaryIds": [
+      "stats-91",
+      "ml-148"
+    ],
+    "acceptableDecks": [
+      "machine-learning",
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "时间序列|ARIMA|Prophet"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "本科生想做数据科学要掌握什么",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-166",
+      "ml-167"
+    ],
+    "acceptableDecks": [
+      "machine-learning",
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "数据科学|统计分析|Python"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "模型部署从哪开始学",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "llm-21",
+      "llm-26"
+    ],
+    "secondaryIds": [
+      "llm-25",
+      "ml-160"
+    ],
+    "acceptableDecks": [
+      "llm",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "部署|推理|ONNX|vLLM"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "统计学习方法书籍推荐",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-126",
+      "ml-17"
+    ],
+    "secondaryIds": [
+      "ml-19"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "统计学习|李航|SVM|决策树"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "自学CS基础要学哪些课",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-113",
+      "ml-115"
+    ],
+    "acceptableDecks": [
+      "leetcode",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "数据结构|算法|操作系统"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "转行DS技术栈清单",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "stats-101",
+      "stats-11"
+    ],
+    "secondaryIds": [
+      "stats-118"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "SQL|Python|可视化|统计"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "风控建模学习路线",
+    "group": "learning-path",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-103",
+      "ml-128"
+    ],
+    "secondaryIds": [
+      "ml-146"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "风控|Fraud|异常.*检测"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Agent规划",
+    "group": "关键词-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-4",
+      "agent-8",
+      "agent-5",
+      "agent-6"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "规划",
+      "Planning",
+      "Planning|规划|AutoGPT"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Agent记忆",
+    "group": "关键词-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-21"
+    ],
+    "secondaryIds": [
+      "agent-5"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "记忆",
+      "Memory"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Function Calling",
+    "group": "关键词-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-2",
+      "agent-3"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Function Calling|FC|FunctionCalling|Tool-Use|工具调用"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RAG",
+    "group": "关键词-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-7"
+    ],
+    "secondaryIds": [
+      "agent-22"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG",
+      "检索增强生成"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Reranking",
+    "group": "关键词-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-25"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Reranking",
+      "重排序"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Reranking重排序",
+    "group": "关键词-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-25"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Rerank|重排"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Tool Use",
+    "group": "关键词-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-2",
+      "agent-3"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Tool Use",
+      "Function Calling",
+      "ToolUse"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "向量数据库",
+    "group": "关键词-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-18"
+    ],
+    "secondaryIds": [
+      "agent-19"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "向量数据库",
+      "Embedding"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "MCP",
+    "group": "关键词-VibeCoding",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "vc-5"
+    ],
+    "secondaryIds": [
+      "vc-17"
+    ],
+    "acceptableDecks": [
+      "vibe-coding"
+    ],
+    "acceptableConcepts": [
+      "MCP",
+      "协议"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "MCP协议",
+    "group": "关键词-VibeCoding",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "vc-17",
+      "vc-5"
+    ],
+    "acceptableDecks": [
+      "vibe-coding"
+    ],
+    "acceptableConcepts": [
+      "MCP"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Skill",
+    "group": "关键词-VibeCoding",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "vc-2",
+      "vc-1",
+      "vc-10"
+    ],
+    "acceptableDecks": [
+      "vibe-coding"
+    ],
+    "acceptableConcepts": [
+      "Skill",
+      "skill|command"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Trie字典树",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-055"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Trie|Prefix"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "两数之和",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-001"
+    ],
+    "secondaryIds": [
+      "lc-016"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "数组",
+      "哈希表"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "二分查找",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-023",
+      "lc-024",
+      "lc-026"
+    ],
+    "secondaryIds": [
+      "lc-040"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "二分查找",
+      "binary search",
+      "Search|Binary"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "二叉树的最近公共祖先",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-049"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "LCA|Lowest"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "动态规划",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-062",
+      "lc-067"
+    ],
+    "secondaryIds": [
+      "lc-069"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "DP",
+      "动态规划"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "动态规划DP",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-062",
+      "lc-065"
+    ],
+    "secondaryIds": [
+      "lc-067"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Climbing|Coin|House"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "单调栈",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-035",
+      "lc-036",
+      "lc-030",
+      "lc-008",
+      "lc-029"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "单调栈",
+      "接雨水",
+      "Daily|Trapping|Min S"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "反转链表",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-033"
+    ],
+    "secondaryIds": [
+      "lc-039"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "链表",
+      "反转"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "回文串",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-018",
+      "lc-039"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "回文",
+      "palindrome",
+      "Palindr|回文"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "字典树",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-055"
+    ],
+    "secondaryIds": [
+      "lc-056"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Trie",
+      "前缀树"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "字典树Trie",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-055",
+      "lc-056"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Trie"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "岛屿DFS",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-052"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Islands|岛屿"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "岛屿问题",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-052"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "DFS",
+      "网格",
+      "岛屿"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "并查集",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-083",
+      "lc-084",
+      "lc-053",
+      "lc-052"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "并查集",
+      "Union Find",
+      "UnionFind"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "拓扑排序",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-053"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "拓扑排序",
+      "BFS"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "接雨水",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-008"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "双指针",
+      "单调栈"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "滑动窗口",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-019",
+      "lc-022"
+    ],
+    "secondaryIds": [
+      "lc-015",
+      "lc-016"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "滑动窗口",
+      "双指针",
+      "Sliding|滑动"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "爬楼梯",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-062"
+    ],
+    "secondaryIds": [
+      "lc-069"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "动态规划",
+      "斐波那契"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "背包问题",
+    "group": "关键词-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-073",
+      "lc-074",
+      "lc-076"
+    ],
+    "secondaryIds": [
+      "lc-071"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "背包",
+      "Partition|Knapsack|B"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "BERT",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10"
+    ],
+    "secondaryIds": [
+      "llm-17",
+      "llm-12"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "BERT",
+      "预训练",
+      "MLM"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "BERT预训练",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "BERT"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GPT",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10",
+      "llm-7",
+      "llm-24"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "GPT",
+      "自回归",
+      "decoder"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GPT大模型",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10",
+      "llm-24"
+    ],
+    "secondaryIds": [
+      "llm-39"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "GPT"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "KV Cache推理加速",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-21",
+      "llm-26"
+    ],
+    "secondaryIds": [
+      "llm-25"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "KV|vLLM|推理|PagedA"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RLHF对齐",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-11",
+      "llm-14"
+    ],
+    "secondaryIds": [
+      "llm-15"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "RLHF|DPO|对齐"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Transformer",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1",
+      "llm-3",
+      "llm-2"
+    ],
+    "secondaryIds": [
+      "llm-38"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Transformer",
+      "Self-Attention",
+      "Transformer|Self-Att"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "位置编码",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-4"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Positional Encoding",
+      "位置编码|Positional"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "多头注意力",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-3",
+      "llm-9"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Multi-Head Attention",
+      "Multi-Head"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "微调Fine-tuning",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-11",
+      "llm-12"
+    ],
+    "secondaryIds": [
+      "llm-13"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "微调|Finetun|SFT"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "模型量化",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-24",
+      "llm-42"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "量化|Quantiz"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "残差连接",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-10",
+      "dl-19"
+    ],
+    "acceptableDecks": [
+      "llm",
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "残差连接",
+      "ResNet"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "注意力机制",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1"
+    ],
+    "secondaryIds": [
+      "llm-3"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Attention",
+      "QKV"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "词嵌入",
+    "group": "关键词-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-105",
+      "ml-109"
+    ],
+    "secondaryIds": [
+      "ml-89"
+    ],
+    "acceptableDecks": [
+      "llm",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Embedding",
+      "Word2Vec"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Bagging Boosting",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-32",
+      "ml-31"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "集成"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Bagging Boosting Stacking",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-32",
+      "ml-31",
+      "ml-36"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "集成学习"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "K-Means",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-21"
+    ],
+    "secondaryIds": [
+      "ml-23"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "KMeans",
+      "聚类",
+      "肘部法则"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "KMeans聚类",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-124",
+      "ml-125"
+    ],
+    "secondaryIds": [
+      "ml-21"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "K-Means|聚类"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "L1 L2",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-10",
+      "ml-20"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "正则化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "L1 L2正则化",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-10",
+      "ml-20"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "L1",
+      "L2",
+      "正则化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Precision F1",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-49",
+      "ml-51",
+      "ml-184"
+    ],
+    "secondaryIds": [
+      "ml-56"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "F1",
+      "Precision|F1|精确率"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Precision Recall F1",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-49",
+      "ml-51"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "精确率",
+      "召回率",
+      "F1"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Q-learning",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-114"
+    ],
+    "secondaryIds": [
+      "ml-115"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Q-learning",
+      "DQN",
+      "Q-Learning|DQN"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "交叉验证",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-9"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "K折",
+      "交叉验证"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "偏差方差",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-8"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "偏差",
+      "方差",
+      "泛化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "偏差方差权衡",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-188",
+      "ml-8"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "偏差.*方差|Bias.*Varianc"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "决策树",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-3"
+    ],
+    "secondaryIds": [
+      "ml-17"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "决策树",
+      "信息增益",
+      "剪枝"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "半监督学习",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-111",
+      "ml-118",
+      "ml-122"
+    ],
+    "secondaryIds": [
+      "ml-10",
+      "ml-146"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "半监督",
+      "标签传播",
+      "自监督|半监督"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "强化学习",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-112"
+    ],
+    "secondaryIds": [
+      "ml-117"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "强化学习",
+      "MDP",
+      "Q-learning",
+      "RL"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "强化学习RL",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-112",
+      "ml-117"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "强化学习|Reinforcement"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "损失函数",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-1",
+      "ml-53",
+      "ml-142",
+      "ml-143"
+    ],
+    "secondaryIds": [
+      "ml-144"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "损失函数",
+      "交叉熵",
+      "MSE",
+      "损失函数|交叉熵"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "支持向量机",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-2"
+    ],
+    "secondaryIds": [
+      "ml-19"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SVM",
+      "核函数"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "朴素贝叶斯",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-179",
+      "ml-183"
+    ],
+    "secondaryIds": [
+      "stats-9"
+    ],
+    "acceptableDecks": [
+      "machine-learning",
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "朴素贝叶斯",
+      "贝叶斯"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "梯度下降",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-11",
+      "ml-157",
+      "ml-57"
+    ],
+    "secondaryIds": [
+      "ml-58"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "梯度下降",
+      "SGD",
+      "优化器",
+      "梯度下降|SGD"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "欠拟合",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-7"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "欠拟合|underfit"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "正则化",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-10"
+    ],
+    "secondaryIds": [
+      "ml-20"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "L1",
+      "L2",
+      "正则化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "特征工程",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-13",
+      "ml-46",
+      "ml-129"
+    ],
+    "secondaryIds": [
+      "ml-138"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "特征工程",
+      "特征选择",
+      "特征"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "特征缩放",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-13",
+      "ml-45"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "特征缩放",
+      "归一化",
+      "标准化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "聚类算法",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-21",
+      "ml-23"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "聚类",
+      "KMeans",
+      "DBSCAN"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "迁移学习",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-149",
+      "ml-151",
+      "ml-177"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "迁移学习",
+      "fine-tune"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "迁移学习Transfer",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-149",
+      "ml-151"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "迁移|Transfer"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "过拟合",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-7"
+    ],
+    "secondaryIds": [
+      "ml-8"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "过拟合",
+      "欠拟合",
+      "偏差方差"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "逻辑回归",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-1"
+    ],
+    "secondaryIds": [
+      "ml-6"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "逻辑回归",
+      "损失函数"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "降维",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-22",
+      "ml-26"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "降维",
+      "PCA",
+      "t-SNE"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "降维PCA",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-141",
+      "ml-22"
+    ],
+    "secondaryIds": [
+      "ml-26"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "PCA|降维"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "随机梯度下降",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-157",
+      "ml-11"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SGD",
+      "梯度下降"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "随机梯度下降SGD",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-11",
+      "ml-57"
+    ],
+    "secondaryIds": [
+      "ml-58"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SGD|梯度下降"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "随机森林",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-18"
+    ],
+    "secondaryIds": [
+      "ml-38"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "随机森林",
+      "特征重要性"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "集成学习Bagging Boosting",
+    "group": "关键词-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-189",
+      "ml-32"
+    ],
+    "secondaryIds": [
+      "ml-36"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Bagging|Boosting|集成"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Adam优化器",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-30"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "Adam",
+      "优化器"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "BatchNorm归一化",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-21",
+      "dl-22"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "BatchNorm|归一化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "CNN卷积神经网络",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-6"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "CNN|卷积"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Dropout",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-4"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "Dropout",
+      "过拟合"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GAN",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-11",
+      "dl-12"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "GAN"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GAN生成对抗",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-11",
+      "dl-12"
+    ],
+    "secondaryIds": [
+      "dl-14"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "GAN",
+      "生成对抗"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GAN生成对抗网络",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-11",
+      "dl-12"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "GAN"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RNN",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-9",
+      "dl-10"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "RNN",
+      "LSTM",
+      "GRU"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RNN循环神经网络",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-24",
+      "dl-7"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "RNN|LSTM"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "卷积神经网络",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-14"
+    ],
+    "secondaryIds": [
+      "dl-6",
+      "dl-18"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "CNN",
+      "卷积"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "反向传播",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-5"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "反向传播",
+      "backpropagation"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "归一化",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-3",
+      "dl-22"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "BatchNorm",
+      "LayerNorm"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "梯度消失",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-2"
+    ],
+    "secondaryIds": [
+      "dl-1"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "梯度消失",
+      "激活函数"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "残差网络",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-8"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "ResNet",
+      "跳跃连接"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "激活函数",
+    "group": "关键词-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-1",
+      "dl-31",
+      "dl-24"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "激活函数",
+      "ReLU",
+      "sigmoid"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "MLE",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-195"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "MLE"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "P值显著性",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-134",
+      "stats-162"
+    ],
+    "secondaryIds": [
+      "stats-170"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "P.*值|显著性"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "余弦相似度",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-16",
+      "ml-59"
+    ],
+    "secondaryIds": [
+      "ml-47",
+      "agent-19"
+    ],
+    "acceptableDecks": [
+      "statistics",
+      "machine-learning",
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "余弦相似度",
+      "余弦"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "假设检验",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-24",
+      "stats-105",
+      "stats-107"
+    ],
+    "secondaryIds": [
+      "stats-25",
+      "stats-119"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "p值",
+      "假设检验",
+      "假设检验|t.*检验"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "先验后验",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-9",
+      "stats-15"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "贝叶斯",
+      "先验",
+      "后验"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "协方差",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-17",
+      "stats-146"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "协方差",
+      "相关系数"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "卡方检验",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-27",
+      "stats-28"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "卡方检验",
+      "独立性检验",
+      "卡方"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "大数定律",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-10"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "大数定律",
+      "中心极限定理"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "数据倾斜",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-187"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "数据倾斜|倾斜"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "方差分析",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-29"
+    ],
+    "secondaryIds": [
+      "stats-30"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "ANOVA",
+      "方差分析"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "方差分析ANOVA",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-106",
+      "stats-146"
+    ],
+    "secondaryIds": [
+      "stats-32"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "ANOVA|方差分析"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "最大似然估计",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-100",
+      "stats-109"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "MLE",
+      "似然函数"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "最大似然估计MLE",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-195",
+      "stats-39"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "MLE|似然"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "正态分布",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-11",
+      "stats-101",
+      "stats-114"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "正态分布",
+      "高斯"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "线性回归",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-47",
+      "stats-49"
+    ],
+    "secondaryIds": [
+      "stats-54"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "线性回归",
+      "OLS"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "置信区间",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-8"
+    ],
+    "secondaryIds": [
+      "stats-7"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "置信区间",
+      "标准误差"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "贝叶斯定理",
+    "group": "关键词-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-9",
+      "stats-15",
+      "stats-39"
+    ],
+    "secondaryIds": [
+      "stats-41"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "贝叶斯",
+      "条件概率",
+      "先验",
+      "后验"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "STAR法则",
+    "group": "关键词-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-7"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "STAR",
+      "面试"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "向上管理",
+    "group": "关键词-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-2"
+    ],
+    "secondaryIds": [
+      "wp-3"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "向上管理",
+      "沟通"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "述职",
+    "group": "关键词-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-3",
+      "wp-8"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "述职",
+      "汇报"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "述职汇报",
+    "group": "关键词-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-3",
+      "wp-7"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "述职|汇报"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "复盘",
+    "group": "关键词-黑话",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "jargon-6"
+    ],
+    "acceptableDecks": [
+      "jargon"
+    ],
+    "acceptableConcepts": [
+      "复盘",
+      "Review"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "底层逻辑",
+    "group": "关键词-黑话",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "jargon-5"
+    ],
+    "acceptableDecks": [
+      "jargon"
+    ],
+    "acceptableConcepts": [
+      "底层逻辑",
+      "认知",
+      "逻辑"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "赋能",
+    "group": "关键词-黑话",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "jargon-2"
+    ],
+    "acceptableDecks": [
+      "jargon"
+    ],
+    "acceptableConcepts": [
+      "赋能",
+      "Empower"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "迭代",
+    "group": "关键词-黑话",
+    "benchmarkScope": "excluded",
+    "intentType": "ambiguous",
+    "excludeReason": "too_ambiguous",
+    "primaryIds": [
+      "jargon-24",
+      "jargon-37"
+    ],
+    "acceptableDecks": [
+      "jargon"
+    ],
+    "acceptableConcepts": [
+      "迭代"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "闭环",
+    "group": "关键词-黑话",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "jargon-3"
+    ],
+    "acceptableDecks": [
+      "jargon"
+    ],
+    "acceptableConcepts": [
+      "闭环",
+      "Closed Loop"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "颗粒度",
+    "group": "关键词-黑话",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "jargon-1"
+    ],
+    "acceptableDecks": [
+      "jargon"
+    ],
+    "acceptableConcepts": [
+      "颗粒度",
+      "对齐"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "A Gentle Introduction to Reinforcement Learning",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-112",
+      "ml-113"
+    ],
+    "secondaryIds": [
+      "ml-117"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "强化|DQN|Reward|RL"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Agent反复调用同一个工具怎么办",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-21",
+      "agent-3"
+    ],
+    "secondaryIds": [
+      "agent-4"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "工具.*调用|循环|Agent"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Attention Mask是什么",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1",
+      "llm-2"
+    ],
+    "secondaryIds": [
+      "llm-26"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Mask|Attention|Paddi"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Convolutional Neural Networks beginners",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-6"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "CNN|convolution|卷积"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ML里如何处理缺失值",
+    "normalizedQuery": "缺失值处理 插补 删除 均值填充",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-141",
+      "ml-15"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "缺失值|Missing|NaN|Impu"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ROC曲线是干什么的",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-153",
+      "ml-50"
+    ],
+    "secondaryIds": [
+      "ml-56"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "ROC|AUC|分类.*评估"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "SVM核函数怎么选",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-19",
+      "ml-2"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SVM|核函数|RBF"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Self-Reflection让Agent自纠错",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-14"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Self.*Reflect|纠错|反思"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Sparse vs Dense向量",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-19",
+      "agent-24"
+    ],
+    "secondaryIds": [
+      "agent-9"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "稀疏|稠密|Embedding"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Type I Error 和 Type II Error",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-120",
+      "stats-134"
+    ],
+    "secondaryIds": [
+      "stats-25"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "Type.*Error|第一类|显著性"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "What is Backpropagation",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-5"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "Backprop|反向.*传播"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "为什么需要RAG",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10",
+      "agent-11"
+    ],
+    "secondaryIds": [
+      "agent-12"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG|检索|幻觉"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "什么是Confounder",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-136",
+      "stats-145"
+    ],
+    "secondaryIds": [
+      "stats-6"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "混杂|Confound|因果"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "什么是正态分布",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-101",
+      "stats-11"
+    ],
+    "secondaryIds": [
+      "stats-111"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "正态|高斯|分布"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "什么是自注意力",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1",
+      "llm-2"
+    ],
+    "secondaryIds": [
+      "llm-9"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Self.*Attention|自注意力"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "向量数据库选型",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-18"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "向量.*数据库|Pinecone|Mil"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "大模型能不能用来做搜索",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10",
+      "agent-11"
+    ],
+    "secondaryIds": [
+      "agent-12"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG|搜索|检索"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "对话生成的上下文管理怎么做",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "上下文|记忆|Window"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么搞懂反向传播",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-2",
+      "dl-5"
+    ],
+    "secondaryIds": [
+      "ml-1",
+      "ml-106"
+    ],
+    "acceptableDecks": [
+      "deep-learning",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "反向.*传播|BP|梯度"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么评估一个Agent好不好",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-15",
+      "agent-24"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "评估|Agent.*评估"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "数据隐私和模型训练矛盾",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-188"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "隐私|Federated|差分"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "树模型特征重要性怎么算",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-13",
+      "ml-176"
+    ],
+    "secondaryIds": [
+      "ml-18"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "特征.*重要|Permutation|S"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "模型Serving怎么做",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-26"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Serving|vLLM|Triton"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "统计学的中心极限定理",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-10",
+      "stats-11"
+    ],
+    "secondaryIds": [
+      "stats-114"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "中心极限|CLT|正态"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "设计一个像GPT那样的对话Agent需要考虑什么",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-21",
+      "agent-3"
+    ],
+    "secondaryIds": [
+      "agent-4"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Agent|GPT|对话|Token"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "过拟合欠拟合如何判断",
+    "group": "回归-对抗",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-188",
+      "ml-7"
+    ],
+    "secondaryIds": [
+      "ml-77"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "过拟合|欠拟合|偏差.*方差"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么在实际工作中把大模型的能力集成到自己的业务系统里",
+    "group": "复杂-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-7"
+    ],
+    "secondaryIds": [
+      "agent-21",
+      "agent-2"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG",
+      "Agentic RAG",
+      "Function Calling"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "海量数据里找相似向量最快的方案是什么",
+    "group": "复杂-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-18"
+    ],
+    "secondaryIds": [
+      "agent-26",
+      "agent-9"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "向量数据库",
+      "ANN",
+      "混合检索"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "作为一个面试官，我想问几个关于 MCP 协议的好问题",
+    "group": "复杂-VibeCoding",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "vc-5"
+    ],
+    "secondaryIds": [
+      "vc-17"
+    ],
+    "acceptableDecks": [
+      "vibe-coding"
+    ],
+    "acceptableConcepts": [
+      "MCP",
+      "协议"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "二叉树的四种遍历方式分别是什么，各自的应用场景",
+    "group": "复杂-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-043"
+    ],
+    "secondaryIds": [
+      "lc-040",
+      "lc-041"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "二叉树",
+      "遍历",
+      "前序",
+      "中序"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "动态规划的解题框架是什么，有什么经典例题可以举例说明",
+    "group": "复杂-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-062"
+    ],
+    "secondaryIds": [
+      "lc-069",
+      "lc-071",
+      "lc-073"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "动态规划",
+      "爬楼梯",
+      "编辑距离"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "大模型推理太慢了，有哪些加速手段可以用",
+    "group": "复杂-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-21",
+      "llm-24"
+    ],
+    "secondaryIds": [
+      "llm-25",
+      "llm-26"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "KV Cache",
+      "量化",
+      "推理加速"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么理解大模型 alignment 对齐这回事，为什么要做 RLHF",
+    "group": "复杂-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-14"
+    ],
+    "secondaryIds": [
+      "llm-11",
+      "llm-15"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "RLHF",
+      "对齐",
+      "预训练"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "给我讲一下从 word2vec 到 BERT 到 GPT 的发展脉络",
+    "group": "复杂-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10"
+    ],
+    "secondaryIds": [
+      "llm-8",
+      "llm-7"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "BERT",
+      "GPT",
+      "Transformer"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "请详细解释一下 Transformer 的自注意力机制是怎么计算的，Q K V 分别代表什么",
+    "group": "复杂-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1",
+      "llm-3"
+    ],
+    "secondaryIds": [
+      "llm-2"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Self-Attention",
+      "QKV",
+      "Multi-Head"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "有 100 万条数据但是标注只有 1 万条，这种情况该怎么办",
+    "group": "复杂-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-10"
+    ],
+    "secondaryIds": [
+      "ml-9",
+      "ml-16"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "半监督",
+      "正则化",
+      "迁移学习"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "能不能帮我系统梳理一下集成学习从 bagging 到 boosting 到 stacking 的演变",
+    "group": "复杂-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-32"
+    ],
+    "secondaryIds": [
+      "ml-31",
+      "ml-36"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Bagging",
+      "Boosting",
+      "Stacking"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "面试官问我怎么评估一个分类模型的好坏，我应该从哪些角度回答",
+    "group": "复杂-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-49",
+      "ml-50"
+    ],
+    "secondaryIds": [
+      "ml-51",
+      "ml-56"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "精确率",
+      "召回率",
+      "ROC",
+      "AUC"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Stable Diffusion 为什么在 latent space 扩散而不是像素空间",
+    "group": "复杂-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-16"
+    ],
+    "secondaryIds": [
+      "dl-15"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "Stable Diffusion",
+      "Latent Space"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "我在训练深度学习模型时发现训练 loss 一直降但验证 loss 不降，这是什么问题，怎么解决",
+    "group": "复杂-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-7"
+    ],
+    "secondaryIds": [
+      "dl-4",
+      "ml-9"
+    ],
+    "acceptableDecks": [
+      "machine-learning",
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "过拟合",
+      "Dropout",
+      "交叉验证"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "AB 测试做了之后发现实验组和对照组没有显著差异，可能的原因有哪些",
+    "group": "复杂-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-26"
+    ],
+    "secondaryIds": [
+      "stats-31",
+      "stats-25"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "假设检验",
+      "统计功效",
+      "样本量"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "想刷动态规划，推荐几道题",
+    "group": "学习路径-力扣",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "lc-062"
+    ],
+    "secondaryIds": [
+      "lc-063",
+      "lc-064",
+      "lc-067"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "动态规划",
+      "DP"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "我 Transformer 不太懂，帮我找相关卡片",
+    "group": "学习路径-大模型",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "llm-1"
+    ],
+    "secondaryIds": [
+      "llm-3",
+      "llm-4",
+      "llm-9"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Transformer",
+      "Attention",
+      "位置编码"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "假如我想学习决策树，我应该学习哪些卡片",
+    "group": "学习路径-机器学习",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "ml-3"
+    ],
+    "secondaryIds": [
+      "ml-16",
+      "ml-17"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "决策树",
+      "随机森林",
+      "集成学习"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "现在想入门深度学习，需要看哪些基础卡片",
+    "group": "学习路径-深度学习",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "dl-1"
+    ],
+    "secondaryIds": [
+      "dl-2",
+      "dl-3",
+      "dl-5"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "深度学习",
+      "反向传播",
+      "激活函数"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "如何系统地学习假设检验",
+    "group": "学习路径-统计学",
+    "benchmarkScope": "learning_plan",
+    "intentType": "learning_plan",
+    "primaryIds": [
+      "stats-24",
+      "stats-25"
+    ],
+    "secondaryIds": [
+      "stats-26",
+      "stats-27"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "假设检验",
+      "p值",
+      "t检验"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Agent和LLM到底什么关系",
+    "group": "概念-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-1",
+      "agent-2"
+    ],
+    "secondaryIds": [
+      "agent-21",
+      "llm-16"
+    ],
+    "acceptableDecks": [
+      "agent",
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Agent|LLM|关系"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Agent长期记忆怎么设计",
+    "group": "概念-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-21"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "记忆|Memory|Agentic"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RAG 的检索结果要不要重新排个序",
+    "group": "概念-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-25"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Reranking",
+      "重排序"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ReAct和普通对话模型区别",
+    "group": "概念-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-1",
+      "agent-21"
+    ],
+    "secondaryIds": [
+      "agent-3"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "ReAct|推理|Agent"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么知道 RAG 搜出来的东西靠不靠谱",
+    "group": "概念-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-15"
+    ],
+    "secondaryIds": [
+      "agent-17"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "评估",
+      "幻觉"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么让Agent执行多步骤任务",
+    "group": "概念-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-5",
+      "agent-6"
+    ],
+    "secondaryIds": [
+      "agent-8"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Planning|AutoGPT|步骤"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么让大模型自己去调 API",
+    "group": "概念-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-2"
+    ],
+    "secondaryIds": [
+      "agent-3"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Function Calling",
+      "Tool-Use"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么评估RAG系统好不好",
+    "group": "概念-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-15",
+      "agent-24"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG.*评估|检索质量"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "agent 和 skill 的核心区别在哪",
+    "group": "概念-VibeCoding",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "vc-2",
+      "vc-1"
+    ],
+    "secondaryIds": [
+      "vc-3"
+    ],
+    "acceptableDecks": [
+      "vibe-coding"
+    ],
+    "acceptableConcepts": [
+      "Agent",
+      "Skill",
+      "sub-agent"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么给 AI 写项目规则文件",
+    "group": "概念-VibeCoding",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "vc-6"
+    ],
+    "acceptableDecks": [
+      "vibe-coding"
+    ],
+    "acceptableConcepts": [
+      "CLAUDE.md",
+      "AGENTS.md"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "二叉树的最近公共祖先",
+    "group": "概念-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-049"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "LCA",
+      "二叉树"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "二叉树遍历递归和非递归哪个好",
+    "group": "概念-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-040",
+      "lc-043"
+    ],
+    "secondaryIds": [
+      "lc-044"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Binary Tree.*Travers"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "刷动态规划一直搞不懂状态转移",
+    "group": "概念-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-062",
+      "lc-065"
+    ],
+    "secondaryIds": [
+      "lc-067"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Climbing|Coin|House"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "十字链表有什么用",
+    "group": "概念-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-010",
+      "lc-011"
+    ],
+    "secondaryIds": [
+      "lc-026"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Matrix|Set Zero|Spir"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "合并有序数组",
+    "group": "概念-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-013"
+    ],
+    "secondaryIds": [
+      "lc-038"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "合并",
+      "有序数组"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "图的最短路径算法比较",
+    "group": "概念-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-050",
+      "lc-051"
+    ],
+    "secondaryIds": [
+      "lc-069"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Path|Dijkstra|最短"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "数组题双指针和前缀和怎么选",
+    "group": "概念-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-001",
+      "lc-004"
+    ],
+    "secondaryIds": [
+      "lc-005"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Two Sum|Subarray|Mov"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "最长不重复子串",
+    "group": "概念-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-019"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "无重复字符",
+      "滑动窗口"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "面试考链表老写bug怎么办",
+    "group": "概念-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-032",
+      "lc-033"
+    ],
+    "secondaryIds": [
+      "lc-034"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "Reverse.*Linked|Cycl"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Encoder Decoder架构",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-8"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Encoder.*Decoder|Seq"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "KV cache为什么要用",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-21",
+      "llm-26"
+    ],
+    "secondaryIds": [
+      "llm-25"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "KV|Cache|推理"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RLHF怎么让模型对齐人类偏好",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-14",
+      "llm-15"
+    ],
+    "secondaryIds": [
+      "llm-20"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "RLHF|DPO|奖励"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "为什么 transformer 比 rnn 训练得快",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-7"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "并行化",
+      "Transformer"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "为什么Transformer比RNN快",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1",
+      "llm-2"
+    ],
+    "secondaryIds": [
+      "llm-38",
+      "dl-9"
+    ],
+    "acceptableDecks": [
+      "llm",
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "并行|Transformer|Self-"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "为什么Transformer用位置编码",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-4"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "位置编码|Positional|RoPE"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "为什么大模型部署用KV cache",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-21",
+      "llm-26"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "KV.*Cache|推理.*加速|Pag"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "多模态大模型原理",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-26"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "多模态|视觉|VL"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "大模型为什么胡编乱造",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10",
+      "agent-11"
+    ],
+    "acceptableDecks": [
+      "llm",
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "幻觉|事实性|RAG"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "大模型微调灾难性遗忘",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-18"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "灾难|Catastrophic|遗忘"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "微调和从头训练有什么区别",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-11",
+      "llm-12"
+    ],
+    "secondaryIds": [
+      "llm-13"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "微调|Pretrain|SFT"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么在不改大模型参数的情况下让它学会新任务",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-12"
+    ],
+    "secondaryIds": [
+      "llm-16",
+      "llm-17"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "LoRA",
+      "PEFT",
+      "微调"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么让大模型回答更准确",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-14",
+      "llm-16"
+    ],
+    "secondaryIds": [
+      "llm-20"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Prompt|COT|RAG|RLHF"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "模型怎么知道每个 token 在句子里的位置",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-4"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "位置编码",
+      "Transformer"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "量化对模型性能影响多大",
+    "group": "概念-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-24",
+      "llm-42"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "量化|AWQ|GPTQ"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "EM算法核心思想",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-125",
+      "ml-134"
+    ],
+    "secondaryIds": [
+      "ml-138"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "EM|GMM|高斯混合"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Stacking和Blending区别",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-189",
+      "ml-36"
+    ],
+    "secondaryIds": [
+      "ml-40"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Stacking|Blending|集成"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "不平衡数据怎么处理",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-143",
+      "ml-16"
+    ],
+    "secondaryIds": [
+      "ml-72"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "不平衡|Imbalance|SMOTE"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "为什么分类用交叉熵不用MSE",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-53",
+      "ml-54"
+    ],
+    "secondaryIds": [
+      "ml-60"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "交叉熵|MSE|Log.*Loss"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "为什么要shuffle数据",
+    "normalizedQuery": "数据打乱 SGD mini-batch shuffle",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-109",
+      "ml-122"
+    ],
+    "secondaryIds": [
+      "ml-155"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "shuffle|epoch|训练"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "交叉验证K怎么选",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-176",
+      "ml-187"
+    ],
+    "secondaryIds": [
+      "ml-44"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "K.*Fold|交叉验证|Cross"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "什么是冷启动问题",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-87"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "冷启动|Cold Start"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "参数太多模型太复杂怎么办",
+    "normalizedQuery": "过拟合 正则化 模型复杂度 参数数量",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-10",
+      "ml-139"
+    ],
+    "secondaryIds": [
+      "ml-7"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "过拟合|正则化|复杂度"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "多个模型的结果怎么融合起来",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-31"
+    ],
+    "secondaryIds": [
+      "ml-36",
+      "ml-32"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "集成学习",
+      "Bagging",
+      "Boosting"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么判断模型是不是学过头了",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-7"
+    ],
+    "secondaryIds": [
+      "ml-9"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "过拟合",
+      "交叉验证"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么判断聚类结果好不好",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-21",
+      "ml-23"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "聚类.*评估|轮廓|Silhouette"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "损失函数不下降了怎么办",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-1",
+      "ml-53",
+      "ml-142",
+      "ml-143"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "学习率|收敛|局部最优"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "数据太少训练不好怎么办",
+    "normalizedQuery": "小样本学习 数据增强 迁移学习 few-shot",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-149",
+      "ml-151"
+    ],
+    "secondaryIds": [
+      "ml-180"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "数据增强|迁移|少样本"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "机器学习模型上线后衰减",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-156",
+      "ml-157"
+    ],
+    "secondaryIds": [
+      "ml-158"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "漂移|衰减|Drift|监控|MLOps"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "样本不均衡怎么处理",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-16"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "类别不均衡",
+      "SMOTE"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "模型在训练集准上线差怎么排查",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-158",
+      "ml-7"
+    ],
+    "secondaryIds": [
+      "ml-77"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "过拟合|泛化|分布"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "特征太多怎么挑选重要的",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-138",
+      "ml-181"
+    ],
+    "secondaryIds": [
+      "ml-41"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "特征选择|Permutation|SHA"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "特征工程完整流程",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-13",
+      "ml-138"
+    ],
+    "secondaryIds": [
+      "ml-41"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "特征.*工程|特征.*选择|特征.*缩放"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "生成模型和判别模型区别",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-110",
+      "ml-111"
+    ],
+    "secondaryIds": [
+      "ml-169"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "生成|判别|GAN|贝叶斯"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "训练集表现很好但测试集很差是怎么回事",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-7"
+    ],
+    "secondaryIds": [
+      "ml-8",
+      "ml-4"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "过拟合",
+      "泛化",
+      "偏差方差"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "风控建模一般用什么算法",
+    "group": "概念-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-199",
+      "ml-200"
+    ],
+    "secondaryIds": [
+      "ml-201",
+      "ml-146"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "风控|异常|Fraud|Anomaly"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Diffusion去噪过程",
+    "group": "概念-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-15",
+      "dl-16"
+    ],
+    "secondaryIds": [
+      "dl-27"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "扩散|Diffusion|DDPM"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "LSTM怎么解决长期记忆问题",
+    "group": "概念-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-24",
+      "dl-7"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "LSTM|GRU|长期"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "softmax输出为什么和为1",
+    "group": "概念-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-31",
+      "dl-32"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "softmax"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "卷积层到底在提取什么信息",
+    "group": "概念-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-6"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "CNN|卷积核|特征图"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "残差网络为什么要跳跃连接",
+    "group": "概念-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-8"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "ResNet|残差|Skip.*Conn"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "生成器和判别器是怎么互相博弈的",
+    "group": "概念-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-11"
+    ],
+    "secondaryIds": [
+      "dl-12"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "GAN",
+      "生成对抗"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "神经网络为什么不能太深也不能太浅",
+    "group": "概念-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-2"
+    ],
+    "secondaryIds": [
+      "dl-8"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "梯度消失",
+      "梯度爆炸",
+      "ResNet"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "神经网络为什么要加激活函数",
+    "group": "概念-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-1",
+      "dl-24"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "激活函数|非线性"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "训练和推理时 dropout 行为一样吗",
+    "group": "概念-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-4"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "Dropout",
+      "训练推理"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "AB测试怎么判断显著",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-102",
+      "stats-116"
+    ],
+    "secondaryIds": [
+      "stats-118"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "AB|A/B|显著|P值"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "EDA数据探索怎么做",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-52"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "EDA|描述|可视化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "SQL怎么优化慢查询",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-180",
+      "stats-183"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "SQL.*优化|索引|慢查询"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "pandas处理大数据内存溢出",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-180",
+      "stats-187"
+    ],
+    "secondaryIds": [
+      "stats-153"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "内存|溢出|大数据"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "为什么样本方差分母是 n 减 1",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-2"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "方差",
+      "自由度"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "什么时候用图数据库",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-33",
+      "dl-34"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "图|Graph|Neo4j"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "什么是指标体系北极星",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-77",
+      "wp-78"
+    ],
+    "secondaryIds": [
+      "stats-164"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "北极星|North Star|AARRR"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么判断两个变量之间有没有关系",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-115",
+      "stats-138"
+    ],
+    "secondaryIds": [
+      "stats-140",
+      "ml-1"
+    ],
+    "acceptableDecks": [
+      "statistics",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "相关|回归"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么判断两组数据有没有显著差异",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-26"
+    ],
+    "secondaryIds": [
+      "stats-28"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "t检验",
+      "假设检验"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么设计数据指标体系",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-167",
+      "stats-168",
+      "jargon-33"
+    ],
+    "secondaryIds": [
+      "stats-159"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "指标|Metric|North Star"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎样用数据来更新我们的信念",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-9"
+    ],
+    "secondaryIds": [
+      "stats-39"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "贝叶斯",
+      "先验后验"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "数据和直觉不一致听谁的",
+    "group": "概念-统计学",
+    "benchmarkScope": "excluded",
+    "intentType": "not_card_search_intent",
+    "excludeReason": "business_decision",
+    "primaryIds": [
+      "stats-134",
+      "stats-154"
+    ],
+    "secondaryIds": [
+      "stats-156"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "数据驱动|决策"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "时间序列季节性怎么处理",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-88",
+      "stats-90",
+      "stats-91"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "季节|时间序列|ARIMA|Prophe"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "样本量要多大才算够",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-118",
+      "stats-119"
+    ],
+    "secondaryIds": [
+      "stats-161"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "样本量|功效|Power"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "相关和因果怎么区分",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-115",
+      "stats-136"
+    ],
+    "secondaryIds": [
+      "stats-140"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "因果|相关|混淆"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "第一类错误和第二类错误谁更严重",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-120",
+      "stats-134"
+    ],
+    "secondaryIds": [
+      "stats-25"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "第一类|Type I|显著性"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "马尔可夫链怎么收敛",
+    "group": "概念-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-103",
+      "stats-109"
+    ],
+    "secondaryIds": [
+      "stats-199"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "马尔可夫|Markov|MCMC"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么拒绝不合理的需求",
+    "group": "概念-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-1",
+      "wp-20"
+    ],
+    "secondaryIds": [
+      "wp-4"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "拒绝|需求|不合理"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么给领导汇报进度",
+    "group": "概念-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-3",
+      "wp-7"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "汇报|延期|进度"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么跟领导汇报工作进展",
+    "group": "概念-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-8"
+    ],
+    "secondaryIds": [
+      "wp-3"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "汇报",
+      "向上沟通"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "怎么面试中谈薪资",
+    "group": "概念-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-10",
+      "wp-29"
+    ],
+    "secondaryIds": [
+      "wp-49"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "薪资|涨薪|薪酬"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "空降新团队怎么快速融入",
+    "group": "概念-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-21"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "新人|融入|入职"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "面试的时候怎么介绍自己的项目经历比较好",
+    "group": "概念-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-7"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "面试",
+      "项目",
+      "STAR"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "互联网公司常说的底层能力指什么",
+    "group": "概念-黑话",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "jargon-5"
+    ],
+    "acceptableDecks": [
+      "jargon"
+    ],
+    "acceptableConcepts": [
+      "底层逻辑",
+      "方法论"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "项目做完之后要总结一下经验",
+    "group": "概念-黑话",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "jargon-6"
+    ],
+    "acceptableDecks": [
+      "jargon"
+    ],
+    "acceptableConcepts": [
+      "复盘",
+      "回顾"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Agent ReAct推理模式",
+    "group": "混合-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-1",
+      "agent-6"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "ReAct|推理|Planning"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Chunking策略Sentences还是固定长度",
+    "group": "混合-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-23",
+      "agent-8"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "分块|Chunk|Sliding"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Hybrid Search 混合检索",
+    "group": "混合-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-26"
+    ],
+    "secondaryIds": [
+      "agent-9"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "混合检索",
+      "Hybrid Search"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RAG Retrieval检索流程",
+    "group": "混合-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10",
+      "agent-11"
+    ],
+    "secondaryIds": [
+      "agent-12"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG|检索.*管道"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ReAct 框架 Reasoning Acting",
+    "group": "混合-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-1"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "ReAct",
+      "推理行动"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Reranker重排序模型",
+    "group": "混合-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-25"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Rerank|Cross.*Encode"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "CLAUDE.md 和 AGENTS.md 优先级",
+    "group": "混合-VibeCoding",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "vc-6"
+    ],
+    "acceptableDecks": [
+      "vibe-coding"
+    ],
+    "acceptableConcepts": [
+      "CLAUDE.md",
+      "AGENTS.md"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "MCP server client 架构",
+    "group": "混合-VibeCoding",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "vc-5"
+    ],
+    "secondaryIds": [
+      "vc-17"
+    ],
+    "acceptableDecks": [
+      "vibe-coding"
+    ],
+    "acceptableConcepts": [
+      "MCP",
+      "server",
+      "client"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "DFS 和 BFS 遍历二叉树",
+    "group": "混合-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-043"
+    ],
+    "secondaryIds": [
+      "lc-040",
+      "lc-041"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "DFS",
+      "BFS",
+      "二叉树"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "LRU Cache 实现",
+    "group": "混合-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-087"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "LRU",
+      "缓存"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Attention机制的Q K V到底是什么",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1",
+      "llm-2"
+    ],
+    "secondaryIds": [
+      "llm-26"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Attention|Query.*Val"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "BERT fine-tuning怎么调参数",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10",
+      "llm-12"
+    ],
+    "secondaryIds": [
+      "llm-13"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "BERT|微调"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "CLIP多模态对比学习",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-4",
+      "llm-8"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "CLIP|多模态|对比"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "FlashAttention GPU显存优化",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-40"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Flash.*Attention|显存."
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "KV Cache 推理加速",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-21"
+    ],
+    "secondaryIds": [
+      "llm-26"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "KV Cache",
+      "推理加速"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "LoRA 和全量 finetune 对比",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-12"
+    ],
+    "secondaryIds": [
+      "llm-17"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "LoRA",
+      "全参数微调"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "LoRA微调和Full Fine-tuning",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-12",
+      "llm-13"
+    ],
+    "secondaryIds": [
+      "llm-17"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "LoRA|微调|Adapter"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "OOM排查调batch size显存",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-38",
+      "llm-40"
+    ],
+    "secondaryIds": [
+      "llm-47"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "OOM|显存|Batch"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Pipeline并行 Gradient Accumulation",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-48",
+      "llm-7"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "并行|Pipeline|梯度.*累积"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Positonal Encoding和RoPE区别",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-4"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "位置编码|RoPE|Posit"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Qwen模型Prompt优化",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-16",
+      "llm-40"
+    ],
+    "secondaryIds": [
+      "llm-46"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Prompt|优化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RLHF reward model 训练",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-14"
+    ],
+    "secondaryIds": [
+      "llm-15"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "RLHF",
+      "reward model"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Self-Attention QKV 计算",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1"
+    ],
+    "secondaryIds": [
+      "llm-2",
+      "llm-9"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Self-Attention",
+      "QKV"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Speculative解码投机推理",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-25"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Speculat|推测.*解码|投机"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Transformer Self-Attention机制",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1",
+      "llm-2"
+    ],
+    "secondaryIds": [
+      "llm-38"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Self.*Attention|Tran"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "vLLM PagedAttention加速原理",
+    "group": "混合-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-26"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "vLLM|PagedAtt"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "AUC PR-AUC区别什么情况用哪个",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-9",
+      "ml-49",
+      "ml-137"
+    ],
+    "secondaryIds": [
+      "ml-133"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "AUC|PR|ROC"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Adam和SGD选哪个",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-58"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Adam|SGD|优化器"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Cross Entropy交叉熵Loss",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-142",
+      "ml-143"
+    ],
+    "secondaryIds": [
+      "ml-144"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "交叉熵|Cross.*Entropy|L"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Data Augmentation数据增强",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-180"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "数据.*增强|Augment"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "K-Means 聚类 K 值选择",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-21"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "KMeans",
+      "肘部法则"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "KMeans的K值怎么选Elbow",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-125",
+      "ml-21"
+    ],
+    "secondaryIds": [
+      "ml-24"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "K.*Means|Elbow|轮廓"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Label Encoding ordinal",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-14",
+      "ml-135",
+      "ml-178"
+    ],
+    "secondaryIds": [
+      "ml-121"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "编码|Label|类别"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "LightGBM和XGBoost哪个好",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-31",
+      "ml-33"
+    ],
+    "secondaryIds": [
+      "ml-34"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "LightGBM|XGBoost|GBD"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "One-hot Encoding有什么问题",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-14",
+      "ml-28",
+      "ml-42"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "One.*Hot|编码|高维"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "PCA variance explained计算",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-141",
+      "ml-22"
+    ],
+    "secondaryIds": [
+      "ml-26"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "PCA|方差.*解释|SVD"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "PCA 降维原理",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-22"
+    ],
+    "secondaryIds": [
+      "ml-26",
+      "ml-48"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "PCA",
+      "降维"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Precision Recall F1怎么算",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-184",
+      "ml-49"
+    ],
+    "secondaryIds": [
+      "ml-88"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Precision|Recall|F1"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ROC AUC 怎么理解",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-50"
+    ],
+    "secondaryIds": [
+      "ml-56"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "ROC",
+      "AUC"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ROC AUC曲线解释",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-9",
+      "ml-49",
+      "ml-137"
+    ],
+    "secondaryIds": [
+      "ml-133"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "ROC|AUC|PR"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Random Forest过拟合怎么办",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-18",
+      "ml-31"
+    ],
+    "secondaryIds": [
+      "ml-38"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "随机森林|过拟合|n_estim"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "SVM Kernel核函数选择",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-19",
+      "ml-2"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SVM|核函数|Kernel"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "SVM kernel 选择",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-2"
+    ],
+    "secondaryIds": [
+      "ml-19"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SVM",
+      "kernel"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Self-Supervised自监督学习",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-118",
+      "ml-119"
+    ],
+    "secondaryIds": [
+      "ml-122"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "自监督|对比|SimCLR"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "XGBoost 和 LightGBM 对比",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-33",
+      "ml-34"
+    ],
+    "secondaryIds": [
+      "ml-31"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "XGBoost",
+      "LightGBM",
+      "GBDT"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "XGBoost调参技巧",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-31",
+      "ml-33"
+    ],
+    "secondaryIds": [
+      "ml-37"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "XGBoost|调参|Hyperpar"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "t-SNE vs PCA 可视化",
+    "group": "混合-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-26"
+    ],
+    "secondaryIds": [
+      "ml-22"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "t-SNE",
+      "PCA"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Adam 和 SGD 选哪个",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-30"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "Adam",
+      "SGD",
+      "优化器"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Batch Normalization公式",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-21",
+      "dl-22"
+    ],
+    "secondaryIds": [
+      "dl-3"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "Batch.*Norm|归一化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "BatchNorm vs LayerNorm",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-3"
+    ],
+    "secondaryIds": [
+      "dl-22"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "BatchNorm",
+      "LayerNorm"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Diffusion Model 前向加噪过程",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-15"
+    ],
+    "secondaryIds": [
+      "dl-27"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "扩散模型",
+      "Diffusion"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GAN Discriminator生成器判别器",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-11",
+      "dl-12"
+    ],
+    "secondaryIds": [
+      "dl-14"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "GAN|生成.*对抗"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GAN mode collapse 怎么解决",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-12"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "GAN",
+      "模式坍塌"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GELU激活函数公式推导",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-1",
+      "dl-24"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "GELU|激活|Swish|ReLU"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "LSTM GRU区别和选择",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-24",
+      "dl-7"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "LSTM|GRU|RNN"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Layer Normalization位置应用",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-22",
+      "dl-3"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "Layer.*Norm|Batch.*N"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ReLU LeakyReLU区别",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-1",
+      "dl-24"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "ReLU|Leaky|激活"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ResNet残差网络Skip Connection",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-8"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "ResNet|残差|Skip"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Sigmoid 和 Softmax 区别",
+    "group": "混合-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-31"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "sigmoid",
+      "softmax"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Bootstrap 和 Permutation Test",
+    "group": "混合-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-37"
+    ],
+    "secondaryIds": [
+      "stats-38"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "Bootstrap",
+      "置换检验"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "MCMC 采样原理",
+    "group": "混合-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-43"
+    ],
+    "secondaryIds": [
+      "stats-44"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "MCMC",
+      "采样"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Window Function窗口函数SQL",
+    "group": "混合-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-178",
+      "stats-179"
+    ],
+    "secondaryIds": [
+      "stats-180"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "Window|窗口|SQL"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "p-value 的误解",
+    "group": "混合-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-24"
+    ],
+    "secondaryIds": [
+      "stats-25"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "p值",
+      "显著性"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "OKR 和 KPI 的区别",
+    "group": "混合-黑话",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "jargon-35"
+    ],
+    "acceptableDecks": [
+      "jargon"
+    ],
+    "acceptableConcepts": [
+      "OKR",
+      "KPI",
+      "绩效"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "how to evaluate retrieval augmented generation",
+    "group": "英文-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-22",
+      "agent-15"
+    ],
+    "secondaryIds": [
+      "agent-7"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG",
+      "evaluation"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "binary tree traversal preorder inorder postorder",
+    "group": "英文-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-043",
+      "lc-040"
+    ],
+    "secondaryIds": [
+      "lc-041"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "binary tree",
+      "traversal",
+      "DFS"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "self attention mechanism transformer",
+    "group": "英文-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-1",
+      "llm-3"
+    ],
+    "secondaryIds": [
+      "llm-9"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "self-attention",
+      "Transformer"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "gradient descent optimization",
+    "group": "英文-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-11",
+      "ml-57"
+    ],
+    "secondaryIds": [
+      "ml-58"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "gradient descent",
+      "SGD",
+      "optimization"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "overfitting vs underfitting deep learning",
+    "group": "英文-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-7"
+    ],
+    "secondaryIds": [
+      "ml-8",
+      "dl-4"
+    ],
+    "acceptableDecks": [
+      "machine-learning",
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "overfitting",
+      "underfitting"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RAG和Fine-tuning什么时候用哪个",
+    "group": "跨模块-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10",
+      "agent-11"
+    ],
+    "secondaryIds": [
+      "agent-12"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG|微调|对比"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ReAct和Plan-and-Execute区别",
+    "group": "跨模块-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-1",
+      "agent-6"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "ReAct|Planning|Plan."
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Vibe Coding和Agent开发区别",
+    "group": "跨模块-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-21",
+      "agent-3"
+    ],
+    "secondaryIds": [
+      "agent-4"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Vibe|Agent|Coding|编程"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "函数调用和DSL工具选择",
+    "group": "跨模块-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-2",
+      "agent-3"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "Function Calling|DSL"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "结构化输出JSON Mode对比",
+    "group": "跨模块-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-2"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "JSON.*Mode|Structure"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "AUC和F1衡量指标的区别",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-9",
+      "ml-49",
+      "ml-185"
+    ],
+    "secondaryIds": [
+      "ml-133"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "AUC|F1|PR|ROC"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Bagging和Boosting核心差异",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-189",
+      "ml-32"
+    ],
+    "secondaryIds": [
+      "ml-36"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Bagging|Boosting|集成"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GBDT和随机森林本质区别",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-126",
+      "ml-17"
+    ],
+    "secondaryIds": [
+      "ml-18"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "GBDT|随机森林|决策"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "KMeans和DBSCAN选择",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-123",
+      "ml-124"
+    ],
+    "secondaryIds": [
+      "ml-125"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "DBSCAN|K.*Means|聚类"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "L1 L2 Dropout 正则化选哪个",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-10"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "L1.*L2|Dropout|正则化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "MSE和MAE损失函数对比",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-1",
+      "ml-53",
+      "ml-142",
+      "ml-143"
+    ],
+    "secondaryIds": [
+      "ml-144"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "MSE|MAE|L1.*Loss|L2."
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Mini Batch vs Full Batch训练",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-1",
+      "ml-11",
+      "ml-58"
+    ],
+    "secondaryIds": [
+      "ml-115"
+    ],
+    "acceptableDecks": [
+      "deep-learning",
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Batch|SGD|梯度"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "One-Hot和Target Encoding",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-14",
+      "ml-135",
+      "ml-178"
+    ],
+    "secondaryIds": [
+      "ml-129"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "One.*Hot|Target|编码"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Precision vs Recall业务取舍",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-49",
+      "ml-88"
+    ],
+    "secondaryIds": [
+      "ml-90"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Precision|Recall|业务"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "SGD vs AdamW什么时候用",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-58"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SGD|Adam|优化器"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "SVM和逻辑回归谁更好",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-1",
+      "ml-19"
+    ],
+    "secondaryIds": [
+      "ml-2"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SVM|逻辑回归"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "回归任务和分类任务Loss",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-1",
+      "ml-155"
+    ],
+    "secondaryIds": [
+      "ml-185"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "回归|分类|MSE|交叉熵"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "多任务学习vs单任务训练",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-150"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "多任务|Multi.*task|共享"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "架构和数据哪个更重要",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-104",
+      "ml-110"
+    ],
+    "secondaryIds": [
+      "ml-135"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "数据.*模型|Data-centric"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "梯度下降和牛顿法优化对比",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-11",
+      "ml-57"
+    ],
+    "secondaryIds": [
+      "ml-58"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "梯度下降|牛顿法|二阶"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "白盒模型和黑盒模型可解释",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-137",
+      "ml-181"
+    ],
+    "secondaryIds": [
+      "ml-73"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "可解释|SHAP|黑盒|白盒"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "离线强化学习和在线强化学习",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-113",
+      "ml-153"
+    ],
+    "secondaryIds": [
+      "ml-163"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "在线|离线|RL|Batch.*RL"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "离线评估和在线实验的差异",
+    "group": "跨模块-ML",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-137",
+      "ml-153",
+      "ml-163"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "离线.*评估|在线.*实验|AB"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "BERT和GPT训练目标不同",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "BERT.*GPT|自编码|自回归"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GPT和Claude文风差异",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10",
+      "llm-11"
+    ],
+    "secondaryIds": [
+      "llm-24"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "GPT|Claude|对齐|风格"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ONNX TensorRT哪个快",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-21",
+      "llm-26",
+      "llm-23"
+    ],
+    "secondaryIds": [
+      "llm-25"
+    ],
+    "acceptableDecks": [
+      "llm",
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "ONNX|TensorRT|推理"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Prompt工程和Fine-tuning选哪个",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-12",
+      "llm-13"
+    ],
+    "secondaryIds": [
+      "llm-16"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Prompt|微调|ICL"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Seq2Seq和Transformer架构对比",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-38",
+      "llm-4"
+    ],
+    "secondaryIds": [
+      "llm-5"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Seq2Seq|Transformer"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "TPU和GPU训练优势劣势",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-11",
+      "llm-40"
+    ],
+    "secondaryIds": [
+      "llm-48"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "TPU|GPU|硬件|训练"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "微调LoRA和全量微调的区别",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-12",
+      "llm-13"
+    ],
+    "secondaryIds": [
+      "llm-17"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "LoRA|全量|微调"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "自编码模型和自回归模型区别",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10",
+      "llm-24"
+    ],
+    "secondaryIds": [
+      "llm-39"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "自编码|自回归|BERT|GPT"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "贪心搜索和束搜索对比",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-22"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "贪心|Beam|解码"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "预训练和微调模型的差异",
+    "group": "跨模块-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-11",
+      "llm-12"
+    ],
+    "secondaryIds": [
+      "llm-13"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "预训练|微调|Pretrain"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "BatchNorm和LayerNorm什么时候用哪个",
+    "group": "跨模块-深度vs大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-21",
+      "dl-22"
+    ],
+    "secondaryIds": [
+      "dl-3",
+      "llm-38"
+    ],
+    "acceptableDecks": [
+      "deep-learning",
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Batch.*Norm|Layer.*N"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RNN和Transformer大不同",
+    "group": "跨模块-深度vs大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-24",
+      "dl-7"
+    ],
+    "secondaryIds": [
+      "dl-9",
+      "llm-38"
+    ],
+    "acceptableDecks": [
+      "deep-learning",
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "RNN|LSTM|Transformer"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ReLU Sigmoid中间状态推导",
+    "group": "跨模块-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-1",
+      "dl-24"
+    ],
+    "secondaryIds": [
+      "dl-31"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "ReLU|Sigmoid|Tanh|激活"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ETL ELT数据集成区别",
+    "group": "跨模块-统计",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-116",
+      "stats-125"
+    ],
+    "secondaryIds": [
+      "stats-185"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "ETL|ELT|数据.*仓库"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "KL散度和JS散度对比",
+    "group": "跨模块-统计",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-194"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "KL.*散度|JS|相对熵"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "SQL和NoSQL数据库选型",
+    "group": "跨模块-统计",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-178",
+      "stats-180"
+    ],
+    "secondaryIds": [
+      "stats-182"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "SQL|NoSQL|关系型"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Streaming和Batch数据处理",
+    "group": "跨模块-统计",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-150",
+      "stats-187"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "流式|批处理|Kafka|Spark"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "如何设计一个实验评估",
+    "group": "跨模块-统计",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-102",
+      "stats-116"
+    ],
+    "secondaryIds": [
+      "stats-118"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "实验|AB|随机"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "最大似然和最大后验区别",
+    "group": "跨模块-统计",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-111",
+      "stats-195"
+    ],
+    "secondaryIds": [
+      "stats-39"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "MLE|MAP|似然|后验"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Agent 开发里面 ReAct 模式和 Function Calling 到底有什么区别，什么时候用哪个",
+    "group": "长句-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-2"
+    ],
+    "secondaryIds": [
+      "agent-3",
+      "agent-4"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "ReAct",
+      "Function Calling",
+      "Tool Use"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "AutoGPT怎么自己规划执行任务",
+    "group": "长句-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-21",
+      "agent-3"
+    ],
+    "secondaryIds": [
+      "agent-4"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "AutoGPT|Planning|Age"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "HNSW索引向量数据库",
+    "group": "长句-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10",
+      "agent-12"
+    ],
+    "secondaryIds": [
+      "agent-15"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "向量.*数据库|HNSW|ANN|检索"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "JSON Mode和Function Calling区别",
+    "group": "长句-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-2"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "JSON.*Mode|Function "
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "LangChain和LlamaIndex对比",
+    "group": "长句-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10",
+      "agent-11"
+    ],
+    "secondaryIds": [
+      "agent-12"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "LangChain|LlamaIndex"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RAG检索和生成怎么结合的",
+    "group": "长句-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10",
+      "agent-11"
+    ],
+    "secondaryIds": [
+      "agent-12"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG|检索|生成|Pipeline"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "我们想在公司内部搭建一个基于 RAG 的知识库问答系统，从技术选型到落地有什么需要注意的地方",
+    "group": "长句-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-7"
+    ],
+    "secondaryIds": [
+      "agent-15",
+      "agent-18",
+      "agent-22"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG",
+      "检索增强生成",
+      "知识库"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "智能客服意图识别怎么做",
+    "group": "长句-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-10",
+      "agent-11"
+    ],
+    "secondaryIds": [
+      "agent-12"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG|分类|意图"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "用AI回复客户邮件隐私怎么保证",
+    "group": "长句-Agent",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "agent-27",
+      "agent-28"
+    ],
+    "secondaryIds": [
+      "agent-12"
+    ],
+    "acceptableDecks": [
+      "agent"
+    ],
+    "acceptableConcepts": [
+      "RAG|安全|幻觉"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "力扣里面二叉树相关的题目我做得不太好，尤其是递归遍历老是写错，有哪些经典题可以练手",
+    "group": "长句-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-043"
+    ],
+    "secondaryIds": [
+      "lc-040",
+      "lc-041",
+      "lc-039"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "二叉树",
+      "遍历",
+      "递归"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "最近在刷数组相关的题，哈希表和双指针这两类经常搞混，什么时候用哈希什么时候用双指针",
+    "group": "长句-力扣",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "lc-001"
+    ],
+    "secondaryIds": [
+      "lc-002",
+      "lc-005"
+    ],
+    "acceptableDecks": [
+      "leetcode"
+    ],
+    "acceptableConcepts": [
+      "哈希表",
+      "双指针",
+      "数组"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "8G显存部署大模型有什么轻量化方案",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-24",
+      "llm-40"
+    ],
+    "secondaryIds": [
+      "llm-42"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "量化|压缩|部署|显存"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Chain-of-Thought在GPT4中",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-21",
+      "llm-17"
+    ],
+    "secondaryIds": [
+      "llm-25"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "COT|思维链|推理"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Flash Attention怎么加速",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-21",
+      "llm-25"
+    ],
+    "secondaryIds": [
+      "llm-40"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Flash.*Attention|加速"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "OOM显存不足怎么排查",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-40",
+      "llm-47"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "OOM|显存|内存.*不足"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "PEFT方法LoRA Adapter对比",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-12",
+      "llm-13"
+    ],
+    "secondaryIds": [
+      "llm-17"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "LoRA|Adapter|PEFT|微调"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "RoPE和其他位置编码冲突吗",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-4"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "RoPE|位置编码|ALiBi"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Speculative Decoding推理加速",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-21",
+      "llm-25"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Speculative|推测.*解码|推"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "TPU和GPU训练架构差异",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-11",
+      "llm-40"
+    ],
+    "secondaryIds": [
+      "llm-48"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "TPU|GPU|训练|并行"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Transformer为什么除以根号dk",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-2"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "缩放|√|方差|点积"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "few-shot为什么给例子就能学",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-16",
+      "llm-46"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Few.*shot|Prompt|上下文"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "vLLM PageAttention批处理",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-26"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "vLLM|PagedAttention"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "大模型论文看不过来有什么必读",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-10",
+      "llm-24"
+    ],
+    "secondaryIds": [
+      "llm-42"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Transformer.*架构|GPT."
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "微调应该冻结哪些层",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-12",
+      "llm-13"
+    ],
+    "secondaryIds": [
+      "llm-17"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "微调|LoRA|冻结|Adapter"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "想了解一下现在主流的 prompt engineering 技巧有哪些，有没有什么套路可以参考",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-14"
+    ],
+    "secondaryIds": [
+      "llm-13"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "Prompt",
+      "CoT",
+      "Few-shot"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "我们团队想把一个大模型部署到生产环境，但是推理速度太慢了，有没有什么加速的方案可以推荐一下",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-15"
+    ],
+    "secondaryIds": [
+      "llm-16",
+      "llm-17"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "推理加速",
+      "量化",
+      "KV Cache"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "数据并行模型并行流水线并行",
+    "group": "长句-大模型",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "llm-47",
+      "llm-48"
+    ],
+    "secondaryIds": [
+      "llm-7"
+    ],
+    "acceptableDecks": [
+      "llm"
+    ],
+    "acceptableConcepts": [
+      "并行|ZeRO|分布式"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "改简历准备大厂技术面",
+    "group": "长句-学习路径",
+    "benchmarkScope": "excluded",
+    "intentType": "not_card_search_intent",
+    "excludeReason": "career_advice",
+    "primaryIds": [
+      "wp-80",
+      "wp-81"
+    ],
+    "secondaryIds": [
+      "ml-189"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "面试|简历|机器学习"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "机器学习面试记了又忘怎么办",
+    "group": "长句-学习路径",
+    "benchmarkScope": "excluded",
+    "intentType": "not_card_search_intent",
+    "excludeReason": "career_advice",
+    "primaryIds": [
+      "ml-202",
+      "ml-203"
+    ],
+    "secondaryIds": [
+      "ml-119"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "面试|复习|核心"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "特征工程零散怎么系统学",
+    "group": "长句-学习路径",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-138",
+      "ml-141"
+    ],
+    "secondaryIds": [
+      "ml-41"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "特征.*工程|特征.*选择|降维"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Batch Size对收敛有什么影响",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-58"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Batch.*Size|SGD|收敛"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Contrastive Learning InfoNCE推导",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-119",
+      "ml-122"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "对比.*学习|InfoNCE|SimCL"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "DBSCAN和KMeans对比",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-123",
+      "ml-124"
+    ],
+    "secondaryIds": [
+      "ml-125"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "DBSCAN|K.*Means|聚类"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Early Stopping防过拟合原理",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-7",
+      "ml-77"
+    ],
+    "secondaryIds": [
+      "ml-78"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Early.*Stop|早停|过拟合"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Imbalanced Dataset采样策略",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-105",
+      "ml-135"
+    ],
+    "secondaryIds": [
+      "ml-143"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "不平衡|SMOTE|采样"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "MLflow和WandB怎么管理实验",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-162"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "MLflow|实验.*管理|模型.*版本"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Momentum为什么能加速收敛",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-120",
+      "ml-58"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "动量|SGD|优化器|Adam"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Precision Recall trade-off可视化",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-49",
+      "ml-50"
+    ],
+    "secondaryIds": [
+      "ml-56"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Precision.*Recall|PR"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "WOE编码和OneHot区别",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-14",
+      "ml-42"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "WOE|One.*Hot|特征.*编码"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Weight Decay和L2等价吗",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-10"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "Weight.*Decay|L1.*L2"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "XGBoost调参不如默认值怎么办",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-31",
+      "ml-33"
+    ],
+    "secondaryIds": [
+      "ml-34"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "XGBoost|LightGBM|调参"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "传统ML还有没有必要学",
+    "group": "长句-机器学习",
+    "benchmarkScope": "excluded",
+    "intentType": "not_card_search_intent",
+    "excludeReason": "open_qa",
+    "primaryIds": [
+      "ml-205",
+      "ml-206"
+    ],
+    "secondaryIds": [
+      "ml-207",
+      "ml-2"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SVM|随机森林|大模型.*对比"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "几十万条数据冷启动推荐系统怎么做",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-103",
+      "ml-117"
+    ],
+    "secondaryIds": [
+      "ml-133"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "冷启动|矩阵分解|推荐"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "噪声标签怎么训练模型",
+    "normalizedQuery": "噪声标签 label noise robust training",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-144"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "噪声.*标签|鲁棒|清洗"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "在线推理离线批处理架构区别",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-104",
+      "ml-110"
+    ],
+    "secondaryIds": [
+      "ml-160"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "推理|批处理|架构|部署"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "对比学习为什么不需要标注",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-118",
+      "ml-119"
+    ],
+    "secondaryIds": [
+      "ml-122"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "对比学习|自监督|SimCLR|Info"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "我有个数据集样本特别不均衡，正样本只有百分之五，这种情况一般怎么处理比较好",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-16"
+    ],
+    "secondaryIds": [
+      "ml-17",
+      "ml-50"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "样本不均衡",
+      "SMOTE",
+      "类别权重"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "最近在复习机器学习基础，想问一下偏差和方差到底怎么理解，有什么直观的例子吗",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-8"
+    ],
+    "secondaryIds": [
+      "ml-7"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "偏差方差",
+      "bias-variance",
+      "过拟合"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "树模型家族怎么选",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-126",
+      "ml-17"
+    ],
+    "secondaryIds": [
+      "ml-18"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "决策树|随机森林|GBDT|XGBoos"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "正样本只有3%直接训练会不会有问题",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-143",
+      "ml-16"
+    ],
+    "secondaryIds": [
+      "ml-72"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "不平衡|SMOTE|类别.*加权"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "深度学习金融风控可解释性",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-134",
+      "ml-137"
+    ],
+    "secondaryIds": [
+      "ml-181"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "可解释|SHAP|LIME|Fairne"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "现场推导逻辑回归梯度卡住了怎么办",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-1"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "逻辑回归.*损失|梯度.*推导"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "过拟合训练99测试80怎么排查",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-10",
+      "ml-7"
+    ],
+    "secondaryIds": [
+      "ml-77"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "过拟合|Dropout|正则化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "面试官如果问我 SVM 的原理和核函数怎么选，我该怎么回答比较好",
+    "group": "长句-机器学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-2"
+    ],
+    "secondaryIds": [
+      "ml-19",
+      "ml-20"
+    ],
+    "acceptableDecks": [
+      "machine-learning"
+    ],
+    "acceptableConcepts": [
+      "SVM",
+      "核函数",
+      "kernel"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "BPTT在RNN中怎么工作",
+    "group": "长句-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-5",
+      "dl-7"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "RNN|BPTT|反向.*传播"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "GELU激活函数数学公式优势",
+    "group": "长句-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-1",
+      "dl-24"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "GELU|Swish|激活"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "LSTM和GRU本质区别是什么",
+    "group": "长句-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-24",
+      "dl-7"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "LSTM|GRU|RNN"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "图像分割手机端部署选什么模型",
+    "group": "长句-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-36",
+      "dl-37"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "CNN|分割|轻量化|模型.*压缩"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "我在做图像分类任务，模型训练了好几个小时一直在震荡不收敛，可能是什么原因",
+    "group": "长句-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-2"
+    ],
+    "secondaryIds": [
+      "dl-1",
+      "dl-5"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "梯度消失",
+      "激活函数",
+      "学习率"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "梯度消失梯度爆炸通俗解释",
+    "group": "长句-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-2"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "梯度.*消失|梯度.*爆炸|BatchN"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "能不能用通俗易懂的方式给我解释一下 Batch Normalization 到底做了什么事情",
+    "group": "长句-深度学习",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "dl-3"
+    ],
+    "secondaryIds": [
+      "dl-2"
+    ],
+    "acceptableDecks": [
+      "deep-learning"
+    ],
+    "acceptableConcepts": [
+      "BatchNorm",
+      "归一化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "AB测试转化率提升只有0.5%怎么判断显著",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-119",
+      "stats-174"
+    ],
+    "secondaryIds": [
+      "stats-31"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "AB.*测试|A/B.*显著|样本量"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "CAP理论为什么不能三者兼得",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-190",
+      "ml-191"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "CAP|分布式|一致"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "ETL流程pipeline最佳实践",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "ml-197",
+      "ml-196"
+    ],
+    "secondaryIds": [
+      "stats-153"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "ETL|pipeline|数据"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "SQL全表扫描怎么加索引",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-180",
+      "stats-183"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "索引|SQL.*优化|全表"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "Spark join操作特别慢怎么办",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-180",
+      "stats-187"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "数据倾斜|Spark|优化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "pandas百万数据内存溢出怎么办",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-180",
+      "stats-187"
+    ],
+    "secondaryIds": [
+      "stats-153"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "pandas|内存|大数据"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "协方差和相关系数公式老搞混",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-115",
+      "stats-146"
+    ],
+    "secondaryIds": [
+      "stats-17"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "协方差|相关系数|标准化"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "新功能是否对留存有正向影响",
+    "group": "长句-统计学",
+    "benchmarkScope": "excluded",
+    "intentType": "not_card_search_intent",
+    "excludeReason": "business_decision",
+    "primaryIds": [
+      "stats-136",
+      "stats-145"
+    ],
+    "secondaryIds": [
+      "stats-164"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "AB.*测试|因果|留存"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "时间序列节假日效应怎么处理",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-88",
+      "stats-90"
+    ],
+    "secondaryIds": [
+      "stats-91"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "季节|节假日|ARIMA|Prophet"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "面试被问到中心极限定理，我其实一直没完全理解它的实际应用场景，能帮我梳理一下吗",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-10"
+    ],
+    "secondaryIds": [
+      "stats-11"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "中心极限定理",
+      "大数定律",
+      "抽样分布"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "领导让我分析一下新功能上线前后用户留存有没有显著变化，我应该用什么统计方法",
+    "group": "长句-统计学",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "stats-24"
+    ],
+    "secondaryIds": [
+      "stats-25",
+      "stats-26"
+    ],
+    "acceptableDecks": [
+      "statistics"
+    ],
+    "acceptableConcepts": [
+      "AB测试",
+      "假设检验",
+      "显著性"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "下周要跟领导做季度述职汇报了，怎么把工作成果讲得有条理又有亮点，有什么推荐的框架吗",
+    "group": "长句-职场",
+    "benchmarkScope": "search",
+    "intentType": "concept_card_search",
+    "primaryIds": [
+      "wp-3"
+    ],
+    "secondaryIds": [
+      "wp-8"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "汇报",
+      "向上沟通",
+      "述职"
+    ],
+    "source": "legacy"
+  },
+  {
+    "query": "最近想跳槽但是简历投出去都没有回音，想请教一下怎么写简历才能让 HR 眼前一亮",
+    "group": "长句-职场",
+    "benchmarkScope": "excluded",
+    "intentType": "not_card_search_intent",
+    "excludeReason": "career_advice",
+    "primaryIds": [
+      "wp-7"
+    ],
+    "secondaryIds": [
+      "wp-6",
+      "wp-5"
+    ],
+    "acceptableDecks": [
+      "workplace"
+    ],
+    "acceptableConcepts": [
+      "简历",
+      "面试",
+      "STAR法则"
+    ],
+    "source": "legacy"
+  }
+];
