@@ -94,12 +94,21 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
 
   const handleMarkComplete = (cardId: string) => {
     if (!plan) return;
+    const item = plan.items.find(i => i.cardId === cardId);
+    if (!item) return;
+
+    const isCompleting = !item.completed;
+    if (isCompleting && state.cardsById[cardId]) {
+      // Actually review the card to consume daily quota
+      dispatch({ type: 'RATE_CARD', payload: { cardId: cardId, rating: 3 } });
+    }
+
     const updated = {
       ...plan,
-      items: plan.items.map(item =>
-        item.cardId === cardId
-          ? { ...item, completed: !item.completed, completedAt: item.completed ? undefined : Date.now() }
-          : item
+      items: plan.items.map(it =>
+        it.cardId === cardId
+          ? { ...it, completed: !it.completed, completedAt: it.completed ? undefined : Date.now() }
+          : it
       ),
     };
     setPlan(updated);
@@ -108,6 +117,12 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
 
   const handleMarkAllComplete = () => {
     if (!plan) return;
+    // Actually review all incomplete cards to consume daily quota
+    for (const item of plan.items) {
+      if (!item.completed && state.cardsById[item.cardId]) {
+        dispatch({ type: 'RATE_CARD', payload: { cardId: item.cardId, rating: 3 } });
+      }
+    }
     const updated = {
       ...plan,
       items: plan.items.map(item => ({ ...item, completed: true, completedAt: Date.now() })),
