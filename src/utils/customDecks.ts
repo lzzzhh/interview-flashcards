@@ -137,7 +137,7 @@ export function getModuleDailyLimit(moduleId: string): number {
 
 /** 设置模块的每日新卡上限 */
 export function setModuleDailyLimit(moduleId: string, limit: number): void {
-  localStorage.setItem(`fc-limit-${moduleId}`, String(Math.max(1, Math.min(100, limit))));
+  localStorage.setItem(`fc-limit-${moduleId}`, String(Math.max(0, Math.min(100, limit))));
 }
 
 /** 获取模块的每日复习上限 */
