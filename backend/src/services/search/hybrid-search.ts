@@ -290,7 +290,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const ranked = rerank(rerankInput, cardDetails, profile, extraBoosts);
 
   // 8b. Deck matching boost: use profile's deckBoost value
-  const deckBoostSet = new Set(expandedDeckIds);
+  const deckBoostSet = new Set(deckIds || []);
   for (const r of ranked) {
     const card = cardMap.get(r.cardId);
     if (card && deckBoostSet.has(card.deckId)) {
