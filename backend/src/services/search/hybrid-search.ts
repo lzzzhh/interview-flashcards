@@ -119,28 +119,23 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
 
   // 1. Query understanding
   const parsed = await understandQuery(input.query);
-  const { intent, topic, keywords, subtopics, rewrittenQuery } = parsed;
-  const recallText = [rewrittenQuery, topic, ...subtopics, ...keywords.slice(0, 5)]
-    .filter(Boolean).join(' ').slice(0, 2000);
-  const rerankText = [topic, ...keywords.slice(0, 3), ...subtopics.slice(0, 2)]
-    .filter(Boolean).join(' ');
-  const isStudyIntent = intent === 'study' || intent === 'plan';
+  const { intent, topic, canonicalTopic, deckHint, coreKeywords, expandedKeywords, lowPriorityKeywords, subtopics, recallText, rerankText, rewrittenQuery } = parsed;
+  const isStudyIntent = intent === 'study' || intent === 'plan' || intent === 'recommend_cards';
   // For study intent: use lower threshold, higher max results
   const effectiveMinScore = isStudyIntent ? Math.min(input.minScore ?? 0.20, 0.25) : (input.minScore ?? DEFAULT_MIN_SCORE);
   const effectiveMaxResults = isStudyIntent ? Math.max(input.maxResults ?? 100, 100) : (input.maxResults ?? DEFAULT_MAX_RESULTS);
 
   // Debug log
   if (!process.env.EVAL_SUPPRESS_DEBUG) {
-    console.log('[search] rawQuery:', parsed.rawQuery.slice(0, 80));
-    console.log('[search] intent:', intent, 'topic:', topic, 'deckHint:', parsed.deckHint || '-', 'confidence:', parsed.confidence);
-    console.log('[search] rewrittenQuery:', rewrittenQuery.slice(0, 120));
-    console.log('[search] keywords:', keywords.slice(0, 10).join(', '));
+    console.log('[search] intent:', intent, 'topic:', topic, 'canonicalTopic:', canonicalTopic, 'deckHint:', deckHint || '-');
+    console.log('[search] coreKeywords:', coreKeywords.join(' '));
+    console.log('[search] expandedKeywords:', expandedKeywords.slice(0, 10).join(' '));
     console.log('[search] recallText:', recallText.slice(0, 120));
     console.log('[search] rerankText:', rerankText);
   }
 
   const allQueryTextRecall = recallText.slice(0, 2000);
-  const deckIds = parsed.deckHint ? [parsed.deckHint] : undefined;
+  const deckIds = deckHint ? [deckHint] : undefined;
 
   // 2. 多路召回（并行）— 召回池大小由 candidateLimit 控制
   const poolSize = candidateLimit;
@@ -153,8 +148,8 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     vecPool,
   ] = await Promise.all([
     recallFTS5(allQueryTextRecall, poolSize, deckIds),
-    recallByTags(allQueryTextRecall, keywords.slice(0, 8), tagPoolSize),
-    recallBySearchKeywords(allQueryTextRecall, keywords.slice(0, 8), tagPoolSize),
+    recallByTags(allQueryTextRecall, expandedKeywords.slice(0, 8), tagPoolSize),
+    recallBySearchKeywords(allQueryTextRecall, expandedKeywords.slice(0, 8), tagPoolSize),
     recallVector(rerankText, candidateLimit),
   ]);
 
@@ -269,7 +264,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
 
   // 7. Detect rerank profile + compute stats lexical boosts
   const profile = input.overrideProfile
-    || detectProfile(input.query, topic, keywords, deckIds || []);
+    || detectProfile(input.query, topic, expandedKeywords.slice(0, 5), deckIds || []);
   const extraBoosts = new Map<string, number>();
   const queryLower = topic.toLowerCase();
 
@@ -409,10 +404,10 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
         validation: { before: { topic: input.query, rewrittenQuery: input.query }, after: { topic, rewrittenQuery }, warnings: [] },
       },
       rewrite: {
-        rewrittenQuery, keywords: keywords.slice(0, 15),
-        expandedKeywords: [...new Set([...keywords, ...subtopics])],
-        canonicalTopic: topic, dictionaryHit: (parsed.debug || '').includes('dict'),
-        rewriteSource: (parsed.debug || '').includes('llm') ? 'llm' as const : 'dict' as const,
+        rewrittenQuery, keywords: coreKeywords.slice(0, 15),
+        expandedKeywords: [...coreKeywords, ...expandedKeywords].slice(0, 30),
+        canonicalTopic, dictionaryHit: true,
+        rewriteSource: parsed.source === 'llm' ? 'llm' as const : 'dict' as const,
       },
       retrievalText: { recallText, rerankText, rawQueryUsed: false },
       retrieval: {

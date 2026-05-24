@@ -1,65 +1,132 @@
 // backend/src/services/search/concept-dictionary.ts
-// Data-driven concept dictionary — reads from SearchTopic table (seeded from Card.tags)
+// Data-driven concept dictionary — reads from SearchTopic table + hardcoded fallback for specific concepts
 
 import prisma from '../../db/prisma';
 
 export interface ConceptEntry {
   topic: string;
+  canonicalTopic?: string;  // if topic is an alias, this is the canonical name
   deckHint?: string;
+  parentCategory?: string;  // knowledge domain
   subtopics: string[];
-  keywords: string[];
+  coreKeywords: string[];        // most specific concept words
+  expandedKeywords: string[];    // synonyms, strongly related sub-concepts
+  lowPriorityKeywords: string[]; // parent category words, not for main recall
 }
 
 let cachedTopics: ConceptEntry[] | null = null;
 let cacheTime = 0;
 
-/** Load topics from DB (cached for 5 minutes) */
-async function loadTopics(): Promise<ConceptEntry[]> {
+// ── Hardcoded concept dictionary for specific terms not in DB ──
+
+const STATIC_CONCEPTS: ConceptEntry[] = [
+  // Specific ML algorithms
+  { topic: 'XGBoost', canonicalTopic: 'XGBoost', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: [], coreKeywords: ['XGBoost', 'extreme gradient boosting'],
+    expandedKeywords: ['GBDT', 'gradient boosting', 'boosting', 'decision tree', 'tree boosting', 'regularization', 'feature importance'],
+    lowPriorityKeywords: ['机器学习', '分类', '回归'] },
+  { topic: 'xgboost', canonicalTopic: 'XGBoost', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: [], coreKeywords: ['XGBoost', 'extreme gradient boosting'],
+    expandedKeywords: ['GBDT', 'gradient boosting', 'boosting', 'decision tree', 'tree boosting'],
+    lowPriorityKeywords: ['机器学习', '分类', '回归'] },
+
+  { topic: 'LightGBM', canonicalTopic: 'LightGBM', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: [], coreKeywords: ['LightGBM', 'light gbm'],
+    expandedKeywords: ['GBDT', 'gradient boosting', 'boosting', 'decision tree', 'leaf-wise'],
+    lowPriorityKeywords: ['机器学习'] },
+  { topic: 'lightgbm', canonicalTopic: 'LightGBM', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: [], coreKeywords: ['LightGBM', 'light gbm'],
+    expandedKeywords: ['GBDT', 'gradient boosting', 'boosting'],
+    lowPriorityKeywords: ['机器学习'] },
+
+  { topic: 'CatBoost', canonicalTopic: 'CatBoost', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: [], coreKeywords: ['CatBoost', 'cat boost'],
+    expandedKeywords: ['GBDT', 'gradient boosting', 'boosting', 'categorical features'],
+    lowPriorityKeywords: ['机器学习'] },
+  { topic: 'catboost', canonicalTopic: 'CatBoost', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: [], coreKeywords: ['CatBoost'], expandedKeywords: ['GBDT', 'gradient boosting'], lowPriorityKeywords: ['机器学习'] },
+
+  // Specific concepts
+  { topic: '集成学习', canonicalTopic: '集成学习', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: ['Bagging', 'Boosting', 'Stacking'],
+    coreKeywords: ['集成学习', 'ensemble learning'],
+    expandedKeywords: ['Bagging', 'Boosting', 'Stacking', '随机森林', 'GBDT', 'XGBoost', 'LightGBM', 'CatBoost', '梯度提升', '模型融合', '投票法'],
+    lowPriorityKeywords: ['机器学习', '分类', '回归', '过拟合', '特征重要性', '特征工程', '特征选择', '降维'] },
+  { topic: 'ensemble learning', canonicalTopic: '集成学习', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: [], coreKeywords: ['集成学习', 'ensemble learning'],
+    expandedKeywords: ['Bagging', 'Boosting', 'Stacking'], lowPriorityKeywords: ['机器学习'] },
+
+  { topic: '哈希表', canonicalTopic: '哈希表', deckHint: 'leetcode', parentCategory: '算法',
+    subtopics: ['哈希', 'Map'], coreKeywords: ['哈希表', 'hash table', 'hashmap', 'hash map'],
+    expandedKeywords: ['哈希', '散列表', 'dictionary', 'map', 'set', '计数', '频率', '两数之和', '前缀和', '字母异位词'],
+    lowPriorityKeywords: ['算法', '数据结构'] },
+
+  { topic: '数组', canonicalTopic: '数组', deckHint: 'leetcode', parentCategory: '算法',
+    subtopics: [], coreKeywords: ['数组', 'array'],
+    expandedKeywords: ['双指针', '滑动窗口', '前缀和', '矩阵'],
+    lowPriorityKeywords: ['算法', '数据结构'] },
+
+  { topic: '动态规划', canonicalTopic: '动态规划', deckHint: 'leetcode', parentCategory: '算法',
+    subtopics: [], coreKeywords: ['动态规划', 'DP', 'dynamic programming'],
+    expandedKeywords: ['状态转移', '最优子结构', '子问题', '背包', '子序列'],
+    lowPriorityKeywords: ['算法'] },
+
+  { topic: 'RAG', canonicalTopic: 'RAG', deckHint: 'agent', parentCategory: 'Agent',
+    subtopics: [], coreKeywords: ['RAG', 'retrieval augmented generation'],
+    expandedKeywords: ['检索增强生成', 'vector search', 'embedding', 'document retrieval', 'chunking'],
+    lowPriorityKeywords: ['AI', '大模型', 'Agent'] },
+  { topic: 'rag', canonicalTopic: 'RAG', deckHint: 'agent', parentCategory: 'Agent',
+    subtopics: [], coreKeywords: ['RAG', 'retrieval augmented generation'],
+    expandedKeywords: ['检索增强生成', 'vector search', 'embedding'],
+    lowPriorityKeywords: ['AI', '大模型'] },
+
+  { topic: 'Transformer', canonicalTopic: 'Transformer', deckHint: 'deep-learning', parentCategory: '深度学习',
+    subtopics: ['Attention', 'Encoder-Decoder'], coreKeywords: ['Transformer', 'transformer architecture'],
+    expandedKeywords: ['attention', 'self-attention', 'multi-head', 'encoder', 'decoder', 'positional encoding'],
+    lowPriorityKeywords: ['深度学习', '大模型', 'NLP'] },
+];
+
+const STATIC_LOOKUP = new Map<string, ConceptEntry>();
+for (const c of STATIC_CONCEPTS) {
+  STATIC_LOOKUP.set(c.topic.toLowerCase(), c);
+}
+
+async function loadDBTopics(): Promise<ConceptEntry[]> {
   if (cachedTopics && Date.now() - cacheTime < 300_000) return cachedTopics;
-
-  const rows = await prisma.searchTopic.findMany({
-    where: { enabled: true },
-    orderBy: { tagCount: 'desc' },
-  });
-
+  const rows = await prisma.searchTopic.findMany({ where: { enabled: true }, orderBy: { tagCount: 'desc' } });
   cachedTopics = rows.map(r => ({
-    topic: r.name,
-    deckHint: r.deckHint || undefined,
+    topic: r.name, deckHint: r.deckHint || undefined,
     subtopics: safeParse(r.subtopics),
-    keywords: safeParse(r.keywords),
+    coreKeywords: safeParse(r.keywords),
+    expandedKeywords: [],
+    lowPriorityKeywords: [],
   }));
   cacheTime = Date.now();
   return cachedTopics;
 }
 
-function safeParse(s: string): string[] {
-  try { const v = JSON.parse(s); return Array.isArray(v) ? v : []; } catch { return []; }
-}
+function safeParse(s: string): string[] { try { const v = JSON.parse(s); return Array.isArray(v) ? v : []; } catch { return []; } }
 
-/** Look up concept by exact match on topic name or keywords */
 export async function conceptLookup(term: string): Promise<ConceptEntry | undefined> {
-  const topics = await loadTopics();
-  const tLower = term.toLowerCase();
+  const tLower = term.toLowerCase().trim();
+  if (!tLower) return undefined;
 
-  // Exact match on topic name
-  for (const t of topics) {
+  // 1. Static dictionary (specific concepts)
+  const staticMatch = STATIC_LOOKUP.get(tLower);
+  if (staticMatch) return staticMatch;
+
+  // 2. DB topics (broader card-tag-based topics)
+  const dbTopics = await loadDBTopics();
+  for (const t of dbTopics) {
     if (t.topic.toLowerCase() === tLower) return t;
   }
-
-  // Exact match on keywords (e.g., "hash" → 哈希表)
-  for (const t of topics) {
-    if (t.keywords.some(k => k.toLowerCase() === tLower)) return t;
-  }
-
-  // Topic substring: term contains topic (e.g., "集成学习" → doesn't match "机器学习")
-  for (const t of topics) {
-    if (tLower.includes(t.topic.toLowerCase())) return t;
+  for (const t of dbTopics) {
+    if (t.coreKeywords.some(k => k.toLowerCase() === tLower)) return t;
   }
 
   return undefined;
 }
 
 export async function getAllTopics(): Promise<string[]> {
-  const topics = await loadTopics();
-  return topics.map(t => t.topic);
+  return [...STATIC_LOOKUP.keys(), ...(await loadDBTopics()).map(t => t.topic)];
 }
