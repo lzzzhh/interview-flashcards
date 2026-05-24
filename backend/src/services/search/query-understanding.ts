@@ -53,7 +53,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
         const concept = conceptLookup(topicRaw);
         if (concept) {
           const rewritten = await llmRewrite(topicRaw, q, concept);
-          return buildResult(group.intent, concept.topic, concept, q, rewritten, `regex+dict: topic="${topicRaw}"`);
+          return buildResult(group.intent, concept.topic, concept, q, rewritten || concept.keywords.join(' '), `regex+dict: topic="${topicRaw}"`);
         }
         // No dict match — try LLM rewrite
         const rewritten = await llmRewrite(topicRaw, q, undefined);
