@@ -5,10 +5,9 @@ import { fts5Search } from '../services/search/fts5-search';
 import { HybridSearchSchema, validate } from './schemas';
 
 export async function searchRoutes(app: FastifyInstance) {
-  app.post('/api/search/hybrid', async (req, reply) => {
+  app.post('/api/search/hybrid', async (req) => {
     const v = validate(HybridSearchSchema, req.body);
     const body = v.success ? v.data : (req.body as any);
-    const debug = body.debug === true;
 
     const start = Date.now();
     const result: any = await hybridSearch({
@@ -18,27 +17,14 @@ export async function searchRoutes(app: FastifyInstance) {
       minScore: body.minScore,
       candidateLimit: body.candidateLimit,
       filters: body.filters,
-      debug,
+      debug: true, // always collect trace
     });
     const ms = Date.now() - start;
 
-    if (debug) {
-      const trace = result._trace;
-      delete result._trace;
-      if (trace) trace.timingMs = { ...trace.timingMs, total: ms };
-      return { results: result, total: result.length, debug: trace };
-    }
-
-    const simpleDebug = {
-      ms,
-      query: body.query || '',
-      resultCount: result.length,
-      topScores: result.slice(0, 5).map((r: any) => ({
-        cardId: r.cardId, score: r.score?.toFixed?.(4) ?? r.score,
-        title: (r.titleCn || r.title || '').slice(0, 30), deck: r.deckId,
-      })),
-    };
-    return { results: result, total: result.length, debug: simpleDebug };
+    const trace = result._trace || {};
+    delete result._trace;
+    trace.timingMs = { ...(trace.timingMs || {}), total: ms };
+    return { results: result, total: result.length, debug: trace };
   });
 
   app.get('/api/search/keyword', async (req) => {
