@@ -5,6 +5,9 @@ import { ArrowLeft, Play, CheckCheck } from 'lucide-react';
 import { getPlan, updatePlan, type LearningPlan } from '../utils/learningPlans';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
+import { scheduleReview, createDefaultSM2 } from '../utils/sm2';
+import { appendReviewLog } from '../utils/reviewLogs';
+import { loadProgress } from '../utils/storage';
 import type { Category } from '../types';
 
 interface Props {
@@ -99,12 +102,26 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
 
     const isCompleting = !item.completed;
     if (isCompleting) {
-      // Jump to card first to load it into memory, then rate it
-      dispatch({ type: 'JUMP_TO_CARD', payload: { category: item.deckId as Category, cardId } });
-      // Small delay to let card load, then rate
-      setTimeout(() => {
-        dispatch({ type: 'RATE_CARD', payload: { cardId, rating: 3 } });
-      }, 100);
+      // Directly write SM2 progress to localStorage (works even without card in memory)
+      const sm2 = state.cardsById[cardId]?.sm2 || createDefaultSM2();
+      const rating = sm2.state === 'new' ? 3 : 3; // 'good' rating
+      const result = scheduleReview(cardId, sm2, rating);
+      appendReviewLog(result.log);
+
+      // Persist progress to localStorage for this deck
+      const progressKey = `fc-progress-${item.deckId}`;
+      try {
+        const progress = loadProgress(item.deckId as Category);
+        progress.sm2[cardId] = result.sm2;
+        localStorage.setItem(progressKey, JSON.stringify(progress));
+      } catch (e) {
+        console.error('Failed to save progress:', e);
+      }
+
+      // Also dispatch if card is in memory (updates UI)
+      if (state.cardsById[cardId]) {
+        dispatch({ type: 'RATE_CARD', payload: { cardId, rating } });
+      }
     }
 
     const updated = {
@@ -121,9 +138,21 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
 
   const handleMarkAllComplete = () => {
     if (!plan) return;
-    // Actually review all incomplete cards to consume daily quota
     for (const item of plan.items) {
-      if (!item.completed && state.cardsById[item.cardId]) {
+      if (item.completed) continue;
+      // Directly write SM2 progress to localStorage
+      const sm2 = state.cardsById[item.cardId]?.sm2 || createDefaultSM2();
+      const result = scheduleReview(item.cardId, sm2, 3);
+      appendReviewLog(result.log);
+
+      const progressKey = `fc-progress-${item.deckId}`;
+      try {
+        const progress = loadProgress(item.deckId as Category);
+        progress.sm2[item.cardId] = result.sm2;
+        localStorage.setItem(progressKey, JSON.stringify(progress));
+      } catch {}
+
+      if (state.cardsById[item.cardId]) {
         dispatch({ type: 'RATE_CARD', payload: { cardId: item.cardId, rating: 3 } });
       }
     }
