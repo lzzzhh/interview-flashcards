@@ -21,7 +21,6 @@ import AgentHubPage from './components/AgentHubPage';
 import DraftReviewPage from './components/DraftReviewPage';
 import JobPrepPage from './components/JobPrepPage';
 import IngestPage from './components/IngestPage';
-import ApiSettingsPage from './components/ApiSettingsPage';
 import TagManagerPage from './components/TagManagerPage';
 import MockInterviewPage from './components/MockInterviewPage';
 import ResumeProjectPage from './components/ResumeProjectPage';
@@ -134,7 +133,6 @@ function AppInner() {
     if (profileSubPage === 'card-database') return <CardDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'vector-database') return <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'tag-manager') return <TagManagerPage onBack={() => setProfileSubPage(null)} />;
-    if (profileSubPage === 'api-settings') return <ApiSettingsPage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'learning-plans' && learningPlanId) return <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} onEnterStudy={handleEnterStudy} />;
     if (profileSubPage === 'learning-plans') return <LearningPlanListPage onBack={() => setProfileSubPage(null)} onViewPlan={(id) => setLearningPlanId(id)} />;
     return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;

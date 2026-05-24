@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { ArrowLeft, Moon, Sun, User, Download, Upload, ChevronRight, Settings } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, User, Download, Upload, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { exportProgress, importProgress, exportProgressCSV, importProgressCSV } from '../utils/backup';
 
@@ -120,13 +120,6 @@ export default function ProfilePage({ onBack, onNavigate }: Props) {
             } />
             <SettingRow label="版本" right={<span className="text-[13px]" style={{ color: TEXT_MUTED }}>0.5.0</span>} />
             <SettingRow label="数据存储路径" right={<span className="text-[11px] text-right max-w-[180px] truncate" style={{ color: TEXT_MUTED }}>~/Documents/interview-flashcards/</span>} />
-            <button onClick={() => onNavigate('api-settings')} className="flex items-center justify-between w-full py-2.5 border-b last:border-b-0" style={{ borderColor: 'var(--card-border)' }}>
-              <div className="flex items-center gap-2">
-                <Settings className="w-4 h-4" style={{ color: BLUE }} />
-                <span className="text-[13px]" style={{ color: TEXT_PRIMARY }}>API 配置</span>
-              </div>
-              <ChevronRight className="w-4 h-4" style={{ color: TEXT_MUTED }} />
-            </button>
           </div>
         </div>
 
