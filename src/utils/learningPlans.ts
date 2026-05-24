@@ -6,6 +6,8 @@ export interface LearningPlanItem {
   cardId: string;
   deckId: string;
   title: string;
+  completed?: boolean;
+  completedAt?: number;
 }
 
 export interface LearningPlan {
@@ -38,6 +40,15 @@ export function savePlan(plan: LearningPlan): void {
 export function deletePlan(id: string): void {
   const plans = loadPlans().filter(p => p.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(plans));
+}
+
+export function updatePlan(plan: LearningPlan): void {
+  const plans = loadPlans();
+  const idx = plans.findIndex(p => p.id === plan.id);
+  if (idx >= 0) {
+    plans[idx] = plan;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(plans));
+  }
 }
 
 export function getPlan(id: string): LearningPlan | undefined {
