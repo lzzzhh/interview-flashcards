@@ -10,6 +10,18 @@ import { appendReviewLog } from '../utils/reviewLogs';
 import { loadProgress } from '../utils/storage';
 import type { Category } from '../types';
 
+const PROGRESS_KEYS: Record<string, string> = {
+  leetcode: 'fc-leetcode-progress',
+  statistics: 'fc-stats-progress',
+  'machine-learning': 'fc-ml-progress',
+  'deep-learning': 'fc-deep-learning-progress',
+  llm: 'fc-llm-progress',
+  agent: 'fc-agent-progress',
+  jargon: 'fc-jargon-progress',
+  workplace: 'fc-workplace-progress',
+  'vibe-coding': 'fc-vibe-coding-progress',
+};
+
 interface Props {
   planId: string;
   onBack: () => void;
@@ -109,7 +121,7 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
       appendReviewLog(result.log);
 
       // Persist progress to localStorage for this deck
-      const progressKey = `fc-progress-${item.deckId}`;
+      const progressKey = PROGRESS_KEYS[item.deckId] || `fc-progress-${item.deckId}`;
       try {
         const progress = loadProgress(item.deckId as Category);
         progress.sm2[cardId] = result.sm2;
@@ -145,7 +157,7 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
       const result = scheduleReview(item.cardId, sm2, 3);
       appendReviewLog(result.log);
 
-      const progressKey = `fc-progress-${item.deckId}`;
+      const progressKey = PROGRESS_KEYS[item.deckId] || `fc-progress-${item.deckId}`;
       try {
         const progress = loadProgress(item.deckId as Category);
         progress.sm2[item.cardId] = result.sm2;
