@@ -21,6 +21,7 @@ export interface AppData {
   customCards: Record<string, QACard[]>;
   moduleDailyLimits: Record<string, number>;
   moduleDailyReviewLimits: Record<string, number>;
+  reviewLogs: Record<string, any[]>;
 }
 
 function emptyAppData(): AppData {
@@ -114,7 +115,11 @@ function lsRead(): AppData {
       moduleDailyReviewLimits[k.replace('fc-review-limit-', '')] = Number(localStorage.getItem(k)) || 100;
     }
   }
-  return { schemaVersion: 2, progress, settings, stats, customDecks, customCards, moduleDailyLimits, moduleDailyReviewLimits };
+  // Read reviewLogs from localStorage
+  let reviewLogs: Record<string, any[]> = {};
+  try { reviewLogs = JSON.parse(localStorage.getItem('fc-review-logs') || '{}'); } catch {}
+
+  return { schemaVersion: 2, progress, settings, stats, customDecks, customCards, moduleDailyLimits, moduleDailyReviewLimits, reviewLogs };
 }
 
 function lsWrite(data: AppData): void {
@@ -134,6 +139,10 @@ function lsWrite(data: AppData): void {
     for (const [id, limit] of Object.entries(data.moduleDailyReviewLimits)) {
       localStorage.setItem(`fc-review-limit-${id}`, String(limit));
     }
+  }
+  // Sync reviewLogs to localStorage so reviewLogs.ts can read them
+  if (data.reviewLogs) {
+    localStorage.setItem('fc-review-logs', JSON.stringify(data.reviewLogs));
   }
 }
 
