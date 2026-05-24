@@ -146,8 +146,9 @@ export interface AppState {
   dailyReviewLimit: number;
   studyMode: StudyMode;
   loading: boolean;
-  /** API 模式：true = 从 SQLite 拉取, false = 用前端静态数据 */
   apiSource: boolean;
+  /** 计划学习模式：只显示指定卡片，不受每日新卡限制 */
+  planCardIds: string[] | null;
 }
 
 // ============================================================
@@ -183,7 +184,9 @@ export type AppAction =
   | { type: 'LOADED_QUEUE'; payload: { cards: FlashCard[]; mode: 'new' | 'review' } }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'API_RATE_SUCCESS'; payload: { cardId: string; progress: any } }
-  | { type: 'SET_API_SOURCE'; payload: boolean };
+  | { type: 'SET_API_SOURCE'; payload: boolean }
+  | { type: 'START_PLAN_STUDY'; payload: { cardIds: string[] } }
+  | { type: 'STOP_PLAN_STUDY' };
 
 // ============================================================
 // localStorage 持久化（兼容旧格式）

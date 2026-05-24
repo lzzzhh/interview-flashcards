@@ -1,35 +1,30 @@
-// src/components/LearningPlanDetailPage.tsx — 学习清单详情 + 计划学习模式
+// src/components/LearningPlanDetailPage.tsx — 学习清单详情
 import { useState, useMemo, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Play } from 'lucide-react';
 import { getPlan, generateStudyPlan, type LearningPlan } from '../utils/learningPlans';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
-
-const API = 'http://localhost:3001/api';
-
-interface Props {
-  planId: string;
-  onBack: () => void;
-}
 
 const CARD_BG = 'var(--card-bg)';
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
 const BLUE = 'var(--blue)';
 const GREEN = '#10B981';
-const ORANGE = 'var(--orange)';
 
-export default function LearningPlanDetailPage({ planId, onBack }: Props) {
+interface Props {
+  planId: string;
+  onBack: () => void;
+  onStudyPlan: (cardIds: string[]) => void;
+}
+
+export default function LearningPlanDetailPage({ planId, onBack, onStudyPlan }: Props) {
   const { state } = useAppContext();
   const [plan, setPlan] = useState<LearningPlan | undefined>();
   const [generating, setGenerating] = useState(false);
-  const [studying, setStudying] = useState(false);
-  const [studyIndex, setStudyIndex] = useState(0);
-  const [completed, setCompleted] = useState<Set<string>>(new Set());
-  const [reviewing, setReviewing] = useState(false);
 
   useEffect(() => { getPlan(planId).then(setPlan); }, [planId]);
 
+  // Track completed cards (read from DB CardProgress via cardsById sm2)
   const enrichedItems = useMemo(() => {
     if (!plan) return [];
     return plan.items.map((item, i) => {
@@ -52,19 +47,18 @@ export default function LearningPlanDetailPage({ planId, onBack }: Props) {
           || `${category?.label || item.deckId} · ${item.cardId}`;
       }
       const deckName = category?.label || item.deckId;
-      const cardState = (card?.sm2 as any)?.state || 'new';
-      const isCompleted = completed.has(item.cardId) || item.completed;
+      const sm2 = (card?.sm2 as any);
+      const isCompleted = !!sm2 && sm2.state !== 'new';
       return {
         idx: i,
         cardId: item.cardId, deckId: item.deckId,
         title: typeof title === 'string' ? title : String(title || ''),
-        deckName, state: cardState,
-        interval: (card?.sm2 as any)?.interval || 0,
+        deckName,
         isCompleted,
         card,
       };
     });
-  }, [plan, state.cardsById, completed]);
+  }, [plan, state.cardsById]);
 
   const handleGenerate = async () => {
     if (!plan?.id) return;
@@ -76,92 +70,9 @@ export default function LearningPlanDetailPage({ planId, onBack }: Props) {
     setGenerating(false);
   };
 
-  const handleStartStudy = () => {
-    setStudying(true);
-    setStudyIndex(0);
-  };
-
-  const handleExitStudy = () => setStudying(false);
-
-  const handleRate = async (rating: number) => {
-    const item = enrichedItems[studyIndex];
-    if (!item || reviewing) return;
-    setReviewing(true);
-    try {
-      await fetch(`${API}/reviews`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cardId: item.cardId, rating }),
-      });
-      setCompleted(prev => new Set([...prev, item.cardId]));
-    } catch (e) { console.error(e); }
-
-    if (studyIndex < enrichedItems.length - 1) {
-      setStudyIndex(i => i + 1);
-    }
-    setReviewing(false);
-  };
-
-  const studyCard = enrichedItems[studyIndex];
   const completedCount = enrichedItems.filter(i => i.isCompleted).length;
   const totalCount = enrichedItems.length;
-
-  // Study mode overlay
-  if (studying && studyCard) {
-    return (
-      <div className="dark-bg homepage-glass-stage fixed inset-0 z-50 flex flex-col min-h-screen transition-colors">
-        <div className="nav-bar sticky top-0 z-20 flex items-center justify-between">
-          <button onClick={handleExitStudy} className="p-1 -ml-1"><ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} /></button>
-          <span className="text-[13px]" style={{ color: TEXT_MUTED }}>{studyIndex + 1}/{totalCount}</span>
-          <div className="w-6" />
-        </div>
-
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-8">
-          <div className="w-full max-w-md">
-            <div className="text-[11px] mb-2" style={{ color: TEXT_MUTED }}>{studyCard.deckName}</div>
-            <h2 className="text-[18px] font-bold mb-6 leading-relaxed" style={{ color: TEXT_PRIMARY }}>
-              {studyCard.title}
-            </h2>
-            {studyCard.card && (
-              <div className="rounded-xl p-4 border mb-6" style={{ backgroundColor: CARD_BG, borderColor: 'var(--card-border)' }}>
-                <p className="text-[14px] leading-relaxed whitespace-pre-wrap" style={{ color: TEXT_PRIMARY }}>
-                  {(studyCard.card as any).question || ''}
-                </p>
-                {(studyCard.card as any).answer && (
-                  <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--card-border)' }}>
-                    <p className="text-[13px] leading-relaxed whitespace-pre-wrap" style={{ color: TEXT_MUTED }}>
-                      {(studyCard.card as any).answer}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="px-5 py-4 border-t" style={{ borderColor: 'var(--card-border)' }}>
-          <div className="max-w-md mx-auto flex gap-2">
-            {[
-              { label: '重来', rating: 1, color: '#EF4444' },
-              { label: '困难', rating: 2, color: ORANGE },
-              { label: '一般', rating: 3, color: BLUE },
-              { label: '简单', rating: 4, color: GREEN },
-            ].map(btn => (
-              <button
-                key={btn.rating}
-                onClick={() => handleRate(btn.rating)}
-                disabled={reviewing}
-                className="flex-1 py-3 rounded-xl text-[13px] font-bold transition-opacity"
-                style={{ backgroundColor: `${btn.color}20`, color: btn.color, opacity: reviewing ? 0.5 : 1 }}
-              >
-                {btn.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const cardIds = enrichedItems.map(i => i.cardId);
 
   if (!plan) {
     return (
@@ -180,14 +91,14 @@ export default function LearningPlanDetailPage({ planId, onBack }: Props) {
       <div className="nav-bar sticky top-0 z-20 flex items-center">
         <button onClick={onBack} className="p-1 -ml-1"><ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} /></button>
         <h1 className="nav-title">{plan.title}</h1>
-        <button onClick={handleStartStudy} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] font-medium transition-colors" style={{ backgroundColor: `${BLUE}15`, color: BLUE }}>
-          开始学习
+        <button onClick={() => onStudyPlan(cardIds)} disabled={cardIds.length === 0} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] font-medium transition-colors" style={{ backgroundColor: `${BLUE}15`, color: BLUE, opacity: cardIds.length > 0 ? 1 : 0.4 }}>
+          <Play className="w-3.5 h-3.5" />学习
         </button>
       </div>
 
       <div className="flex-1 flex items-start justify-center">
         <div className="relative z-10 w-full max-w-md px-5 py-6 pb-24 space-y-3">
-          {/* Generate plan button */}
+          {/* Generate plan */}
           {!plan.studyPlan && (
             <button onClick={handleGenerate} disabled={generating} className="w-full py-2 rounded-xl text-[13px] font-medium transition-colors" style={{ backgroundColor: `${BLUE}10`, color: BLUE, opacity: generating ? 0.5 : 1 }}>
               {generating ? '生成中...' : 'AI 生成学习计划'}

@@ -118,6 +118,11 @@ function isLeetCodeCard(card: FlashCard): card is LeetCodeCard {
 
 // ---- 筛选 visibleCardIds ----
 function computeVisibleIds(state: AppState): string[] {
+  // Plan study: only show plan cards, no daily limit
+  if (state.planCardIds) {
+    return state.planCardIds.filter(id => id in state.cardsById);
+  }
+
   let ids = Object.keys(state.cardsById);
 
   // 学习模式：新学 / 复习
@@ -430,6 +435,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
         prev.sm2[cardId] = result.sm2;
         localStorage.setItem(key, JSON.stringify(prev));
       } catch {}
+      // Fire-and-forget POST to backend API
+      fetch('http://localhost:3001/api/reviews', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cardId, rating }) }).catch(() => {});
       const updated = {
         ...state,
         cardsById: {
@@ -597,6 +604,16 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
     }
 
+    case 'START_PLAN_STUDY': {
+      const next = { ...state, planCardIds: action.payload.cardIds, studyMode: 'new' as const, shuffled: false };
+      // Card need be loaded first — jump to first deck to load them
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+    case 'STOP_PLAN_STUDY': {
+      const next = { ...state, planCardIds: null, studyMode: 'choose' as const };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
     default:
       return state;
   }
@@ -641,6 +658,7 @@ function createInitialState(): AppState {
     studyMode: 'choose',
     loading: false,
     apiSource: false,
+    planCardIds: null,
   };
 }
 

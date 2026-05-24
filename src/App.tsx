@@ -135,7 +135,12 @@ function AppInner() {
     if (profileSubPage === 'vector-database') return <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'tag-manager') return <TagManagerPage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'api-settings') return <ApiSettingsPage onBack={() => setProfileSubPage(null)} />;
-    if (profileSubPage === 'learning-plans' && learningPlanId) return <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} />;
+    if (profileSubPage === 'learning-plans' && learningPlanId) return <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} onStudyPlan={(cardIds) => {
+      dispatch({ type: 'START_PLAN_STUDY', payload: { cardIds } });
+      const deckMap: Record<string, string> = { lc: 'leetcode', stats: 'statistics', ml: 'machine-learning', dl: 'deep-learning', llm: 'llm', agent: 'agent', jargon: 'jargon', wp: 'workplace', vc: 'vibe-coding' };
+      const deck = deckMap[cardIds[0]?.split('-')[0] || ''] || 'leetcode';
+      handleEnterStudy(deck as Category);
+    }} />;
     if (profileSubPage === 'learning-plans') return <LearningPlanListPage onBack={() => setProfileSubPage(null)} onViewPlan={(id) => setLearningPlanId(id)} />;
     return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
   }
@@ -157,7 +162,7 @@ function AppInner() {
       </div>
       {studyCategory && (
         <div className="page-enter" key={studyCategory}>
-          <StudyPage onBack={() => setStudyCategory(null)} />
+          <StudyPage onBack={() => { dispatch({ type: 'STOP_PLAN_STUDY' }); setStudyCategory(null); }} />
         </div>
       )}
     </>
