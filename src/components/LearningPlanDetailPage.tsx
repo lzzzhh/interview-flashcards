@@ -98,9 +98,13 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
     if (!item) return;
 
     const isCompleting = !item.completed;
-    if (isCompleting && state.cardsById[cardId]) {
-      // Actually review the card to consume daily quota
-      dispatch({ type: 'RATE_CARD', payload: { cardId: cardId, rating: 3 } });
+    if (isCompleting) {
+      // Jump to card first to load it into memory, then rate it
+      dispatch({ type: 'JUMP_TO_CARD', payload: { category: item.deckId as Category, cardId } });
+      // Small delay to let card load, then rate
+      setTimeout(() => {
+        dispatch({ type: 'RATE_CARD', payload: { cardId, rating: 3 } });
+      }, 100);
     }
 
     const updated = {
