@@ -10,12 +10,17 @@ export async function learningPlanRoutes(app: FastifyInstance) {
     const plans = await prisma.learningPlan.findMany({
       where: { userId: USER_ID },
       orderBy: { createdAt: 'desc' },
-      select: { id: true, title: true, query: true, createdAt: true, updatedAt: true },
+      select: { id: true, title: true, query: true, items: true, createdAt: true, updatedAt: true },
     });
-    return plans.map(p => ({
-      ...p,
-      itemCount: 0, // lazy: item count from items JSON
-    }));
+    return plans.map(p => {
+      const items = safeParse(p.items);
+      return {
+        id: p.id, title: p.title, query: p.query,
+        createdAt: p.createdAt, updatedAt: p.updatedAt,
+        items,
+        itemCount: items.length,
+      };
+    });
   });
 
   // GET /api/learning-plans/:id — 详情

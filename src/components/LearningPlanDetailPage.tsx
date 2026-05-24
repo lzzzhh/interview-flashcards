@@ -141,14 +141,9 @@ export default function LearningPlanDetailPage({ planId, onBack }: Props) {
                 {i + 1}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-[13px] font-bold truncate" style={{ color: isCompleted ? GREEN : TEXT_PRIMARY }}>{item.title}</span>
-                  {isCompleted && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: 'rgba(16,185,129,0.15)', color: GREEN }}>已完成</span>
-                  )}
-                  {!isCompleted && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: `${item.stateColor}15`, color: item.stateColor }}>{item.stateLabel}</span>
-                  )}
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: isCompleted ? 'rgba(16,185,129,0.15)' : `${item.stateColor}15`, color: isCompleted ? GREEN : item.stateColor }}>{isCompleted ? '已完成' : item.stateLabel}</span>
                 </div>
                 <p className="text-[10px] mt-1" style={{ color: TEXT_MUTED }}>
                   {item.deckName}{item.interval > 0 ? ` · 间隔${item.interval}天` : ''}
