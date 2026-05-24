@@ -174,15 +174,6 @@ function StatBox({ icon, label, value, color }: { icon: React.ReactNode; label: 
   );
 }
 
-function StatBoxSmall({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) {
-  return (
-    <div className="text-center">
-      <div className="flex justify-center mb-1" style={{ color }}>{icon}</div>
-      <div className="text-[11px] mb-0.5" style={{ color: TEXT_MUTED }}>{label}</div>
-      <div className="text-[18px] font-bold" style={{ color }}>{value}</div>
-    </div>
-  );
-}
 
 function StageBadge({ label, count, color }: { label: string; count: number; color: string }) {
   return (
