@@ -65,21 +65,30 @@ model CardProgress {
 }
 
 model ReviewLog {
-  id             String   @id
-  userId         String
-  cardId         String
-  reviewedAt     DateTime
-  rating         Int
-  stateBefore    String
-  stateAfter     String
-  intervalBefore Int
-  intervalAfter  Int
-  easeBefore     Float
-  easeAfter      Float
-  elapsedDays    Float
-  scheduledDays  Int
+  id               String   @id
+  userId           String
+  cardId           String
+  reviewedAt       DateTime
+  rating           Int
+  stateBefore      String
+  stateAfter       String
+  intervalBefore   Int
+  intervalAfter    Int
+  easeBefore       Float
+  easeAfter        Float
+  repetitionsBefore Int @default(0)
+  repetitionsAfter  Int @default(0)
+  lapsesBefore      Int @default(0)
+  lapsesAfter       Int @default(0)
+  nextReviewBefore  DateTime?
+  nextReviewAfter   DateTime?
+  elapsedDays      Float
+  scheduledDays    Int
 
   card Card @relation(fields: [cardId], references: [id])
+
+  @@index([userId, reviewedAt])
+  @@index([userId, cardId, reviewedAt])
 }
 
 model DeckDailyLimit {
