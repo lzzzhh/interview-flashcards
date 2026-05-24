@@ -72,3 +72,10 @@ The normalized baseline (docs/official-baseline-normalized.md) is the authoritat
 - Remaining 22 ✗ cases classified: 5 embedding_blind_spot, 5 coverage_gap, 5 cross_module, 5 label/keyword, 2 ambiguous. None require search algorithm changes.
 
 LLM rewrite is permanently rejected for default search path. Future LLM use in search must pass ablation showing ≥ baseline before being considered.
+
+Additionally, bge-reranker-v2-m3 cross-encoder was tested (2026-05-24) as an alternative ranking improvement and also rejected:
+- Cannot fix blind_spot — target cards not in Top50 candidate pool (recall failure, not ranking failure)
+- Degraded ranking in some cases (ml-122: #2 → #14)
+- Added ~2s latency + 2GB model overhead
+
+Root cause of remaining 22 ✗ cases is bge-m3 embedding recall (vector≈0 for colloquial/abbreviation queries). Neither LLM rewrite nor cross-encoder reranker can address this without fixing the embedding layer itself.

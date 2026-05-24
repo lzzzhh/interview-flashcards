@@ -32,21 +32,24 @@ export async function hybridSearch(params: HybridSearchParams): Promise<HybridSe
   return apiPost('/search/hybrid', params);
 }
 
+export interface LearningPlanCard {
+  cardId: string;
+  title: string;
+  deckId: string;
+  score: number;
+  stage: string;
+  stageIndex: number;
+  snippet: string;
+  state: string;
+  priority: number;
+  deckName: string;
+  interval?: number;
+}
+
 export interface LearningPlanResponse {
   plan: {
     topic: string;
-    stages: Record<string, {
-      cardId: string;
-      title: string;
-      deckId: string;
-      score: number;
-      stage: string;
-      stageIndex: number;
-      snippet: string;
-      state: string;
-      priority: number;
-      deckName: string;
-    }[]>;
+    stages: Record<string, LearningPlanCard[]>;
     totalCards: number;
     stageBalance: number;
   };

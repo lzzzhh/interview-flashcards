@@ -3,6 +3,10 @@
 Date: 2026-05-23
 Status: P3 — experimental only, not in default search path
 
+Note: bge-reranker-v2-m3 was tested as an alternative to this design and rejected
+(can't fix blind_spot recall, degrades ranking). Root cause of remaining ✗ is
+embedding recall (vector≈0), not re-ranking quality.
+
 ## Start Conditions
 
 Do NOT start unless at least one is true:

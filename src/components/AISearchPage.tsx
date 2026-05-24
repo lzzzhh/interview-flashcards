@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Search, Loader2, ChevronDown, ChevronUp, CheckCircle2, Check, ZoomIn } from 'lucide-react';
-import { hybridSearch, fetchLearningPlan, type SearchResult } from '../api/searchApi';
+import { hybridSearch, fetchLearningPlan, type LearningPlanCard, type SearchResult } from '../api/searchApi';
 import { useAppContext } from '../context/AppContext';
 import { API_BASE } from '../api/client';
 import { savePlan, type LearningPlanItem } from '../utils/learningPlans';
@@ -96,14 +96,14 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
     setPlanError(null);
     try {
       const data = await fetchLearningPlan({ query: query.trim() });
-      const allCards = Object.values(data.plan?.stages || {}).flat() as any[];
+      const allCards = Object.values(data.plan?.stages || {}).flat() as LearningPlanCard[];
       if (allCards.length === 0) {
         setPlanError('没有找到相关卡片，试试更具体的学习方向');
       } else {
-        setPlanItems(allCards.map((p: any) => ({
+        setPlanItems(allCards.map((p) => ({
           cardId: p.cardId, deckId: p.deckId,
           title: p.title, deckName: p.deckName,
-          state: p.state, interval: p.interval,
+          state: p.state, interval: p.interval ?? 0,
           selected: true, snippet: p.snippet,
         })));
         setPlanExpanded(true);

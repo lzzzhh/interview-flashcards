@@ -3,8 +3,8 @@
 Date: 2026-05-23
 Status: AUTHORITATIVE (current benchmark)
 Embedding: bge-m3 via Ollama (dim=1024)
-Git: 139e8b6
-DB: 754 cards, 754 searchKeywords, 754 embeddings, 754 FTS5
+Git: 139e8b6 (latest: 52483a9)
+DB: 748 cards, 748 searchKeywords, 748 embeddings, 748 FTS5
 
 ## Search Benchmark (430 cases)
 
