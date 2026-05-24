@@ -1,4 +1,3 @@
-// @ts-nocheck — generated from DB via sync-frontend-data.ts
 import type { QACard } from '../types';
 
 export const agentCards: QACard[] = [
@@ -297,26 +296,32 @@ export const agentCards: QACard[] = [
     category: 'agent',
     question: "用 AI 自动回复客户邮件时，如何保证用户隐私和数据安全？",
     answer: "AI 客服邮件的隐私保护层级：\n1. PII 脱敏（输入层）：\n   - 检测并替换姓名、邮箱、电话、身份证号\n   - 工具：Presidio（Microsoft）/ Spacy NER + 正则\n2. 本地推理（推理层）：\n   - 敏感场景使用本地 LLM（Llama/Phi）而非 API\n   - 避免用户数据发送到第三方服务\n3. 数据隔离（存储层）：\n   - 邮件内容不用于模型训练\n   - 日志中 PII 自动脱敏\n4. 输出审计（输出层）：\n   - AI 回复内容审核（不包含原始 PII）\n   - 人工抽检机制\n\n企业合规要点：\n- GDPR：用户有权要求删除对话数据\n- 中国《个人信息保护法》：敏感个人信息需单独同意\n- SOC2 / ISO27001：日志审计 + 访问控制",
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     tags: ["隐私","PII","AI客服","脱敏","GDPR"],
     subTopic: "AI安全",
     difficulty: 'medium',
+    favorited: false,
   },
   {
     id: 'agent-28',
     category: 'agent',
     question: "AI 隐私保护中，本地推理和云端推理有哪些 trade-off？",
     answer: "本地推理（On-device）：\n优点：数据不离开设备，最彻底的隐私保护\n缺点：模型能力受限（参数量<10B），设备算力有限\n适用：手机输入法联想、相册人脸分组、本地文档搜索\n\n云端推理（Cloud API）：\n优点：可以使用最强模型（GPT-4/Claude），能力天花板高\n缺点：数据需传输到第三方，合规风险\n适用：通用客服、内容生成、复杂推理\n\n混合方案：\n- PII 脱敏后送云端（去掉个人信息，保留语义）\n- 本地做分类（这条邮件是否包含敏感信息），敏感的在本地处理\n- Apple Intelligence：本地先跑，复杂的才送云端（加密传输）\n\n生产建议：对外部客户的客服邮件 → 至少脱敏后再送 LLM API；内部工单系统 → 可放宽。",
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     tags: ["隐私","本地推理","云端推理","PII","脱敏"],
     subTopic: "AI安全",
     difficulty: 'medium',
+    favorited: false,
   },
   {
     id: 'agent-29',
     category: 'agent',
     question: "设计一个 AI 驱动的客服邮件自动回复系统，架构上要考虑什么？",
     answer: "系统架构：\n1. 邮件接入层：接收邮件 → 意图分类（退款/咨询/投诉/其他）\n2. 信息抽取层：提取订单号、产品名、问题描述\n3. 路由层：\n   - 简单问题（退款进度查询）→ RAG 检索知识库 → LLM 生成回复\n   - 复杂问题（投诉/法律相关）→ 人工坐席\n4. 隐私层：PII 脱敏 → LLM 推理 → 回复审核（自动+人工抽检）\n5. 发送层：去 PII 脱敏标记 → 发送邮件\n\n关键指标：\n- 自动解决率（无需人工介入的比例）\n- 首次响应时间（从 4h → 30s）\n- 客户满意度（CSAT）：AI 回复要听起来像人\n- 误路由率（投诉被当成咨询自动回复 = 灾难）\n\n渐进式上线策略：先做辅助（起草回复→人工确认），再自动发送低风险类别。",
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     tags: ["系统设计","AI客服","RAG","邮件","架构"],
     subTopic: "AI安全",
     difficulty: 'medium',
+    favorited: false,
   }
 ];

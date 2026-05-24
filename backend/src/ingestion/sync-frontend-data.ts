@@ -71,7 +71,7 @@ async function main() {
     category: '${deckId}',
     question: ${JSON.stringify(c.question || titleCn || title)},
     answer: ${JSON.stringify(c.answer || '')},
-    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
     tags: ${JSON.stringify(tags)},
     ${c.subTopic ? `subTopic: ${JSON.stringify(c.subTopic)},` : ''}
     difficulty: ${diffStr},
