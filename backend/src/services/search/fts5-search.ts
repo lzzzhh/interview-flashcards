@@ -165,15 +165,27 @@ async function likeSearch(terms: string[], limit: number): Promise<FTS5Result[]>
 /** Extract meaningful Chinese terms: strip qualifiers, progressive truncation */
 function extractChineseTerms(escaped: string): string[] {
   const spaceTerms = escaped.split(/\s+/).filter(t => t.length > 0);
-  if (spaceTerms.length > 1) return spaceTerms;
+  if (spaceTerms.length > 1) {
+    const prefix = /^(我想|我要|我想学|我要学|怎么学|怎么学习|什么|什么是|有没有|能不能|可以|应该|需要|为什么|请问|如何|怎样|怎么样)/;
+    const stripped = new Set(spaceTerms.map(t => t.replace(prefix, '')).filter(t => t.length >= 2));
+    // Add bigrams from stripped terms as fallback
+    for (const term of [...stripped]) {
+      for (let i = 0; i < term.length - 1; i++) stripped.add(term.slice(i, i + 2));
+    }
+    return [...stripped];
+  }
 
   const phrase = spaceTerms[0] || escaped;
   const expanded = new Set<string>();
   expanded.add(phrase);
+  // Also add each individual char-bigram as fallback
+  if (phrase.length >= 2) {
+    for (let i = 0; i < phrase.length - 1; i++) expanded.add(phrase.slice(i, i + 2));
+  }
 
   let stripped = phrase
-    .replace(/^(怎么|如何|什么样|什么|有没有|能不能|可以|应该|需要|为什么|请问|怎样)/, '')
-    .replace(/(呢|吗|啊|吧|的|了|是)$/, '');
+    .replace(/^(我想|我要|我想学|我要学|我想了解|怎么学|怎么学习|什么|什么是|有没有|能不能|可以|应该|需要|为什么|请问|如何|怎样|怎么样)/, '')
+    .replace(/(呢|吗|啊|吧|的|了|是|怎么学|如何学)$/, '');
   if (stripped.length >= 2 && stripped !== phrase) expanded.add(stripped);
 
   const cjkOnly = stripped.replace(/[^\u4e00-\u9fff]/g, '');
