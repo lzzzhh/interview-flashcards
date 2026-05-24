@@ -1,7 +1,7 @@
 // src/components/LearningPlanDetailPage.tsx — 学习清单详情
 // Items only store cardId+deckId (slim format). Card details are looked up from AppContext.
 import { useState, useMemo } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Play } from 'lucide-react';
 import { getPlan, type LearningPlan } from '../utils/learningPlans';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
@@ -86,6 +86,13 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
     onEnterStudy(deckId as Category);
   };
 
+  const handleStudyAll = () => {
+    if (enrichedItems.length === 0) return;
+    const first = enrichedItems[0];
+    dispatch({ type: 'JUMP_TO_CARD', payload: { category: first.deckId as Category, cardId: first.cardId } });
+    onEnterStudy(first.deckId as Category);
+  };
+
   if (!plan) {
     return (
       <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
@@ -107,6 +114,14 @@ export default function LearningPlanDetailPage({ planId, onBack, onEnterStudy }:
           <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
         </button>
         <h1 className="nav-title">{plan.title}</h1>
+        <button
+          onClick={handleStudyAll}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors"
+          style={{ backgroundColor: `${BLUE}15`, color: BLUE }}
+        >
+          <Play className="w-4 h-4" />
+          开始学习
+        </button>
       </div>
 
       <div className="flex-1 flex items-start justify-center">
