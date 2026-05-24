@@ -1,4 +1,4 @@
-// src/components/LearningPlanListPage.tsx — 我的学习清单
+// src/components/LearningPlanListPage.tsx — 我的学习清单（只读查看）
 import { useState } from 'react';
 import { ArrowLeft, Trash2, ChevronRight, ListChecks, CheckCircle } from 'lucide-react';
 import { loadPlans, deletePlan, type LearningPlan } from '../utils/learningPlans';
@@ -15,10 +15,7 @@ const CARD_BORDER = 'var(--card-border)';
 const GREEN = '#10B981';
 
 export default function LearningPlanListPage({ onBack, onViewPlan }: Props) {
-  const [plans, setPlans] = useState<LearningPlan[]>(() => {
-    const loaded = loadPlans();
-    return loaded;
-  });
+  const [plans, setPlans] = useState<LearningPlan[]>(() => loadPlans());
 
   const handleDelete = (id: string) => {
     deletePlan(id);
@@ -52,7 +49,7 @@ export default function LearningPlanListPage({ onBack, onViewPlan }: Props) {
               {plans.map((plan) => {
                 const completedCount = plan.items.filter(i => i.completed).length;
                 const totalCount = plan.items.length;
-                const allDone = completedCount === totalCount;
+                const allDone = completedCount === totalCount && totalCount > 0;
                 return (
                 <div
                   key={plan.id}
