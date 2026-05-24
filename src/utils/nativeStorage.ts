@@ -34,10 +34,11 @@ function emptyAppData(): AppData {
     customCards: {},
     moduleDailyLimits: {},
     moduleDailyReviewLimits: {},
+    reviewLogs: {},
   };
 }
 
-/** 检测是否运行在 Tauri 环境中 */
+// ---- Tauri native file read/write ----
 export function isTauri(): boolean {
   return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 }
