@@ -13,7 +13,7 @@ import { getVectorStore } from '../vector/vector-store';
 import { fts5Search } from './fts5-search';
 import { getEmbeddingProvider } from '../embedding-provider';
 import { textToVector } from '../vector/local-embedding';
-import { understandQuery, type ParsedSearchQuery } from './query-understanding';
+import { understandQuery, sanitizeTopic, type ParsedSearchQuery } from './query-understanding';
 import { expandQuery } from './query-expander';
 import { tokenizeBigrams } from './bigram';
 import {
@@ -112,6 +112,20 @@ interface RecallCandidate {
 
 // ---- 主入口 ----
 
+/** Fast parse without LLM — for eval mode */
+async function quickParse(rawQuery: string): Promise<ParsedSearchQuery> {
+  const q = rawQuery.trim();
+  const topic = sanitizeTopic(q);
+  return {
+    rawQuery: q, intent: 'lookup', topicRaw: q, topic, canonicalTopic: topic,
+    deckHint: undefined, parentCategory: undefined, subtopics: [],
+    constraints: {}, coreKeywords: [topic], expandedKeywords: [], lowPriorityKeywords: [],
+    rewrittenQuery: topic, recallText: topic, rerankText: topic,
+    confidence: 0.3, source: 'fallback', topicChangeReason: 'eval mode', filteredStopwords: [],
+    debug: 'quickParse',
+  };
+}
+
 export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[]> {
   // Resolve parameters: new fields take priority, fallback to legacy topK
   const maxResults = input.maxResults ?? input.topK ?? DEFAULT_MAX_RESULTS;
@@ -119,24 +133,22 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const candidateLimit = Math.min(input.candidateLimit ?? DEFAULT_CANDIDATE_LIMIT, 1000);
 
   // 1. Query understanding (for intent/topic/debug)
-  const parsed = await understandQuery(input.query);
+  // Skip LLM in eval mode to match baseline speed
+  const parsed = process.env.EVAL_SUPPRESS_DEBUG
+    ? await quickParse(input.query)
+    : await understandQuery(input.query);
   const { intent, topic, canonicalTopic, deckHint, coreKeywords, expandedKeywords, lowPriorityKeywords, subtopics, recallText, rerankText, rewrittenQuery } = parsed;
   const isStudyIntent = intent === 'study' || intent === 'plan' || intent === 'recommend_cards';
 
-  // 1b. Old expandQuery for backward-compatible recall (430 eval cases), filtered
-  const LEGACY_LOW_PRIORITY = new Set(['机器学习', '算法', '数据结构', '分类', '回归', '模型', '深度学习', '人工智能', '统计学', '数据挖掘', '代码', '面试', '特征工程']);
-  const LEGACY_STOPWORDS = new Set(['学习', '学', '怎么学', '教程', '方法', '推荐', '卡片', '几张', '知识点', '总结', '资料', '路线', '计划', '入门', '实战', '案例']);
+  // 1b. Old expandQuery for primary recall (proven baseline)
   const { keywords: oldKW, normalizedQuery: oldNorm } = expandQuery(input.query);
-  const legacyLowPriority: string[] = [];
-  const legacyFiltered: string[] = [];
-  for (const kw of oldKW) {
-    if (LEGACY_STOPWORDS.has(kw)) continue;
-    if (LEGACY_LOW_PRIORITY.has(kw)) { legacyLowPriority.push(kw); continue; }
-    legacyFiltered.push(kw);
-  }
-  // Combine: canonicalTopic + coreKeywords + expandedKeywords + legacyFiltered (NOT legacyLowPriority, NOT raw query)
-  const combined = [canonicalTopic, ...coreKeywords, ...expandedKeywords, ...legacyFiltered].filter(Boolean);
-  const allQueryTextRecall = [...new Set(combined)].filter(k => !LEGACY_STOPWORDS.has(k)).join(' ').slice(0, 2000);
+  // Old recall: raw query + normalized + expanded keywords
+  const allQueryTextRecall = [input.query, oldNorm || '', ...oldKW].filter(Boolean).join(' ').slice(0, 2000);
+  // For study intent (from new understanding), also include tiered keywords
+  const studyBoostText = isStudyIntent ? recallText : '';
+  const finalRecallText = studyBoostText
+    ? [allQueryTextRecall, studyBoostText].join(' ')
+    : allQueryTextRecall;
   // For study intent: use lower threshold, higher max results
   const effectiveMinScore = isStudyIntent ? Math.min(input.minScore ?? 0.20, 0.25) : (input.minScore ?? DEFAULT_MIN_SCORE);
   const effectiveMaxResults = isStudyIntent ? Math.max(input.maxResults ?? 100, 100) : (input.maxResults ?? DEFAULT_MAX_RESULTS);
@@ -150,8 +162,6 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     console.log('[search] rerankText:', rerankText);
   }
 
-  // allQueryTextRecall: tiered keywords + raw query for extractChineseTerms bigram expansion
-  const allQueryTextRecall = [recallText, parsed.rawQuery].filter(Boolean).join(' ').slice(0, 2000);
   const deckIds = deckHint ? [deckHint] : undefined;
 
   // 2. 多路召回（并行）— 召回池大小由 candidateLimit 控制
@@ -164,10 +174,10 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     skwPool,
     vecPool,
   ] = await Promise.all([
-    recallFTS5(allQueryTextRecall, poolSize, deckIds),
-    recallByTags(allQueryTextRecall, expandedKeywords.slice(0, 12), tagPoolSize),
-    recallBySearchKeywords(allQueryTextRecall, expandedKeywords.slice(0, 12), tagPoolSize),
-    recallVector(allQueryTextRecall, candidateLimit),
+    recallFTS5(finalRecallText, poolSize, input.deckIds),
+    recallByTags(finalRecallText, expandedKeywords.slice(0, 12), tagPoolSize),
+    recallBySearchKeywords(finalRecallText, expandedKeywords.slice(0, 12), tagPoolSize),
+    recallVector(finalRecallText, candidateLimit),
   ]);
 
   // 3. Union + dedup
