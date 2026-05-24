@@ -18,6 +18,20 @@ export interface SearchResult {
 export interface HybridSearchResponse {
   results: SearchResult[];
   total: number;
+  debug?: {
+    ms: number;
+    rawQuery: string;
+    intent: string;
+    topic: string;
+    deckHint: string | null;
+    rewrittenQuery: string;
+    keywords: string[];
+    confidence: number;
+    parseMethod: string;
+    recallText: string;
+    rerankText: string;
+    resultCount: number;
+  };
 }
 
 export interface HybridSearchParams {
