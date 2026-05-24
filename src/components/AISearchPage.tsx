@@ -45,6 +45,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const { dispatch } = useAppContext();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [warmingUp, setWarmingUp] = useState(true);
@@ -80,6 +81,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
       const res = await hybridSearch({ query: query.trim(), minScore: threshold, maxResults: 50 });
       setResults(res.results);
       setSearched(true);
+      if ((res as any).debug) setDebugInfo((res as any).debug);
     } catch { setResults([]); }
     setLoading(false);
   };
@@ -298,6 +300,21 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
                   </div>
                 </button>
               ))}
+            </div>
+          )}
+          {/* Debug Panel */}
+          {debugInfo && (
+            <div className="mt-4 rounded-xl p-3 border" style={{ backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(255,255,255,0.1)' }}>
+              <p className="text-[11px] font-bold mb-2" style={{ color: '#6B7280' }}>search debug</p>
+              <div className="space-y-1 text-[10px] font-mono" style={{ color: '#9CA3AF' }}>
+                <div>rawQuery: <span style={{ color: '#E5E7EB' }}>{debugInfo.rawQuery}</span></div>
+                <div>intent: <span style={{ color: '#60A5FA' }}>{debugInfo.intent}</span> · topic: <span style={{ color: '#34D399' }}>{debugInfo.topic}</span> · confidence: {debugInfo.confidence}</div>
+                <div>deckHint: {debugInfo.deckHint || '-'}</div>
+                <div>rewrite: <span style={{ color: '#F59E0B' }}>{debugInfo.rewrittenQuery?.slice(0, 80)}</span></div>
+                <div>keywords ({debugInfo.keywords?.length}): {debugInfo.keywords?.slice(0,6).join(', ')}</div>
+                <div>parse: {debugInfo.parseMethod}</div>
+                <div>results: <span style={{ color: debugInfo.resultCount > 0 ? '#34D399' : '#EF4444' }}>{debugInfo.resultCount}</span> · {debugInfo.ms}ms</div>
+              </div>
             </div>
           )}
         </div>
