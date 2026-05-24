@@ -565,7 +565,7 @@ function ModuleLimitSlider({ moduleId, label }: { moduleId: string; label: strin
       <div className="flex items-center gap-2">
         <input
           type="range"
-          min="1"
+          min="0"
           max="100"
           value={limit}
           onChange={(e) => { const v = Number(e.target.value); setLimit(v); setModuleDailyLimit(moduleId, v); }}

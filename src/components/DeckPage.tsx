@@ -128,7 +128,7 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
               <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="牌组名称" className="w-full px-3 py-2 rounded-lg border text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'var(--text-primary)', borderColor: 'rgba(255,255,255,0.1)' }} onKeyDown={(e) => e.key === 'Enter' && handleCreate()} autoFocus />
               <div className="flex items-center justify-between">
                 <span className="text-[12px]" style={{ color: 'var(--text-muted)' }}>每日新卡上限</span>
-                <input type="number" min="1" max="100" value={newLimit} onChange={(e) => setNewLimit(Number(e.target.value))} className="w-16 px-2 py-1 rounded-lg border text-sm text-center" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'var(--text-primary)', borderColor: 'rgba(255,255,255,0.1)' }} />
+                <input type="number" min="0" max="100" value={newLimit} onChange={(e) => setNewLimit(Number(e.target.value))} className="w-16 px-2 py-1 rounded-lg border text-sm text-center" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'var(--text-primary)', borderColor: 'rgba(255,255,255,0.1)' }} />
               </div>
               <button onClick={handleCreate} disabled={!newName.trim()} className="w-full py-2.5 rounded-xl text-[14px] font-bold text-white disabled:opacity-30" style={{ background: `linear-gradient(135deg, var(--blue), #1D4ED8)` }}>
                 创建
