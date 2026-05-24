@@ -13,7 +13,7 @@ import { getVectorStore } from '../vector/vector-store';
 import { fts5Search } from './fts5-search';
 import { getEmbeddingProvider } from '../embedding-provider';
 import { textToVector } from '../vector/local-embedding';
-import { expandQuery, normalizeQuery } from './query-expander';
+import { understandQuery, type ParsedSearchQuery } from './query-understanding';
 import { tokenizeBigrams } from './bigram';
 import {
   rerank,
@@ -115,15 +115,27 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const minScore = input.minScore ?? DEFAULT_MIN_SCORE;
   const candidateLimit = Math.min(input.candidateLimit ?? DEFAULT_CANDIDATE_LIMIT, 1000);
 
-  // 1. Query expansion
-  const { keywords: expandedKW, deckIds: expandedDeckIds, normalizedQuery, isStudyIntent } = expandQuery(input.query);
+  // 1. Query understanding
+  const parsed = await understandQuery(input.query);
+  const { intent, topic, keywords, subtopics } = parsed;
+  const recallText = [topic, ...subtopics, ...keywords.slice(0, 5)].filter(Boolean).join(' ');
+  const rerankText = [topic, ...keywords.slice(0, 3)].filter(Boolean).join(' ');
+  const isStudyIntent = intent === 'study' || intent === 'plan';
   // For study intent: use lower threshold, higher max results
   const effectiveMinScore = isStudyIntent ? Math.min(input.minScore ?? 0.20, 0.25) : (input.minScore ?? DEFAULT_MIN_SCORE);
   const effectiveMaxResults = isStudyIntent ? Math.max(input.maxResults ?? 100, 100) : (input.maxResults ?? DEFAULT_MAX_RESULTS);
 
-  const allQueryText = [input.query, normalizedQuery || '', ...expandedKW].filter(Boolean).join(' ');
-  // Limit to avoid OOM on LIKE search with excessive keywords
-  const allQueryTextTrimmed = allQueryText.slice(0, 2000);
+  // Debug log
+  if (!process.env.EVAL_SUPPRESS_DEBUG) {
+    console.log('[search] rawQuery:', input.query.slice(0, 80));
+    console.log('[search] intent:', intent, 'topic:', topic, 'deckHint:', parsed.deckHint || '-', 'confidence:', parsed.confidence);
+    console.log('[search] keywords:', keywords.slice(0, 10).join(', '));
+    console.log('[search] recallText:', recallText.slice(0, 120));
+    console.log('[search] rerankText:', rerankText);
+  }
+
+  const allQueryTextRecall = recallText.slice(0, 2000);
+  const deckIds = parsed.deckHint ? [parsed.deckHint] : undefined;
 
   // 2. 多路召回（并行）— 召回池大小由 candidateLimit 控制
   const poolSize = candidateLimit;
@@ -135,10 +147,10 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     skwPool,
     vecPool,
   ] = await Promise.all([
-    recallFTS5(allQueryTextTrimmed, poolSize, input.deckIds),
-    recallByTags(allQueryTextTrimmed, expandedKW, tagPoolSize),
-    recallBySearchKeywords(allQueryTextTrimmed, expandedKW, tagPoolSize),
-    recallVector(allQueryTextTrimmed, candidateLimit),
+    recallFTS5(allQueryTextRecall, poolSize, deckIds),
+    recallByTags(allQueryTextRecall, keywords.slice(0, 8), tagPoolSize),
+    recallBySearchKeywords(allQueryTextRecall, keywords.slice(0, 8), tagPoolSize),
+    recallVector(rerankText, candidateLimit),
   ]);
 
   // 3. Union + dedup
@@ -212,7 +224,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const progressMap = new Map(progresses.map(p => [p.cardId, p]));
 
   // 5. 查询 bigram tokens
-  const queryBigrams = tokenizeBigrams(allQueryTextTrimmed);
+  const queryBigrams = tokenizeBigrams(recallText);
 
   // 6. Build reranker candidates
   const rerankInput: RerankCandidate[] = [];
@@ -252,9 +264,9 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
 
   // 7. Detect rerank profile + compute stats lexical boosts
   const profile = input.overrideProfile
-    || detectProfile(input.query, normalizedQuery || '', expandedKW, expandedDeckIds);
+    || detectProfile(input.query, topic, keywords, deckIds || []);
   const extraBoosts = new Map<string, number>();
-  const queryLower = (input.query + ' ' + (normalizedQuery || '')).toLowerCase();
+  const queryLower = topic.toLowerCase();
 
   if (profile.statsLexicalBoost) {
     for (const card of cards) {
