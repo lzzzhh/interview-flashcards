@@ -1,3 +1,4 @@
+// @ts-nocheck — generated from DB via sync-frontend-data.ts
 import type { QACard } from '../types';
 
 const SM2 = { state: 'new' as const, easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() };
@@ -373,7 +374,7 @@ export const deepLearningCards: QACard[] = [
     answer: "图数据库（Graph Database）以节点（Node）和边（Edge）为基本存储单元，天然支持图结构数据的存储和查询。\n\n与关系型数据库的区别：\n1. 数据模型：关系型用表+外键，图数据库用节点+关系\n2. 查询语言：关系型用 SQL，图数据库用 Cypher/SPARQL/Gremlin\n3. 多跳查询：图数据库 O(1) 遍历边，关系型需要多次 JOIN（指数级退化）\n4. 典型场景：社交网络（推荐关注）、知识图谱、欺诈检测、供应链追溯\n\n代表系统：Neo4j（Cypher）、Amazon Neptune、TigerGraph、ArangoDB。",
     tags: ["图数据库","Neo4j","知识图谱","Cypher","NoSQL"],
     subTopic: "数据存储",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'dl-34',
@@ -382,7 +383,7 @@ export const deepLearningCards: QACard[] = [
     answer: "选择图数据库的判据：\n1. 数据高度互联（社交关系、推荐、知识图谱）—— 关系型 JOIN 性能下降\n2. 需要多跳遍历（3 跳以上）—— 图数据库每条边 O(1)\n3. 查询模式以路径/模式匹配为主（「A 的朋友的朋友买了什么」）\n4. Schema 灵活、数据模型持续演化\n\n不应使用图数据库的场景：\n- 简单的 CRUD 应用（关系型更成熟）\n- 聚合分析为主（列式存储更好）\n- 团队没有图查询经验（学习曲线陡）\n\n现实建议：从 PostgreSQL + 递归 CTE 开始验证需求，确认确实需要图遍历性能再引入 Neo4j。",
     tags: ["选型","图数据库","Neo4j","社交网络","知识图谱"],
     subTopic: "数据存储",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'dl-35',
@@ -391,7 +392,7 @@ export const deepLearningCards: QACard[] = [
     answer: "反欺诈经典场景：识别欺诈团伙\n\n传统方法（关系型）：\n- 用户 A 和用户 B 使用同一设备 → JOIN User-Device 表\n- 用户 B 和用户 C 使用同一 IP → 再 JOIN\n- 用户 C 和用户 D 使用同一信用卡 → 再 JOIN\n- 3 跳之后查询复杂度 O(n³)，几乎不可行\n\n图数据库方法：\n- 用 Cypher 写出「找到所有共享设备/IP/信用卡的用户群」\n- 多跳遍历线性时间\n- 自动发现环形关系（洗钱链路）\n\n真实案例：PayPal 用图数据库检测欺诈交易；银行用 Neo4j 做反洗钱（AML）关联分析。",
     tags: ["反欺诈","图数据库","风控","Neo4j","关联分析"],
     subTopic: "数据存储",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'dl-36',
@@ -400,7 +401,7 @@ export const deepLearningCards: QACard[] = [
     answer: "手机端部署图像分割模型的方案：\n1. 轻量 Backbone：MobileNetV3 / EfficientNet-Lite / ShuffleNet\n2. 轻量分割头：DeepLabV3+ Lite / BiSeNet / SegFormer (tiny)\n3. 模型量化：INT8 量化（TFLite / CoreML），模型大小减少 75%，速度提升 2-4x\n4. 推理框架：\n   - Android：TFLite GPU Delegate / NNAPI / MediaPipe\n   - iOS：CoreML + ANE（Apple Neural Engine）\n5. 模型剪枝 + 蒸馏：用大模型（Teacher）教小模型（Student）\n\n典型效果：MobileNetV3 + DeepLabV3+，INT8 量化后 5-10MB，iPhone 上 15-30ms/帧。",
     tags: ["移动端","图像分割","MobileNet","TFLite","CoreML","量化"],
     subTopic: "模型部署",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'dl-37',
@@ -409,7 +410,7 @@ export const deepLearningCards: QACard[] = [
     answer: "边缘推理（On-device）优势：\n- 延迟低（不需要网络往返）\n- 隐私保护（数据不离开设备）\n- 离线可用\n- 零服务端成本\n场景：实时视频处理（美颜/滤镜）、OCR、语音唤醒\n\n云端推理优势：\n- 模型可以更大更准（GPU/TPU 集群）\n- 模型更新即时生效（不需要发版）\n- 可以利用多模态/多模型 ensemble\n场景：医疗影像诊断、复杂 NLP、大模型推理\n\n混合方案：\n- 轻量模型在本地做粗筛，置信度低的送云端\n- Google Lens：手机端检测物体，云端做 OCR/翻译\n- Siri/Alexa：本地做唤醒词检测，云端做语音识别",
     tags: ["边缘推理","云端推理","部署","端侧","ONNX"],
     subTopic: "模型部署",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'dl-38',
@@ -418,7 +419,7 @@ export const deepLearningCards: QACard[] = [
     answer: "三大移动推理框架对比：\n\nCoreML（iOS）：\n- Apple 原生，自动利用 ANE（Neural Engine）\n- 模型格式：.mlmodel / .mlpackage\n- 优点：零额外依赖，与 SwiftUI/ARKit 深度集成\n- 缺点：只支持 iOS/macOS\n\nTFLite（跨平台）：\n- Google 出品，Android 首选\n- 支持 GPU Delegate、NNAPI、XNNPack\n- 优点：跨平台，量化工具链成熟\n- 缺点：iOS 上性能略逊于 CoreML\n\nMediaPipe（高级封装）：\n- Google 基于 TFLite 的应用框架\n- 内置人脸检测/手部关键点/姿态估计等预置方案\n- 优点：开箱即用，自定义模型也方便接入\n- 缺点：包体积较大\n\n选型建议：iOS 用 CoreML，Android 用 TFLite+MediaPipe，跨平台需求用 TFLite。",
     tags: ["CoreML","TFLite","MediaPipe","移动端","框架选型"],
     subTopic: "模型部署",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'dl-39',
@@ -427,7 +428,7 @@ export const deepLearningCards: QACard[] = [
     answer: "ONNX（Open Neural Network Exchange）：\n- 开放模型格式，不同框架间互转（PyTorch → ONNX → TensorRT/CoreML/TFLite）\n- 工具：torch.onnx.export() / onnxruntime\n- 角色：中间表示（IR），不负责推理加速\n\nTensorRT（NVIDIA）：\n- NVIDIA 的推理优化引擎，专为 GPU 优化\n- 优化手段：层融合（Layer Fusion）、精度校准（FP16/INT8）、Kernel 自动调优（Auto-tuning）\n- 角色：推理加速器\n\n典型流程：\nPyTorch 模型 → export ONNX → TensorRT build engine → TensorRT inference\n加速效果：FP16 2-4x，INT8 4-8x（相对 PyTorch FP32）\n\n对比：ONNX Runtime 也支持 GPU 加速，但 TensorRT 在 NVIDIA GPU 上通常是性能王者。",
     tags: ["ONNX","TensorRT","推理加速","模型部署","GPU"],
     subTopic: "模型部署",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'dl-40',
@@ -436,7 +437,7 @@ export const deepLearningCards: QACard[] = [
     answer: "通用优化手段（按优先级排序）：\n1. 模型量化（INT8/FP16）：最有效的优化，2-4x 速度提升\n2. 图优化（算子融合）：合并 Conv+BN+ReLU 为单个 kernel\n3. 批处理（Batching）：合并多个请求为一批做 GPU 推理，吞吐量提升 5-10x\n4. KV Cache（LLM 专用）：缓存已计算的 Key/Value，避免重复计算\n5. Flash Attention：优化 Attention 计算的显存访问模式\n6. 模型蒸馏：用大模型教小模型\n7. 剪枝（Pruning）：去掉不重要的权重\n\n加速比参考（ResNet-50）：\n- FP32 baseline: 1x\n- FP16: 2x\n- INT8: 4x\n- INT8 + TensorRT: 8x\n- INT8 + TensorRT + Batching: 20x+",
     tags: ["量化","推理加速","TensorRT","部署优化","批处理"],
     subTopic: "模型部署",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'dl-41',
@@ -445,6 +446,6 @@ export const deepLearningCards: QACard[] = [
     answer: "推理服务架构关键设计点：\n1. 服务化：Triton Inference Server / TorchServe / BentoML\n2. 负载均衡：多 GPU 实例 + 请求队列\n3. 模型版本管理：A/B 测试 + 灰度发布 + 一键回滚\n4. 动态批处理（Dynamic Batching）：Triton 自动合并请求\n5. 模型预热（Warmup）：启动时预加载 + 一次 dummy 推理，避免冷启动延迟\n6. 超时 + 熔断：推理超时自动降级到简化模型/缓存结果\n7. 监控：P50/P99 延迟、吞吐量、GPU 利用率、显存\n\n容量规划：\n- 单 GPU 推理延迟 10ms → QPS=100（串行）\n- 加上 Dynamic Batching (batch=8) → QPS=800\n- 4 GPU 集群 → QPS=3200",
     tags: ["推理服务","Triton","架构","部署","GPU"],
     subTopic: "模型部署",
-    difficulty: 3,
+    difficulty: 'medium',
   }
 ];

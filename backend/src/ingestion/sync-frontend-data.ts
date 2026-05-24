@@ -63,15 +63,19 @@ async function main() {
       const titleCn = c.titleCn || '';
       const title = c.title || '';
       const diffNum = parseInt(c.difficulty || '3') || 3;
+      const difficultyMap: Record<number, string> = { 1: "'easy'", 2: "'easy'", 3: "'medium'", 4: "'hard'", 5: "'hard'" };
+      const diffStr = difficultyMap[diffNum] || "'medium'";
 
       return `  {
     id: '${c.id}',
     category: '${deckId}',
     question: ${JSON.stringify(c.question || titleCn || title)},
     answer: ${JSON.stringify(c.answer || '')},
+    sm2: { state: 'new', easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: now },
     tags: ${JSON.stringify(tags)},
     ${c.subTopic ? `subTopic: ${JSON.stringify(c.subTopic)},` : ''}
-    difficulty: ${diffNum},
+    difficulty: ${diffStr},
+    favorited: false,
   }`;
     });
 

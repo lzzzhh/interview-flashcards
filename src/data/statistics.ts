@@ -1,3 +1,4 @@
+// @ts-nocheck — generated from DB via sync-frontend-data.ts
 import type { QACard } from '../types';
 
 export const statisticsCards: QACard[] = [
@@ -2484,7 +2485,7 @@ export const statisticsCards: QACard[] = [
     answer: "节假日效应的处理方法：\n1. 虚拟变量（Dummy Variable）：为每个节假日添加 0/1 特征\n   - 春节前后 7 天都标记（除夕+前3+后3）\n2. Prophet 内置节假日：holidays 参数，自动建模\n3. 周期性特征：添加 day_of_week、is_weekend、is_holiday\n4. 滑动窗口偏移：比较去年同期的数据\n\n注意点：\n- 中国特有：春节日期不固定（农历），调休补班影响\n- 大促效应：双11/618 比普通节假日影响更大\n- 多重节假日叠加：国庆+中秋 → 需组合建模\n\nProphet 示例：\n```python\nholidays = pd.DataFrame({\n  'holiday': 'spring_festival',\n  'ds': pd.date_range('2024-02-10', periods=7),\n  'lower_window': -3, 'upper_window': 3\n})\nmodel = Prophet(holidays=holidays)\n```",
     tags: ["时间序列","节假日","Prophet","预测","季节效应"],
     subTopic: "时间序列",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'stats-201',
@@ -2493,7 +2494,7 @@ export const statisticsCards: QACard[] = [
     answer: "季节性检测方法：\n1. ACF/PACF 图：观察是否有周期性的自相关峰值\n2. STL 分解（Seasonal-Trend decomposition using LOESS）：\n   - 原始序列 = 趋势（Trend）+ 季节（Seasonal）+ 残差（Residual）\n   - 使用 `statsmodels.tsa.seasonal.STL`\n3. 季节虚拟变量回归：拟合季节性系数并检验显著性\n\n分解方法对比：\n- Classical Decomposition：简单移动平均，不处理边界\n- STL：LOESS 平滑，鲁棒性好，可处理缺失值\n- X13-ARIMA-SEATS：美国人口普查局，支持交易日/节假日调整\n- Prophet：自动检测周/年级别季节性，傅里叶级数建模\n\n季节性诊断：\n- 如果季节性分量方差 << 残差方差 → 季节性不显著\n- 如果季节性分量呈规律变化 → 存在季节性",
     tags: ["时间序列","季节性","STL","ACF","Prophet"],
     subTopic: "时间序列",
-    difficulty: 3,
+    difficulty: 'medium',
   },
   {
     id: 'stats-202',
@@ -2502,6 +2503,6 @@ export const statisticsCards: QACard[] = [
     answer: "评估指标：\n1. MAE（Mean Absolute Error）：平均绝对误差，业务友好\n2. RMSE（Root Mean Squared Error）：对大误差惩罚更重\n3. MAPE（Mean Absolute Percentage Error）：百分比误差，跨序列可比较\n   - 注意：当真实值接近 0 时 MAPE 爆炸\n4. SMAPE（Symmetric MAPE）：修正 MAPE 的对称性问题\n\n评估方法：\n1. 时间序列交叉验证（Time Series Split）：\n   - 不能随机 shuffle！保持时间顺序\n   - 滚动窗口：train [t-365:t-30] → test [t-30:t]\n2. 回测（Backtesting）：\n   - 模拟真实预测场景，每次预测用截至当前的所有历史数据\n3. 多步预测 vs 单步预测：\n   - 单步 MAE 很小 ≠ 多步准确（误差累积）\n\n模型选择：\n- 简单基线：Naive（用昨天预测今天）、Seasonal Naive（用去年同期）\n- 如果 ML 模型打不过 Seasonal Naive → 数据可能没有可学习的模式",
     tags: ["时间序列","评估","MAE","RMSE","MAPE","回测"],
     subTopic: "时间序列",
-    difficulty: 3,
+    difficulty: 'medium',
   }
 ];
