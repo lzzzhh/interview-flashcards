@@ -605,8 +605,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case 'START_PLAN_STUDY': {
-      const next = { ...state, planCardIds: action.payload.cardIds, studyMode: 'new' as const, shuffled: false };
-      // Card need be loaded first — jump to first deck to load them
+      // Load cards from all decks needed by the plan
+      const allCardsById: Record<string, FlashCard> = { ...state.cardsById };
+      const neededDecks = new Set(action.payload.cardIds.map(id => {
+        const prefix = id.split('-')[0];
+        const deckMap: Record<string, string> = { lc: 'leetcode', stats: 'statistics', ml: 'machine-learning', dl: 'deep-learning', llm: 'llm', agent: 'agent', jargon: 'jargon', wp: 'workplace', vc: 'vibe-coding' };
+        return deckMap[prefix] || prefix;
+      }));
+      for (const deck of neededDecks) {
+        Object.assign(allCardsById, buildCardsById(deck as Category));
+      }
+      const next = { ...state, cardsById: allCardsById, planCardIds: action.payload.cardIds, studyMode: 'new' as const, shuffled: false };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
     }
     case 'STOP_PLAN_STUDY': {
