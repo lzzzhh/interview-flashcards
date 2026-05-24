@@ -1,6 +1,6 @@
 // backend/src/services/search/query-understanding.ts
-// Parses natural language search queries into structured intent + topic + keywords.
-// Uses regex for common patterns; falls back to LLM for ambiguous queries.
+// Pipeline: raw query → intent detection → slot extraction → validation → query rewrite → concept expansion
+// Uses regex for common patterns; falls back to LLM for rewrite + ambiguous cases.
 
 import { conceptLookup, getAllTopics } from './concept-dictionary';
 
@@ -10,21 +10,22 @@ export type SearchIntent = 'study' | 'review' | 'lookup' | 'practice' | 'plan';
 
 export interface ParsedSearchQuery {
   intent: SearchIntent;
-  topic: string;          // normalized topic (concept dictionary key or raw phrase)
-  deckHint?: string;      // suggested deck
-  subtopics: string[];    // sub-topic refinements
-  keywords: string[];     // expansion keywords
+  topic: string;
+  deckHint?: string;
+  subtopics: string[];
+  keywords: string[];
+  rewrittenQuery: string;    // keyword string for retrieval (no口语noise)
   constraints: {
     difficulty?: string[];
     onlyDue?: boolean;
     newOnly?: boolean;
   };
-  confidence: number;     // 0-1, higher = more confident regex matched
-  rawQuery: string;       // original input
-  debug: string;          // how was this parsed?
+  confidence: number;
+  rawQuery: string;
+  debug: string;
 }
 
-// ── Regex patterns ──
+// ── Regex intent patterns ──
 
 interface IntentPattern {
   intent: SearchIntent;
@@ -32,130 +33,132 @@ interface IntentPattern {
 }
 
 const INTENT_PATTERNS: IntentPattern[] = [
-  {
-    intent: 'study',
-    patterns: [
-      /^(?:我想|我要|我想学|我要学|想学|想学习|学|学习)(.+)/,
-      /^(.+)(?:怎么学|如何学|如何学习|怎么学习|学习方法)$/,
-    ],
-  },
-  {
-    intent: 'review',
-    patterns: [
-      /^(?:复习|回顾|重温)(.+)/,
-      /^(?:我想复习|我要复习)(.+)/,
-      /^(.+)(?:复习|回顾)$/,
-    ],
-  },
-  {
-    intent: 'practice',
-    patterns: [
-      /^(?:刷|刷题|练习|训练)(.+)/,
-      /^(.+)(?:刷题|练习|训练)$/,
-    ],
-  },
-  {
-    intent: 'lookup',
-    patterns: [
-      /^(?:什么是|什么叫|什么是|啥是|解释)(.+)/,
-    ],
-  },
-  {
-    intent: 'plan',
-    patterns: [
-      /^(?:制定|生成|帮我|帮我制定|帮我生成|给我)(?:一个|一份)?(?:学习|复习)?计划(?:.*)?(.+)/,
-    ],
-  },
+  { intent: 'study',   patterns: [/^(?:我想|我要|我想学|我要学|想学|想学习|学|学习)(.+)/, /^(.+)(?:怎么学|如何学|如何学习|怎么学习|学习方法)$/] },
+  { intent: 'review',  patterns: [/^(?:复习|回顾|重温|我想复习|我要复习)(.+)/, /^(.+)(?:复习|回顾)$/] },
+  { intent: 'practice', patterns: [/^(?:刷|刷题|练习|训练)(.+)/, /^(.+)(?:刷题|练习|训练)$/] },
+  { intent: 'lookup',  patterns: [/^(?:什么是|什么叫|啥是|解释)(.+)/] },
+  { intent: 'plan',    patterns: [/^(?:制定|生成|帮我|帮我制定|帮我生成|给我)(?:一个|一份)?(?:学习|复习)?计划(?:.*)?(.+)/] },
 ];
 
-/** Main entry point: parse a raw query into structured form. */
+/** Main entry point */
 export async function understandQuery(rawQuery: string): Promise<ParsedSearchQuery> {
   const q = rawQuery.trim();
 
-  // ── Regex parsing ──
+  // ── Step 1: Regex intent + topic extraction ──
   for (const group of INTENT_PATTERNS) {
     for (const pattern of group.patterns) {
       const match = q.match(pattern);
       if (match) {
-        const topicRaw = match[1]?.trim() || '';
-        const result = resolveFromTopic(topicRaw, group.intent, q);
-        if (result) return result;
-        // Topic extraction failed — continue trying other patterns
+        const topicRaw = (match[1] || '').trim();
+        const concept = conceptLookup(topicRaw);
+        if (concept) {
+          const rewritten = await llmRewrite(topicRaw, q, concept);
+          return buildResult(group.intent, concept.topic, concept, q, rewritten, `regex+dict: topic="${topicRaw}"`);
+        }
+        // No dict match — try LLM rewrite
+        const rewritten = await llmRewrite(topicRaw, q, undefined);
+        return buildResult(group.intent, topicRaw, undefined, q, rewritten || topicRaw, `regex: topic="${topicRaw}", no dict`);
       }
     }
   }
 
-  // ── Fallback: try to match any known topic ──
-  const topicMatch = matchAnyTopic(q);
-  if (topicMatch) {
-    const resolved = resolveFromTopic(topicMatch.topic, 'lookup', q);
-    if (resolved) return { ...resolved, confidence: Math.min(resolved.confidence, 0.5) };
+  // ── Step 2: Try dict match from full query ──
+  const dictMatch = matchAnyTopic(q);
+  if (dictMatch) {
+    const concept = conceptLookup(dictMatch.topic);
+    return buildResult('lookup', concept?.topic || dictMatch.topic, concept, q, q, `dict match: "${dictMatch.topic}"`);
   }
 
-  // ── LLM fallback ──
-  const llmResult = await llmUnderstanding(q);
+  // ── Step 3: LLM full parse ──
+  const llmResult = await llmFullParse(q);
   if (llmResult) return llmResult;
 
-  // ── Final fallback: raw query as lookup ──
-  return {
-    intent: 'lookup',
-    topic: q,
-    subtopics: [],
-    keywords: [q],
-    constraints: {},
-    confidence: 0.1,
-    rawQuery: q,
-    debug: 'fallback: raw query as lookup',
-  };
+  // ── Step 4: Fallback ──
+  return buildResult('lookup', q, undefined, q, q, 'fallback: raw query');
+}
+
+// ── LLM rewrite ──
+
+async function llmRewrite(
+  topicRaw: string,
+  rawQuery: string,
+  concept?: { topic: string; keywords: string[]; subtopics: string[] },
+): Promise<string | null> {
+  const dictWords = concept ? [...concept.keywords, ...concept.subtopics].join(', ') : '';
+  const prompt = concept
+    ? `用户搜索: "${rawQuery}"\n识别话题: ${concept.topic}\n扩展词: ${dictWords}\n\n请输出一个面向搜索引擎的关键词串（空格分隔），去除"我想学/我要学/怎么学"等口语前缀。只返回关键词，不要其他内容。长度不超过300字。`
+    : `用户搜索: "${rawQuery}"\n\n请输出一个面向搜索引擎的关键词串（空格分隔），去除"我想学/我要学/怎么学"等口语前缀。只返回关键词，不要其他内容。长度不超过300字。`;
+
+  try {
+    const res = await fetch(
+      `${process.env.LLM_BASE_URL || 'https://api.deepseek.com'}/v1/chat/completions`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.LLM_API_KEY || process.env.DEEPSEEK_API_KEY}` },
+        body: JSON.stringify({ model: process.env.LLM_MODEL || 'deepseek-chat', messages: [{ role: 'user', content: prompt }], max_tokens: 120, temperature: 0 }) },
+    );
+    if (!res.ok) return null;
+    const data = await res.json() as any;
+    const text = (data.choices?.[0]?.message?.content || '').trim();
+    if (!text || text.length === 0 || text.length > 300) return null;
+    // Validate: no口语 prefix
+    if (/^(我想|我要|我想学|怎么学|帮我|给我|请问)/.test(text)) return null;
+    return text;
+  } catch {
+    return null;
+  }
+}
+
+// ── LLM full parse ──
+
+async function llmFullParse(query: string): Promise<ParsedSearchQuery | null> {
+  const knownTopics = getAllTopics().join(', ');
+  const prompt = `你是搜索意图解析器。分析查询并返回JSON。
+
+已知话题：${knownTopics}
+
+查询："${query}"
+
+返回JSON：
+{
+  "intent": "study|review|lookup|practice|plan",
+  "topic": "话题名（必须是已知话题或查询关键词）",
+  "rewrittenQuery": "面向搜索的关键词串（空格分隔，去除口语前缀，不超过300字）",
+  "confidence": 0.0-1.0
+}
+
+要求：topic不能为空/含口语前缀，只返回JSON。`;
+
+  try {
+    const res = await fetch(
+      `${process.env.LLM_BASE_URL || 'https://api.deepseek.com'}/v1/chat/completions`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.LLM_API_KEY || process.env.DEEPSEEK_API_KEY}` },
+        body: JSON.stringify({ model: process.env.LLM_MODEL || 'deepseek-chat', messages: [{ role: 'user', content: prompt }], max_tokens: 300, temperature: 0 }) },
+    );
+    if (!res.ok) return null;
+    const data = await res.json() as any;
+    const text = data.choices?.[0]?.message?.content || '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    const parsed = JSON.parse(jsonMatch[0]) as { intent: string; topic: string; rewrittenQuery: string; confidence: number };
+    if (!parsed.topic || parsed.topic.trim().length === 0) return null;
+    if (/^(我想|我要|我想学|怎么学|如何学)/.test(parsed.topic.trim())) return null;
+    const rewritten = (parsed.rewrittenQuery || '').trim();
+    if (rewritten && (rewritten.length === 0 || rewritten.length > 300 || /^(我想|我要|我想学|怎么学|帮我|给我|请问)/.test(rewritten))) return null;
+    const intent = (['study', 'review', 'lookup', 'practice', 'plan'].includes(parsed.intent) ? parsed.intent : 'lookup') as SearchIntent;
+    const concept = conceptLookup(parsed.topic.trim());
+    return buildResult(
+      intent,
+      concept?.topic || parsed.topic.trim(),
+      concept,
+      query,
+      rewritten || concept?.keywords.join(' ') || query,
+      `llm: topic="${parsed.topic.trim()}"`,
+    );
+  } catch {
+    return null;
+  }
 }
 
 // ── Helpers ──
-
-function resolveFromTopic(
-  topicRaw: string,
-  intent: SearchIntent,
-  rawQuery: string,
-): ParsedSearchQuery | null {
-  // Strip trailing noise
-  let topic = topicRaw
-    .replace(/[，,。\.！!？?\s]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  if (!topic || topic.length < 1) return null;
-
-  // Remove trailing intent words
-  topic = topic.replace(/(怎么学|如何学|怎么学习|复习|回顾|学习)$/g, '').trim();
-  if (!topic) return null;
-
-  // Concept dictionary lookup
-  const concept = conceptLookup(topic);
-  if (concept) {
-    return {
-      intent,
-      topic: concept.topic,
-      deckHint: concept.deckHint,
-      subtopics: concept.subtopics,
-      keywords: concept.keywords,
-      constraints: intent === 'review' ? { onlyDue: true } : {},
-      confidence: 0.9,
-      rawQuery,
-      debug: `regex: intent=${intent}, topic="${concept.topic}" from "${topicRaw}"`,
-    };
-  }
-
-  // No concept match — use raw topic
-  return {
-    intent,
-    topic,
-    subtopics: [],
-    keywords: [topic],
-    constraints: intent === 'review' ? { onlyDue: true } : {},
-    confidence: 0.6,
-    rawQuery,
-    debug: `regex: intent=${intent}, topic="${topic}", no concept match`,
-  };
-}
 
 function matchAnyTopic(query: string): { topic: string } | null {
   const words = query.split(/\s+/).filter(w => w.length >= 2);
@@ -166,80 +169,24 @@ function matchAnyTopic(query: string): { topic: string } | null {
   return null;
 }
 
-// ── LLM fallback ──
-
-async function llmUnderstanding(query: string): Promise<ParsedSearchQuery | null> {
-  const knownTopics = getAllTopics().join(', ');
-  const prompt = `你是一个搜索意图解析器。分析用户查询并提取以下字段：
-
-已知话题：${knownTopics}
-
-用户查询："${query}"
-
-请返回 JSON：
-{
-  "intent": "study" | "review" | "lookup" | "practice" | "plan",
-  "topic": "话题名称（必须是已知话题或查询中的关键词）",
-  "confidence": 0.0-1.0
-}
-
-要求：
-- topic 不能为空
-- topic 不能包含"我想学"、"我要学"、"怎么学"等前缀
-- 如果查询没有明确话题，confidence 设为 0
-- 只返回 JSON，不要其他文字`;
-
-  try {
-    const res = await fetch(
-      `${process.env.LLM_BASE_URL || 'https://api.deepseek.com'}/v1/chat/completions`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.LLM_API_KEY || process.env.DEEPSEEK_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: process.env.LLM_MODEL || 'deepseek-chat',
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: 200,
-          temperature: 0,
-        }),
-      },
-    );
-
-    if (!res.ok) return null;
-    const data = await res.json() as any;
-    const text = data.choices?.[0]?.message?.content || '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-
-    const parsed = JSON.parse(jsonMatch[0]) as {
-      intent: string; topic: string; confidence: number;
-    };
-
-    // Validate
-    if (!parsed.topic || parsed.topic.trim().length === 0) return null;
-    const invalidPrefix = /^(我想|我要|我想学|怎么学|如何学)/;
-    if (invalidPrefix.test(parsed.topic.trim())) return null;
-
-    const intent = (['study', 'review', 'lookup', 'practice', 'plan'].includes(parsed.intent)
-      ? parsed.intent : 'lookup') as SearchIntent;
-    const topic = parsed.topic.trim();
-    const concept = conceptLookup(topic);
-
-    return {
-      intent,
-      topic: concept?.topic || topic,
-      deckHint: concept?.deckHint,
-      subtopics: concept?.subtopics || [],
-      keywords: concept?.keywords || [topic],
-      constraints: intent === 'review' ? { onlyDue: true } : {},
-      confidence: Math.min(parsed.confidence || 0.5, 0.7),
-      rawQuery: query,
-      debug: `llm: intent=${intent}, topic="${topic}", confidence=${parsed.confidence}`,
-    };
-  } catch (e) {
-    console.error('[query-understanding] LLM failed:', (e as Error).message?.slice(0, 100));
-    return null;
-  }
+function buildResult(
+  intent: SearchIntent,
+  topic: string,
+  concept: { topic: string; subtopics: string[]; keywords: string[]; deckHint?: string } | undefined,
+  rawQuery: string,
+  rewrittenQuery: string,
+  debug: string,
+): ParsedSearchQuery {
+  return {
+    intent,
+    topic: concept?.topic || topic,
+    deckHint: concept?.deckHint,
+    subtopics: concept?.subtopics || [],
+    keywords: concept?.keywords || [topic],
+    rewrittenQuery: rewrittenQuery || topic,
+    constraints: intent === 'review' ? { onlyDue: true } : {},
+    confidence: concept ? 0.9 : 0.5,
+    rawQuery,
+    debug,
+  };
 }

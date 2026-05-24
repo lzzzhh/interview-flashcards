@@ -117,9 +117,11 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
 
   // 1. Query understanding
   const parsed = await understandQuery(input.query);
-  const { intent, topic, keywords, subtopics } = parsed;
-  const recallText = [topic, ...subtopics, ...keywords.slice(0, 5)].filter(Boolean).join(' ');
-  const rerankText = [topic, ...keywords.slice(0, 3)].filter(Boolean).join(' ');
+  const { intent, topic, keywords, subtopics, rewrittenQuery } = parsed;
+  const recallText = [rewrittenQuery, topic, ...subtopics, ...keywords.slice(0, 5)]
+    .filter(Boolean).join(' ').slice(0, 2000);
+  const rerankText = [topic, ...keywords.slice(0, 3), ...subtopics.slice(0, 2)]
+    .filter(Boolean).join(' ');
   const isStudyIntent = intent === 'study' || intent === 'plan';
   // For study intent: use lower threshold, higher max results
   const effectiveMinScore = isStudyIntent ? Math.min(input.minScore ?? 0.20, 0.25) : (input.minScore ?? DEFAULT_MIN_SCORE);
@@ -127,8 +129,9 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
 
   // Debug log
   if (!process.env.EVAL_SUPPRESS_DEBUG) {
-    console.log('[search] rawQuery:', input.query.slice(0, 80));
+    console.log('[search] rawQuery:', parsed.rawQuery.slice(0, 80));
     console.log('[search] intent:', intent, 'topic:', topic, 'deckHint:', parsed.deckHint || '-', 'confidence:', parsed.confidence);
+    console.log('[search] rewrittenQuery:', rewrittenQuery.slice(0, 120));
     console.log('[search] keywords:', keywords.slice(0, 10).join(', '));
     console.log('[search] recallText:', recallText.slice(0, 120));
     console.log('[search] rerankText:', rerankText);
