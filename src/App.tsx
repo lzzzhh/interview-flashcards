@@ -135,7 +135,7 @@ function AppInner() {
     if (profileSubPage === 'vector-database') return <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'tag-manager') return <TagManagerPage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'api-settings') return <ApiSettingsPage onBack={() => setProfileSubPage(null)} />;
-    if (profileSubPage === 'learning-plans' && learningPlanId) return <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} onEnterStudy={handleEnterStudy} />;
+    if (profileSubPage === 'learning-plans' && learningPlanId) return <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} />;
     if (profileSubPage === 'learning-plans') return <LearningPlanListPage onBack={() => setProfileSubPage(null)} onViewPlan={(id) => setLearningPlanId(id)} />;
     return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
   }
