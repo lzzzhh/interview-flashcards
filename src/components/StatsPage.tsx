@@ -1,7 +1,6 @@
 // src/components/StatsPage.tsx — 学习统计（纯后端 API 驱动）
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, BookOpen, CheckCircle, Clock, ChevronDown } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { getModuleDailyLimit, setModuleDailyLimit, getModuleDailyReviewLimit, setModuleDailyReviewLimit, loadCustomDecks } from '../utils/customDecks';
 
@@ -35,7 +34,6 @@ interface Props {
 }
 
 export default function StatsPage({ onBack }: Props) {
-  const { dueCountByCategory, totalNew } = useAppContext();
   const [data, setData] = useState<OverviewData | null>(null);
   const [limitsOpen, setLimitsOpen] = useState(false);
   const [reviewLimitsOpen, setReviewLimitsOpen] = useState(false);
@@ -46,12 +44,6 @@ export default function StatsPage({ onBack }: Props) {
       .then(setData)
       .catch(() => {});
   }, []);
-
-  const dueCount = useMemo(() => {
-    let t = 0;
-    for (const cat of CATEGORIES) t += dueCountByCategory[cat.key] ?? 0;
-    return t;
-  }, [dueCountByCategory]);
 
   if (!data) {
     return (
