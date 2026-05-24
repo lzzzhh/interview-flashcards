@@ -36,24 +36,24 @@ function safeParse(s: string): string[] {
   try { const v = JSON.parse(s); return Array.isArray(v) ? v : []; } catch { return []; }
 }
 
-/** Look up concept by any term (topic or keyword) */
+/** Look up concept by exact match on topic name or keywords */
 export async function conceptLookup(term: string): Promise<ConceptEntry | undefined> {
   const topics = await loadTopics();
+  const tLower = term.toLowerCase();
 
   // Exact match on topic name
   for (const t of topics) {
-    if (t.topic === term || t.topic.toLowerCase() === term.toLowerCase()) return t;
+    if (t.topic.toLowerCase() === tLower) return t;
   }
 
-  // Match on keywords
+  // Exact match on keywords (e.g., "hash" → 哈希表)
   for (const t of topics) {
-    if (t.keywords.some(k => k === term || k.toLowerCase() === term.toLowerCase())) return t;
+    if (t.keywords.some(k => k.toLowerCase() === tLower)) return t;
   }
 
-  // Substring match
+  // Topic substring: term contains topic (e.g., "集成学习" → doesn't match "机器学习")
   for (const t of topics) {
-    if (t.topic.includes(term) || term.includes(t.topic)) return t;
-    if (t.keywords.some(k => k.includes(term) || term.includes(k))) return t;
+    if (tLower.includes(t.topic.toLowerCase())) return t;
   }
 
   return undefined;

@@ -33,7 +33,7 @@ interface IntentPattern {
 }
 
 const INTENT_PATTERNS: IntentPattern[] = [
-  { intent: 'study',   patterns: [/^(?:我想|我要|我想学|我要学|想学|想学习|学|学习)(.+)/, /^(.+)(?:怎么学|如何学|如何学习|怎么学习|学习方法)$/] },
+  { intent: 'study',   patterns: [/^(?:怎么学|如何学|怎么学习|我想|我要|我想学|我要学|想学|想学习|学|学习)(.+)/, /^(.+)(?:怎么学|如何学|如何学习|怎么学习|学习方法)$/] },
   { intent: 'review',  patterns: [/^(?:复习|回顾|重温|我想复习|我要复习)(.+)/, /^(.+)(?:复习|回顾)$/] },
   { intent: 'practice', patterns: [/^(?:刷|刷题|练习|训练)(.+)/, /^(.+)(?:刷题|练习|训练)$/] },
   { intent: 'lookup',  patterns: [/^(?:什么是|什么叫|啥是|解释)(.+)/] },
@@ -52,8 +52,12 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
         const topicRaw = (match[1] || '').trim();
         const concept = await conceptLookup(topicRaw);
         if (concept) {
-          const rewritten = await llmRewrite(topicRaw, q, concept);
-          return buildResult(group.intent, concept.topic, concept, q, rewritten || concept.keywords.join(' '), `regex+dict: topic="${topicRaw}"`);
+          const rewritten = await llmRewrite(topicRaw, q, {
+            topic: topicRaw,  // keep original topic
+            keywords: [...new Set([...concept.keywords, topicRaw])],
+            subtopics: concept.subtopics,
+          });
+          return buildResult(group.intent, topicRaw, concept, q, rewritten || [...concept.keywords, topicRaw].join(' '), `regex+dict: topic="${topicRaw}"`);
         }
         // No dict match — try LLM rewrite
         const rewritten = await llmRewrite(topicRaw, q, undefined);
@@ -66,7 +70,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   const dictMatch = await matchAnyTopic(q);
   if (dictMatch) {
     const concept = await conceptLookup(dictMatch.topic);
-    return buildResult('lookup', concept?.topic || dictMatch.topic, concept, q, q, `dict match: "${dictMatch.topic}"`);
+    return buildResult('lookup', dictMatch.topic, concept, q, q, `dict match: "${dictMatch.topic}"`);
   }
 
   // ── Step 3: LLM full parse ──
@@ -147,7 +151,7 @@ async function llmFullParse(query: string): Promise<ParsedSearchQuery | null> {
     const concept = await conceptLookup(parsed.topic.trim());
     return buildResult(
       intent,
-      concept?.topic || parsed.topic.trim(),
+      parsed.topic.trim(),
       concept,
       query,
       rewritten || concept?.keywords.join(' ') || query,
@@ -179,7 +183,7 @@ function buildResult(
 ): ParsedSearchQuery {
   return {
     intent,
-    topic: concept?.topic || topic,
+    topic,
     deckHint: concept?.deckHint,
     subtopics: concept?.subtopics || [],
     keywords: concept?.keywords || [topic],
