@@ -321,6 +321,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
               ))}
             </div>
           )}
+          </>
         </div>
       </div>
     </div>
