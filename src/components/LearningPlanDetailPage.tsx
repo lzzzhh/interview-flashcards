@@ -1,7 +1,7 @@
-// src/components/LearningPlanDetailPage.tsx — 学习清单详情（只读查看）
-import { useState, useMemo } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { getPlan, type LearningPlan } from '../utils/learningPlans';
+// src/components/LearningPlanDetailPage.tsx — 学习清单详情（后端 API 驱动）
+import { useState, useMemo, useEffect } from 'react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
+import { getPlan, generateStudyPlan, type LearningPlan } from '../utils/learningPlans';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 
@@ -26,7 +26,10 @@ const PRIORITY_CONFIG: Record<string, { label: string; color: string }> = {
 
 export default function LearningPlanDetailPage({ planId, onBack }: Props) {
   const { state } = useAppContext();
-  const [plan] = useState<LearningPlan | undefined>(() => getPlan(planId));
+  const [plan, setPlan] = useState<LearningPlan | undefined>();
+  const [generating, setGenerating] = useState(false);
+
+  useEffect(() => { getPlan(planId).then(setPlan); }, [planId]);
 
   const enrichedItems = useMemo(() => {
     if (!plan) return [];
@@ -54,28 +57,25 @@ export default function LearningPlanDetailPage({ planId, onBack }: Props) {
       }
       const deckName = category?.label || item.deckId;
       return {
-        cardId: item.cardId,
-        deckId: item.deckId,
+        cardId: item.cardId, deckId: item.deckId,
         title: typeof title === 'string' ? title : String(title || ''),
-        deckName,
-        state: cardState,
+        deckName, state: cardState,
         interval: sm2?.interval || 0,
-        stateLabel: cfg.label,
-        stateColor: cfg.color,
+        stateLabel: cfg.label, stateColor: cfg.color,
         completed: item.completed,
       };
     });
   }, [plan, state.cardsById]);
 
-  const stats = useMemo(() => {
-    let n = 0, d = 0, c = 0;
-    for (const item of enrichedItems) {
-      if (item.state === 'new') n++;
-      else d++;
-      if (item.completed) c++;
-    }
-    return { new: n, due: d, completed: c };
-  }, [enrichedItems]);
+  const handleGenerate = async () => {
+    if (!plan?.id) return;
+    setGenerating(true);
+    try {
+      const studyPlan = await generateStudyPlan(plan.id);
+      setPlan(prev => prev ? { ...prev, studyPlan } : prev);
+    } catch (e) { console.error(e); }
+    setGenerating(false);
+  };
 
   if (!plan) {
     return (
@@ -85,7 +85,7 @@ export default function LearningPlanDetailPage({ planId, onBack }: Props) {
           <h1 className="nav-title">学习清单</h1>
         </div>
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-[13px]" style={{ color: TEXT_MUTED }}>清单不存在或已删除</p>
+          <p className="text-[13px]" style={{ color: TEXT_MUTED }}>加载中...</p>
         </div>
       </div>
     );
@@ -98,27 +98,34 @@ export default function LearningPlanDetailPage({ planId, onBack }: Props) {
           <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
         </button>
         <h1 className="nav-title">{plan.title}</h1>
+        <button
+          onClick={handleGenerate}
+          disabled={generating || !!plan.studyPlan}
+          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] transition-colors"
+          style={{
+            backgroundColor: plan.studyPlan ? `${GREEN}15` : `${BLUE}15`,
+            color: plan.studyPlan ? GREEN : BLUE,
+            opacity: generating ? 0.5 : 1,
+          }}
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          {generating ? '生成中...' : plan.studyPlan ? '已生成' : '生成计划'}
+        </button>
       </div>
 
       <div className="flex-1 flex items-start justify-center">
         <div className="relative z-10 w-full max-w-md px-5 py-6 pb-24 space-y-3">
-          {/* Stats bar */}
-          <div className="flex gap-2">
-            <div className="flex-1 rounded-xl px-3 py-2 text-center" style={{ backgroundColor: `${BLUE}10` }}>
-              <p className="text-[11px]" style={{ color: BLUE }}>新卡</p>
-              <p className="text-[14px] font-bold" style={{ color: BLUE }}>{stats.new}</p>
+          {/* Study Plan */}
+          {plan.studyPlan && (
+            <div className="rounded-xl p-4 border" style={{ backgroundColor: `${GREEN}08`, borderColor: GREEN }}>
+              <h3 className="text-[14px] font-bold mb-2" style={{ color: GREEN }}>📅 学习计划</h3>
+              <pre className="text-[12px] whitespace-pre-wrap leading-relaxed" style={{ color: TEXT_PRIMARY, fontFamily: 'inherit' }}>
+                {plan.studyPlan}
+              </pre>
             </div>
-            <div className="flex-1 rounded-xl px-3 py-2 text-center" style={{ backgroundColor: `${ORANGE}10` }}>
-              <p className="text-[11px]" style={{ color: ORANGE }}>待复习</p>
-              <p className="text-[14px] font-bold" style={{ color: ORANGE }}>{stats.due}</p>
-            </div>
-            <div className="flex-1 rounded-xl px-3 py-2 text-center" style={{ backgroundColor: `${GREEN}10` }}>
-              <p className="text-[11px]" style={{ color: GREEN }}>已完成</p>
-              <p className="text-[14px] font-bold" style={{ color: GREEN }}>{stats.completed}</p>
-            </div>
-          </div>
+          )}
 
-          {/* Card list — view only */}
+          {/* Card list */}
           {enrichedItems.map((item, i) => {
             const isCompleted = item.completed;
             return (

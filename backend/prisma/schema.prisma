@@ -186,6 +186,21 @@ model EmbeddingRecord {
   @@unique([objectType, objectId, model])
 }
 
+// ============ 学习计划 ============
+
+model LearningPlan {
+  id        String   @id @default(cuid())
+  userId    String   @default("demo-user")
+  title     String
+  query     String
+  items     String   // JSON: [{cardId, deckId, titleCn}]
+  studyPlan String?  // LLM 生成的文本计划
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
 // ============ API 配置 ============
 
 model AppConfig {

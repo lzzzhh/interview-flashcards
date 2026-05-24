@@ -1,6 +1,5 @@
-// src/utils/learningPlans.ts — 学习清单持久化
-// Only stores cardId+deckId to avoid localStorage QuotaExceededError.
-// Full card details are looked up from AppContext at render time.
+// src/utils/learningPlans.ts — 学习计划持久化（后端 API）
+const API = 'http://localhost:3001/api/learning-plans';
 
 export interface LearningPlanItem {
   cardId: string;
@@ -15,42 +14,61 @@ export interface LearningPlan {
   title: string;
   query: string;
   items: LearningPlanItem[];
+  studyPlan?: string;
   createdAt: number;
 }
 
-const STORAGE_KEY = 'fc-learning-plans';
-
-export function loadPlans(): LearningPlan[] {
+export async function loadPlans(): Promise<LearningPlan[]> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const res = await fetch(API);
+    const data = await res.json();
+    return (Array.isArray(data) ? data : []).map((p: any) => ({
+      id: p.id,
+      title: p.title,
+      query: p.query,
+      items: p.items || [],
+      studyPlan: p.studyPlan || undefined,
+      createdAt: new Date(p.createdAt).getTime(),
+    }));
   } catch { return []; }
 }
 
-export function savePlan(plan: LearningPlan): void {
+export async function savePlan(plan: LearningPlan): Promise<void> {
   try {
-    const plans = loadPlans();
-    plans.unshift(plan);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(plans));
-  } catch (e) {
-    console.error('Failed to save learning plan:', e);
-  }
+    await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: plan.title,
+        query: plan.query,
+        items: plan.items,
+      }),
+    });
+  } catch (e) { console.error('Failed to save plan:', e); }
 }
 
-export function deletePlan(id: string): void {
-  const plans = loadPlans().filter(p => p.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(plans));
+export async function getPlan(id: string): Promise<LearningPlan | undefined> {
+  try {
+    const res = await fetch(`${API}/${id}`);
+    const data = await res.json();
+    if (data.error) return undefined;
+    return {
+      id: data.id,
+      title: data.title,
+      query: data.query,
+      items: data.items || [],
+      studyPlan: data.studyPlan || undefined,
+      createdAt: new Date(data.createdAt).getTime(),
+    };
+  } catch { return undefined; }
 }
 
-export function updatePlan(plan: LearningPlan): void {
-  const plans = loadPlans();
-  const idx = plans.findIndex(p => p.id === plan.id);
-  if (idx >= 0) {
-    plans[idx] = plan;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(plans));
-  }
+export async function deletePlan(id: string): Promise<void> {
+  try { await fetch(`${API}/${id}`, { method: 'DELETE' }); } catch {}
 }
 
-export function getPlan(id: string): LearningPlan | undefined {
-  return loadPlans().find(p => p.id === id);
+export async function generateStudyPlan(id: string): Promise<string> {
+  const res = await fetch(`${API}/${id}/generate`, { method: 'POST' });
+  const data = await res.json();
+  return data.studyPlan || '';
 }

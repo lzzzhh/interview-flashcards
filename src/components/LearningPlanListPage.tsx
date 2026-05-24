@@ -1,5 +1,5 @@
-// src/components/LearningPlanListPage.tsx — 我的学习清单（只读查看）
-import { useState } from 'react';
+// src/components/LearningPlanListPage.tsx — 我的学习清单（后端 API 驱动）
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Trash2, ChevronRight, ListChecks, CheckCircle } from 'lucide-react';
 import { loadPlans, deletePlan, type LearningPlan } from '../utils/learningPlans';
 
@@ -15,11 +15,14 @@ const CARD_BORDER = 'var(--card-border)';
 const GREEN = '#10B981';
 
 export default function LearningPlanListPage({ onBack, onViewPlan }: Props) {
-  const [plans, setPlans] = useState<LearningPlan[]>(() => loadPlans());
+  const [plans, setPlans] = useState<LearningPlan[]>([]);
 
-  const handleDelete = (id: string) => {
-    deletePlan(id);
-    setPlans(loadPlans());
+  const refresh = () => loadPlans().then(setPlans);
+  useEffect(() => { refresh(); }, []);
+
+  const handleDelete = async (id: string) => {
+    await deletePlan(id);
+    refresh();
   };
 
   const formatDate = (ts: number) => {
@@ -59,35 +62,21 @@ export default function LearningPlanListPage({ onBack, onViewPlan }: Props) {
                     borderColor: allDone ? GREEN : CARD_BORDER,
                   }}
                 >
-                  <button
-                    onClick={() => onViewPlan(plan.id)}
-                    className="w-full text-left px-4 py-3 flex items-center gap-3"
-                  >
+                  <button onClick={() => onViewPlan(plan.id)} className="w-full text-left px-4 py-3 flex items-center gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="text-[14px] font-bold truncate" style={{ color: allDone ? GREEN : TEXT_PRIMARY }}>{plan.title}</h3>
-                        {allDone && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: 'rgba(16,185,129,0.15)', color: GREEN }}>已完成</span>
-                        )}
+                        {allDone && <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: 'rgba(16,185,129,0.15)', color: GREEN }}>已完成</span>}
                       </div>
                       <p className="text-[11px] mt-0.5" style={{ color: allDone ? GREEN : TEXT_MUTED }}>
                         {completedCount}/{totalCount} 张卡片 · {formatDate(plan.createdAt)}
                       </p>
                     </div>
-                    {allDone ? (
-                      <CheckCircle className="w-4 h-4 shrink-0" style={{ color: GREEN }} />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_MUTED }} />
-                    )}
+                    {allDone ? <CheckCircle className="w-4 h-4 shrink-0" style={{ color: GREEN }} /> : <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_MUTED }} />}
                   </button>
                   <div className="border-t flex" style={{ borderColor: allDone ? GREEN : CARD_BORDER }}>
-                    <button
-                      onClick={() => handleDelete(plan.id)}
-                      className="flex-1 py-2 flex items-center justify-center gap-1.5 text-[11px] transition-colors hover:bg-red-50 dark:hover:bg-red-900/10"
-                      style={{ color: '#EF4444' }}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      删除
+                    <button onClick={() => handleDelete(plan.id)} className="flex-1 py-2 flex items-center justify-center gap-1.5 text-[11px] transition-colors hover:bg-red-50 dark:hover:bg-red-900/10" style={{ color: '#EF4444' }}>
+                      <Trash2 className="w-3.5 h-3.5" />删除
                     </button>
                   </div>
                 </div>
