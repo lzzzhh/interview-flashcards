@@ -19,10 +19,21 @@ export interface HybridSearchResponse {
   results: SearchResult[];
   total: number;
   debug?: {
-    ms: number;
-    query: string;
-    resultCount: number;
-    topScores: { cardId: string; score: string; title: string; deck: string }[];
+    traceId?: string;
+    timingMs?: Record<string, number>;
+    request?: { rawQuery: string; maxResults: number; minScore: number; deckIds?: string[] };
+    understanding?: { intent: string; source: string; confidence: number; topic: string; deckHint?: string; subtopics: string[]; constraints: any; validation: any };
+    rewrite?: { rewrittenQuery: string; keywords: string[]; expandedKeywords: string[]; canonicalTopic?: string; dictionaryHit: boolean; rewriteSource: string };
+    retrievalText?: { recallText: string; rerankText: string; rawQueryUsed: boolean };
+    retrieval?: Record<string, { count: number; top: any[] }>;
+    merge?: { beforeDedup: number; afterDedup: number; topCandidates: any[] };
+    hydration?: { requested: number; hydrated: number; missing: string[] };
+    filters?: { before: number; after: number; removed: any[] };
+    rerank?: { profile: string; top: any[] };
+    threshold?: { minScore: number; before: number; after: number; removed: any[] };
+    final?: { returned: number; top: { cardId: string; title: string; score: number; explanation: string }[] };
+    // Simple mode
+    ms?: number; resultCount?: number; topScores?: any[];
   };
 }
 

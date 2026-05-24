@@ -8,32 +8,37 @@ export async function searchRoutes(app: FastifyInstance) {
   app.post('/api/search/hybrid', async (req, reply) => {
     const v = validate(HybridSearchSchema, req.body);
     const body = v.success ? v.data : (req.body as any);
+    const debug = body.debug === true;
+
     const start = Date.now();
-    const results = await hybridSearch({
+    const result: any = await hybridSearch({
       query: body.query || '',
       deckIds: body.deckIds,
       maxResults: body.maxResults ?? body.topK ?? undefined,
       minScore: body.minScore,
       candidateLimit: body.candidateLimit,
       filters: body.filters,
+      debug,
     });
     const ms = Date.now() - start;
 
-    return {
-      results,
-      total: results.length,
-      debug: {
-        ms,
-        query: body.query || '',
-        resultCount: results.length,
-        topScores: results.slice(0, 3).map((r: any) => ({
-          cardId: r.cardId,
-          score: r.score?.toFixed?.(4) ?? r.score,
-          title: (r.titleCn || r.title || '').slice(0, 30),
-          deck: r.deckId,
-        })),
-      },
+    if (debug) {
+      const trace = result._trace;
+      delete result._trace;
+      if (trace) trace.timingMs = { ...trace.timingMs, total: ms };
+      return { results: result, total: result.length, debug: trace };
+    }
+
+    const simpleDebug = {
+      ms,
+      query: body.query || '',
+      resultCount: result.length,
+      topScores: result.slice(0, 5).map((r: any) => ({
+        cardId: r.cardId, score: r.score?.toFixed?.(4) ?? r.score,
+        title: (r.titleCn || r.title || '').slice(0, 30), deck: r.deckId,
+      })),
     };
+    return { results: result, total: result.length, debug: simpleDebug };
   });
 
   app.get('/api/search/keyword', async (req) => {

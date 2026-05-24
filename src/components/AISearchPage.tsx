@@ -305,15 +305,22 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
           {/* Debug Panel */}
           {debugInfo && (
             <div className="mt-4 rounded-xl p-3 border" style={{ backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(255,255,255,0.1)' }}>
-              <p className="text-[11px] font-bold mb-2" style={{ color: '#6B7280' }}>search debug</p>
+              <p className="text-[11px] font-bold mb-2" style={{ color: '#6B7280' }}>search trace</p>
               <div className="space-y-1 text-[10px] font-mono" style={{ color: '#9CA3AF' }}>
-                <div>query: <span style={{ color: '#E5E7EB' }}>{debugInfo.query}</span></div>
-                <div>results: <span style={{ color: debugInfo.resultCount > 0 ? '#34D399' : '#EF4444' }}>{debugInfo.resultCount}</span> · {debugInfo.ms}ms</div>
-                {debugInfo.topScores?.slice(0, 5).map((s: any, i: number) => (
-                  <div key={i} className="text-[9px] pl-2" style={{ color: '#6B7280' }}>
-                    [{s.deck}] {s.cardId} score={s.score} · {s.title}
-                  </div>
-                ))}
+                <div>request: <span style={{ color: '#E5E7EB' }}>{debugInfo.request?.rawQuery || debugInfo.query || '-'}</span> · maxResults={debugInfo.request?.maxResults || '-'} · minScore={debugInfo.request?.minScore || '-'}</div>
+                <div>intent: <span style={{ color: '#60A5FA' }}>{debugInfo.understanding?.intent || '-'}</span> · topic: <span style={{ color: '#34D399' }}>{debugInfo.understanding?.topic || '-'}</span> · source: {debugInfo.understanding?.source || '-'}</div>
+                <div>rewrite: <span style={{ color: '#F59E0B' }}>{debugInfo.rewrite?.rewrittenQuery?.slice(0, 80) || '-'}</span></div>
+                <div>retrieval channels:
+                  fts5={debugInfo.retrieval?.fts5?.count || '-'}
+                  tag={debugInfo.retrieval?.tag?.count || '-'}
+                  kw={debugInfo.retrieval?.searchKeywords?.count || '-'}
+                  vec={debugInfo.retrieval?.vector?.count || '-'}
+                </div>
+                <div>merge: {debugInfo.merge?.beforeDedup || '-'} → {debugInfo.merge?.afterDedup || '-'} · hydrate: {debugInfo.hydration?.requested || '-'}</div>
+                <div>filters: {debugInfo.filters?.before || '-'} → {debugInfo.filters?.after || '-'} · removed: {debugInfo.filters?.removed?.length || 0}</div>
+                <div>rerank profile: {debugInfo.rerank?.profile || '-'}</div>
+                <div>threshold: min={debugInfo.threshold?.minScore || '-'} · {debugInfo.threshold?.before || '-'} → {debugInfo.threshold?.after || '-'} · removed: {debugInfo.threshold?.removed?.length || 0}</div>
+                <div>final results: <span style={{ color: (debugInfo.final?.returned || debugInfo.resultCount || 0) > 0 ? '#34D399' : '#EF4444' }}>{debugInfo.final?.returned || debugInfo.resultCount || 0}</span> · {debugInfo.timingMs ? JSON.stringify(debugInfo.timingMs) : '-ms'}</div>
               </div>
             </div>
           )}

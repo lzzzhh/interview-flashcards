@@ -47,6 +47,8 @@ interface HybridSearchInput {
   };
   /** 强制使用指定 profile（用于 ablation 测试） */
   overrideProfile?: RerankProfile;
+  /** 开启全链路 trace */
+  debug?: boolean;
 }
 
 interface CardMatch {
@@ -388,6 +390,66 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
 
   // Sort by finalScore descending, then apply threshold and limit
   results.sort((a, b) => b.score - a.score);
+
+  // Build trace if debug mode
+  if (input.debug) {
+    const beforeThreshold = results.length;
+    const filtered = effectiveMinScore > 0 ? results.filter(r => r.score >= effectiveMinScore) : results;
+    const finalResults = filtered.slice(0, effectiveMaxResults);
+    const thresholdRemoved = beforeThreshold - filtered.length;
+
+    const trace: any = {
+      traceId: `trace_${Date.now()}`,
+      timingMs: {},
+      request: { rawQuery: input.query, maxResults: effectiveMaxResults, minScore: effectiveMinScore, deckIds: input.deckIds },
+      understanding: {
+        intent, source: parsed.confidence >= 0.9 ? 'regex' as const : 'llm' as const,
+        confidence: parsed.confidence, topic, deckHint: parsed.deckHint, subtopics,
+        constraints: parsed.constraints,
+        validation: { before: { topic: input.query, rewrittenQuery: input.query }, after: { topic, rewrittenQuery }, warnings: [] },
+      },
+      rewrite: {
+        rewrittenQuery, keywords: keywords.slice(0, 15),
+        expandedKeywords: [...new Set([...keywords, ...subtopics])],
+        canonicalTopic: topic, dictionaryHit: (parsed.debug || '').includes('dict'),
+        rewriteSource: (parsed.debug || '').includes('llm') ? 'llm' as const : 'dict' as const,
+      },
+      retrievalText: { recallText, rerankText, rawQueryUsed: false },
+      retrieval: {
+        fts5: { count: fts5Pool.length, top: fts5Pool.slice(0, 5).map(c => ({ cardId: c.cardId })) },
+        like: { count: 0, top: [] },
+        tag: { count: tagPool.length, top: tagPool.slice(0, 5).map((c: any) => ({ cardId: c.cardId, matched: c.matchedKeywords })) },
+        searchKeywords: { count: skwPool.length, top: skwPool.slice(0, 5).map((c: any) => ({ cardId: c.cardId, matched: c.matchedKeywords })) },
+        vector: { count: vecPool.length, top: vecPool.slice(0, 5).map((c: any) => ({ cardId: c.cardId, score: c.vectorScore })) },
+      },
+      merge: { beforeDedup: fts5Pool.length + tagPool.length + skwPool.length + vecPool.length, afterDedup: candidateMap.size, topCandidates: [] },
+      hydration: { requested: candidateMap.size, hydrated: cards.length, missing: [] },
+      filters: { before: cards.length, after: cards.length, removed: [] },
+      rerank: {
+        profile: profile.id || 'default',
+        top: finalResults.slice(0, 5).map(r => ({
+          cardId: r.cardId, title: r.title, finalScore: r.score,
+          vectorScore: r.scoreBreakdown?.vectorScore || 0,
+          keywordScore: r.scoreBreakdown?.keywordScore || 0,
+          fieldBoost: r.scoreBreakdown?.fieldBoost || 0,
+          learningBoost: r.scoreBreakdown?.learningBoost || 0,
+          deckBoost: r.scoreBreakdown?.deckBoost || 0,
+          lexicalBoost: r.scoreBreakdown?.lexicalBoost || 0,
+        })),
+      },
+      threshold: {
+        minScore: effectiveMinScore, before: beforeThreshold, after: beforeThreshold - thresholdRemoved,
+        removed: thresholdRemoved > 0 ? results.filter(r => r.score < effectiveMinScore).slice(0, 10).map(r => ({ cardId: r.cardId, title: r.title, score: r.score })) : [],
+      },
+      final: {
+        returned: finalResults.length,
+        top: finalResults.slice(0, 5).map(r => ({ cardId: r.cardId, title: r.title, score: r.score, explanation: r.reason || '' })),
+      },
+    };
+    (finalResults as any)._trace = trace;
+    return finalResults;
+  }
+
   const filtered = effectiveMinScore > 0 ? results.filter(r => r.score >= effectiveMinScore) : results;
   return filtered.slice(0, effectiveMaxResults);
 }
