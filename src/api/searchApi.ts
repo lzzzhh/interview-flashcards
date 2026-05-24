@@ -20,17 +20,9 @@ export interface HybridSearchResponse {
   total: number;
   debug?: {
     ms: number;
-    rawQuery: string;
-    intent: string;
-    topic: string;
-    deckHint: string | null;
-    rewrittenQuery: string;
-    keywords: string[];
-    confidence: number;
-    parseMethod: string;
-    recallText: string;
-    rerankText: string;
+    query: string;
     resultCount: number;
+    topScores: { cardId: string; score: string; title: string; deck: string }[];
   };
 }
 

@@ -2,11 +2,10 @@
 import { FastifyInstance } from 'fastify';
 import { hybridSearch, learningPlanSearch } from '../services/search/hybrid-search';
 import { fts5Search } from '../services/search/fts5-search';
-import { understandQuery } from '../services/search/query-understanding';
 import { HybridSearchSchema, validate } from './schemas';
 
 export async function searchRoutes(app: FastifyInstance) {
-  app.post('/api/search/hybrid', async (req) => {
+  app.post('/api/search/hybrid', async (req, reply) => {
     const v = validate(HybridSearchSchema, req.body);
     const body = v.success ? v.data : (req.body as any);
     const start = Date.now();
@@ -20,24 +19,19 @@ export async function searchRoutes(app: FastifyInstance) {
     });
     const ms = Date.now() - start;
 
-    // Debug: parse query to return intent info
-    const parsed = await understandQuery(body.query || '');
     return {
       results,
       total: results.length,
       debug: {
         ms,
-        rawQuery: parsed.rawQuery,
-        intent: parsed.intent,
-        topic: parsed.topic,
-        deckHint: parsed.deckHint || null,
-        rewrittenQuery: parsed.rewrittenQuery,
-        keywords: parsed.keywords.slice(0, 10),
-        confidence: parsed.confidence,
-        parseMethod: parsed.debug,
-        recallText: [parsed.rewrittenQuery, parsed.topic, ...parsed.keywords.slice(0, 5)].filter(Boolean).join(' ').slice(0, 200),
-        rerankText: [parsed.topic, ...parsed.keywords.slice(0, 3)].filter(Boolean).join(' '),
+        query: body.query || '',
         resultCount: results.length,
+        topScores: results.slice(0, 3).map((r: any) => ({
+          cardId: r.cardId,
+          score: r.score?.toFixed?.(4) ?? r.score,
+          title: (r.titleCn || r.title || '').slice(0, 30),
+          deck: r.deckId,
+        })),
       },
     };
   });
