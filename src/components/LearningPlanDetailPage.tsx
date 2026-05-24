@@ -1,6 +1,6 @@
 // src/components/LearningPlanDetailPage.tsx — 学习清单详情（后端 API 驱动）
 import { useState, useMemo, useEffect } from 'react';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Zap } from 'lucide-react';
 import { getPlan, generateStudyPlan, type LearningPlan } from '../utils/learningPlans';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
@@ -108,7 +108,7 @@ export default function LearningPlanDetailPage({ planId, onBack }: Props) {
             opacity: generating ? 0.5 : 1,
           }}
         >
-          <Sparkles className="w-3.5 h-3.5" />
+          <Zap className="w-3.5 h-3.5" />
           {generating ? '生成中...' : plan.studyPlan ? '已生成' : '生成计划'}
         </button>
       </div>
@@ -118,7 +118,7 @@ export default function LearningPlanDetailPage({ planId, onBack }: Props) {
           {/* Study Plan */}
           {plan.studyPlan && (
             <div className="rounded-xl p-4 border" style={{ backgroundColor: `${GREEN}08`, borderColor: GREEN }}>
-              <h3 className="text-[14px] font-bold mb-2" style={{ color: GREEN }}>📅 学习计划</h3>
+              <h3 className="text-[14px] font-bold mb-2" style={{ color: GREEN }}>学习计划</h3>
               <pre className="text-[12px] whitespace-pre-wrap leading-relaxed" style={{ color: TEXT_PRIMARY, fontFamily: 'inherit' }}>
                 {plan.studyPlan}
               </pre>
