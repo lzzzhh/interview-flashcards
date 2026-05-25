@@ -68,7 +68,7 @@ const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
     // Weakness suffixes (check before broader study suffixes)
     /^(.+?)(?:不太懂|很薄弱|老是搞混|完全没概念)/,
     // Suffix patterns — broad coverage
-    /^(.+)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学|从哪开始|应该先学什么|先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
+    /^(.+?)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学|从哪开始|应该先学什么|先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
   ]},
   { intent: 'review',  patterns: [
     /^(?:复习|回顾|重温|我想复习|我要复习)(.+)/,
@@ -204,6 +204,8 @@ export function sanitizeTopic(raw: string): string {
 
   // Strip compound negation prefixes: "我不会X" → X, "我对X很薄弱" → X
   t = t.replace(/^(?:我|我对|面试|最近)(?:不会|不懂|不太懂|很薄弱|老是搞混|完全没概念|总答不好)\s*/i, '');
+  // Also strip standalone weakness pronouns when topic starts with "我"
+  t = t.replace(/^(?:我对|我)\s*/, '');
 
   // Capitalization normalization
   if (/^[a-zA-Z]/.test(t)) {
