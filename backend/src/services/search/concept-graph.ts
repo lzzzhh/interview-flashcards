@@ -11,8 +11,6 @@ export interface ConceptNode {
   deckHint?: string; parentCategory?: string;
   coreKeywords: string[]; searchAliases: string[];
   relations: Relation[];
-  migrationStatus: 'manual' | 'generated' | 'reviewed' | 'deprecatedLegacy';
-  domain: string;
 }
 
 export interface KeywordTiers {
@@ -24,208 +22,285 @@ export interface KeywordTiers {
 
 const NODES: ConceptNode[] = [
   // ====== 机器学习概念 ======
-  { 
-    migrationStatus: 'manual', domain: 'machine-learning',
+  { id: 'ensemble', canonical: '集成学习', aliases: ['集成学习', 'ensemble learning'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['集成学习', 'ensemble learning'], searchAliases: ['ensemble', '模型融合', '元学习', 'meta learning'],
+    relations: [
+      { type: 'parent', target: 'ml' },
       { type: 'child', target: 'bagging' }, { type: 'child', target: 'boosting' }, { type: 'child', target: 'stacking' },
       { type: 'implementation', target: 'random_forest' }, { type: 'implementation', target: 'gbdt' }, { type: 'implementation', target: 'xgboost' },
       { type: 'related', target: 'decision_tree' }, { type: 'related', target: 'overfitting' }, { type: 'related', target: 'feature_importance' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'machine-learning', { type: 'parent', target: 'boosting' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'xgboost', canonical: 'XGBoost', aliases: ['XGBoost', 'xgboost', 'extreme gradient boosting'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['XGBoost', 'extreme gradient boosting'], searchAliases: ['xgboost', 'xgb', 'extreme gradient boosting'],
+    relations: [
+      { type: 'parent', target: 'gbdt' }, { type: 'parent', target: 'boosting' },
       { type: 'child', target: 'ml' }, { type: 'related', target: 'random_forest' }, { type: 'related', target: 'feature_importance' },
       { type: 'related', target: 'regularization' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'machine-learning', { type: 'child', target: 'decision_tree' },
-      { type: 'related', target: 'feature_importance' }, { type: 'contrast', target: 'gbdt' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
+    ],
     migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'random_forest', canonical: '随机森林', aliases: ['随机森林', 'random forest'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['随机森林', 'random forest'], searchAliases: ['random forest', 'rf', 'bagging ensemble'],
+    relations: [
+      { type: 'parent', target: 'bagging' }, { type: 'child', target: 'decision_tree' },
+      { type: 'related', target: 'feature_importance' }, { type: 'contrast', target: 'gbdt' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'bagging', canonical: 'Bagging', aliases: ['Bagging', 'bagging', 'bootstrap aggregating'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['Bagging', 'bootstrap'], searchAliases: ['bagging', 'bootstrap', 'bootstrap aggregating'],
+    relations: [
+      { type: 'parent', target: 'ensemble' },
       { type: 'child', target: 'random_forest' },
       { type: 'related', target: 'overfitting' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
+    ],
     migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'boosting', canonical: 'Boosting', aliases: ['Boosting', 'boosting'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['Boosting', '梯度提升', 'gradient boosting'], searchAliases: ['boosting', 'gradient boosting', 'sequential', '加法模型'],
+    relations: [
+      { type: 'parent', target: 'ensemble' },
       { type: 'child', target: 'gbdt' },
       { type: 'related', target: 'overfitting' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
+    ],
     migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'gbdt', canonical: 'GBDT', aliases: ['GBDT', 'gradient boosted decision trees'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['GBDT', 'gradient boosting'], searchAliases: ['gbdt', 'gradient boosting', 'mart', 'tree boosting'],
+    relations: [
+      { type: 'parent', target: 'boosting' },
       { type: 'child', target: 'xgboost' },
       { type: 'related', target: 'decision_tree' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'machine-learning', { type: 'foundation', target: 'gbdt' },
-      { type: 'related', target: 'overfitting' }, { type: 'related', target: 'regularization' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'machine-learning', { type: 'related', target: 'decision_tree' },
-      { type: 'related', target: 'cross_validation' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
+    ],
     migrationStatus: 'manual', domain: 'machine-learning',
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'machine-learning', { type: 'related', target: 'xgboost' },
-    ]},
+  },
+  { id: 'decision_tree', canonical: '决策树', aliases: ['决策树', 'decision tree'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['决策树', 'decision tree'], searchAliases: ['decision tree', 'cart', 'c45', 'id3', 'tree model'],
+    relations: [
+      { type: 'foundation', target: 'random_forest' }, { type: 'foundation', target: 'gbdt' },
+      { type: 'related', target: 'overfitting' }, { type: 'related', target: 'regularization' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'overfitting', canonical: '过拟合', aliases: ['过拟合', 'overfitting'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['过拟合', 'overfitting'], searchAliases: ['overfitting', 'overfit', 'bias variance', 'high variance', '泛化'],
+    relations: [
+      { type: 'related', target: 'regularization' }, { type: 'related', target: 'decision_tree' },
+      { type: 'related', target: 'cross_validation' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'regularization', canonical: '正则化', aliases: ['正则化', 'regularization'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['正则化', 'regularization'], searchAliases: ['regularization', 'L1', 'L2', 'ridge', 'lasso', 'elastic net', 'dropout', 'weight decay'],
+    relations: [
+      { type: 'related', target: 'overfitting' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'feature_importance', canonical: '特征重要性', aliases: ['特征重要性', 'feature importance'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['特征重要性', 'feature importance'], searchAliases: ['feature importance', 'shap', 'impurity', 'permutation', 'importance score'],
+    relations: [
+      { type: 'related', target: 'random_forest' }, { type: 'related', target: 'xgboost' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
 
   // ====== 图算法 ======
-  { 
-    migrationStatus: 'manual', domain: 'leetcode', { type: 'child', target: 'dfs' },
+  { id: 'graph_algorithm', canonical: '图算法', aliases: ['图算法', '图', 'graph algorithm', 'graph'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['图算法', 'graph algorithm'], searchAliases: ['graph', '图', 'graphtheory', '图论'],
+    relations: [
+      { type: 'child', target: 'bfs' }, { type: 'child', target: 'dfs' },
       { type: 'child', target: 'shortest_path' }, { type: 'child', target: 'topo_sort' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'leetcode', { type: 'contrast', target: 'dfs' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'bfs', canonical: 'BFS', aliases: ['BFS', '广度优先搜索', 'breadth first search'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['BFS', '广度优先搜索', 'breadth first search'], searchAliases: ['bfs', '广度', 'breadth first', '层序', 'level order', 'queue'],
+    relations: [
+      { type: 'parent', target: 'graph_algorithm' }, { type: 'contrast', target: 'dfs' },
       { type: 'related', target: 'shortest_path' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'leetcode', { type: 'contrast', target: 'bfs' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'dfs', canonical: 'DFS', aliases: ['DFS', '深度优先搜索', 'depth first search'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['DFS', '深度优先搜索', 'depth first search'], searchAliases: ['dfs', '深度', 'depth first', 'backtrack', '递归', 'stack'],
+    relations: [
+      { type: 'parent', target: 'graph_algorithm' }, { type: 'contrast', target: 'bfs' },
       { type: 'related', target: 'backtracking' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'leetcode',
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'shortest_path', canonical: '最短路', aliases: ['最短路', 'shortest path'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['最短路', 'shortest path'], searchAliases: ['shortest path', 'Dijkstra', 'Bellman Ford', 'Floyd', 'A*'],
+    relations: [
+      { type: 'parent', target: 'graph_algorithm' },
       { type: 'related', target: 'bfs' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'leetcode',
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'topo_sort', canonical: '拓扑排序', aliases: ['拓扑排序', 'topological sort'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['拓扑排序', 'topological sort'], searchAliases: ['topological', 'topo', 'DAG', 'indegree', '入度'],
+    relations: [
+      { type: 'parent', target: 'graph_algorithm' },
       { type: 'related', target: 'bfs' }, { type: 'related', target: 'dfs' },
-    ]},
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
 
   // ====== 数据结构 ======
-  { 
-    migrationStatus: 'manual', domain: 'leetcode', { type: 'contrast', target: 'two_pointer' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'leetcode',
+  { id: 'hash_table', canonical: '哈希表', aliases: ['哈希表', 'hash table'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['哈希表', 'hash table', 'hashmap', 'hash map'], searchAliases: ['hash', '散列', 'map', 'dict', 'dictionary', 'set'],
+    relations: [
+      { type: 'related', target: 'array' }, { type: 'contrast', target: 'two_pointer' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'array', canonical: '数组', aliases: ['数组', 'array'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['数组', 'array'], searchAliases: ['array', 'list', 'vector', '连续', '下标', '索引'],
+    relations: [
+      { type: 'related', target: 'hash_table' },
       { type: 'related', target: 'two_pointer' }, { type: 'related', target: 'sliding_window' },
       { type: 'foundation', target: 'dynamic_programming' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'leetcode', { type: 'contrast', target: 'hash_table' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'leetcode',
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'leetcode',
-    ]},
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'two_pointer', canonical: '双指针', aliases: ['双指针', 'two pointer'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['双指针', 'two pointer'], searchAliases: ['two pointer', '对撞', '快慢', '相向', '同向'],
+    relations: [
+      { type: 'related', target: 'sliding_window' }, { type: 'contrast', target: 'hash_table' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'sliding_window', canonical: '滑动窗口', aliases: ['滑动窗口', 'sliding window'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['滑动窗口', 'sliding window'], searchAliases: ['sliding window', '窗口', '定长', '不定长'],
+    relations: [
+      { type: 'related', target: 'two_pointer' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'dynamic_programming', canonical: '动态规划', aliases: ['动态规划', 'DP', 'dynamic programming'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['动态规划', 'DP', 'dynamic programming'], searchAliases: ['dp', '状态转移', '最优子结构', '子问题', '背包', '子序列'],
+    relations: [
+      { type: 'foundation', target: 'array' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
 
   // ====== LLM/Agent ======
-  { 
-    migrationStatus: 'manual', domain: 'deep-learning',
+  { id: 'transformer', canonical: 'Transformer', aliases: ['Transformer', 'transformer'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['Transformer', 'transformer architecture'], searchAliases: ['transformer', 'attention is all you need'],
+    relations: [
+      { type: 'child', target: 'attention' },
       { type: 'foundation', target: 'rag' }, { type: 'foundation', target: 'agent' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'deep-learning',
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'attention', canonical: 'Attention', aliases: ['Attention', '注意力机制', 'attention mechanism'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['Attention', '注意力', 'attention mechanism'], searchAliases: ['attention', 'self attention', 'multi head', 'qkv', 'query key value'],
+    relations: [
+      { type: 'parent', target: 'transformer' },
       { type: 'implementation', target: 'transformer' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'llm-agent-rag', { type: 'related', target: 'vector_db' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'rag', canonical: 'RAG', aliases: ['RAG', 'retrieval augmented generation'], deckHint: 'agent', parentCategory: 'Agent',
+    coreKeywords: ['RAG', 'retrieval augmented generation'], searchAliases: ['rag', '检索增强', 'vector search', 'knowledge base', 'embedding'],
+    relations: [
+      { type: 'related', target: 'embedding' }, { type: 'related', target: 'vector_db' },
       { type: 'contrast', target: 'agent' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'llm-agent-rag',
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'agent', canonical: 'Agent', aliases: ['Agent', '智能体', 'AI Agent'], deckHint: 'agent', parentCategory: 'Agent',
+    coreKeywords: ['Agent', '智能体', 'AI agent'], searchAliases: ['agent', '智能体', 'autonomous', 'ReAct', 'tool use', 'function calling', 'planning', 'memory'],
+    relations: [
+      { type: 'contrast', target: 'rag' },
       { type: 'related', target: 'rag' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'llm-agent-rag', { type: 'related', target: 'rag' },
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- 
-    migrationStatus: 'manual', domain: 'llm-agent-rag',
-    ]},
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'embedding', canonical: 'Embedding', aliases: ['Embedding', '嵌入', '向量表示'], deckHint: 'agent', parentCategory: '大模型',
+    coreKeywords: ['Embedding', '嵌入', '向量'], searchAliases: ['embedding', 'vector', 'representation', 'sentence embedding'],
+    relations: [
+      { type: 'related', target: 'vector_db' }, { type: 'related', target: 'rag' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
+  { id: 'vector_db', canonical: 'Vector DB', aliases: ['Vector DB', '向量数据库'], deckHint: 'agent', parentCategory: '大模型',
+    coreKeywords: ['Vector DB', '向量数据库'], searchAliases: ['vector db', 'Milvus', 'Pinecone', 'Faiss', 'ANN', 'approximate nearest neighbor', '索引'],
+    relations: [
+      { type: 'related', target: 'embedding' },
+    ],
+    migrationStatus: 'manual', domain: 'machine-learning',
+  },
 
   // Parent categories (kept separate, never used as canonicalTopic)
-  { 
+  { id: 'ml', canonical: '机器学习', aliases: ['机器学习', 'machine learning'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['机器学习', 'machine learning'], searchAliases: ['ml', 'machine learning', 'predictive modeling', 'statistical learning'],
+    relations: [
+      { type: 'child', target: 'ensemble' },
+    ],
     migrationStatus: 'manual', domain: 'machine-learning',
-],
-  migrationStatus: "manual", domain: "unknown",
-},
- id: 'backtracking', canonical: '回溯', aliases: ['回溯', '回溯算法', 'backtracking'], deckHint: 'leetcode', parentCategory: '算法',
+  },
+  { id: 'backtracking', canonical: '回溯', aliases: ['回溯', '回溯算法', 'backtracking'], deckHint: 'leetcode', parentCategory: '算法',
     coreKeywords: ['回溯', 'backtracking'], searchAliases: ['backtracking', '递归', 'DFS', '剪枝', 'permutation', 'combination'],
     relations: [{ type: 'related', target: 'dfs' }] },
   { id: 'reinforcement_learning', canonical: '强化学习', aliases: ['强化学习', 'reinforcement learning', 'RL'], deckHint: 'machine-learning', parentCategory: '机器学习',
     coreKeywords: ['强化学习', 'reinforcement learning', 'RL'], searchAliases: ['rl', 'agent', 'environment', 'reward', 'Q-learning', 'policy', 'value', 'Bellman'],
     relations: [{ type: 'related', target: 'ml' }] },
-  { 
-    migrationStatus: 'manual', domain: 'machine-learning',
-  { 
-    migrationStatus: 'manual', domain: 'machine-learning',
+  { id: 'pca', canonical: 'PCA', aliases: ['PCA', 'principal component analysis'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['PCA', 'principal component analysis'], searchAliases: ['pca', '降维', 'eigenvalue', '主成分', 'variance'],
+    relations: [] },
+  { id: 'feature_engineering', canonical: '特征工程', aliases: ['特征工程', 'feature engineering'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['特征工程', 'feature engineering'], searchAliases: ['feature', '特征选择', '特征提取', '特征缩放', '编码', '缺失值'],
+    relations: [] },
   { id: 'cross_validation', canonical: '交叉验证', aliases: ['交叉验证', 'cross validation'], deckHint: 'machine-learning', parentCategory: '机器学习',
     coreKeywords: ['交叉验证', 'cross validation'], searchAliases: ['cross val', 'k-fold', 'holdout', 'LOOCV'],
     relations: [{ type: 'related', target: 'overfitting' }] },
-  { 
-    migrationStatus: 'manual', domain: 'machine-learning',
-  { 
-    migrationStatus: 'manual', domain: 'machine-learning',
-  { 
-    migrationStatus: 'manual', domain: 'machine-learning',
-  { 
-    migrationStatus: 'manual', domain: 'machine-learning',
-  { 
-    migrationStatus: 'manual', domain: 'machine-learning',
-  { 
-    migrationStatus: 'manual', domain: 'deep-learning',
-  { 
-    migrationStatus: 'manual', domain: 'deep-learning',
-  { 
-    migrationStatus: 'manual', domain: 'deep-learning',
+  { id: 'logistic_regression', canonical: '逻辑回归', aliases: ['逻辑回归', 'logistic regression'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['逻辑回归', 'logistic regression'], searchAliases: ['logistic', 'sigmoid', '二分类', 'odds'],
+    relations: [] },
+  { id: 'linear_regression', canonical: '线性回归', aliases: ['线性回归', 'linear regression'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['线性回归', 'linear regression'], searchAliases: ['linear', 'OLS', 'least squares', 'R方'],
+    relations: [] },
+  { id: 'knn', canonical: 'KNN', aliases: ['KNN', 'k nearest neighbors'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['KNN', 'k nearest neighbors'], searchAliases: ['knn', '距离', '欧氏', '惰性学习'],
+    relations: [] },
+  { id: 'kmeans', canonical: 'KMeans', aliases: ['KMeans', 'k均值'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['KMeans', 'k均值'], searchAliases: ['kmeans', '聚类', 'elbow', '轮廓系数'],
+    relations: [] },
+  { id: 'svm', canonical: 'SVM', aliases: ['SVM', 'support vector machine'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['SVM', 'support vector machine'], searchAliases: ['svm', '核函数', '最大间隔', 'KKT'],
+    relations: [] },
+  { id: 'cnn', canonical: 'CNN', aliases: ['CNN', 'convolutional neural network'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['CNN', 'convolutional neural network'], searchAliases: ['cnn', '卷积', 'pooling', 'feature map'],
+    relations: [] },
+  { id: 'rnn', canonical: 'RNN', aliases: ['RNN', 'recurrent neural network', 'LSTM'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['RNN', 'recurrent neural network', 'LSTM'], searchAliases: ['rnn', 'lstm', 'gru', '序列', 'sequence'],
+    relations: [] },
+  { id: 'batchnorm', canonical: 'BatchNorm', aliases: ['BatchNorm', 'batch normalization'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['BatchNorm', 'batch normalization'], searchAliases: ['batchnorm', 'normalization', 'layernorm'],
+    relations: [] },
   { id: 'dropout', canonical: 'Dropout', aliases: ['Dropout', 'drop out'], deckHint: 'deep-learning', parentCategory: '深度学习',
     coreKeywords: ['Dropout'], searchAliases: ['dropout', 'inverted'],
     relations: [{ type: 'related', target: 'regularization' }] },
-  { 
-    migrationStatus: 'manual', domain: 'deep-learning',
-  { 
-    migrationStatus: 'manual', domain: 'deep-learning',
-  { 
-    migrationStatus: 'manual', domain: 'deep-learning', { type: 'child', target: 'rnn' }, { type: 'child', target: 'transformer' }] },
-  { 
-    migrationStatus: 'manual', domain: 'data-science-statistics',
-  { 
-    migrationStatus: 'manual', domain: 'data-science-statistics',
+  { id: 'optimizer', canonical: '优化器', aliases: ['优化器', 'optimizer'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['优化器', 'optimizer'], searchAliases: ['SGD', 'Adam', 'RMSprop', 'momentum', '学习率'],
+    relations: [] },
+  { id: 'loss_function', canonical: '损失函数', aliases: ['损失函数', 'loss function'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['损失函数', 'loss function'], searchAliases: ['交叉熵', 'MSE', 'hinge', 'focal'],
+    relations: [] },
+  { id: 'dl', canonical: '深度学习', aliases: ['深度学习', 'deep learning'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['深度学习', 'deep learning'], searchAliases: ['deep learning', '神经网络', '反向传播', 'gradient'],
+    relations: [{ type: 'child', target: 'cnn' }, { type: 'child', target: 'rnn' }, { type: 'child', target: 'transformer' }] },
+  { id: 'sql', canonical: 'SQL', aliases: ['SQL'], deckHint: 'statistics', parentCategory: '数据科学',
+    coreKeywords: ['SQL'], searchAliases: ['sql', 'query', 'join', 'group by', 'window', '索引'],
+    relations: [] },
+  { id: 'data_science', canonical: '数据科学', aliases: ['数据科学', 'data science'], deckHint: 'statistics', parentCategory: '数据科学',
+    coreKeywords: ['数据科学', 'data science'], searchAliases: ['data science', 'SQL', 'Python', 'pandas', '统计'],
+    relations: [] },
 ];
 
 // ── Graph Index ──
