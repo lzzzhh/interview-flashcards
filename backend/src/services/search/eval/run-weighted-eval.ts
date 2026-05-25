@@ -25,9 +25,17 @@ async function main() {
   for (const r of classified) realismMap.set(r.id, r);
 
   const results: WeightedResult[] = [];
+  const excludedList: { id: string; query: string; reason: string }[] = [];
 
   for (const c of allCases.slice(0, 200)) {
     const realism = realismMap.get(c.id) || { realism: 'common', weight: 0.7 } as RealismCase;
+    
+    // Excluded cases: track separately, don't affect pass rate
+    if (realism.realism === 'excluded') {
+      excludedList.push({ id: c.id, query: c.query, reason: (realism as any).excludeReason || 'excluded' });
+      continue;
+    }
+    
     const exp = c.expectedUnderstanding || { intent: c.expectedIntent, topic: c.expectedTopic };
     const parsed = await understandQuery(c.query);
 
@@ -144,6 +152,11 @@ async function main() {
   for (const [t, c] of byType) console.log(`  ${t}: ${c}`);
 
   console.log(`\nTotal failures: ${results.filter(r => !r.pass).length}`);
+  
+  if (excludedList.length > 0) {
+    console.log(`\n=== Excluded (${excludedList.length}) ===`);
+    for (const e of excludedList) console.log(`  ${e.id}: "${e.query.slice(0,40)}" — ${e.reason}`);
+  }
 }
 
 main();

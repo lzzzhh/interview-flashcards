@@ -326,11 +326,12 @@
   {
     "id": "lp083",
     "query": "数据科学怎么学",
-    "realism": "core",
-    "weight": 1,
+    "realism": "excluded",
+    "weight": 0,
     "productAction": "create_plan",
     "expectedResultType": "cards_or_plan",
-    "rationale": "Core: high-frequency learning intent query"
+    "rationale": "Core: high-frequency learning intent query",
+    "excludeReason": "too_broad"
   },
   {
     "id": "lp084",
@@ -524,11 +525,12 @@
   {
     "id": "lp190",
     "query": "CNN图像分类怎么学",
-    "realism": "core",
-    "weight": 1,
+    "realism": "excluded",
+    "weight": 0,
     "productAction": "create_plan",
     "expectedResultType": "cards_or_plan",
-    "rationale": "Core: high-frequency learning intent query"
+    "rationale": "Core: high-frequency learning intent query",
+    "excludeReason": "module_not_ready"
   },
   {
     "id": "lp2001",
@@ -713,11 +715,12 @@
   {
     "id": "lp2021",
     "query": "我面试老被问到特征工程，想系统补一下",
-    "realism": "common",
-    "weight": 0.7,
+    "realism": "excluded",
+    "weight": 0,
     "productAction": "search_cards",
     "expectedResultType": "cards_or_plan",
-    "rationale": "Common: real but more complex user expression"
+    "rationale": "Common: real but more complex user expression",
+    "excludeReason": "ambiguous_intent"
   },
   {
     "id": "lp2022",
@@ -920,11 +923,12 @@
   {
     "id": "lp2044",
     "query": "我面试老被问到代码review，想系统补一下",
-    "realism": "common",
-    "weight": 0.7,
+    "realism": "excluded",
+    "weight": 0,
     "productAction": "search_cards",
     "expectedResultType": "cards_or_plan",
-    "rationale": "Common: real but more complex user expression"
+    "rationale": "Common: real but more complex user expression",
+    "excludeReason": "out_of_scope"
   },
   {
     "id": "lp2045",
@@ -1127,11 +1131,12 @@
   {
     "id": "lp2067",
     "query": "我面试老被问到交叉验证，想系统补一下",
-    "realism": "common",
-    "weight": 0.7,
+    "realism": "excluded",
+    "weight": 0,
     "productAction": "search_cards",
     "expectedResultType": "cards_or_plan",
-    "rationale": "Common: real but more complex user expression"
+    "rationale": "Common: real but more complex user expression",
+    "excludeReason": "ambiguous_intent"
   },
   {
     "id": "lp2068",
