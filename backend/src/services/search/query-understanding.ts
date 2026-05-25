@@ -167,20 +167,34 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   const topicChangeReason = buildTopicChangeReason(topicRaw, protectedTopic, canonicalTopic);
 
   // ── Step 7: Keyword tiering ──
+  // Primary: legacy dict (proven eval coverage). Supplementary: graph adds extra keywords.
   let coreKeywords: string[], expandedKeywords: string[], lowPriorityKeywords: string[], prerequisiteKeywords: string[];
+  
+  // Base keywords always from legacy dict (if available)
+  const baseCore = concept?.coreKeywords?.length
+    ? [...new Set([canonicalTopic, ...concept.coreKeywords])]
+    : [canonicalTopic];
+  const baseExpanded = concept?.expandedKeywords ? [...concept.expandedKeywords] : [];
+  const baseLow = concept?.lowPriorityKeywords || [];
+  const basePrereq = concept?.prerequisiteKeywords || [];
+  
+  // If graph hit, supplement with graph-derived keywords (not replace)
   if (graphResolved.conceptGraphHit) {
-    const tiers = buildKeywordTiersFromGraphWithLimits(graphResolved.graphNodeId!, intent === 'study' ? 'learning-path' : 'search');
-    coreKeywords = [canonicalTopic, ...tiers.coreKeywords.filter(k => k !== canonicalTopic)];
-    expandedKeywords = tiers.expandedKeywords;
-    lowPriorityKeywords = tiers.lowPriorityKeywords;
-    prerequisiteKeywords = tiers.prerequisiteKeywords;
+    const graphTiers = buildKeywordTiersFromGraphWithLimits(graphResolved.graphNodeId!, intent === 'study' ? 'learning-path' : 'search');
+    // Graph core: only add new keywords not already in base
+    coreKeywords = [...new Set([...baseCore, ...graphTiers.coreKeywords])];
+    // Graph expanded: only add new, respecting max
+    const graphNew = graphTiers.expandedKeywords.filter(k => !baseExpanded.includes(k));
+    expandedKeywords = [...baseExpanded, ...graphNew].slice(0, 16);
+    // Low priority: merge both
+    lowPriorityKeywords = [...new Set([...baseLow, ...graphTiers.lowPriorityKeywords])];
+    // Prerequisites: merge both, graph may have more via relations
+    prerequisiteKeywords = [...new Set([...basePrereq, ...graphTiers.prerequisiteKeywords])];
   } else {
-    coreKeywords = concept?.coreKeywords?.length
-      ? [...new Set([canonicalTopic, ...concept.coreKeywords])]
-      : [canonicalTopic];
-    expandedKeywords = concept?.expandedKeywords || [];
-    lowPriorityKeywords = concept?.lowPriorityKeywords || [];
-    prerequisiteKeywords = concept?.prerequisiteKeywords || [];
+    coreKeywords = baseCore;
+    expandedKeywords = baseExpanded;
+    lowPriorityKeywords = baseLow;
+    prerequisiteKeywords = basePrereq;
   }
 
   // ── Step 8: Build recall/rerank text ──
