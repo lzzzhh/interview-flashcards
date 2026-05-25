@@ -38,10 +38,13 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   const failures: string[] = [];
   const exp = getExpected(c);
   
-  // 1. Understanding
+  // 1. Understanding (with acceptable sets)
   const parsed = await understandQuery(c.query);
-  const uPass = parsed.intent === exp.intent
-    && (parsed.topic || '').toLowerCase() === (exp.topic || '').toLowerCase();
+  const acceptableIntent = c.expectedUnderstanding?.acceptableIntent || [exp.intent];
+  const intentOk = acceptableIntent.includes(parsed.intent);
+  const acceptableTopic = c.expectedUnderstanding?.acceptableTopic || [exp.topic];
+  const topicOk = acceptableTopic.some((t: string) => (parsed.topic || '').toLowerCase() === t.toLowerCase());
+  const uPass = intentOk && topicOk;
   if (!uPass) {
     if (parsed.intent !== exp.intent) failures.push(`intent: ${parsed.intent}≠${exp.intent}`);
     if ((parsed.topic || '').toLowerCase() !== (exp.topic || '').toLowerCase()) failures.push(`topic: ${parsed.topic}≠${exp.topic}`);
@@ -72,12 +75,16 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   if (!rMustIncOk) failures.push(`mustInclude failed: ${rMustInc.filter((w: string) => !tieredTokens.has(w.toLowerCase())).join(',')}`);
   if (!rMustNotOk) failures.push(`mustNotInclude failed: ${rMustNot.filter((w: string) => tieredTokens.has(w.toLowerCase())).join(',')}`);
 
-  // 3. Search
+  // 3. Search (merged cap by topic granularity)
   const results: any = await hybridSearch({ query: c.query, maxResults: 20, minScore: 0, debug: true });
   const trace = results._trace || {};
-  const merged = trace.merge?.afterDedup || 0; // Use deduped count, not sum of channels
+  const merged = trace.merge?.afterDedup || 0;
   const finalCnt = results.length;
-  const mergedFail = c.retrieval?.maxMergedCandidates && merged > c.retrieval.maxMergedCandidates;
+  // Topic granularity: broad topics get higher cap
+  const granularity = c.topicGranularity || 'specific';
+  const capByGranularity: Record<string, number> = { specific: 200, medium: 250, broad: 350, compare: 300 };
+  const maxMerged = c.retrieval?.maxMergedCandidates || capByGranularity[granularity] || 250;
+  const mergedFail = merged > maxMerged;
   if (mergedFail) failures.push(`merged: ${merged} > ${c.retrieval.maxMergedCandidates}`);
 
   // 4. Ranking (with card-concept matching for concept-level precision)
