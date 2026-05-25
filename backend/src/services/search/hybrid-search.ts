@@ -119,7 +119,7 @@ async function quickParse(rawQuery: string): Promise<ParsedSearchQuery> {
   return {
     rawQuery: q, intent: 'lookup', topicRaw: q, topic, canonicalTopic: topic,
     deckHint: undefined, parentCategory: undefined, subtopics: [],
-    constraints: {}, coreKeywords: [topic], expandedKeywords: [], lowPriorityKeywords: [],
+    constraints: {}, coreKeywords: [topic], expandedKeywords: [], lowPriorityKeywords: [], prerequisiteKeywords: [],
     rewrittenQuery: topic, recallText: topic, rerankText: topic,
     confidence: 0.3, source: 'fallback', topicChangeReason: 'eval mode', filteredStopwords: [],
     debug: 'quickParse',
@@ -319,6 +319,67 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     const card = cardMap.get(r.cardId);
     if (card && deckBoostSet.has(card.deckId)) {
       r.finalScore += profile.deckBoost;
+    }
+  }
+
+  // 8c. Learning-path mode: prerequisite boost + diversity spread
+  const isLearningPath = intent === 'study' || intent === 'plan' || intent === 'recommend_cards';
+  if (isLearningPath) {
+    const allPrereq = new Set(parsed.prerequisiteKeywords.map(k => k.toLowerCase()));
+
+    // Sort by score first, then apply prerequisite boost to top 40
+    ranked.sort((a, b) => b.finalScore - a.finalScore);
+    for (const r of ranked.slice(0, 40)) {
+      const card = cardMap.get(r.cardId);
+      if (card) {
+        // Prerequisite boost: cards matching foundational keywords get +0.15
+        const cardText = [card.title, card.titleCn, card.tags, card.searchKeywords, card.question].filter(Boolean).join(' ').toLowerCase();
+        if (allPrereq.size > 0 && [...allPrereq].some(k => cardText.includes(k))) {
+          r.finalScore += 0.15;
+        }
+        // Easy card boost: cards with lower difficulty or fewer lapses
+        const prog = progressMap.get(r.cardId);
+        if (prog && prog.lapses !== null && prog.lapses <= 2 && r.finalScore > 0.3) {
+          r.finalScore += 0.05; // gentle bump for beginner-friendly cards
+        }
+      }
+    }
+
+    // Resort after boost
+    ranked.sort((a, b) => b.finalScore - a.finalScore);
+
+    // Deck diversity: space out same-deck cards
+    const diversified: typeof ranked = [];
+    const deckCounts = new Map<string, number>();
+    const remaining = [...ranked];
+    while (remaining.length > 0 && diversified.length < 60) {
+      let bestIdx = 0;
+      let bestPenalty = Infinity;
+      for (let i = 0; i < Math.min(remaining.length, 40); i++) {
+        const card = cardMap.get(remaining[i].cardId);
+        const deck = card?.deckId || 'unknown';
+        const count = deckCounts.get(deck) || 0;
+        const penalty = remaining[i].finalScore - count * 0.02;
+        if (penalty > bestPenalty || (penalty === bestPenalty && remaining[i].finalScore > 0)) {
+          bestPenalty = penalty;
+          bestIdx = i;
+        }
+      }
+      const chosen = remaining.splice(bestIdx, 1)[0];
+      const card = cardMap.get(chosen.cardId);
+      const deck = card?.deckId || 'unknown';
+      deckCounts.set(deck, (deckCounts.get(deck) || 0) + 1);
+      diversified.push(chosen);
+    }
+
+    // Replace ranked with diversified order (but keep original scores for threshold)
+    const scoreMap = new Map(ranked.map(r => [r.cardId, r.finalScore]));
+    ranked.length = 0;
+    for (const d of diversified) {
+      const orig = scoreMap.get(d.cardId);
+      if (orig !== undefined) {
+        ranked.push({ cardId: d.cardId, finalScore: orig, fieldBoost: 0, learningBoost: 0 });
+      }
     }
   }
   // Re-sort after deck boost

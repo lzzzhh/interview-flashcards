@@ -20,6 +20,7 @@ export interface ParsedSearchQuery {
   coreKeywords: string[];        // must be in recall + rerank
   expandedKeywords: string[];    // participate in recall, few in rerank
   lowPriorityKeywords: string[]; // not in main recall, only fallback
+  prerequisiteKeywords: string[]; // learning-path: foundational concepts
   rewrittenQuery: string;        // final keyword string for retrieval
   recallText: string;            // what goes into recall channels
   rerankText: string;            // what goes into reranker
@@ -145,6 +146,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     subtopics: concept?.subtopics || [],
     constraints: intent === 'review' ? { onlyDue: true } : {},
     coreKeywords, expandedKeywords, lowPriorityKeywords,
+    prerequisiteKeywords: concept?.prerequisiteKeywords || [],
     rewrittenQuery: recallText,
     recallText, rerankText,
     confidence: source !== 'fallback' ? 0.8 : 0.2,

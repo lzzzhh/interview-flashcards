@@ -5,13 +5,15 @@ import prisma from '../../db/prisma';
 
 export interface ConceptEntry {
   topic: string;
-  canonicalTopic?: string;  // if topic is an alias, this is the canonical name
+  canonicalTopic?: string;
   deckHint?: string;
-  parentCategory?: string;  // knowledge domain
+  parentCategory?: string;
   subtopics: string[];
-  coreKeywords: string[];        // most specific concept words
-  expandedKeywords: string[];    // synonyms, strongly related sub-concepts
-  lowPriorityKeywords: string[]; // parent category words, not for main recall
+  coreKeywords: string[];
+  expandedKeywords: string[];
+  lowPriorityKeywords: string[];
+  /** Learning-path: foundational/prerequisite keywords for beginner cards */
+  prerequisiteKeywords?: string[];
 }
 
 let cachedTopics: ConceptEntry[] | null = null;
@@ -47,11 +49,18 @@ const STATIC_CONCEPTS: ConceptEntry[] = [
     subtopics: [], coreKeywords: ['CatBoost'], expandedKeywords: ['GBDT', 'gradient boosting'], lowPriorityKeywords: ['机器学习'] },
 
   // Specific concepts
+  { topic: '深度学习', canonicalTopic: '深度学习', deckHint: 'deep-learning', parentCategory: '深度学习',
+    subtopics: ['CNN', 'RNN', 'Transformer'],
+    coreKeywords: ['深度学习', 'deep learning'],
+    expandedKeywords: ['CNN', 'RNN', 'LSTM', 'Transformer', '反向传播', '梯度下降', '激活函数', '损失函数'],
+    lowPriorityKeywords: [],
+    prerequisiteKeywords: ['神经网络', '感知机', '激活函数', '梯度下降', '前馈', '反向传播'] },
   { topic: '集成学习', canonicalTopic: '集成学习', deckHint: 'machine-learning', parentCategory: '机器学习',
     subtopics: ['Bagging', 'Boosting', 'Stacking'],
     coreKeywords: ['集成学习', 'ensemble learning'],
     expandedKeywords: ['Bagging', 'Boosting', 'Stacking', '随机森林', 'GBDT', 'XGBoost', 'LightGBM', 'CatBoost', '梯度提升', '模型融合', '投票法'],
-    lowPriorityKeywords: ['机器学习', '分类', '回归', '过拟合', '特征重要性', '特征工程', '特征选择', '降维'] },
+    lowPriorityKeywords: ['机器学习', '分类', '回归', '过拟合', '特征重要性', '特征工程', '特征选择', '降维'],
+    prerequisiteKeywords: ['决策树', 'bias-variance', '过拟合', '交叉验证'] },
   { topic: 'ensemble learning', canonicalTopic: '集成学习', deckHint: 'machine-learning', parentCategory: '机器学习',
     subtopics: [], coreKeywords: ['集成学习', 'ensemble learning'],
     expandedKeywords: ['Bagging', 'Boosting', 'Stacking'], lowPriorityKeywords: ['机器学习'] },
