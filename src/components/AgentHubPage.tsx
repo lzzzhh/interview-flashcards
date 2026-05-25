@@ -15,7 +15,7 @@ const CARD_BORDER = 'var(--card-border)';
 const BLUE = '#3B82F6';
 
 const AGENTS = [
-  { key: 'search', icon: Search, title: 'AI 智能搜索', desc: '语义搜索所有卡片，快速定位薄弱知识点', color: '#3B82F6', needsModel: 'bge-m3' },
+  { key: 'search', icon: Search, title: 'AI 搜卡片', desc: '找相关卡片、生成学习清单、补弱复习', color: '#3B82F6', needsModel: 'bge-m3' },
   { key: 'ingest', icon: FileText, title: '资料制卡', desc: '上传 PDF/Word，AI 自动生成面试卡片', color: '#10B981' },
   { key: 'jobprep', icon: Briefcase, title: '岗位备战', desc: '输入公司/岗位，匹配题库并生成学习计划', color: '#F59E0B' },
   { key: 'drafts', icon: Sparkles, title: '草稿审核', desc: '审核 AI 生成的卡片草稿，一键入库', color: '#8B5CF6' },

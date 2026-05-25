@@ -183,10 +183,10 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
             warmingUp ? (
               <div className="text-center mt-8">
                 <Loader2 className="w-5 h-5 mx-auto mb-2 animate-spin" style={{ color: BLUE }} />
-                <p className="text-[13px]" style={{ color: TEXT_MUTED }}>正在预热 AI 搜索模型...</p>
+                <p className="text-[13px]" style={{ color: TEXT_MUTED }}>正在加载搜索模型...</p>
               </div>
             ) : (
-              <p className="text-center text-[13px] mt-8" style={{ color: TEXT_MUTED }}>输入关键词搜索卡片</p>
+              <p className="text-center text-[13px] mt-8" style={{ color: TEXT_MUTED }}>搜索卡片·生成学习清单·补弱复习</p>
             )
           ) : (
             <>
