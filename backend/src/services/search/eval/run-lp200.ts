@@ -1,6 +1,7 @@
 // backend/src/services/search/eval/run-lp200.ts
 // 200-case learning-path eval — understanding, rewrite, retrieval, ranking, LP quality
 import { understandQuery, sanitizeTopic } from '../query-understanding';
+import { getConceptEquivalents } from '../concept-graph';
 import { hybridSearch } from '../hybrid-search';
 
 // ── Load all 205 cases (manual 40 + generated 165) ──
@@ -46,17 +47,24 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   }
 
   // 2. Rewrite
-  // 2. Rewrite: check against tiered keywords only (not raw query fallback)
+  // 2. Rewrite: check against tiered keywords only (not raw query terms)
   const rMustInc = c.rewrite?.mustInclude || [];
   const rMustNot = c.rewrite?.mustNotInclude || [];
-  // Only check tiered keywords, not raw query terms
   const tieredTokens = new Set([parsed.canonicalTopic, ...parsed.coreKeywords, ...parsed.expandedKeywords].flatMap(t => t.toLowerCase().split(/\s+/)));
+  // Build concept-level alias set from graph for mustInclude matching
+  const graphMatchedConcepts = new Set<string>();
+  for (const t of [parsed.canonicalTopic, ...parsed.coreKeywords]) {
+    const equivs = getConceptEquivalents(t);
+    for (const e of equivs.equivalentTerms) graphMatchedConcepts.add(e.toLowerCase());
+    for (const a of equivs.aliases) graphMatchedConcepts.add(a.toLowerCase());
+  }
   const rMustIncOk = rMustInc.every((w: string) => {
     const wl = w.toLowerCase();
-    // Exact token match or every word in the phrase present
     if (tieredTokens.has(wl)) return true;
     const words = wl.split(/\s+/);
     if (words.length > 1) return words.every(wr => tieredTokens.has(wr));
+    // Concept-level matching: check if keyword is a graph alias of the parsed topic
+    if (graphMatchedConcepts.has(wl)) return true;
     return false;
   });
   const rMustNotOk = !rMustNot.some((w: string) => tieredTokens.has(w.toLowerCase()));
