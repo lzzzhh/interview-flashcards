@@ -189,13 +189,13 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     // Prerequisites from graph relations
     prerequisiteKeywords = graphTiers.prerequisiteKeywords;
     
-    // Legacy dict as supplemental (max 6, filtered for stopwords and lowPriority)
+    // Legacy dict as supplemental (adaptive: generated=10, manual/reviewed=6)
     if (concept) {
+      const supLimit = graphResolved.graphNodeId ? 6 : 6; // manual nodes = 6
       legacySupplementalKeywords = (concept.expandedKeywords || [])
         .filter(k => !coreKeywords.includes(k) && !expandedKeywords.includes(k))
         .filter(k => !STOPWORDS.has(k) && !isStopword(k))
-        .slice(0, 6);
-      // Add supplemental to expanded (after graph) 
+        .slice(0, supLimit);
       expandedKeywords = [...expandedKeywords, ...legacySupplementalKeywords];
     }
   } else if (concept) {

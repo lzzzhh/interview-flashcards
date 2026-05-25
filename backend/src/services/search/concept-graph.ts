@@ -108,7 +108,7 @@ const NODES: ConceptNode[] = [
   },
 
   // ====== 图算法 ======
-  { id: 'graph_algorithm', canonical: '图算法', aliases: ['图算法', '图', 'graph algorithm', 'graph'], deckHint: 'leetcode', parentCategory: '算法',
+  { id: 'graph_algorithm', canonical: '图算法', aliases: ['图算法', '图', 'graph algorithm', 'graph', 'graph theory', '图论'], deckHint: 'leetcode', parentCategory: '算法',
     coreKeywords: ['图算法', 'graph algorithm'], searchAliases: ['graph', '图', 'graphtheory', '图论'],
     relations: [
       { type: 'child', target: 'bfs' }, { type: 'child', target: 'dfs' },
@@ -214,7 +214,7 @@ const NODES: ConceptNode[] = [
     migrationStatus: 'manual', domain: 'machine-learning',
   },
   { id: 'agent', canonical: 'Agent', aliases: ['Agent', '智能体', 'AI Agent'], deckHint: 'agent', parentCategory: 'Agent',
-    coreKeywords: ['Agent', '智能体', 'AI agent'], searchAliases: ['agent', '智能体', 'autonomous', 'ReAct', 'tool use', 'function calling', 'planning', 'memory'],
+    coreKeywords: ['Agent', '智能体', 'AI agent'], searchAliases: ['agent', '智能体', 'autonomous', 'ReAct', 'tool use', 'function calling', 'planning', 'memory', 'react', 'tool call', '工具调用'],
     relations: [
       { type: 'contrast', target: 'rag' },
       { type: 'related', target: 'rag' },
@@ -238,7 +238,7 @@ const NODES: ConceptNode[] = [
 
   // Parent categories (kept separate, never used as canonicalTopic)
   { id: 'ml', canonical: '机器学习', aliases: ['机器学习', 'machine learning'], deckHint: 'machine-learning', parentCategory: '机器学习',
-    coreKeywords: ['机器学习', 'machine learning'], searchAliases: ['ml', 'machine learning', 'predictive modeling', 'statistical learning'],
+    coreKeywords: ['机器学习', 'machine learning'], searchAliases: ['ml', 'machine learning', 'predictive modeling', 'statistical learning', '监督学习', 'supervised', '无监督学习', 'unsupervised', '过拟合', 'overfitting'],
     relations: [
       { type: 'child', target: 'ensemble' },
     ],
@@ -254,7 +254,7 @@ const NODES: ConceptNode[] = [
     coreKeywords: ['PCA', 'principal component analysis'], searchAliases: ['pca', '降维', 'eigenvalue', '主成分', 'variance'],
     relations: [] },
   { id: 'feature_engineering', canonical: '特征工程', aliases: ['特征工程', 'feature engineering'], deckHint: 'machine-learning', parentCategory: '机器学习',
-    coreKeywords: ['特征工程', 'feature engineering'], searchAliases: ['feature', '特征选择', '特征提取', '特征缩放', '编码', '缺失值'],
+    coreKeywords: ['特征工程', 'feature engineering'], searchAliases: ['feature', '特征选择', '特征提取', '特征缩放', '编码', '缺失值', '特征工程'],
     relations: [] },
   { id: 'cross_validation', canonical: '交叉验证', aliases: ['交叉验证', 'cross validation'], deckHint: 'machine-learning', parentCategory: '机器学习',
     coreKeywords: ['交叉验证', 'cross validation'], searchAliases: ['cross val', 'k-fold', 'holdout', 'LOOCV'],
@@ -296,7 +296,7 @@ const NODES: ConceptNode[] = [
     coreKeywords: ['深度学习', 'deep learning'], searchAliases: ['deep learning', '神经网络', '反向传播', 'gradient'],
     relations: [{ type: 'child', target: 'cnn' }, { type: 'child', target: 'rnn' }, { type: 'child', target: 'transformer' }] },
   { id: 'sql', canonical: 'SQL', aliases: ['SQL'], deckHint: 'statistics', parentCategory: '数据科学',
-    coreKeywords: ['SQL'], searchAliases: ['sql', 'query', 'join', 'group by', 'window', '索引'],
+    coreKeywords: ['SQL'], searchAliases: ['sql', 'query', 'join', 'group by', 'window', '索引', 'WHERE', 'SELECT', 'HAVING'],
     relations: [] },
   { id: 'data_science', canonical: '数据科学', aliases: ['数据科学', 'data science'], deckHint: 'statistics', parentCategory: '数据科学',
     coreKeywords: ['数据科学', 'data science'], searchAliases: ['data science', 'SQL', 'Python', 'pandas', '统计'],
