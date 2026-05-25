@@ -66,9 +66,11 @@ const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
     // Prefix patterns
     /^(?:如何学习|怎么学习|要怎么学|该怎么学|我想学|我要学|怎么学|如何学|怎样学|我想|我要|想学|想学习|学|学习)(.+)/,
     // Suffix patterns — broad coverage
-    /^(.+?)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学|从哪开始|先学什么|应该先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|老是搞混|不太懂|很薄弱|推荐几张卡|推荐几张|推荐卡)/,
-    // Compound/Weakness: extract topic BEFORE the marker, after optional pronouns
-    /^(?:我|我对|最近|面试)?(.+?)(?:不会|不懂|不太懂|很薄弱|老是搞混|完全没概念|总[答做]不好).*/,
+    /^(.+?)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学|从哪开始|先学什么|应该先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
+    // Weakness suffixes: topic is before the marker
+    /^(.+?)(?:不太懂|很薄弱|老是搞混|完全没概念)/,
+    // Compound: skip pronoun/prefix, capture before negation
+    /^(?:我|我对|面试|最近)(.+?)(?:不会|不懂|总答不好)/,
   ]},
   { intent: 'review',  patterns: [
     /^(?:复习|回顾|重温|我想复习|我要复习)(.+)/,
