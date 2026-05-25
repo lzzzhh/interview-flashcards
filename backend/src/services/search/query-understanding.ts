@@ -2,7 +2,6 @@
 // Pipeline: rawQuery → normalize → intent → slot extraction → sanitizeTopic → protect → concept expansion → keyword tiering → rewrite
 
 import { conceptLookup, getAllTopics, type ConceptEntry } from './concept-dictionary';
-import { conceptGraphLookup, buildKeywordTiersFromGraph, getGraphTrace } from './concept-graph';
 
 // ── Types ──
 
@@ -71,7 +70,7 @@ const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
     // Weakness suffixes (check before broader study suffixes)
     /^(.+?)(?:不太懂|很薄弱|老是搞混|完全没概念)/,
     // Suffix patterns — broad coverage
-    /^(.+?)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|的学习路径|学习路径|入门|从哪里开始学|从哪开始|应该先学什么|先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
+    /^(.+?)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学|从哪开始|应该先学什么|先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
   ]},
   { intent: 'review',  patterns: [
     /^(?:复习|回顾|重温|我想复习|我要复习)(.+)/,
@@ -154,23 +153,12 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
 
   const topicChangeReason = buildTopicChangeReason(topicRaw, protectedTopic, canonicalTopic);
 
-  // ── Step 7: Keyword tiering (from graph or concept dictionary) ──
-  const graphNode = conceptGraphLookup(canonicalTopic);
-  let coreKeywords: string[], expandedKeywords: string[], lowPriorityKeywords: string[], prerequisiteKeywords: string[];
-  if (graphNode) {
-    const tiers = buildKeywordTiersFromGraph(graphNode.id, intent === 'study' ? 'learning_path' : 'search');
-    coreKeywords = [canonicalTopic, ...tiers.coreKeywords.filter(k => k !== canonicalTopic)];
-    expandedKeywords = tiers.expandedKeywords;
-    lowPriorityKeywords = tiers.lowPriorityKeywords;
-    prerequisiteKeywords = tiers.prerequisiteKeywords;
-  } else {
-    coreKeywords = concept?.coreKeywords?.length
-      ? [...new Set([canonicalTopic, ...concept.coreKeywords])]
-      : [canonicalTopic];
-    expandedKeywords = concept?.expandedKeywords || [];
-    lowPriorityKeywords = concept?.lowPriorityKeywords || [];
-    prerequisiteKeywords = concept?.prerequisiteKeywords || [];
-  }
+  // ── Step 7: Keyword tiering ──
+  const coreKeywords = concept?.coreKeywords?.length
+    ? [...new Set([canonicalTopic, ...concept.coreKeywords])]
+    : [canonicalTopic];
+  const expandedKeywords = concept?.expandedKeywords || [];
+  const lowPriorityKeywords = concept?.lowPriorityKeywords || [];
 
   // ── Step 8: Build recall/rerank text ──
   // IMPORTANT: always include topicRaw + sanitized raw query as fallback terms
@@ -190,7 +178,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     subtopics: concept?.subtopics || [],
     constraints: intent === 'review' ? { onlyDue: true } : {},
     coreKeywords, expandedKeywords, lowPriorityKeywords,
-    prerequisiteKeywords,
+    prerequisiteKeywords: concept?.prerequisiteKeywords || [],
     rewrittenQuery: recallText,
     recallText, rerankText,
     confidence: source !== 'fallback' ? 0.8 : 0.2,
