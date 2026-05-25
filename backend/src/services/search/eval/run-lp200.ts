@@ -51,12 +51,19 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   const rMustNot = c.rewrite?.mustNotInclude || [];
   // Only check tiered keywords, not raw query terms
   const tieredTokens = new Set([parsed.canonicalTopic, ...parsed.coreKeywords, ...parsed.expandedKeywords].flatMap(t => t.toLowerCase().split(/\s+/)));
+  // P2: Also check graph aliases for concept-level matching
+  const graphTokens = new Set<string>();
+  for (const t of parsed.coreKeywords) {
+    const node = conceptGraphLookup(t);
+    if (node) { for (const a of node.aliases) graphTokens.add(a.toLowerCase()); for (const a of node.searchAliases) graphTokens.add(a.toLowerCase()); }
+    graphTokens.add(t.toLowerCase());
+  }
   const rMustIncOk = rMustInc.every((w: string) => {
     const wl = w.toLowerCase();
-    // Exact token match or every word in the phrase present
     if (tieredTokens.has(wl)) return true;
+    if (graphTokens.has(wl)) return true;
     const words = wl.split(/\s+/);
-    if (words.length > 1) return words.every(wr => tieredTokens.has(wr));
+    if (words.length > 1) return words.every(wr => tieredTokens.has(wr) || graphTokens.has(wr));
     return false;
   });
   const rMustNotOk = !rMustNot.some((w: string) => tieredTokens.has(w.toLowerCase()));
