@@ -116,6 +116,24 @@ interface RecallCandidate {
 async function quickParse(rawQuery: string): Promise<ParsedSearchQuery> {
   const q = rawQuery.trim();
   const topic = sanitizeTopic(q);
+  // Do concept dict lookup even in eval mode for keyword expansion
+  const concept = await conceptLookup(topic);
+  if (concept) {
+    const coreKws = [topic, ...(concept.coreKeywords || [])];
+    const expandedKws = [...(concept.expandedKeywords || [])];
+    return {
+      rawQuery: q, intent: 'study', topicRaw: q, topic, canonicalTopic: concept.canonicalTopic || topic,
+      deckHint: concept.deckHint, parentCategory: concept.parentCategory,
+      subtopics: concept.subtopics || [], constraints: {},
+      coreKeywords: [...new Set(coreKws)], expandedKeywords: [...new Set(expandedKws)],
+      lowPriorityKeywords: concept.lowPriorityKeywords || [], prerequisiteKeywords: concept.prerequisiteKeywords || [],
+      rewrittenQuery: [...new Set([topic, ...coreKws, ...expandedKws])].join(' '),
+      recallText: [...new Set([topic, ...coreKws, ...expandedKws])].join(' '),
+      rerankText: [...new Set([topic, ...coreKws.slice(0, 3)])].join(' '),
+      confidence: 0.8, source: 'fallback', topicChangeReason: 'eval+dict', filteredStopwords: [],
+      debug: 'quickParse+dict',
+    };
+  }
   return {
     rawQuery: q, intent: 'lookup', topicRaw: q, topic, canonicalTopic: topic,
     deckHint: undefined, parentCategory: undefined, subtopics: [],
