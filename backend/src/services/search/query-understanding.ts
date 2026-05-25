@@ -204,6 +204,9 @@ export function sanitizeTopic(raw: string): string {
 
   t = t.trim();
 
+  // Alias resolution
+  t = CANONICAL_ALIAS[t] || t;
+
   // Strip compound negation prefixes: "我不会X" → X, "我对X很薄弱" → X
   t = t.replace(/^(?:我|我对|面试|最近)(?:不会|不懂|不太懂|很薄弱|老是搞混|完全没概念|总答不好)\s*/i, '');
   // Also strip standalone weakness pronouns when topic starts with "我"

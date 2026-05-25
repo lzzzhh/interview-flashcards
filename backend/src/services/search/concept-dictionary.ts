@@ -253,7 +253,11 @@ const STATIC_CONCEPTS: ConceptEntry[] = [
     lowPriorityKeywords: ['大模型'] },
   { topic: 'Prompt Engineering', canonicalTopic: 'Prompt', deckHint: 'llm', parentCategory: '大模型',
     subtopics: [], coreKeywords: ['Prompt', 'prompt engineering', '提示工程'],
-    expandedKeywords: ['few-shot', 'zero-shot', 'chain of thought'], lowPriorityKeywords: ['大模型'] },
+    expandedKeywords: ['few-shot', 'zero-shot', 'chain of thought'],    lowPriorityKeywords: ['大模型'] },
+  { topic: 'Fine-tuning', canonicalTopic: 'Fine-tuning', deckHint: 'llm', parentCategory: '大模型',
+    subtopics: [], coreKeywords: ['Fine-tuning', '微调', 'fine tune'],
+    expandedKeywords: ['LoRA', 'SFT', 'RLHF', 'instruction tuning', '全量微调'],
+    lowPriorityKeywords: ['大模型'] },
 ];
 
 const STATIC_LOOKUP = new Map<string, ConceptEntry>();
