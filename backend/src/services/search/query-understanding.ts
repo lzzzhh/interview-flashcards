@@ -72,7 +72,7 @@ const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
     // Request/recommend patterns
     /^(?:帮我找|给我一组|给我推荐|帮我推荐|给我)(.+?)(?:相关卡片|的学习清单|几张卡片|的相关内容)?$/,
     // Weakness suffixes
-    /^(.+?)(?:不太懂|很薄弱|老是搞混|完全没概念|看了几遍还是不懂|看了几遍还不懂)/,
+    /^(.+?)(?:不太懂|很薄弱|老是搞混|完全没概念|看了几遍还是不懂|看了几遍还不懂|看了几遍还是不会)/,
     // Interview + weakness
     /^面试(.+?)(?:总[答做]不好|老是|被问到).*/,
     // Suffix patterns
