@@ -150,6 +150,21 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     debugMsg = 'fallback: raw query';
   }
 
+  // ── Step 4b: Multi-topic compare detection ──
+  const compareMatch = q.match(/(.+?)和(.+?)(?:有什么区别|怎么区分|区别|区别是什么|对比|比较|哪个好|先学哪个)/);
+  if (compareMatch) {
+    intent = 'compare';
+    topicRaw = [compareMatch[1].trim(), compareMatch[2].trim()].join(' 和 ');
+    source = 'regex';
+    debugMsg = `compare: topics=["${compareMatch[1].trim()}","${compareMatch[2].trim()}"]`;
+  }
+
+  // ── Step 4c: Needs clarification detection ──
+  const needsClarify = /^(应该先学|先看哪些|从哪开始|先学什么|哪些卡|学什么)(?:什么|哪些|哪里)?$/.test(q);
+  if (needsClarify && !topicRaw) {
+    return buildClarifyResult(q);
+  }
+
   // ── Step 5: Protect specific topic ──
   const protectedTopic = protectSpecificTopic(q, topicRaw);
 
