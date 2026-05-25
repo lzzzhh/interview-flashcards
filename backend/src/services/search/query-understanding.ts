@@ -272,6 +272,13 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
 export function sanitizeTopic(raw: string): string {
   let t = raw.trim();
 
+  // Collapse scattered English acronyms: "x g b o o s t" → "xgboost"
+  // Remove spaces between consecutive English letter sequences
+  t = t.replace(/([a-zA-Z])\s+([a-zA-Z])/g, '$1$2');
+  t = t.replace(/([a-zA-Z])\s+([a-zA-Z])/g, '$1$2');
+  t = t.replace(/([a-zA-Z])\s+([a-zA-Z])/g, '$1$2');
+  t = t.replace(/([a-zA-Z])\s+([a-zA-Z])/g, '$1$2');
+
   // Remove intent prefixes (order matters: longer first)
   t = t.replace(/^(怎么学习|要怎么学|该怎么学|怎么学|如何学习|如何学|怎样学|我想了解|我想学|我要学|我想|我要|想学|想学习|学|学习|了解|掌握|搞懂|刷|复习|回顾|入门)\s*/i, '');
 
