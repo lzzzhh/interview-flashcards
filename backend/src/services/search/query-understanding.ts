@@ -2,6 +2,7 @@
 // Pipeline: rawQuery → normalize → intent → slot extraction → sanitizeTopic → protect → concept expansion → keyword tiering → rewrite
 
 import { conceptLookup, getAllTopics, type ConceptEntry } from './concept-dictionary';
+import { resolveConceptFromGraph, buildKeywordTiersFromGraphWithLimits } from './concept-graph';
 
 // ── Types ──
 
@@ -45,6 +46,7 @@ export interface ParsedSearchQuery {
   source: 'regex' | 'llm' | 'fallback';
   topicChangeReason: string;     // why topic changed from topicRaw
   filteredStopwords: string[];   // stopwords removed from query
+  conceptSource: 'graph' | 'legacy' | 'fallback';  // where concept info came from
   debug: string;
 }
 
@@ -147,18 +149,39 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   // ── Step 5: Protect specific topic ──
   const protectedTopic = protectSpecificTopic(q, topicRaw);
 
-  // ── Step 6: Concept expansion ──
-  const concept = await conceptLookup(protectedTopic);
-  const canonicalTopic = concept?.canonicalTopic || concept?.topic || protectedTopic;
+  // ── Step 6: Concept expansion (graph first, legacy fallback) ──
+  const graphResolved = resolveConceptFromGraph(protectedTopic);
+  let conceptSource: ParsedSearchQuery['conceptSource'] = 'fallback';
+  let concept: ConceptEntry | undefined;
+  let canonicalTopic: string;
+  
+  if (graphResolved.conceptGraphHit) {
+    conceptSource = 'graph';
+    canonicalTopic = graphResolved.canonicalTopic;
+  } else {
+    concept = await conceptLookup(protectedTopic);
+    conceptSource = concept ? 'legacy' : 'fallback';
+    canonicalTopic = concept?.canonicalTopic || concept?.topic || protectedTopic;
+  }
 
   const topicChangeReason = buildTopicChangeReason(topicRaw, protectedTopic, canonicalTopic);
 
   // ── Step 7: Keyword tiering ──
-  const coreKeywords = concept?.coreKeywords?.length
-    ? [...new Set([canonicalTopic, ...concept.coreKeywords])]
-    : [canonicalTopic];
-  const expandedKeywords = concept?.expandedKeywords || [];
-  const lowPriorityKeywords = concept?.lowPriorityKeywords || [];
+  let coreKeywords: string[], expandedKeywords: string[], lowPriorityKeywords: string[], prerequisiteKeywords: string[];
+  if (graphResolved.conceptGraphHit) {
+    const tiers = buildKeywordTiersFromGraphWithLimits(graphResolved.graphNodeId!, intent === 'study' ? 'learning-path' : 'search');
+    coreKeywords = [canonicalTopic, ...tiers.coreKeywords.filter(k => k !== canonicalTopic)];
+    expandedKeywords = tiers.expandedKeywords;
+    lowPriorityKeywords = tiers.lowPriorityKeywords;
+    prerequisiteKeywords = tiers.prerequisiteKeywords;
+  } else {
+    coreKeywords = concept?.coreKeywords?.length
+      ? [...new Set([canonicalTopic, ...concept.coreKeywords])]
+      : [canonicalTopic];
+    expandedKeywords = concept?.expandedKeywords || [];
+    lowPriorityKeywords = concept?.lowPriorityKeywords || [];
+    prerequisiteKeywords = concept?.prerequisiteKeywords || [];
+  }
 
   // ── Step 8: Build recall/rerank text ──
   // IMPORTANT: always include topicRaw + sanitized raw query as fallback terms
@@ -183,6 +206,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     recallText, rerankText,
     confidence: source !== 'fallback' ? 0.8 : 0.2,
     source, topicChangeReason, filteredStopwords,
+    conceptSource,
     debug: debugMsg,
   };
 }
@@ -235,7 +259,7 @@ function buildClarifyResult(q: string): ParsedSearchQuery {
     constraints: {}, coreKeywords: [], expandedKeywords: [], lowPriorityKeywords: [], prerequisiteKeywords: [],
     rewrittenQuery: '', recallText: '', rerankText: '',
     confidence: 0, source: 'regex', topicChangeReason: 'needsClarification: no topic in learning_path query',
-    filteredStopwords: [], debug: 'needsClarification',
+    filteredStopwords: [], conceptSource: 'fallback', debug: 'needsClarification',
   };
 }
 

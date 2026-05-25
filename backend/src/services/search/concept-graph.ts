@@ -88,7 +88,7 @@ const NODES: ConceptNode[] = [
     ]},
 
   // ====== 图算法 ======
-  { id: 'graph_algorithm', canonical: '图算法', aliases: ['图算法', 'graph algorithm'], deckHint: 'leetcode', parentCategory: '算法',
+  { id: 'graph_algorithm', canonical: '图算法', aliases: ['图算法', '图', 'graph algorithm', 'graph'], deckHint: 'leetcode', parentCategory: '算法',
     coreKeywords: ['图算法', 'graph algorithm'], searchAliases: ['graph', '图', 'graphtheory', '图论'],
     relations: [
       { type: 'child', target: 'bfs' }, { type: 'child', target: 'dfs' },
@@ -399,5 +399,163 @@ export function getGraphTrace(topicId: string) {
     hit: true, nodeId: node.id, canonical: node.canonical,
     parentCategory: node.parentCategory,
     relationsUsed: node.relations.map(r => `${r.type}:${r.target}`),
+  };
+}
+
+// ── Adapter Interfaces ──
+
+export interface GraphResolveResult {
+  conceptGraphHit: boolean;
+  graphNodeId?: string;
+  canonicalTopic: string;
+  aliases: string[];
+  deckHint?: string;
+  parentCategory?: string;
+  matchedAlias?: string;
+  confidence: number;
+}
+
+export interface RelatedConcept {
+  id: string;
+  canonical: string;
+  relationType: RelationType;
+  weight: number;
+}
+
+/** Resolve a raw topic string through the concept graph */
+export function resolveConceptFromGraph(rawTopic: string): GraphResolveResult {
+  const id = nodeByAlias.get(rawTopic.toLowerCase());
+  if (!id) {
+    return { conceptGraphHit: false, canonicalTopic: rawTopic, aliases: [], confidence: 0 };
+  }
+  const node = nodeById.get(id)!;
+  return {
+    conceptGraphHit: true,
+    graphNodeId: node.id,
+    canonicalTopic: node.canonical,
+    aliases: [...node.aliases],
+    deckHint: node.deckHint,
+    parentCategory: node.parentCategory,
+    matchedAlias: rawTopic !== node.canonical ? rawTopic : undefined,
+    confidence: 0.9,
+  };
+}
+
+/** Get all equivalent terms (aliases + searchAliases) for a concept */
+export function getConceptEquivalents(topicOrId: string): { canonical: string; aliases: string[]; equivalentTerms: string[] } {
+  const node = nodeById.get(topicOrId) || nodeById.get(nodeByAlias.get(topicOrId.toLowerCase()) || '');
+  if (!node) return { canonical: topicOrId, aliases: [], equivalentTerms: [topicOrId] };
+  return {
+    canonical: node.canonical,
+    aliases: [...node.aliases],
+    equivalentTerms: [...node.aliases, ...node.searchAliases],
+  };
+}
+
+/** Get related concepts by relation type */
+export function getRelatedConcepts(
+  topicId: string,
+  relationTypes: RelationType[] = ['related', 'child', 'implementation'],
+  maxDepth: number = 1
+): RelatedConcept[] {
+  const visited = walkEdges(topicId, relationTypes, maxDepth);
+  const result: RelatedConcept[] = [];
+  for (const vid of visited) {
+    const vnode = nodeById.get(vid);
+    if (vnode) {
+      const rel = vnode.relations.find(r => r.target === topicId);
+      result.push({
+        id: vnode.id, canonical: vnode.canonical,
+        relationType: rel?.type || 'related',
+        weight: rel?.weight || 0.5,
+      });
+    }
+  }
+  return result;
+}
+
+/** Build tiered keywords with token limits */
+export function buildKeywordTiersFromGraphWithLimits(
+  topicId: string,
+  mode: 'search' | 'learning-path' | 'compare' = 'search'
+): KeywordTiers & { graphRelationsUsed: string[] } {
+  const node = nodeById.get(topicId);
+  if (!node) return { coreKeywords: [], expandedKeywords: [], prerequisiteKeywords: [], lowPriorityKeywords: [], graphRelationsUsed: [] };
+
+  const maxDepth = mode === 'learning-path' ? 2 : 1;
+  const core = new Set(node.coreKeywords);
+  const expanded = new Set<string>();
+  const prereq = new Set<string>();
+  const lowPrio = new Set<string>();
+  const relUsed: string[] = [];
+
+  // Parent → lowPriority only (never in main recall)
+  const parents = walkEdges(topicId, ['parent'], 1);
+  for (const pid of parents) {
+    const pn = nodeById.get(pid);
+    if (pn) {
+      if (pn.parentCategory === pn.canonical) {
+        for (const k of pn.coreKeywords) lowPrio.add(k);
+        for (const k of pn.searchAliases) lowPrio.add(k);
+        relUsed.push(`parent:${pid}`);
+      }
+    }
+  }
+
+  // Children → expanded
+  const children = walkEdges(topicId, ['child'], maxDepth);
+  for (const cid of children) {
+    const cn = nodeById.get(cid);
+    if (cn) {
+      for (const k of cn.coreKeywords) { if (!core.has(k)) expanded.add(k); }
+      relUsed.push(`child:${cid}`);
+    }
+  }
+
+  // Learning-path specific
+  if (mode === 'learning-path') {
+    const foundation = walkEdges(topicId, ['foundation'], maxDepth);
+    for (const fid of foundation) {
+      const fn = nodeById.get(fid);
+      if (fn) { for (const k of fn.coreKeywords) prereq.add(k); for (const k of fn.searchAliases) prereq.add(k); relUsed.push(`foundation:${fid}`); }
+    }
+    const prerequisites = walkEdges(topicId, ['prerequisite'], maxDepth);
+    for (const pid of prerequisites) {
+      const pn = nodeById.get(pid);
+      if (pn) { for (const k of pn.coreKeywords) prereq.add(k); relUsed.push(`prerequisite:${pid}`); }
+    }
+  }
+
+  // Related/implementation → expanded
+  const related = walkEdges(topicId, ['related', 'implementation'], maxDepth);
+  for (const rid of related) {
+    const rn = nodeById.get(rid);
+    if (rn) {
+      if (mode === 'learning-path') {
+        for (const k of rn.coreKeywords) prereq.add(k);
+      } else {
+        for (const k of rn.searchAliases) expanded.add(k);
+      }
+      relUsed.push(`${rn.relations.find(r => r.target === topicId)?.type || 'related'}:${rid}`);
+    }
+  }
+
+  // Contrast → expanded (informational, small)
+  if (mode === 'compare') {
+    const contrasts = walkEdges(topicId, ['contrast'], 1);
+    for (const cid of contrasts) {
+      const cn = nodeById.get(cid);
+      if (cn) { for (const k of cn.coreKeywords) { if (!core.has(k)) expanded.add(k); } relUsed.push(`contrast:${cid}`); }
+    }
+  }
+
+  // Apply limits
+  const MAX_EXPANDED = 16, MAX_PREREQ = 12, MAX_LOW = 8;
+  return {
+    coreKeywords: [...core],
+    expandedKeywords: [...expanded].slice(0, MAX_EXPANDED),
+    prerequisiteKeywords: mode === 'learning-path' ? [...prereq].slice(0, MAX_PREREQ) : [],
+    lowPriorityKeywords: [...lowPrio].slice(0, MAX_LOW),
+    graphRelationsUsed: relUsed,
   };
 }
