@@ -150,9 +150,9 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     debugMsg = 'fallback: raw query';
   }
 
-  // ── Step 4b: Multi-topic compare detection ──
-  const compareMatch = q.match(/(.+?)和(.+?)(?:有什么区别|怎么区分|区别|区别是什么|对比|比较|哪个好|先学哪个)/);
-  if (compareMatch) {
+  // ── Step 4b: Multi-topic compare detection (after suffix patterns, Chinese concepts only)
+  const compareMatch = q.match(/([\u4e00-\u9fff]+?)和([\u4e00-\u9fff]+?)(?:有什么区别|怎么区分|区别|先学哪个|对比|比较)/);
+  if (compareMatch && !topicRaw) {
     intent = 'compare';
     topicRaw = [compareMatch[1].trim(), compareMatch[2].trim()].join(' 和 ');
     source = 'regex';
