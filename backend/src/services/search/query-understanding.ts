@@ -45,7 +45,7 @@ const STOPWORDS = new Set([
 // ── Regex intent patterns ──
 
 const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
-  { intent: 'study',   patterns: [/^(?:怎么学|如何学|怎么学习|要怎么学|该怎么学|我想|我要|我想学|我要学|想学|想学习|学|学习)(.+)/, /^(.+)(?:怎么学|如何学|如何学习|怎么学习|学习方法)$/] },
+  { intent: 'study',   patterns: [/^(?:如何学习|怎么学习|要怎么学|该怎么学|我想学|我要学|怎么学|如何学|怎样学|我想|我要|想学|想学习|学|学习)(.+)/, /^(.+)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学)$/] },
   { intent: 'review',  patterns: [/^(?:复习|回顾|重温|我想复习|我要复习)(.+)/, /^(.+)(?:复习|回顾)$/] },
   { intent: 'practice', patterns: [/^(?:刷|刷题|练习|训练)(.+)/, /^(.+)(?:刷|练习|训练)$/] },
   { intent: 'lookup',  patterns: [/^(?:什么是|什么叫|啥是|解释|了解)(.+)/] },
@@ -162,7 +162,7 @@ export function sanitizeTopic(raw: string): string {
   let t = raw.trim();
 
   // Remove intent prefixes (order matters: longer first)
-  t = t.replace(/^(怎么学习|要怎么学|该怎么学|怎么学|如何学习|如何学|怎样学|我想了解|我想学|我要学|我想|我要|想学|想学习|学|学习|了解|掌握|搞懂|刷|复习|回顾)\s*/i, '');
+  t = t.replace(/^(怎么学习|要怎么学|该怎么学|怎么学|如何学习|如何学|怎样学|我想了解|我想学|我要学|我想|我要|想学|想学习|学|学习|了解|掌握|搞懂|刷|复习|回顾|入门)\s*/i, '');
 
   // Remove request tails after punctuation
   t = t.replace(/[，,。！!？?\s]+.*$/s, '');

@@ -46,13 +46,15 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   }
 
   // 2. Rewrite
+  // 2. Rewrite: check against tiered keywords only (not raw query fallback)
   const rMustInc = c.rewrite?.mustInclude || [];
   const rMustNot = c.rewrite?.mustNotInclude || [];
-  const rText = parsed.recallText.toLowerCase();
-  const rMustIncOk = rMustInc.every((w: string) => rText.includes(w.toLowerCase()));
-  const rMustNotOk = !rMustNot.some((w: string) => rText.includes(w.toLowerCase()));
-  if (!rMustIncOk) failures.push(`mustInclude failed: ${rMustInc.filter((w: string) => !rText.includes(w.toLowerCase())).join(',')}`);
-  if (!rMustNotOk) failures.push(`mustNotInclude failed: ${rMustNot.filter((w: string) => rText.includes(w.toLowerCase())).join(',')}`);
+  // Only check tiered keywords, not raw query terms
+  const tieredText = [parsed.canonicalTopic, ...parsed.coreKeywords, ...parsed.expandedKeywords].join(' ').toLowerCase();
+  const rMustIncOk = rMustInc.every((w: string) => tieredText.includes(w.toLowerCase()));
+  const rMustNotOk = !rMustNot.some((w: string) => tieredText.includes(w.toLowerCase()));
+  if (!rMustIncOk) failures.push(`mustInclude failed: ${rMustInc.filter((w: string) => !tieredText.includes(w.toLowerCase())).join(',')}`);
+  if (!rMustNotOk) failures.push(`mustNotInclude failed: ${rMustNot.filter((w: string) => tieredText.includes(w.toLowerCase())).join(',')}`);
 
   // 3. Search
   const results: any = await hybridSearch({ query: c.query, maxResults: 20, minScore: 0, debug: true });
