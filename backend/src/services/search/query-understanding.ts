@@ -6,7 +6,7 @@ import { resolveConceptFromGraph, buildKeywordTiersFromGraphWithLimits } from '.
 
 // ── Types ──
 
-export type SearchIntent = 'study' | 'review' | 'lookup' | 'practice' | 'plan' | 'recommend_cards' | 'learning_path';
+export type SearchIntent = 'search_cards' | 'create_plan' | 'review_weakness' | 'recommend_cards' | 'compare_cards' | 'clarify';
 
 // ── Protected terms — must not be matched by stopword substrings ──
 const PROTECTED_TERMS = new Set([
@@ -64,37 +64,42 @@ const STOPWORDS = new Set([
 ]);
 
 // ── Regex intent patterns ──
-
 const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
-  { intent: 'study',   patterns: [
+  // create_plan: study/learning intent ("怎么学X", "X入门", "X学习路线", "X学习路径")
+  { intent: 'create_plan',   patterns: [
     // Prefix patterns
     /^(?:如何学习|怎么学习|怎么系统学|要怎么学|该怎么学|我想学|我要学|怎么学|如何学|怎样学|我想|我要|想学|想学习|学|学习)(.+)/,
-    // Request/recommend patterns: extract topic from "帮我找X" / "给我一组X"
+    // Request/recommend patterns
     /^(?:帮我找|给我一组|给我推荐|帮我推荐|给我)(.+?)(?:相关卡片|的学习清单|几张卡片|的相关内容)?$/,
-    // Weakness suffixes (check before broader study suffixes)
+    // Weakness suffixes
     /^(.+?)(?:不太懂|很薄弱|老是搞混|完全没概念|看了几遍还是不懂|看了几遍还不懂)/,
-    // Interview + weakness compound
+    // Interview + weakness
     /^面试(.+?)(?:总[答做]不好|老是|被问到).*/,
-    // Suffix patterns — broad coverage
-    /^(.+?)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学|从哪开始|应该先学什么|先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
+    // Suffix patterns
+    /^(.+?)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|的学习路径|学习路径|入门|从哪里开始学|从哪开始|应该先学什么|先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
   ]},
-  { intent: 'review',  patterns: [
+  { intent: 'review_weakness',  patterns: [
     /^(?:复习|回顾|重温|我想复习|我要复习)(.+)/,
     /^(.+)(?:复习|回顾)$/,
-    // Weakness review
     /^(.+?)(?:不太懂|很薄弱|老是搞混).*怎么复习/,
-    /^(.+?)(?:面试|老是)被问到.*怎么补/,
+    /^(.+?)(?:面试|被问到|总[答做]不好|没答好).*(?:怎么补|怎么复习|补哪些)/,
   ]},
-  { intent: 'practice', patterns: [/^(?:刷|刷题|练习|训练)(.+)/, /^(.+)(?:刷|练习|训练)$/] },
-  { intent: 'lookup',  patterns: [/^(?:什么是|什么叫|啥是|解释|了解)(.+)/] },
+  { intent: 'recommend_cards', patterns: [
+    /^(.+?)(?:，|,|给我推荐|推荐几张|推荐).*卡片/,
+    /^(.+?)(?:相关内容|学习清单|的卡片|卡)/,
+  ]},
+  { intent: 'compare_cards', patterns: [
+    /([\u4e00-\u9fff]+?)和([\u4e00-\u9fff]+?)(?:有什么区别|怎么区分|区别|先学哪个|对比|比较|哪个好|总搞混)/,
+  ]},
+  { intent: 'clarify', patterns: [
+    /^(应该先学|先看哪些|从哪开始)(?:什么|哪些|哪里)?$/,
+  ]},
 ];
-
-// ── Main entry point ──
 
 export async function understandQuery(rawQuery: string): Promise<ParsedSearchQuery> {
   const q = rawQuery.trim();
   let topicRaw = '';
-  let intent: SearchIntent = 'lookup';
+  let intent: SearchIntent = 'search_cards';
   let source: ParsedSearchQuery['source'] = 'fallback';
   let debugMsg = '';
 
@@ -123,7 +128,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
       const concept = await conceptLookup(clean);
       if (concept) {
         topicRaw = clean;
-        intent = 'study';
+        intent = 'create_plan';
         source = 'regex';
         debugMsg = `dict match: "${clean}"`;
         break;
@@ -145,7 +150,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   // ── Step 4: Final fallback ──
   if (!topicRaw) {
     topicRaw = q;
-    intent = 'lookup';
+    intent = 'search_cards';
     source = 'fallback';
     debugMsg = 'fallback: raw query';
   }
@@ -196,7 +201,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   if (graphResolved.conceptGraphHit) {
     // Graph-owned tiers: graph provides core/expanded/prerequisite, legacy only supplements
     tierOwner = 'graph';
-    const graphTiers = buildKeywordTiersFromGraphWithLimits(graphResolved.graphNodeId!, intent === 'study' ? 'learning-path' : 'search');
+    const graphTiers = buildKeywordTiersFromGraphWithLimits(graphResolved.graphNodeId!, intent === 'create_plan' ? 'learning-path' : 'search');
     // Core from graph + canonicalTopic
     coreKeywords = [canonicalTopic, ...graphTiers.coreKeywords.filter(k => k !== canonicalTopic)];
     // Expanded from graph, no legacy expanded by default
@@ -248,7 +253,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     deckHint: concept?.deckHint,
     parentCategory: concept?.parentCategory,
     subtopics: concept?.subtopics || [],
-    constraints: intent === 'review' ? { onlyDue: true } : {},
+    constraints: intent === 'review_weakness' ? { onlyDue: true } : {},
     coreKeywords, expandedKeywords, lowPriorityKeywords,
     prerequisiteKeywords: concept?.prerequisiteKeywords || [],
     rewrittenQuery: recallText,
@@ -303,7 +308,7 @@ function isStopword(word: string): boolean {
 // ── P0: Clarification result ──
 function buildClarifyResult(q: string): ParsedSearchQuery {
   return {
-    rawQuery: q, intent: 'learning_path', topicRaw: '', topic: '', canonicalTopic: '',
+    rawQuery: q, intent: 'clarify', topicRaw: '', topic: '', canonicalTopic: '',
     deckHint: undefined, parentCategory: undefined, subtopics: [],
     constraints: {}, coreKeywords: [], expandedKeywords: [], lowPriorityKeywords: [], prerequisiteKeywords: [],
     rewrittenQuery: '', recallText: '', rerankText: '',
@@ -360,7 +365,7 @@ async function llmFullParse(query: string): Promise<{ intent: SearchIntent; topi
 
 返回JSON：
 {
-  "intent": "study|review|lookup|practice|plan|recommend_cards",
+  "intent": "search_cards|create_plan|review_weakness|practice|plan|recommend_cards",
   "topic": "具体概念名（如XGBoost、哈希表、集成学习，不是机器学习这种大类）",
   "rewrittenQuery": "检索关键词（空格分隔，不含学习/教程/推荐/卡片等请求词）"
 }
@@ -379,6 +384,6 @@ async function llmFullParse(query: string): Promise<{ intent: SearchIntent; topi
     if (!jsonMatch) return null;
     const parsed = JSON.parse(jsonMatch[0]);
     if (!parsed.topic || parsed.topic.trim().length === 0) return null;
-    return { intent: parsed.intent || 'lookup', topic: parsed.topic.trim(), rewrittenQuery: parsed.rewrittenQuery || '' };
+    return { intent: parsed.intent || 'search_cards', topic: parsed.topic.trim(), rewrittenQuery: parsed.rewrittenQuery || '' };
   } catch { return null; }
 }
