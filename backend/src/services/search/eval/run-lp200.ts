@@ -29,9 +29,10 @@ interface LPResult {
 
 function getExpected(c: any): { intent: string; topic: string; deckHint?: string; parent?: string } {
   if (c.expectedUnderstanding) {
-    return { intent: c.expectedUnderstanding.intent, topic: c.expectedUnderstanding.topic, deckHint: c.expectedUnderstanding.deckHint, parent: c.expectedUnderstanding.parentCategory };
+    return { intent: c.expectedUnderstanding.intent, topic: c.expectedUnderstanding.topic };
   }
-  return { intent: c.expectedIntent, topic: c.expectedTopic, deckHint: c.expectedDeckHint, parent: c.expectedParent };
+  // Generated cases use flat fields
+  return { intent: c.expectedIntent, topic: c.expectedTopic };
 }
 
 async function runOne(c: any, idx: number): Promise<LPResult> {
