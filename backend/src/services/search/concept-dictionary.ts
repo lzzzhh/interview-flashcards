@@ -286,6 +286,14 @@ const STATIC_CONCEPTS: ConceptEntry[] = [
     subtopics: [], coreKeywords: ['连通性', 'connectivity'],
     expandedKeywords: ['并查集', 'Union Find', 'BFS', 'DFS', 'connected component'],
     lowPriorityKeywords: ['算法'] },
+  { topic: 'Bagging和Boosting', canonicalTopic: 'Bagging', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: [], coreKeywords: ['Bagging', 'Boosting', '集成学习'],
+    expandedKeywords: ['随机森林', 'bootstrap', '方差', '偏差', 'ensemble difference'],
+    lowPriorityKeywords: ['机器学习'] },
+  { topic: 'RAG和Agent', canonicalTopic: 'RAG', deckHint: 'agent', parentCategory: 'Agent',
+    subtopics: [], coreKeywords: ['RAG', 'Agent', 'retrieval', 'tool use'],
+    expandedKeywords: ['function calling', 'ReAct', 'multi-agent', '检索增强'],
+    lowPriorityKeywords: ['AI'] },
 ];
 
 const STATIC_LOOKUP = new Map<string, ConceptEntry>();
