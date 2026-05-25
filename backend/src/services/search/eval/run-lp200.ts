@@ -75,8 +75,10 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   const mustMatch = c.ranking?.mustMatchAny || c.mustMatchAny || [];
   const top10 = results.slice(0, 10);
   const top10Text = top10.map((r: any) => {
-    const parts = [r.titleCn, r.title, r.reason, r.snippet, r.deckName].filter(Boolean);
-    return parts.join(' ').toLowerCase();
+    const parts = [r.titleCn, r.title, r.reason, r.snippet, r.deckName];
+    // Add tags if available
+    if (Array.isArray(r.tags)) parts.push(...r.tags);
+    return parts.filter(Boolean).join(' ').toLowerCase();
   }).join(' ');
   const matched = mustMatch.filter((w: string) => top10Text.includes(w.toLowerCase())).length;
   const precision = mustMatch.length > 0 ? Math.min(1, matched / Math.min(10, mustMatch.length)) : 0;
