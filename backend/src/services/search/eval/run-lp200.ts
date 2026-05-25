@@ -27,12 +27,19 @@ interface LPResult {
   passed: boolean; failures: string[];
 }
 
-function getExpected(c: any): { intent: string; topic: string; deckHint?: string; parent?: string } {
+function getExpected(c: any): { intent: string; topic: string; acceptableIntents?: string[]; acceptableTopics?: string[] } {
   if (c.expectedUnderstanding) {
-    return { intent: c.expectedUnderstanding.intent, topic: c.expectedUnderstanding.topic };
+    return {
+      intent: c.expectedUnderstanding.intent, topic: c.expectedUnderstanding.topic,
+      acceptableIntents: c.expectedUnderstanding.acceptableIntent || c.expectedUnderstanding.acceptableIntents,
+      acceptableTopics: c.expectedUnderstanding.acceptableTopic || c.expectedUnderstanding.acceptableTopics || c.expectedUnderstanding.topics,
+    };
   }
-  // Generated cases use flat fields
-  return { intent: c.expectedIntent, topic: c.expectedTopic };
+  return {
+    intent: c.expectedIntent, topic: c.expectedTopic,
+    acceptableIntents: c.acceptableIntents,
+    acceptableTopics: c.acceptableTopics,
+  };
 }
 
 async function runOne(c: any, idx: number): Promise<LPResult> {
@@ -41,9 +48,9 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   
   // 1. Understanding (with acceptable sets)
   const parsed = await understandQuery(c.query);
-  const acceptableIntent = c.expectedUnderstanding?.acceptableIntent || [exp.intent];
+  const acceptableIntent = exp.acceptableIntents || [exp.intent];
   const intentOk = acceptableIntent.includes(parsed.intent);
-  const acceptableTopic = c.expectedUnderstanding?.acceptableTopic || [exp.topic];
+  const acceptableTopic = exp.acceptableTopics || [exp.topic];
   const topicOk = acceptableTopic.some((t: string) => (parsed.topic || '').toLowerCase() === t.toLowerCase());
   const uPass = intentOk && topicOk;
   if (!uPass) {
