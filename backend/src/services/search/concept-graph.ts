@@ -151,7 +151,7 @@ const NODES: ConceptNode[] = [
 
   // ====== 数据结构 ======
   { id: 'hash_table', canonical: '哈希表', aliases: ['哈希表', 'hash table'], deckHint: 'leetcode', parentCategory: '算法',
-    coreKeywords: ['哈希表', 'hash table', 'hashmap', 'hash map'], searchAliases: ['hash', '散列', 'map', 'dict', 'dictionary', 'set', 'array', '数组'],
+    coreKeywords: ['哈希表', 'hash table', 'hashmap', 'hash map'], searchAliases: ['hash', '散列', 'map', 'dict', 'dictionary', 'set'],
     relations: [
       { type: 'related', target: 'array' }, { type: 'contrast', target: 'two_pointer' },
     ],
@@ -245,7 +245,7 @@ const NODES: ConceptNode[] = [
     migrationStatus: 'manual', domain: 'machine-learning',
   },
   { id: 'backtracking', canonical: '回溯', aliases: ['回溯', '回溯算法', 'backtracking'], deckHint: 'leetcode', parentCategory: '算法',
-    coreKeywords: ['回溯', 'backtracking'], searchAliases: ['backtracking', '递归', '剪枝', 'permutation', 'combination', 'N皇后', '子集'],
+    coreKeywords: ['回溯', 'backtracking'], searchAliases: ['backtracking', '递归', 'DFS', '剪枝', 'permutation', 'combination'],
     relations: [{ type: 'related', target: 'dfs' }] },
   { id: 'reinforcement_learning', canonical: '强化学习', aliases: ['强化学习', 'reinforcement learning', 'RL'], deckHint: 'machine-learning', parentCategory: '机器学习',
     coreKeywords: ['强化学习', 'reinforcement learning', 'RL'], searchAliases: ['rl', 'agent', 'environment', 'reward', 'Q-learning', 'policy', 'value', 'Bellman'],
