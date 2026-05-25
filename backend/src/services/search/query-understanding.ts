@@ -18,7 +18,10 @@ const PROTECTED_TERMS = new Set([
 // ── Alias mapping before sanitize ──
 const CANONICAL_ALIAS: Record<string, string> = {
   '排序算法': '排序', '回溯算法': '回溯', '图算法': '图', '贪心算法': '贪心',
-  '哈希表': '哈希表', // identity, but blocks suffix removal
+  '概率论': '概率', '概率统计': '概率',
+  '哈希表': '哈希表',
+  '优化器': '优化器', '损失函数': '损失函数',
+  '数据结构': '数据结构', '算法': '算法',
 };
 
 export interface ParsedSearchQuery {
@@ -59,8 +62,23 @@ const STOPWORDS = new Set([
 // ── Regex intent patterns ──
 
 const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
-  { intent: 'study',   patterns: [/^(?:如何学习|怎么学习|要怎么学|该怎么学|我想学|我要学|怎么学|如何学|怎样学|我想|我要|想学|想学习|学|学习)(.+)/, /^(.+)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学)$/] },
-  { intent: 'review',  patterns: [/^(?:复习|回顾|重温|我想复习|我要复习)(.+)/, /^(.+)(?:复习|回顾)$/] },
+  { intent: 'study',   patterns: [
+    // Prefix patterns
+    /^(?:如何学习|怎么学习|要怎么学|该怎么学|我想学|我要学|怎么学|如何学|怎样学|我想|我要|想学|想学习|学|学习)(.+)/,
+    // Suffix patterns — broad coverage
+    /^(.+?)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学|从哪开始|先学什么|应该先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|老是搞混|不太懂|很薄弱|推荐几张卡|推荐几张|推荐卡)/,
+    // Compound: X不会Y
+    /^(.+?)不会.+怎么补/,
+    // Interview-based
+    /^(.+?)总[答做]不好.*补/,
+  ]},
+  { intent: 'review',  patterns: [
+    /^(?:复习|回顾|重温|我想复习|我要复习)(.+)/,
+    /^(.+)(?:复习|回顾)$/,
+    // Weakness review
+    /^(.+?)(?:不太懂|很薄弱|老是搞混).*怎么复习/,
+    /^(.+?)(?:面试|老是)被问到.*怎么补/,
+  ]},
   { intent: 'practice', patterns: [/^(?:刷|刷题|练习|训练)(.+)/, /^(.+)(?:刷|练习|训练)$/] },
   { intent: 'lookup',  patterns: [/^(?:什么是|什么叫|啥是|解释|了解)(.+)/] },
 ];
