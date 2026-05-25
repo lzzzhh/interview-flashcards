@@ -2,6 +2,7 @@
 // 200-case learning-path eval — understanding, rewrite, retrieval, ranking, LP quality
 import { understandQuery, sanitizeTopic } from '../query-understanding';
 import { getConceptEquivalents } from '../concept-graph';
+import { matchCardToConcepts } from '../card-concept-matcher';
 import { hybridSearch } from '../hybrid-search';
 
 // ── Load all 205 cases (manual 40 + generated 165) ──
@@ -79,16 +80,25 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   const mergedFail = c.retrieval?.maxMergedCandidates && merged > c.retrieval.maxMergedCandidates;
   if (mergedFail) failures.push(`merged: ${merged} > ${c.retrieval.maxMergedCandidates}`);
 
-  // 4. Ranking
+  // 4. Ranking (with card-concept matching for concept-level precision)
   const mustMatch = c.ranking?.mustMatchAny || c.mustMatchAny || [];
   const top10 = results.slice(0, 10);
+  // Text-based matching (title, tags, snippet, reason, deckName)
   const top10Text = top10.map((r: any) => {
     const parts = [r.titleCn, r.title, r.reason, r.snippet, r.deckName];
-    // Add tags if available
     if (Array.isArray(r.tags)) parts.push(...r.tags);
     return parts.filter(Boolean).join(' ').toLowerCase();
   }).join(' ');
-  const matched = mustMatch.filter((w: string) => top10Text.includes(w.toLowerCase())).length;
+  // Concept-level matching: each result card's fields matched against graph aliases
+  const matchedConceptIds = new Set<string>();
+  for (const r of top10) {
+    const cardFields: any = { cardId: r.cardId, title: r.title, titleCn: r.titleCn, tags: r.tags, searchKeywords: r.searchKeywords, question: r.snippet, answer: r.answer };
+    const matched = matchCardToConcepts(cardFields);
+    for (const mc of matched) matchedConceptIds.add(mc.conceptId);
+  }
+  const conceptText = [...matchedConceptIds].join(' ').toLowerCase();
+  const combinedText = top10Text + ' ' + conceptText;
+  const matched = mustMatch.filter((w: string) => combinedText.includes(w.toLowerCase())).length;
   const precision = mustMatch.length > 0 ? Math.min(1, matched / Math.min(10, mustMatch.length)) : 0;
   const rankFail = (c.ranking?.minPrecision || 0.3) && precision < (c.ranking?.minPrecision || 0.3);
   if (rankFail) failures.push(`precision: ${precision.toFixed(2)} < ${c.ranking.minPrecision}`);
