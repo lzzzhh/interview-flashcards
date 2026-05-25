@@ -64,7 +64,7 @@ const STOPWORDS = new Set([
 const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
   { intent: 'study',   patterns: [
     // Prefix patterns
-    /^(?:如何学习|怎么学习|要怎么学|该怎么学|我想学|我要学|怎么学|如何学|怎样学|我想|我要|想学|想学习|学|学习)(.+)/,
+    /^(?:如何学习|怎么学习|怎么系统学|要怎么学|该怎么学|我想学|我要学|怎么学|如何学|怎样学|我想|我要|想学|想学习|学|学习)(.+)/,
     // Request/recommend patterns: extract topic from "帮我找X" / "给我一组X"
     /^(?:帮我找|给我一组|给我推荐|帮我推荐|给我)(.+?)(?:相关卡片|的学习清单|几张卡片|的相关内容)?$/,
     // Weakness suffixes (check before broader study suffixes)

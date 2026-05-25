@@ -247,6 +247,13 @@ const STATIC_CONCEPTS: ConceptEntry[] = [
     subtopics: [], coreKeywords: ['交叉验证', 'cross validation'],
     expandedKeywords: ['k-fold', 'LOOCV', '验证集', 'holdout', 'grid search'],
     lowPriorityKeywords: ['机器学习'] },
+  { topic: 'Prompt', canonicalTopic: 'Prompt', deckHint: 'llm', parentCategory: '大模型',
+    subtopics: [], coreKeywords: ['Prompt', '提示词', 'prompt engineering'],
+    expandedKeywords: ['few-shot', 'chain of thought', 'CoT', 'instruction', 'system prompt'],
+    lowPriorityKeywords: ['大模型'] },
+  { topic: 'Prompt Engineering', canonicalTopic: 'Prompt', deckHint: 'llm', parentCategory: '大模型',
+    subtopics: [], coreKeywords: ['Prompt', 'prompt engineering', '提示工程'],
+    expandedKeywords: ['few-shot', 'zero-shot', 'chain of thought'], lowPriorityKeywords: ['大模型'] },
 ];
 
 const STATIC_LOOKUP = new Map<string, ConceptEntry>();
