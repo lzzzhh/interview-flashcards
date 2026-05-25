@@ -25,16 +25,24 @@ interface LPResult {
   passed: boolean; failures: string[];
 }
 
+function getExpected(c: any): { intent: string; topic: string; deckHint?: string; parent?: string } {
+  if (c.expectedUnderstanding) {
+    return { intent: c.expectedUnderstanding.intent, topic: c.expectedUnderstanding.topic, deckHint: c.expectedUnderstanding.deckHint, parent: c.expectedUnderstanding.parentCategory };
+  }
+  return { intent: c.expectedIntent, topic: c.expectedTopic, deckHint: c.expectedDeckHint, parent: c.expectedParent };
+}
+
 async function runOne(c: any, idx: number): Promise<LPResult> {
   const failures: string[] = [];
+  const exp = getExpected(c);
   
   // 1. Understanding
   const parsed = await understandQuery(c.query);
-  const uPass = parsed.intent === c.expectedIntent
-    && (parsed.topic || '').toLowerCase() === (c.expectedTopic || '').toLowerCase();
+  const uPass = parsed.intent === exp.intent
+    && (parsed.topic || '').toLowerCase() === (exp.topic || '').toLowerCase();
   if (!uPass) {
-    if (parsed.intent !== c.expectedIntent) failures.push(`intent: ${parsed.intent}≠${c.expectedIntent}`);
-    if ((parsed.topic || '').toLowerCase() !== (c.expectedTopic || '').toLowerCase()) failures.push(`topic: ${parsed.topic}≠${c.expectedTopic}`);
+    if (parsed.intent !== exp.intent) failures.push(`intent: ${parsed.intent}≠${exp.intent}`);
+    if ((parsed.topic || '').toLowerCase() !== (exp.topic || '').toLowerCase()) failures.push(`topic: ${parsed.topic}≠${exp.topic}`);
   }
 
   // 2. Rewrite
@@ -55,12 +63,12 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   if (mergedFail) failures.push(`merged: ${merged} > ${c.retrieval.maxMergedCandidates}`);
 
   // 4. Ranking
-  const mustMatch: string[] = c.ranking?.mustMatchAny || c.mustMatchAny || [];
+  const mustMatch = c.ranking?.mustMatchAny || c.mustMatchAny || [];
   const top10 = results.slice(0, 10);
   const top10Text = top10.map((r: any) => (r.titleCn || r.title || '').toLowerCase()).join(' ');
   const matched = mustMatch.filter((w: string) => top10Text.includes(w.toLowerCase())).length;
   const precision = mustMatch.length > 0 ? matched / Math.min(10, mustMatch.length) : 0;
-  const rankFail = c.ranking?.minPrecision && precision < c.ranking.minPrecision;
+  const rankFail = (c.ranking?.minPrecision || 0.3) && precision < (c.ranking?.minPrecision || 0.3);
   if (rankFail) failures.push(`precision: ${precision.toFixed(2)} < ${c.ranking.minPrecision}`);
 
   // 5. LP quality
@@ -74,7 +82,7 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   return {
     id: c.id, query: c.query.slice(0, 50), category: c.category || '?', domain: c.domain || '?', style: c.style || '?',
     uPass, uIntent: parsed.intent, uTopic: parsed.topic, uDeckHint: parsed.deckHint || '', uParent: parsed.parentCategory || '',
-    uExpectedTopic: c.expectedTopic, uExpectedDeck: c.expectedDeckHint || '',
+    uExpectedTopic: exp.topic, uExpectedDeck: exp.deckHint || '',
     rMustIncOk, rMustNotOk, rRecallLen: parsed.recallText.length, rRerankLen: parsed.rerankText.length,
     merged, finalCnt, mergedFail,
     matched, top10: Math.min(10, finalCnt), precision,
