@@ -53,7 +53,11 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   const tieredTokens = new Set([parsed.canonicalTopic, ...parsed.coreKeywords, ...parsed.expandedKeywords].flatMap(t => t.toLowerCase().split(/\s+/)));
   const rMustIncOk = rMustInc.every((w: string) => {
     const wl = w.toLowerCase();
-    return tieredTokens.has(wl) || [...tieredTokens].some(t => t.startsWith(wl) || t.endsWith(wl));
+    // Exact token match or every word in the phrase present
+    if (tieredTokens.has(wl)) return true;
+    const words = wl.split(/\s+/);
+    if (words.length > 1) return words.every(wr => tieredTokens.has(wr));
+    return false;
   });
   const rMustNotOk = !rMustNot.some((w: string) => tieredTokens.has(w.toLowerCase()));
   if (!rMustIncOk) failures.push(`mustInclude failed: ${rMustInc.filter((w: string) => !tieredTokens.has(w.toLowerCase())).join(',')}`);
@@ -62,7 +66,7 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   // 3. Search
   const results: any = await hybridSearch({ query: c.query, maxResults: 20, minScore: 0, debug: true });
   const trace = results._trace || {};
-  const merged = trace.merge?.beforeDedup || 0;
+  const merged = trace.merge?.afterDedup || 0; // Use deduped count, not sum of channels
   const finalCnt = results.length;
   const mergedFail = c.retrieval?.maxMergedCandidates && merged > c.retrieval.maxMergedCandidates;
   if (mergedFail) failures.push(`merged: ${merged} > ${c.retrieval.maxMergedCandidates}`);
