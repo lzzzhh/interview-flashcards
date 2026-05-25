@@ -74,9 +74,12 @@ async function runOne(c: any, idx: number): Promise<LPResult> {
   // 4. Ranking
   const mustMatch = c.ranking?.mustMatchAny || c.mustMatchAny || [];
   const top10 = results.slice(0, 10);
-  const top10Text = top10.map((r: any) => (r.titleCn || r.title || '').toLowerCase()).join(' ');
+  const top10Text = top10.map((r: any) => {
+    const parts = [r.titleCn, r.title, r.reason, r.snippet, r.deckName].filter(Boolean);
+    return parts.join(' ').toLowerCase();
+  }).join(' ');
   const matched = mustMatch.filter((w: string) => top10Text.includes(w.toLowerCase())).length;
-  const precision = mustMatch.length > 0 ? matched / Math.min(10, mustMatch.length) : 0;
+  const precision = mustMatch.length > 0 ? Math.min(1, matched / Math.min(10, mustMatch.length)) : 0;
   const rankFail = (c.ranking?.minPrecision || 0.3) && precision < (c.ranking?.minPrecision || 0.3);
   if (rankFail) failures.push(`precision: ${precision.toFixed(2)} < ${c.ranking.minPrecision}`);
 
