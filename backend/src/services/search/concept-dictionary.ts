@@ -183,6 +183,14 @@ const STATIC_CONCEPTS: ConceptEntry[] = [
     subtopics: [], coreKeywords: ['大模型', 'LLM', 'GPT'],
     expandedKeywords: ['Transformer', '预训练', '微调', 'RLHF', 'prompt', 'tokenizer'],
     lowPriorityKeywords: [] },
+  { topic: 'LeetCode', canonicalTopic: 'LeetCode', deckHint: 'leetcode', parentCategory: '算法',
+    subtopics: [], coreKeywords: ['LeetCode', '刷题', '算法'],
+    expandedKeywords: ['数组', '哈希表', '动态规划', '字符串', '双指针', '树', '链表', '图', '回溯'],
+    lowPriorityKeywords: [] },
+  { topic: '数组和哈希表', canonicalTopic: '哈希表', deckHint: 'leetcode', parentCategory: '算法',
+    subtopics: [], coreKeywords: ['哈希表', '数组', 'hash', 'array'],
+    expandedKeywords: ['双指针', '频次', '计数', '两数之和', '散列表'],
+    lowPriorityKeywords: ['算法'] },
 ];
 
 const STATIC_LOOKUP = new Map<string, ConceptEntry>();
