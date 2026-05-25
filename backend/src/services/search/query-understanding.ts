@@ -129,7 +129,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
       const concept = await conceptLookup(clean);
       if (concept) {
         topicRaw = clean;
-        intent = 'create_plan';
+        intent = 'search_cards';
         source = 'regex';
         debugMsg = `dict match: "${clean}"`;
         break;

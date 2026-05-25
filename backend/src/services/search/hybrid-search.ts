@@ -120,10 +120,12 @@ async function quickParse(rawQuery: string): Promise<ParsedSearchQuery> {
   // Do concept dict lookup even in eval mode for keyword expansion
   const concept = await conceptLookup(topic);
   if (concept) {
+    const hasStudySignal = /怎么学|如何学|怎样学|入门|学习路线|学习路径|怎么补|怎么复习|推荐|帮我|给我/.test(q);
+    const intent = hasStudySignal ? 'create_plan' as const : 'search_cards' as const;
     const coreKws = [topic, ...(concept.coreKeywords || [])];
     const expandedKws = [...(concept.expandedKeywords || [])];
     return {
-      rawQuery: q, intent: 'create_plan', topicRaw: q, topic, canonicalTopic: concept.canonicalTopic || topic,
+      rawQuery: q, intent, topicRaw: q, topic, canonicalTopic: concept.canonicalTopic || topic,
       deckHint: concept.deckHint, parentCategory: concept.parentCategory,
       subtopics: concept.subtopics || [], constraints: {},
       coreKeywords: [...new Set(coreKws)], expandedKeywords: [...new Set(expandedKws)],
