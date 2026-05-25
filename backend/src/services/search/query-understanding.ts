@@ -68,7 +68,7 @@ const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
     // Weakness suffixes (check before broader study suffixes)
     /^(.+?)(?:不太懂|很薄弱|老是搞混|完全没概念)/,
     // Suffix patterns — broad coverage
-    /^(.+)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学|从哪开始|先学什么|应该先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
+    /^(.+)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|入门|从哪里开始学|从哪开始|应该先学什么|先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
   ]},
   { intent: 'review',  patterns: [
     /^(?:复习|回顾|重温|我想复习|我要复习)(.+)/,
