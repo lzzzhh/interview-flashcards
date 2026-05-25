@@ -171,6 +171,18 @@ const STATIC_CONCEPTS: ConceptEntry[] = [
     subtopics: [], coreKeywords: ['KMeans', 'k均值'],
     expandedKeywords: ['聚类', 'elbow method', '轮廓系数', 'kmeans++'],
     lowPriorityKeywords: ['机器学习'] },
+  { topic: '算法', canonicalTopic: '算法', deckHint: 'leetcode', parentCategory: '算法',
+    subtopics: [], coreKeywords: ['算法', 'algorithm'],
+    expandedKeywords: ['数据结构', '数组', '哈希表', '动态规划', '树', '链表', '栈', '队列', '图', '排序', '递归', '二分'],
+    lowPriorityKeywords: [] },
+  { topic: '数据科学', canonicalTopic: '数据科学', deckHint: 'statistics', parentCategory: '数据科学',
+    subtopics: [], coreKeywords: ['数据科学', 'data science'],
+    expandedKeywords: ['SQL', 'Python', 'pandas', '统计分析', '可视化', '机器学习', '数据清洗'],
+    lowPriorityKeywords: [] },
+  { topic: '大模型', canonicalTopic: '大模型', deckHint: 'llm', parentCategory: '大模型',
+    subtopics: [], coreKeywords: ['大模型', 'LLM', 'GPT'],
+    expandedKeywords: ['Transformer', '预训练', '微调', 'RLHF', 'prompt', 'tokenizer'],
+    lowPriorityKeywords: [] },
 ];
 
 const STATIC_LOOKUP = new Map<string, ConceptEntry>();
