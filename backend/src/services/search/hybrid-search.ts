@@ -16,6 +16,7 @@ import { textToVector } from '../vector/local-embedding';
 import { understandQuery, sanitizeTopic, type ParsedSearchQuery } from './query-understanding';
 import { expandQuery } from './query-expander';
 import { conceptLookup } from './concept-dictionary';
+import { conceptGraphLookup, buildKeywordTiersFromGraph } from './concept-graph';
 import { tokenizeBigrams } from './bigram';
 import {
   rerank,
@@ -117,22 +118,43 @@ interface RecallCandidate {
 async function quickParse(rawQuery: string): Promise<ParsedSearchQuery> {
   const q = rawQuery.trim();
   const topic = sanitizeTopic(q);
-  // Do concept dict lookup even in eval mode for keyword expansion
-  const concept = await conceptLookup(topic);
-  if (concept) {
-    const coreKws = [topic, ...(concept.coreKeywords || [])];
-    const expandedKws = [...(concept.expandedKeywords || [])];
+  // Try concept graph first (for richer keyword tiering), fall back to flat dict
+  const graphNode = conceptGraphLookup(topic);
+  const concept = !graphNode ? await conceptLookup(topic) : null;
+  
+  const tiers = graphNode
+    ? buildKeywordTiersFromGraph(graphNode.id, 'search')
+    : null;
+  
+  if (graphNode || concept) {
+    const coreKws = graphNode
+      ? [topic, ...tiers!.coreKeywords.filter(k => k !== topic)]
+      : [topic, ...(concept!.coreKeywords || [])];
+    const expandedKws = graphNode
+      ? tiers!.expandedKeywords
+      : [...(concept!.expandedKeywords || [])];
+    const lowKws = graphNode
+      ? tiers!.lowPriorityKeywords
+      : (concept!.lowPriorityKeywords || []);
+    const prereqKws = graphNode
+      ? tiers!.prerequisiteKeywords
+      : (concept!.prerequisiteKeywords || []);
+    const canon = graphNode ? graphNode.canonical : (concept!.canonicalTopic || topic);
+    const deck = graphNode?.deckHint || concept!.deckHint;
+    const parent = graphNode?.parentCategory || concept!.parentCategory;
+    
     return {
-      rawQuery: q, intent: 'study', topicRaw: q, topic, canonicalTopic: concept.canonicalTopic || topic,
-      deckHint: concept.deckHint, parentCategory: concept.parentCategory,
-      subtopics: concept.subtopics || [], constraints: {},
+      rawQuery: q, intent: 'study', topicRaw: q, topic, canonicalTopic: canon,
+      deckHint: deck, parentCategory: parent,
+      subtopics: [], constraints: {},
       coreKeywords: [...new Set(coreKws)], expandedKeywords: [...new Set(expandedKws)],
-      lowPriorityKeywords: concept.lowPriorityKeywords || [], prerequisiteKeywords: concept.prerequisiteKeywords || [],
+      lowPriorityKeywords: lowKws, prerequisiteKeywords: prereqKws,
       rewrittenQuery: [...new Set([topic, ...coreKws, ...expandedKws])].join(' '),
       recallText: [...new Set([topic, ...coreKws, ...expandedKws])].join(' '),
       rerankText: [...new Set([topic, ...coreKws.slice(0, 3)])].join(' '),
-      confidence: 0.8, source: 'fallback', topicChangeReason: 'eval+dict', filteredStopwords: [],
-      debug: 'quickParse+dict',
+      confidence: 0.8, source: 'fallback', topicChangeReason: 'eval+' + (graphNode ? 'graph' : 'dict'),
+      filteredStopwords: [],
+      debug: graphNode ? 'quickParse+graph' : 'quickParse+dict',
     };
   }
   return {
