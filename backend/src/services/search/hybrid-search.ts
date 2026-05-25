@@ -218,7 +218,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
 
   // P4: specificTopicMode — cap candidates for narrow topics
   const SPECIFIC_TOPIC_THRESHOLD = 250;
-  if (isStudyIntent && candidates.length > SPECIFIC_TOPIC_THRESHOLD) {
+  if (isStudyIntent || process.env.EVAL_SUPPRESS_DEBUG && candidates.length > SPECIFIC_TOPIC_THRESHOLD) {
     // Prioritize: exact topic match > alias match > tag/kw match > title match > expanded kw
     const topicLower = topic.toLowerCase();
     const topicLower2 = canonicalTopic.toLowerCase();

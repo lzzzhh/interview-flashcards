@@ -63,8 +63,6 @@ const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
   { intent: 'review',  patterns: [/^(?:复习|回顾|重温|我想复习|我要复习)(.+)/, /^(.+)(?:复习|回顾)$/] },
   { intent: 'practice', patterns: [/^(?:刷|刷题|练习|训练)(.+)/, /^(.+)(?:刷|练习|训练)$/] },
   { intent: 'lookup',  patterns: [/^(?:什么是|什么叫|啥是|解释|了解)(.+)/] },
-  { intent: 'recommend_cards', patterns: [/^(?:帮我|给我|帮我找|给我推荐|给我推荐几张)(.+?)(?:卡片|的卡|相关卡片|的内容|相关内容|学习清单)?$/, /^(.+?)(?:推荐几张|找几张|有哪些).*(?:卡片|的卡|学习)/, /^(.+?)(?:相关内容|学习清单|的卡片|卡)/] },
-  { intent: 'learning_path',  patterns: [/^(?:应该先学|先看哪些|从哪开始|先学什么)(?:什么|哪些|哪里)?$/] },
 ];
 
 // ── Main entry point ──
