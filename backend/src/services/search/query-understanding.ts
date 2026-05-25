@@ -5,7 +5,21 @@ import { conceptLookup, getAllTopics, type ConceptEntry } from './concept-dictio
 
 // ── Types ──
 
-export type SearchIntent = 'study' | 'review' | 'lookup' | 'practice' | 'plan' | 'recommend_cards';
+export type SearchIntent = 'study' | 'review' | 'lookup' | 'practice' | 'plan' | 'recommend_cards' | 'learning_path';
+
+// ── Protected terms — must not be matched by stopword substrings ──
+const PROTECTED_TERMS = new Set([
+  '机器学习', '深度学习', '强化学习', '集成学习', '迁移学习', '表示学习', '对比学习', '自监督学习',
+  '排序算法', '回溯算法', '图算法', '贪心算法', '搜索算法',
+  '注意力机制', '自注意力', '多头注意力',
+  '生成对抗网络', '图神经网络', '循环神经网络', '卷积神经网络',
+]);
+
+// ── Alias mapping before sanitize ──
+const CANONICAL_ALIAS: Record<string, string> = {
+  '排序算法': '排序', '回溯算法': '回溯', '图算法': '图', '贪心算法': '贪心',
+  '哈希表': '哈希表', // identity, but blocks suffix removal
+};
 
 export interface ParsedSearchQuery {
   rawQuery: string;
@@ -49,8 +63,8 @@ const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
   { intent: 'review',  patterns: [/^(?:复习|回顾|重温|我想复习|我要复习)(.+)/, /^(.+)(?:复习|回顾)$/] },
   { intent: 'practice', patterns: [/^(?:刷|刷题|练习|训练)(.+)/, /^(.+)(?:刷|练习|训练)$/] },
   { intent: 'lookup',  patterns: [/^(?:什么是|什么叫|啥是|解释|了解)(.+)/] },
-  { intent: 'plan',    patterns: [/^(?:制定|生成|帮我|帮我制定|帮我生成|给我)(?:一个|一份)?(?:学习|复习)?计划(?:.*)?(.+)/] },
-  { intent: 'recommend_cards', patterns: [/^(.+?)(?:，|,|给我推荐|推荐几张|推荐).*卡片/] },
+  { intent: 'recommend_cards', patterns: [/^(?:帮我|给我|帮我找|给我推荐|给我推荐几张)(.+?)(?:卡片|的卡|相关卡片|的内容|相关内容|学习清单)?$/, /^(.+?)(?:推荐几张|找几张|有哪些).*(?:卡片|的卡|学习)/, /^(.+?)(?:相关内容|学习清单|的卡片|卡)/] },
+  { intent: 'learning_path',  patterns: [/^(?:应该先学|先看哪些|从哪开始|先学什么)(?:什么|哪些|哪里)?$/] },
 ];
 
 // ── Main entry point ──
@@ -67,7 +81,9 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     for (const pattern of group.patterns) {
       const match = q.match(pattern);
       if (match) {
-        topicRaw = sanitizeTopic((match[1] || '').trim());
+        const rawMatch = (match[1] || match.length > 1 ? match[1] : '').trim();
+        // P3: alias resolution before sanitize
+        topicRaw = CANONICAL_ALIAS[rawMatch] || sanitizeTopic(rawMatch);
         intent = group.intent;
         source = 'regex';
         debugMsg = `regex: intent=${intent}, topicRaw="${topicRaw}"`;
@@ -130,10 +146,10 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
 
   // ── Step 8: Build recall/rerank text ──
   // IMPORTANT: always include topicRaw + sanitized raw query as fallback terms
-  const rawNoStopwords = q.split(/[\s，,。！!？?]+/).filter(w => w.length >= 2 && !STOPWORDS.has(w));
+  const rawNoStopwords = q.split(/[\s，,。！!？?]+/).filter(w => w.length >= 2 && !isStopword(w));
   const allExpanded = [...coreKeywords, ...expandedKeywords, ...rawNoStopwords];
-  const recallText = [...new Set(allExpanded.filter(k => !STOPWORDS.has(k)))].join(' ');
-  const rerankText = [...new Set([...coreKeywords, ...expandedKeywords.slice(0, 5), ...rawNoStopwords.slice(0, 2)].filter(k => !STOPWORDS.has(k)))].join(' ');
+  const recallText = [...new Set(allExpanded.filter(k => !isStopword(k)))].join(' ');
+  const rerankText = [...new Set([...coreKeywords, ...expandedKeywords.slice(0, 5), ...rawNoStopwords.slice(0, 2)].filter(k => !isStopword(k)))].join(' ');
 
   // ── Step 9: Filtered stopwords ──
   const filteredStopwords = [...STOPWORDS].filter(s => q.includes(s));
@@ -179,6 +195,25 @@ export function sanitizeTopic(raw: string): string {
   }
 
   return t;
+}
+
+// ── P1: Token-level stopword check (protects compound terms) ──
+function isStopword(word: string): boolean {
+  if (PROTECTED_TERMS.has(word)) return false;
+  if (STOPWORDS.has(word)) return true;
+  return false;
+}
+
+// ── P0: Clarification result ──
+function buildClarifyResult(q: string): ParsedSearchQuery {
+  return {
+    rawQuery: q, intent: 'learning_path', topicRaw: '', topic: '', canonicalTopic: '',
+    deckHint: undefined, parentCategory: undefined, subtopics: [],
+    constraints: {}, coreKeywords: [], expandedKeywords: [], lowPriorityKeywords: [], prerequisiteKeywords: [],
+    rewrittenQuery: '', recallText: '', rerankText: '',
+    confidence: 0, source: 'regex', topicChangeReason: 'needsClarification: no topic in learning_path query',
+    filteredStopwords: [], debug: 'needsClarification',
+  };
 }
 
 // ── protectSpecificTopic ──

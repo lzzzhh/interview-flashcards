@@ -216,6 +216,41 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const candidates = [...candidateMap.values()];
   if (candidates.length === 0) return [];
 
+  // P4: specificTopicMode — cap candidates for narrow topics
+  const SPECIFIC_TOPIC_THRESHOLD = 250;
+  if (isStudyIntent && candidates.length > SPECIFIC_TOPIC_THRESHOLD) {
+    // Prioritize: exact topic match > alias match > tag/kw match > title match > expanded kw
+    const topicLower = topic.toLowerCase();
+    const topicLower2 = canonicalTopic.toLowerCase();
+    const coreLower = coreKeywords.map(k => k.toLowerCase());
+
+    const scored = candidates.map(c => {
+      let priority = 0;
+      // Terminal match: card ID or title contains topic exactly
+      if (c.cardId.toLowerCase().includes(topicLower) || c.cardId.toLowerCase().includes(topicLower2)) priority = 100;
+      else if (c.cardId === topic) priority = 100;
+      // Alias match
+      else if (coreLower.some(k => c.cardId.toLowerCase().includes(k))) priority = 80;
+      // Keyword match from matched keywords
+      else if (c.matchedKeywords?.some((k: string) => coreLower.some(cl => k.toLowerCase().includes(cl)))) priority = 60;
+      // Title/titleCn match
+      else priority = 40;
+      return { ...c, _lpPriority: priority };
+    });
+
+    scored.sort((a, b) => b._lpPriority - a._lpPriority || b.keywordScore - a.keywordScore);
+    // Keep top 250 highest priority, then trim to SPECIFIC_TOPIC_THRESHOLD
+    const kept = scored.slice(0, SPECIFIC_TOPIC_THRESHOLD);
+    // Put trimmed ones back as low-priority
+    const trimmed = scored.slice(SPECIFIC_TOPIC_THRESHOLD);
+    // Rebuild candidateMap with kept items only
+    candidateMap.clear();
+    for (const c of kept) candidateMap.set(c.cardId, c);
+    // Rebuild candidates array
+    candidates.length = 0;
+    candidates.push(...candidateMap.values());
+  }
+
   // 4. DB 补全卡片详情 + SM-2 状态
   const cardIds = candidates.map(c => c.cardId);
 
