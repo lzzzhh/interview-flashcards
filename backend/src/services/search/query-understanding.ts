@@ -384,6 +384,10 @@ async function llmFullParse(query: string): Promise<{ intent: SearchIntent; topi
     if (!jsonMatch) return null;
     const parsed = JSON.parse(jsonMatch[0]);
     if (!parsed.topic || parsed.topic.trim().length === 0) return null;
-    return { intent: parsed.intent || 'search_cards', topic: parsed.topic.trim(), rewrittenQuery: parsed.rewrittenQuery || '' };
+    const llmIntent = parsed.intent || 'search_cards';
+      // Remap LLM output to new intent names
+      const intentMap: Record<string, string> = { study: 'create_plan', review: 'review_weakness', lookup: 'search_cards', plan: 'create_plan', practice: 'review_weakness' };
+      const remappedIntent = intentMap[llmIntent] || llmIntent;
+      return { intent: remappedIntent, topic: parsed.topic.trim(), rewrittenQuery: parsed.rewrittenQuery || '' };
   } catch { return null; }
 }

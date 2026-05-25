@@ -123,7 +123,7 @@ async function quickParse(rawQuery: string): Promise<ParsedSearchQuery> {
     const coreKws = [topic, ...(concept.coreKeywords || [])];
     const expandedKws = [...(concept.expandedKeywords || [])];
     return {
-      rawQuery: q, intent: 'study', topicRaw: q, topic, canonicalTopic: concept.canonicalTopic || topic,
+      rawQuery: q, intent: 'create_plan', topicRaw: q, topic, canonicalTopic: concept.canonicalTopic || topic,
       deckHint: concept.deckHint, parentCategory: concept.parentCategory,
       subtopics: concept.subtopics || [], constraints: {},
       coreKeywords: [...new Set(coreKws)], expandedKeywords: [...new Set(expandedKws)],
@@ -136,7 +136,7 @@ async function quickParse(rawQuery: string): Promise<ParsedSearchQuery> {
     };
   }
   return {
-    rawQuery: q, intent: 'lookup', topicRaw: q, topic, canonicalTopic: topic,
+    rawQuery: q, intent: 'search_cards', topicRaw: q, topic, canonicalTopic: topic,
     deckHint: undefined, parentCategory: undefined, subtopics: [],
     constraints: {}, coreKeywords: [topic], expandedKeywords: [], lowPriorityKeywords: [], prerequisiteKeywords: [],
     rewrittenQuery: topic, recallText: topic, rerankText: topic,
