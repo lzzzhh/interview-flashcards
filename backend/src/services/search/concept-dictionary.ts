@@ -243,6 +243,10 @@ const STATIC_CONCEPTS: ConceptEntry[] = [
     subtopics: [], coreKeywords: ['损失函数', 'loss function'],
     expandedKeywords: ['交叉熵', 'MSE', 'hinge loss', 'focal loss', 'MAE'],
     lowPriorityKeywords: ['深度学习'] },
+  { topic: '交叉验证', canonicalTopic: '交叉验证', deckHint: 'machine-learning', parentCategory: '机器学习',
+    subtopics: [], coreKeywords: ['交叉验证', 'cross validation'],
+    expandedKeywords: ['k-fold', 'LOOCV', '验证集', 'holdout', 'grid search'],
+    lowPriorityKeywords: ['机器学习'] },
 ];
 
 const STATIC_LOOKUP = new Map<string, ConceptEntry>();
