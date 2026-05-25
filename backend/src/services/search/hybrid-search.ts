@@ -15,6 +15,7 @@ import { getEmbeddingProvider } from '../embedding-provider';
 import { textToVector } from '../vector/local-embedding';
 import { understandQuery, sanitizeTopic, type ParsedSearchQuery } from './query-understanding';
 import { expandQuery } from './query-expander';
+import { conceptLookup } from './concept-dictionary';
 import { tokenizeBigrams } from './bigram';
 import {
   rerank,
