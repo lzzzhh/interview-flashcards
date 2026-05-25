@@ -191,6 +191,22 @@ const STATIC_CONCEPTS: ConceptEntry[] = [
     subtopics: [], coreKeywords: ['哈希表', '数组', 'hash', 'array'],
     expandedKeywords: ['双指针', '频次', '计数', '两数之和', '散列表'],
     lowPriorityKeywords: ['算法'] },
+  { topic: '栈和队列', canonicalTopic: '栈和队列', deckHint: 'leetcode', parentCategory: '算法',
+    subtopics: [], coreKeywords: ['栈', '队列', 'stack', 'queue'],
+    expandedKeywords: ['单调栈', '优先队列', 'FIFO', 'LIFO', '用栈实现队列'],
+    lowPriorityKeywords: ['算法'] },
+  { topic: 'RAG和Agent', canonicalTopic: 'RAG', deckHint: 'agent', parentCategory: 'Agent',
+    subtopics: [], coreKeywords: ['RAG', 'Agent', 'retrieval', 'tool use'],
+    expandedKeywords: ['retrieval augmented generation', 'function calling', 'ReAct'],
+    lowPriorityKeywords: ['AI'] },
+  { topic: '职场', canonicalTopic: '职场沟通', deckHint: 'workplace', parentCategory: '职场',
+    subtopics: [], coreKeywords: ['职场', '沟通', '汇报'],
+    expandedKeywords: ['STAR', '向上管理', '述职', '面试'],
+    lowPriorityKeywords: [] },
+  { topic: '概率', canonicalTopic: '概率', deckHint: 'statistics', parentCategory: '统计学',
+    subtopics: [], coreKeywords: ['概率', 'probability'],
+    expandedKeywords: ['概率分布', '贝叶斯', '条件概率', '大数定律', '中心极限定理'],
+    lowPriorityKeywords: ['统计学'] },
 ];
 
 const STATIC_LOOKUP = new Map<string, ConceptEntry>();
