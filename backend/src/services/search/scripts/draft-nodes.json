@@ -1,0 +1,5036 @@
+[
+  {
+    "id": "xgboost",
+    "canonical": "XGBoost",
+    "aliases": [
+      "XGBoost",
+      "xgboost"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "XGBoost",
+      "extreme gradient boosting"
+    ],
+    "searchAliases": [
+      "XGBoost",
+      "extreme gradient boosting"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "GBDT",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "gradient boosting",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "boosting",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "decision tree",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "tree boosting",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "GBDT",
+      "gradient boosting",
+      "boosting",
+      "decision tree",
+      "tree boosting"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习",
+      "分类",
+      "回归"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "lightgbm",
+    "canonical": "LightGBM",
+    "aliases": [
+      "LightGBM",
+      "lightgbm"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "LightGBM",
+      "light gbm"
+    ],
+    "searchAliases": [
+      "LightGBM",
+      "light gbm"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "GBDT",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "gradient boosting",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "boosting",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "GBDT",
+      "gradient boosting",
+      "boosting"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "catboost",
+    "canonical": "CatBoost",
+    "aliases": [
+      "CatBoost",
+      "catboost"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "CatBoost"
+    ],
+    "searchAliases": [
+      "CatBoost"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "GBDT",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "gradient boosting",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "GBDT",
+      "gradient boosting"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "深度学习",
+    "aliases": [
+      "深度学习"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "深度学习",
+      "deep learning"
+    ],
+    "searchAliases": [
+      "深度学习",
+      "deep learning"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "related",
+        "target": "CNN",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "RNN",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "LSTM",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Transformer",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "反向传播",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "梯度下降",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "激活函数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "损失函数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "神经网络",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "感知机",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "激活函数",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "梯度下降",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "前馈",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "反向传播",
+        "note": "from legacy prerequisiteKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "CNN",
+      "RNN",
+      "LSTM",
+      "Transformer",
+      "反向传播",
+      "梯度下降",
+      "激活函数",
+      "损失函数"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": [
+      "神经网络",
+      "感知机",
+      "激活函数",
+      "梯度下降",
+      "前馈",
+      "反向传播"
+    ]
+  },
+  {
+    "id": "",
+    "canonical": "集成学习",
+    "aliases": [
+      "集成学习"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "集成学习",
+      "ensemble learning"
+    ],
+    "searchAliases": [
+      "集成学习",
+      "ensemble learning"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "Bagging",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Boosting",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Stacking",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "随机森林",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "GBDT",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "XGBoost",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "LightGBM",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "CatBoost",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "决策树",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "bias-variance",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "过拟合",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "交叉验证",
+        "note": "from legacy prerequisiteKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "Bagging",
+      "Boosting",
+      "Stacking",
+      "随机森林",
+      "GBDT",
+      "XGBoost",
+      "LightGBM",
+      "CatBoost",
+      "梯度提升",
+      "模型融合",
+      "投票法"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习",
+      "分类",
+      "回归",
+      "过拟合",
+      "特征重要性",
+      "特征工程",
+      "特征选择",
+      "降维"
+    ],
+    "legacyPrerequisiteKeywords": [
+      "决策树",
+      "bias-variance",
+      "过拟合",
+      "交叉验证"
+    ]
+  },
+  {
+    "id": "",
+    "canonical": "集成学习",
+    "aliases": [
+      "集成学习",
+      "ensemble learning"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "集成学习",
+      "ensemble learning"
+    ],
+    "searchAliases": [
+      "集成学习",
+      "ensemble learning"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "Bagging",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Boosting",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Stacking",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "Bagging",
+      "Boosting",
+      "Stacking"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "哈希表",
+    "aliases": [
+      "哈希表"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "哈希表",
+      "hash table",
+      "hashmap",
+      "hash map"
+    ],
+    "searchAliases": [
+      "哈希表",
+      "hash table",
+      "hashmap"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "哈希",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "散列表",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "dictionary",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "map",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "set",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "计数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "频率",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "两数之和",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "哈希",
+      "散列表",
+      "dictionary",
+      "map",
+      "set",
+      "计数",
+      "频率",
+      "两数之和",
+      "前缀和",
+      "字母异位词"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法",
+      "数据结构"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "数组",
+    "aliases": [
+      "数组"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "数组",
+      "array"
+    ],
+    "searchAliases": [
+      "数组",
+      "array"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "双指针",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "滑动窗口",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "前缀和",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "矩阵",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "双指针",
+      "滑动窗口",
+      "前缀和",
+      "矩阵"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法",
+      "数据结构"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "动态规划",
+    "aliases": [
+      "动态规划"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "动态规划",
+      "DP",
+      "dynamic programming"
+    ],
+    "searchAliases": [
+      "动态规划",
+      "DP",
+      "dynamic programming"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "状态转移",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "最优子结构",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "子问题",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "背包",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "子序列",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "状态转移",
+      "最优子结构",
+      "子问题",
+      "背包",
+      "子序列"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "rag",
+    "canonical": "RAG",
+    "aliases": [
+      "RAG",
+      "rag"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "agent",
+    "parentCategory": "Agent",
+    "coreKeywords": [
+      "RAG",
+      "retrieval augmented generation"
+    ],
+    "searchAliases": [
+      "RAG",
+      "retrieval augmented generation"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "Agent",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "检索增强生成",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "vector search",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "embedding",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "检索增强生成",
+      "vector search",
+      "embedding"
+    ],
+    "legacyLowPriorityKeywords": [
+      "AI",
+      "大模型"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "transformer",
+    "canonical": "Transformer",
+    "aliases": [
+      "Transformer"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "Transformer",
+      "transformer architecture"
+    ],
+    "searchAliases": [
+      "Transformer",
+      "transformer architecture"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "attention",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "self-attention",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "multi-head",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "encoder",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "decoder",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "positional encoding",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "attention",
+      "self-attention",
+      "multi-head",
+      "encoder",
+      "decoder",
+      "positional encoding"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习",
+      "大模型",
+      "NLP"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "假设检验",
+    "aliases": [
+      "假设检验"
+    ],
+    "domain": "data-science-statistics",
+    "deckHint": "statistics",
+    "parentCategory": "统计学",
+    "coreKeywords": [
+      "假设检验",
+      "hypothesis testing"
+    ],
+    "searchAliases": [
+      "假设检验",
+      "hypothesis testing"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "统计学",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "p值",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "p-value",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "显著性水平",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "原假设",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "备择假设",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Type I error",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Type II error",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "置信区间",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "p值",
+      "p-value",
+      "显著性水平",
+      "原假设",
+      "备择假设",
+      "Type I error",
+      "Type II error",
+      "置信区间",
+      "t检验",
+      "z检验"
+    ],
+    "legacyLowPriorityKeywords": [
+      "统计学"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "强化学习",
+    "aliases": [
+      "强化学习"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "强化学习",
+      "reinforcement learning",
+      "RL"
+    ],
+    "searchAliases": [
+      "强化学习",
+      "reinforcement learning",
+      "RL"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "agent",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "environment",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "reward",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "policy",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "value function",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Q-learning",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Bellman equation",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "temporal difference",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "agent",
+      "environment",
+      "reward",
+      "policy",
+      "value function",
+      "Q-learning",
+      "Bellman equation",
+      "temporal difference",
+      "TD learning",
+      "MDP",
+      "DQN",
+      "policy gradient"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习",
+      "AI"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "qlearning",
+    "canonical": "Q-learning",
+    "aliases": [
+      "Q-learning"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "Q-learning",
+      "Q value",
+      "Q函数"
+    ],
+    "searchAliases": [
+      "Q-learning",
+      "Q value",
+      "Q函数"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "Bellman equation",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "temporal difference",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "TD learning",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Q table",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "DQN",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "policy iteration",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "Bellman equation",
+      "temporal difference",
+      "TD learning",
+      "Q table",
+      "DQN",
+      "policy iteration"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习",
+      "强化学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "置信区间",
+    "aliases": [
+      "置信区间"
+    ],
+    "domain": "data-science-statistics",
+    "deckHint": "statistics",
+    "parentCategory": "统计学",
+    "coreKeywords": [
+      "置信区间",
+      "confidence interval"
+    ],
+    "searchAliases": [
+      "置信区间",
+      "confidence interval"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "统计学",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "标准误",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "抽样分布",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "显著性水平",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "z值",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "区间估计",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "点估计",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "标准误",
+      "抽样分布",
+      "显著性水平",
+      "z值",
+      "区间估计",
+      "点估计"
+    ],
+    "legacyLowPriorityKeywords": [
+      "统计学"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "图像分类",
+    "aliases": [
+      "图像分类"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "图像分类",
+      "image classification"
+    ],
+    "searchAliases": [
+      "图像分类",
+      "image classification"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "CNN",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "ResNet",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "ViT",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "data augmentation",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "transfer learning",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "ImageNet",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "CNN",
+      "ResNet",
+      "ViT",
+      "data augmentation",
+      "transfer learning",
+      "ImageNet"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习",
+      "计算机视觉"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "sql",
+    "canonical": "SQL",
+    "aliases": [
+      "SQL"
+    ],
+    "domain": "data-science-statistics",
+    "deckHint": "statistics",
+    "parentCategory": "数据科学",
+    "coreKeywords": [
+      "SQL",
+      "query"
+    ],
+    "searchAliases": [
+      "SQL",
+      "query"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "数据科学",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "JOIN",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "GROUP BY",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "window function",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "aggregation",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "子查询",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "HAVING",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "WHERE",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "索引",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "JOIN",
+      "GROUP BY",
+      "window function",
+      "aggregation",
+      "子查询",
+      "HAVING",
+      "WHERE",
+      "索引",
+      "index"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "pandas",
+    "canonical": "pandas",
+    "aliases": [
+      "pandas"
+    ],
+    "domain": "data-science-statistics",
+    "deckHint": "statistics",
+    "parentCategory": "数据科学",
+    "coreKeywords": [
+      "pandas",
+      "dataframe"
+    ],
+    "searchAliases": [
+      "pandas",
+      "dataframe"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "数据科学",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "groupby",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "merge",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "missing values",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "dropna",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "fillna",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "apply",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "concat",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "pivot table",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "groupby",
+      "merge",
+      "missing values",
+      "dropna",
+      "fillna",
+      "apply",
+      "concat",
+      "pivot table"
+    ],
+    "legacyLowPriorityKeywords": [
+      "Python",
+      "数据科学"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "数据清洗",
+    "aliases": [
+      "数据清洗"
+    ],
+    "domain": "data-science-statistics",
+    "deckHint": "statistics",
+    "parentCategory": "数据科学",
+    "coreKeywords": [
+      "数据清洗",
+      "data cleaning"
+    ],
+    "searchAliases": [
+      "数据清洗",
+      "data cleaning"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "数据科学",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "missing value",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "outlier",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "normalization",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "标准化",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "编码",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "数据预处理",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "missing value",
+      "outlier",
+      "normalization",
+      "标准化",
+      "编码",
+      "数据预处理"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "反向传播",
+    "aliases": [
+      "反向传播"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "反向传播",
+      "backpropagation"
+    ],
+    "searchAliases": [
+      "反向传播",
+      "backpropagation"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "链式法则",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "梯度消失",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "梯度爆炸",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "autograd",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "计算图",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "链式法则",
+      "梯度消失",
+      "梯度爆炸",
+      "autograd",
+      "计算图"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "梯度下降",
+    "aliases": [
+      "梯度下降"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "梯度下降",
+      "gradient descent"
+    ],
+    "searchAliases": [
+      "梯度下降",
+      "gradient descent"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "SGD",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Adam",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "学习率",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "momentum",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "mini-batch",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "convergence",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "学习率调度",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "SGD",
+      "Adam",
+      "学习率",
+      "momentum",
+      "mini-batch",
+      "convergence",
+      "学习率调度"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习",
+      "优化"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "贪心",
+    "aliases": [
+      "贪心"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "贪心",
+      "greedy"
+    ],
+    "searchAliases": [
+      "贪心",
+      "greedy"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "greedy algorithm",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "区间调度",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "最优子结构",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "货呵问题",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "greedy algorithm",
+      "区间调度",
+      "最优子结构",
+      "货呵问题"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "pca",
+    "canonical": "PCA",
+    "aliases": [
+      "PCA"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "PCA",
+      "principal component analysis"
+    ],
+    "searchAliases": [
+      "PCA",
+      "principal component analysis"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "降维",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "特征值",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "主成分",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "eigenvalue",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "方差解释率",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "奇异值分解",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "降维",
+      "特征值",
+      "主成分",
+      "eigenvalue",
+      "方差解释率",
+      "奇异值分解"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "正则化",
+    "aliases": [
+      "正则化"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "正则化",
+      "regularization"
+    ],
+    "searchAliases": [
+      "正则化",
+      "regularization"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "L1",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "L2",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "lasso",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "ridge",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "dropout",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "权重衰减",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "elastic net",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "early stopping",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "L1",
+      "L2",
+      "lasso",
+      "ridge",
+      "dropout",
+      "权重衰减",
+      "elastic net",
+      "early stopping"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "逻辑回归",
+    "aliases": [
+      "逻辑回归"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "逻辑回归",
+      "logistic regression"
+    ],
+    "searchAliases": [
+      "逻辑回归",
+      "logistic regression"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "sigmoid",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "二分类",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "softmax",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "多分类",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "odds ratio",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "对数几率",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "sigmoid",
+      "二分类",
+      "softmax",
+      "多分类",
+      "odds ratio",
+      "对数几率"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "线性回归",
+    "aliases": [
+      "线性回归"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "线性回归",
+      "linear regression"
+    ],
+    "searchAliases": [
+      "线性回归",
+      "linear regression"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "最小二乘法",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "OLS",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "R方",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "残差",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "多元回归",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "多重共线性",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "最小二乘法",
+      "OLS",
+      "R方",
+      "残差",
+      "多元回归",
+      "多重共线性"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "随机森林",
+    "aliases": [
+      "随机森林"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "随机森林",
+      "random forest"
+    ],
+    "searchAliases": [
+      "随机森林",
+      "random forest"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "决策树",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "bagging",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "特征采样",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "out-of-bag",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "random subspace",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "决策树",
+      "bagging",
+      "特征采样",
+      "out-of-bag",
+      "random subspace"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "决策树",
+    "aliases": [
+      "决策树"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "决策树",
+      "decision tree"
+    ],
+    "searchAliases": [
+      "决策树",
+      "decision tree"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "信息增益",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "基尼系数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "剪枝",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "CART",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "ID3",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "C4.5",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "信息增益",
+      "基尼系数",
+      "剪枝",
+      "CART",
+      "ID3",
+      "C4.5"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "knn",
+    "canonical": "KNN",
+    "aliases": [
+      "KNN"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "KNN",
+      "k nearest neighbors"
+    ],
+    "searchAliases": [
+      "KNN",
+      "k nearest neighbors"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "距离度量",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "欧氏距离",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "曼哈顿距离",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "KD树",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "惰性学习",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "距离度量",
+      "欧氏距离",
+      "曼哈顿距离",
+      "KD树",
+      "惰性学习"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "kmeans",
+    "canonical": "KMeans",
+    "aliases": [
+      "KMeans"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "KMeans",
+      "k均值"
+    ],
+    "searchAliases": [
+      "KMeans",
+      "k均值"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "聚类",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "elbow method",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "轮廓系数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "kmeans++",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "聚类",
+      "elbow method",
+      "轮廓系数",
+      "kmeans++"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "算法",
+    "aliases": [
+      "算法"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "算法",
+      "algorithm"
+    ],
+    "searchAliases": [
+      "算法",
+      "algorithm"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "related",
+        "target": "数据结构",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "数组",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "哈希表",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "动态规划",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "树",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "链表",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "栈",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "队列",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "数据结构",
+      "数组",
+      "哈希表",
+      "动态规划",
+      "树",
+      "链表",
+      "栈",
+      "队列",
+      "图",
+      "排序",
+      "递归",
+      "二分"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "数据科学",
+    "aliases": [
+      "数据科学"
+    ],
+    "domain": "data-science-statistics",
+    "deckHint": "statistics",
+    "parentCategory": "数据科学",
+    "coreKeywords": [
+      "数据科学",
+      "data science"
+    ],
+    "searchAliases": [
+      "数据科学",
+      "data science"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "related",
+        "target": "SQL",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Python",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "pandas",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "统计分析",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "可视化",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "机器学习",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "数据清洗",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "SQL",
+      "Python",
+      "pandas",
+      "统计分析",
+      "可视化",
+      "机器学习",
+      "数据清洗"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "大模型",
+    "aliases": [
+      "大模型"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "llm",
+    "parentCategory": "大模型",
+    "coreKeywords": [
+      "大模型",
+      "LLM",
+      "GPT"
+    ],
+    "searchAliases": [
+      "大模型",
+      "LLM",
+      "GPT"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "related",
+        "target": "Transformer",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "预训练",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "微调",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "RLHF",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "prompt",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "tokenizer",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "Transformer",
+      "预训练",
+      "微调",
+      "RLHF",
+      "prompt",
+      "tokenizer"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "leetcode",
+    "canonical": "LeetCode",
+    "aliases": [
+      "LeetCode"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "LeetCode",
+      "刷题",
+      "算法"
+    ],
+    "searchAliases": [
+      "LeetCode",
+      "刷题",
+      "算法"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "数组",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "哈希表",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "动态规划",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "字符串",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "双指针",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "树",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "链表",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "图",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "数组",
+      "哈希表",
+      "动态规划",
+      "字符串",
+      "双指针",
+      "树",
+      "链表",
+      "图",
+      "回溯"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "哈希表",
+    "aliases": [
+      "哈希表",
+      "数组和哈希表"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "哈希表",
+      "数组",
+      "hash",
+      "array"
+    ],
+    "searchAliases": [
+      "哈希表",
+      "数组",
+      "hash"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "双指针",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "频次",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "计数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "两数之和",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "散列表",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "双指针",
+      "频次",
+      "计数",
+      "两数之和",
+      "散列表"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "栈和队列",
+    "aliases": [
+      "栈和队列"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "栈",
+      "队列",
+      "stack",
+      "queue"
+    ],
+    "searchAliases": [
+      "栈",
+      "队列",
+      "stack"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "单调栈",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "优先队列",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "FIFO",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "LIFO",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "用栈实现队列",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "单调栈",
+      "优先队列",
+      "FIFO",
+      "LIFO",
+      "用栈实现队列"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "rag",
+    "canonical": "RAG",
+    "aliases": [
+      "RAG",
+      "RAG和Agent"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "agent",
+    "parentCategory": "Agent",
+    "coreKeywords": [
+      "RAG",
+      "Agent",
+      "retrieval",
+      "tool use"
+    ],
+    "searchAliases": [
+      "RAG",
+      "Agent",
+      "retrieval"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "Agent",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "function calling",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "ReAct",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "multi-agent",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "检索增强",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "function calling",
+      "ReAct",
+      "multi-agent",
+      "检索增强"
+    ],
+    "legacyLowPriorityKeywords": [
+      "AI"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "职场沟通",
+    "aliases": [
+      "职场沟通",
+      "职场"
+    ],
+    "domain": "workplace-vibecoding",
+    "deckHint": "workplace",
+    "parentCategory": "职场",
+    "coreKeywords": [
+      "职场",
+      "沟通",
+      "汇报"
+    ],
+    "searchAliases": [
+      "职场",
+      "沟通",
+      "汇报"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "职场",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "STAR",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "向上管理",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "述职",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "面试",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "STAR",
+      "向上管理",
+      "述职",
+      "面试"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "概率",
+    "aliases": [
+      "概率"
+    ],
+    "domain": "data-science-statistics",
+    "deckHint": "statistics",
+    "parentCategory": "统计学",
+    "coreKeywords": [
+      "概率",
+      "probability"
+    ],
+    "searchAliases": [
+      "概率",
+      "probability"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "统计学",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "概率分布",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "贝叶斯",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "条件概率",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "大数定律",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "中心极限定理",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "概率分布",
+      "贝叶斯",
+      "条件概率",
+      "大数定律",
+      "中心极限定理"
+    ],
+    "legacyLowPriorityKeywords": [
+      "统计学"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "svm",
+    "canonical": "SVM",
+    "aliases": [
+      "SVM"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "SVM",
+      "support vector machine"
+    ],
+    "searchAliases": [
+      "SVM",
+      "support vector machine"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "核函数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "最大间隔",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "拉格朗日",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "dual problem",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "KKT",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "SMO",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "核函数",
+      "最大间隔",
+      "拉格朗日",
+      "dual problem",
+      "KKT",
+      "SMO"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "特征工程",
+    "aliases": [
+      "特征工程"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "特征工程",
+      "feature engineering"
+    ],
+    "searchAliases": [
+      "特征工程",
+      "feature engineering"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "特征选择",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "特征提取",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "特征缩放",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "编码",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "缺失值",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "特征哈希",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "特征选择",
+      "特征提取",
+      "特征缩放",
+      "编码",
+      "缺失值",
+      "特征哈希"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "batchnorm",
+    "canonical": "BatchNorm",
+    "aliases": [
+      "BatchNorm"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "BatchNorm",
+      "batch normalization"
+    ],
+    "searchAliases": [
+      "BatchNorm",
+      "batch normalization"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "normalization",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "internal covariate shift",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "LayerNorm",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "training stability",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "normalization",
+      "internal covariate shift",
+      "LayerNorm",
+      "training stability"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "layernorm",
+    "canonical": "LayerNorm",
+    "aliases": [
+      "LayerNorm"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "LayerNorm",
+      "layer normalization"
+    ],
+    "searchAliases": [
+      "LayerNorm",
+      "layer normalization"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "normalization",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "batch norm vs layer norm",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "NLP normalization",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "normalization",
+      "batch norm vs layer norm",
+      "NLP normalization"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "rnn",
+    "canonical": "RNN",
+    "aliases": [
+      "RNN"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "RNN",
+      "recurrent neural network",
+      "LSTM"
+    ],
+    "searchAliases": [
+      "RNN",
+      "recurrent neural network",
+      "LSTM"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "GRU",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "序列",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "梯度消失",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "time step",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "双向RNN",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "GRU",
+      "序列",
+      "梯度消失",
+      "time step",
+      "双向RNN"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "cnn",
+    "canonical": "CNN",
+    "aliases": [
+      "CNN"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "CNN",
+      "convolutional neural network"
+    ],
+    "searchAliases": [
+      "CNN",
+      "convolutional neural network"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "卷积",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "pooling",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "filter",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "stride",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "padding",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "feature map",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "卷积",
+      "pooling",
+      "filter",
+      "stride",
+      "padding",
+      "feature map"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "dropout",
+    "canonical": "Dropout",
+    "aliases": [
+      "Dropout"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "Dropout",
+      "drop out"
+    ],
+    "searchAliases": [
+      "Dropout",
+      "drop out"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "正则化",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "ensemble",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "inverted dropout",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "drop connect",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "正则化",
+      "ensemble",
+      "inverted dropout",
+      "drop connect"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "优化器",
+    "aliases": [
+      "优化器"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "优化器",
+      "optimizer"
+    ],
+    "searchAliases": [
+      "优化器",
+      "optimizer"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "SGD",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Adam",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "RMSprop",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "AdamW",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "momentum",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "学习率",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "SGD",
+      "Adam",
+      "RMSprop",
+      "AdamW",
+      "momentum",
+      "学习率"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "损失函数",
+    "aliases": [
+      "损失函数"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "损失函数",
+      "loss function"
+    ],
+    "searchAliases": [
+      "损失函数",
+      "loss function"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "深度学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "交叉熵",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "MSE",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "hinge loss",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "focal loss",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "MAE",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "交叉熵",
+      "MSE",
+      "hinge loss",
+      "focal loss",
+      "MAE"
+    ],
+    "legacyLowPriorityKeywords": [
+      "深度学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "交叉验证",
+    "aliases": [
+      "交叉验证"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "交叉验证",
+      "cross validation"
+    ],
+    "searchAliases": [
+      "交叉验证",
+      "cross validation"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "k-fold",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "LOOCV",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "验证集",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "holdout",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "grid search",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "k-fold",
+      "LOOCV",
+      "验证集",
+      "holdout",
+      "grid search"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "prompt",
+    "canonical": "Prompt",
+    "aliases": [
+      "Prompt"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "llm",
+    "parentCategory": "大模型",
+    "coreKeywords": [
+      "Prompt",
+      "提示词",
+      "prompt engineering"
+    ],
+    "searchAliases": [
+      "Prompt",
+      "提示词",
+      "prompt engineering"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "大模型",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "few-shot",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "chain of thought",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "CoT",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "instruction",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "system prompt",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "few-shot",
+      "chain of thought",
+      "CoT",
+      "instruction",
+      "system prompt"
+    ],
+    "legacyLowPriorityKeywords": [
+      "大模型"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "prompt",
+    "canonical": "Prompt",
+    "aliases": [
+      "Prompt",
+      "Prompt Engineering"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "llm",
+    "parentCategory": "大模型",
+    "coreKeywords": [
+      "Prompt",
+      "prompt engineering",
+      "提示工程"
+    ],
+    "searchAliases": [
+      "Prompt",
+      "prompt engineering",
+      "提示工程"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "大模型",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "few-shot",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "zero-shot",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "chain of thought",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "few-shot",
+      "zero-shot",
+      "chain of thought"
+    ],
+    "legacyLowPriorityKeywords": [
+      "大模型"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "finetuning",
+    "canonical": "Fine-tuning",
+    "aliases": [
+      "Fine-tuning"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "llm",
+    "parentCategory": "大模型",
+    "coreKeywords": [
+      "Fine-tuning",
+      "微调",
+      "fine tune"
+    ],
+    "searchAliases": [
+      "Fine-tuning",
+      "微调",
+      "fine tune"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "大模型",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "LoRA",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "SFT",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "RLHF",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "instruction tuning",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "全量微调",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "LoRA",
+      "SFT",
+      "RLHF",
+      "instruction tuning",
+      "全量微调"
+    ],
+    "legacyLowPriorityKeywords": [
+      "大模型"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "embedding",
+    "canonical": "Embedding",
+    "aliases": [
+      "Embedding"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "llm",
+    "parentCategory": "大模型",
+    "coreKeywords": [
+      "Embedding",
+      "嵌入",
+      "向量"
+    ],
+    "searchAliases": [
+      "Embedding",
+      "嵌入",
+      "向量"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "大模型",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "word2vec",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "BERT embedding",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "ANN",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "vector DB",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Milvus",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Pinecone",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "sentence embedding",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "word2vec",
+      "BERT embedding",
+      "ANN",
+      "vector DB",
+      "Milvus",
+      "Pinecone",
+      "sentence embedding"
+    ],
+    "legacyLowPriorityKeywords": [
+      "大模型"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "前缀和",
+    "aliases": [
+      "前缀和"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "前缀和",
+      "prefix sum"
+    ],
+    "searchAliases": [
+      "前缀和",
+      "prefix sum"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "preSum",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "cumulative sum",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "区间和",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "差分数组",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "subarray sum",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "preSum",
+      "cumulative sum",
+      "区间和",
+      "差分数组",
+      "subarray sum"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "function_calling",
+    "canonical": "Function Calling",
+    "aliases": [
+      "Function Calling"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "agent",
+    "parentCategory": "Agent",
+    "coreKeywords": [
+      "Function Calling",
+      "工具调用",
+      "tool use"
+    ],
+    "searchAliases": [
+      "Function Calling",
+      "工具调用",
+      "tool use"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "Agent",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "OpenAI function",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "tool call",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "plugin",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "API",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "JSON schema",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "OpenAI function",
+      "tool call",
+      "plugin",
+      "API",
+      "JSON schema"
+    ],
+    "legacyLowPriorityKeywords": [
+      "Agent"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "单调栈",
+    "aliases": [
+      "单调栈"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "单调栈",
+      "monotonic stack"
+    ],
+    "searchAliases": [
+      "单调栈",
+      "monotonic stack"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "单调递减",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "单调递增",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "下一个更大元素",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "柱状图",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "daily temperatures",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "单调递减",
+      "单调递增",
+      "下一个更大元素",
+      "柱状图",
+      "daily temperatures"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "vibecoding",
+    "canonical": "VibeCoding",
+    "aliases": [
+      "VibeCoding"
+    ],
+    "domain": "workplace-vibecoding",
+    "deckHint": "vibe-coding",
+    "parentCategory": "VibeCoding",
+    "coreKeywords": [
+      "VibeCoding",
+      "Vibe Coding"
+    ],
+    "searchAliases": [
+      "VibeCoding",
+      "Vibe Coding"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "related",
+        "target": "氛围编程",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "AI辅助编程",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "快速原型",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "prompt engineering",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "自然语言编程",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "氛围编程",
+      "AI辅助编程",
+      "快速原型",
+      "prompt engineering",
+      "自然语言编程"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "双指针",
+    "aliases": [
+      "双指针",
+      "双指针和哈希表"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "双指针",
+      "哈希表",
+      "two pointer",
+      "hash"
+    ],
+    "searchAliases": [
+      "双指针",
+      "哈希表",
+      "two pointer"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "对撞指针",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "快慢指针",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "滑动窗口",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "去重",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "对撞指针",
+      "快慢指针",
+      "滑动窗口",
+      "去重"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "连通性",
+    "aliases": [
+      "连通性"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "连通性",
+      "connectivity"
+    ],
+    "searchAliases": [
+      "连通性",
+      "connectivity"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "并查集",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Union Find",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "BFS",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "DFS",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "connected component",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "并查集",
+      "Union Find",
+      "BFS",
+      "DFS",
+      "connected component"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "bagging",
+    "canonical": "Bagging",
+    "aliases": [
+      "Bagging",
+      "Bagging和Boosting"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "parentCategory": "机器学习",
+    "coreKeywords": [
+      "Bagging",
+      "Boosting",
+      "集成学习"
+    ],
+    "searchAliases": [
+      "Bagging",
+      "Boosting",
+      "集成学习"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "机器学习",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "随机森林",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "bootstrap",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "方差",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "偏差",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "ensemble difference",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "随机森林",
+      "bootstrap",
+      "方差",
+      "偏差",
+      "ensemble difference"
+    ],
+    "legacyLowPriorityKeywords": [
+      "机器学习"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "机器学习",
+    "aliases": [
+      "机器学习"
+    ],
+    "domain": "machine-learning",
+    "deckHint": "machine-learning",
+    "coreKeywords": [
+      "机器学习",
+      "machine learning",
+      "ML",
+      "回归",
+      "分类",
+      "聚类",
+      "降维",
+      "过拟合",
+      "特征",
+      "SVM",
+      "随机森林",
+      "决策树",
+      "GBDT",
+      "XGBoost",
+      "集成",
+      "贝叶斯",
+      "bagging",
+      "boosting",
+      "树",
+      "贝叶斯统计",
+      "贝叶斯频率对比",
+      "causal ml",
+      "特征降维",
+      "MLE",
+      "逻辑回归",
+      "ml",
+      "特征映射",
+      "分类树",
+      "回归树",
+      "朴素贝叶斯",
+      "贝叶斯定理",
+      "文本分类",
+      "线性回归",
+      "特征缩放",
+      "类别特征",
+      "特征重要性",
+      "集成学习",
+      "多项式特征",
+      "特征工程",
+      "特征选择",
+      "特征提取",
+      "聚类评估",
+      "特征值分解",
+      "密度聚类",
+      "聚类对比",
+      "软聚类",
+      "层次聚类",
+      "One-Class SVM",
+      "gradient boosting",
+      "xgboost",
+      "gbdt",
+      "bagging vs boosting",
+      "boosting comparison",
+      "集成学习对比",
+      "Boosting原理",
+      "Bagging",
+      "Boosting",
+      "boosting对比",
+      "boosting原理",
+      "Ordered Boosting",
+      "特征采样",
+      "随机森林对比XGBoost",
+      "特征交叉",
+      "特征哈希",
+      "分类指标",
+      "多分类",
+      "回归评估",
+      "贝叶斯优化",
+      "MLOps",
+      "ML监控",
+      "特征存储",
+      "特征复用",
+      "特征嵌入",
+      "MLM",
+      "递归特征消除",
+      "监督降维",
+      "无监督降维",
+      "ML Pipeline",
+      "特征覆盖",
+      "特征分布",
+      "ML Platform",
+      "ML lineage",
+      "ML Observability",
+      "高基数特征",
+      "多标签分类",
+      "分类器链",
+      "过拟合缓解",
+      "自回归模型",
+      "自回归",
+      "MMLU",
+      "决策",
+      "CoreML",
+      "传统ML",
+      "regression",
+      "classification",
+      "overfitting",
+      "cross validation",
+      "random forest",
+      "decision tree",
+      "ensemble"
+    ],
+    "searchAliases": [
+      "机器学习",
+      "machine learning",
+      "ML"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "大模型",
+    "aliases": [
+      "大模型"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "llm",
+    "parentCategory": "大模型",
+    "coreKeywords": [
+      "大模型",
+      "LLM",
+      "GPT"
+    ],
+    "searchAliases": [
+      "大模型",
+      "LLM",
+      "GPT"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "related",
+        "target": "Transformer",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "预训练",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "微调",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "RLHF",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "prompt",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "tokenizer",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "Transformer",
+      "预训练",
+      "微调",
+      "RLHF",
+      "prompt",
+      "tokenizer"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "统计学",
+    "aliases": [
+      "统计学"
+    ],
+    "domain": "data-science-statistics",
+    "deckHint": "statistics",
+    "coreKeywords": [
+      "统计",
+      "statistics",
+      "概率",
+      "分布",
+      "假设检验",
+      "置信区间",
+      "方差",
+      "贝叶斯",
+      "频率统计",
+      "统计学",
+      "贝叶斯统计",
+      "贝叶斯频率对比",
+      "bayesian statistics",
+      "正态分布",
+      "robust statistics",
+      "朴素贝叶斯",
+      "贝叶斯定理",
+      "高斯分布",
+      "概率校准",
+      "贝叶斯优化",
+      "统计检验",
+      "预测分布",
+      "特征分布",
+      "分布修正",
+      "偏差方差",
+      "偏差方差分解",
+      "方差控制",
+      "分布式训练",
+      "分布式系统",
+      "分布式ID",
+      "分布式",
+      "分布式锁",
+      "probability",
+      "distribution",
+      "hypothesis",
+      "p value",
+      "confidence interval"
+    ],
+    "searchAliases": [
+      "统计",
+      "statistics",
+      "概率"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "agent",
+    "canonical": "Agent",
+    "aliases": [
+      "Agent"
+    ],
+    "domain": "llm-agent-rag",
+    "deckHint": "agent",
+    "coreKeywords": [
+      "Agent",
+      "智能体",
+      "工具调用",
+      "ReAct",
+      "多Agent",
+      "RAG",
+      "memory",
+      "planning",
+      "memoryless",
+      "moving average",
+      "ANN",
+      "Agent框架",
+      "ai agent",
+      "agent",
+      "Agent设计",
+      "Multi-Agent",
+      "Agent架构",
+      "Planning",
+      "Agent规划",
+      "RAG优化",
+      "RAG-Fusion",
+      "Self-RAG",
+      "RAG评估",
+      "RAGAS",
+      "Graph RAG",
+      "RAG基础设施",
+      "Decomposition RAG",
+      "Multi-Query RAG",
+      "Agentic RAG",
+      "tool use",
+      "function call",
+      "multi agent"
+    ],
+    "searchAliases": [
+      "Agent",
+      "智能体",
+      "工具调用"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "图",
+    "aliases": [
+      "图"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "coreKeywords": [
+      "图",
+      "graph",
+      "拓扑",
+      "BFS",
+      "DFS",
+      "并查集",
+      "最短路径",
+      "dfs",
+      "bfs",
+      "拓扑排序",
+      "树状图",
+      "直方图",
+      "图神经网络",
+      "图卷积",
+      "谱图论",
+      "图注意力",
+      "Graph Attention",
+      "异构图",
+      "图应用",
+      "Demographic Parity",
+      "Graph Embedding",
+      "文生图",
+      "Graph RAG",
+      "知识图谱",
+      "图检索",
+      "AP",
+      "图数据库",
+      "图算法",
+      "图像分割",
+      "Dijkstra",
+      "union find",
+      "topological sort"
+    ],
+    "searchAliases": [
+      "图",
+      "graph",
+      "拓扑"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "深度学习",
+    "aliases": [
+      "深度学习"
+    ],
+    "domain": "deep-learning",
+    "deckHint": "deep-learning",
+    "parentCategory": "深度学习",
+    "coreKeywords": [
+      "深度学习",
+      "deep learning"
+    ],
+    "searchAliases": [
+      "深度学习",
+      "deep learning"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "related",
+        "target": "CNN",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "RNN",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "LSTM",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "Transformer",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "反向传播",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "梯度下降",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "激活函数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "损失函数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "神经网络",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "感知机",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "激活函数",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "梯度下降",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "前馈",
+        "note": "from legacy prerequisiteKeywords"
+      },
+      {
+        "type": "prerequisite",
+        "target": "反向传播",
+        "note": "from legacy prerequisiteKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "CNN",
+      "RNN",
+      "LSTM",
+      "Transformer",
+      "反向传播",
+      "梯度下降",
+      "激活函数",
+      "损失函数"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": [
+      "神经网络",
+      "感知机",
+      "激活函数",
+      "梯度下降",
+      "前馈",
+      "反向传播"
+    ]
+  },
+  {
+    "id": "",
+    "canonical": "树",
+    "aliases": [
+      "树"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "coreKeywords": [
+      "树",
+      "tree",
+      "二叉树",
+      "BST",
+      "遍历",
+      "二叉",
+      "bs",
+      "substring",
+      "递归遍历",
+      "binary tree",
+      "bst",
+      "层序遍历",
+      "二叉搜索树",
+      "字典树",
+      "b+ tree",
+      "决策树",
+      "decision tree",
+      "分类树",
+      "回归树",
+      "树状图",
+      "提升树",
+      "对称树",
+      "树模型",
+      "iTree",
+      "Tree-of-Thought",
+      "traversal",
+      "DFS",
+      "BFS"
+    ],
+    "searchAliases": [
+      "树",
+      "tree",
+      "二叉树"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "哈希表",
+    "aliases": [
+      "哈希表"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "哈希表",
+      "hash table",
+      "hashmap",
+      "hash map"
+    ],
+    "searchAliases": [
+      "哈希表",
+      "hash table",
+      "hashmap"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "哈希",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "散列表",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "dictionary",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "map",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "set",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "计数",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "频率",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "两数之和",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "哈希",
+      "散列表",
+      "dictionary",
+      "map",
+      "set",
+      "计数",
+      "频率",
+      "两数之和",
+      "前缀和",
+      "字母异位词"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法",
+      "数据结构"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "sql",
+    "canonical": "SQL",
+    "aliases": [
+      "SQL"
+    ],
+    "domain": "data-science-statistics",
+    "deckHint": "statistics",
+    "parentCategory": "数据科学",
+    "coreKeywords": [
+      "SQL",
+      "query"
+    ],
+    "searchAliases": [
+      "SQL",
+      "query"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "数据科学",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "JOIN",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "GROUP BY",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "window function",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "aggregation",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "子查询",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "HAVING",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "WHERE",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "索引",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "JOIN",
+      "GROUP BY",
+      "window function",
+      "aggregation",
+      "子查询",
+      "HAVING",
+      "WHERE",
+      "索引",
+      "index"
+    ],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "动态规划",
+    "aliases": [
+      "动态规划"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "动态规划",
+      "DP",
+      "dynamic programming"
+    ],
+    "searchAliases": [
+      "动态规划",
+      "DP",
+      "dynamic programming"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "状态转移",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "最优子结构",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "子问题",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "背包",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "子序列",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "状态转移",
+      "最优子结构",
+      "子问题",
+      "背包",
+      "子序列"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "排序",
+    "aliases": [
+      "排序"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "coreKeywords": [
+      "排序",
+      "sort",
+      "快排",
+      "归并",
+      "堆排",
+      "桶排",
+      "堆",
+      "归并排序",
+      "拓扑排序",
+      "桶排序",
+      "计数排序",
+      "排序能力",
+      "排序学习",
+      "排序评估",
+      "排序融合",
+      "重排序",
+      "quick sort",
+      "merge sort",
+      "heap sort"
+    ],
+    "searchAliases": [
+      "排序",
+      "sort",
+      "快排"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "数组",
+    "aliases": [
+      "数组"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "parentCategory": "算法",
+    "coreKeywords": [
+      "数组",
+      "array"
+    ],
+    "searchAliases": [
+      "数组",
+      "array"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [
+      {
+        "type": "parent",
+        "target": "算法",
+        "note": "legacy parentCategory"
+      },
+      {
+        "type": "related",
+        "target": "双指针",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "滑动窗口",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "前缀和",
+        "note": "from legacy expandedKeywords"
+      },
+      {
+        "type": "related",
+        "target": "矩阵",
+        "note": "from legacy expandedKeywords"
+      }
+    ],
+    "legacyExpandedKeywords": [
+      "双指针",
+      "滑动窗口",
+      "前缀和",
+      "矩阵"
+    ],
+    "legacyLowPriorityKeywords": [
+      "算法",
+      "数据结构"
+    ],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "字符串",
+    "aliases": [
+      "字符串"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "coreKeywords": [
+      "字符串",
+      "string",
+      "回文",
+      "正则",
+      "KMP",
+      "子串",
+      "substring",
+      "正则化",
+      "L1正则化",
+      "L2正则化",
+      "KL正则化",
+      "palindrome"
+    ],
+    "searchAliases": [
+      "字符串",
+      "string",
+      "回文"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "递归",
+    "aliases": [
+      "递归"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "coreKeywords": [
+      "递归",
+      "recursion",
+      "回溯",
+      "分治",
+      "递归遍历",
+      "递归特征消除",
+      "backtracking",
+      "divide conquer"
+    ],
+    "searchAliases": [
+      "递归",
+      "recursion",
+      "回溯"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "队列",
+    "aliases": [
+      "队列"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "coreKeywords": [
+      "队列",
+      "queue",
+      "单调队列",
+      "优先队列",
+      "动态队列",
+      "消息队列",
+      "monotonic queue"
+    ],
+    "searchAliases": [
+      "队列",
+      "queue",
+      "单调队列"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "链表",
+    "aliases": [
+      "链表"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "coreKeywords": [
+      "链表",
+      "linked list",
+      "反转",
+      "合并",
+      "链",
+      "双向链表",
+      "reverse"
+    ],
+    "searchAliases": [
+      "链表",
+      "linked list",
+      "反转"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "栈",
+    "aliases": [
+      "栈"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "coreKeywords": [
+      "栈",
+      "stack",
+      "单调栈",
+      "括号",
+      "表达式",
+      "Stacking",
+      "monotonic stack"
+    ],
+    "searchAliases": [
+      "栈",
+      "stack",
+      "单调栈"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "git",
+    "canonical": "Git",
+    "aliases": [
+      "Git"
+    ],
+    "domain": "workplace-vibecoding",
+    "deckHint": "workplace",
+    "coreKeywords": [
+      "Git",
+      "版本控制",
+      "分支",
+      "merge",
+      "rebase",
+      "longitudinal",
+      "ChiMerge",
+      "BASE",
+      "version control",
+      "commit"
+    ],
+    "searchAliases": [
+      "Git",
+      "版本控制",
+      "分支"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  },
+  {
+    "id": "",
+    "canonical": "二分",
+    "aliases": [
+      "二分"
+    ],
+    "domain": "leetcode",
+    "deckHint": "leetcode",
+    "coreKeywords": [
+      "二分",
+      "binary search",
+      "二分查找",
+      "lower bound"
+    ],
+    "searchAliases": [
+      "二分",
+      "binary search",
+      "二分查找"
+    ],
+    "migrationStatus": "generated",
+    "suggestedRelations": [],
+    "legacyExpandedKeywords": [],
+    "legacyLowPriorityKeywords": [],
+    "legacyPrerequisiteKeywords": []
+  }
+]

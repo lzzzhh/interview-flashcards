@@ -47,6 +47,8 @@ export interface ParsedSearchQuery {
   topicChangeReason: string;     // why topic changed from topicRaw
   filteredStopwords: string[];   // stopwords removed from query
   conceptSource: 'graph' | 'legacy' | 'fallback';  // where concept info came from
+  tierOwner: 'graph' | 'legacy' | 'none';
+  legacySupplementalKeywords: string[];
   debug: string;
 }
 
@@ -169,35 +171,48 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
 
   const topicChangeReason = buildTopicChangeReason(topicRaw, protectedTopic, canonicalTopic);
 
-  // ── Step 7: Keyword tiering ──
-  // Primary: legacy dict (proven eval coverage). Supplementary: graph adds extra keywords.
+  // ── Step 7: Keyword tiering (graph-owned for migrated concepts) ──
   let coreKeywords: string[], expandedKeywords: string[], lowPriorityKeywords: string[], prerequisiteKeywords: string[];
+  let tierOwner: 'graph' | 'legacy' | 'none' = 'none';
+  let legacySupplementalKeywords: string[] = [];
   
-  // Base keywords always from legacy dict (if available)
-  const baseCore = concept?.coreKeywords?.length
-    ? [...new Set([canonicalTopic, ...concept.coreKeywords])]
-    : [canonicalTopic];
-  const baseExpanded = concept?.expandedKeywords ? [...concept.expandedKeywords] : [];
-  const baseLow = concept?.lowPriorityKeywords || [];
-  const basePrereq = concept?.prerequisiteKeywords || [];
-  
-  // If graph hit, supplement with graph-derived keywords (not replace)
   if (graphResolved.conceptGraphHit) {
+    // Graph-owned tiers: graph provides core/expanded/prerequisite, legacy only supplements
+    tierOwner = 'graph';
     const graphTiers = buildKeywordTiersFromGraphWithLimits(graphResolved.graphNodeId!, intent === 'study' ? 'learning-path' : 'search');
-    // Graph core: only add new keywords not already in base
-    coreKeywords = [...new Set([...baseCore, ...graphTiers.coreKeywords])];
-    // Graph expanded: only add new, respecting max
-    const graphNew = graphTiers.expandedKeywords.filter(k => !baseExpanded.includes(k));
-    expandedKeywords = [...baseExpanded, ...graphNew].slice(0, 16);
-    // Low priority: merge both
-    lowPriorityKeywords = [...new Set([...baseLow, ...graphTiers.lowPriorityKeywords])];
-    // Prerequisites: merge both, graph may have more via relations
-    prerequisiteKeywords = [...new Set([...basePrereq, ...graphTiers.prerequisiteKeywords])];
+    // Core from graph + canonicalTopic
+    coreKeywords = [canonicalTopic, ...graphTiers.coreKeywords.filter(k => k !== canonicalTopic)];
+    // Expanded from graph, no legacy expanded by default
+    expandedKeywords = graphTiers.expandedKeywords;
+    // Low priority from graph parent relations
+    lowPriorityKeywords = graphTiers.lowPriorityKeywords;
+    // Prerequisites from graph relations
+    prerequisiteKeywords = graphTiers.prerequisiteKeywords;
+    
+    // Legacy dict as supplemental (max 6, filtered for stopwords and lowPriority)
+    if (concept) {
+      legacySupplementalKeywords = (concept.expandedKeywords || [])
+        .filter(k => !coreKeywords.includes(k) && !expandedKeywords.includes(k))
+        .filter(k => !STOPWORDS.has(k) && !isStopword(k))
+        .slice(0, 6);
+      // Add supplemental to expanded (after graph) 
+      expandedKeywords = [...expandedKeywords, ...legacySupplementalKeywords];
+    }
+  } else if (concept) {
+    // Legacy-only: dict provides all keywords
+    tierOwner = 'legacy';
+    coreKeywords = concept.coreKeywords?.length
+      ? [...new Set([canonicalTopic, ...concept.coreKeywords])]
+      : [canonicalTopic];
+    expandedKeywords = concept.expandedKeywords || [];
+    lowPriorityKeywords = concept.lowPriorityKeywords || [];
+    prerequisiteKeywords = concept.prerequisiteKeywords || [];
   } else {
-    coreKeywords = baseCore;
-    expandedKeywords = baseExpanded;
-    lowPriorityKeywords = baseLow;
-    prerequisiteKeywords = basePrereq;
+    tierOwner = 'none';
+    coreKeywords = [canonicalTopic];
+    expandedKeywords = [];
+    lowPriorityKeywords = [];
+    prerequisiteKeywords = [];
   }
 
   // ── Step 8: Build recall/rerank text ──
@@ -223,7 +238,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     recallText, rerankText,
     confidence: source !== 'fallback' ? 0.8 : 0.2,
     source, topicChangeReason, filteredStopwords,
-    conceptSource,
+    conceptSource, tierOwner, legacySupplementalKeywords,
     debug: debugMsg,
   };
 }
@@ -276,7 +291,7 @@ function buildClarifyResult(q: string): ParsedSearchQuery {
     constraints: {}, coreKeywords: [], expandedKeywords: [], lowPriorityKeywords: [], prerequisiteKeywords: [],
     rewrittenQuery: '', recallText: '', rerankText: '',
     confidence: 0, source: 'regex', topicChangeReason: 'needsClarification: no topic in learning_path query',
-    filteredStopwords: [], conceptSource: 'fallback', debug: 'needsClarification',
+    filteredStopwords: [], conceptSource: 'fallback', tierOwner: 'none', legacySupplementalKeywords: [], debug: 'needsClarification',
   };
 }
 
