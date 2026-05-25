@@ -1,6 +1,7 @@
 // backend/src/services/search/eval/run-lp200.ts
 // 200-case learning-path eval — understanding, rewrite, retrieval, ranking, LP quality
 import { understandQuery, sanitizeTopic } from '../query-understanding';
+import { conceptGraphLookup } from '../concept-graph';
 import { hybridSearch } from '../hybrid-search';
 
 // ── Load all 205 cases (manual 40 + generated 165) ──
