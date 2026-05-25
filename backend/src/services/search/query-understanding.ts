@@ -65,6 +65,11 @@ const STOPWORDS = new Set([
 
 // ── Regex intent patterns ──
 const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
+  // Multi-topic sequential: "先学X再学Y" / "X然后再学Y" / "X和Y给我规划"
+  { intent: 'create_plan', patterns: [
+    /^(?:我想|我要|想|要|先想|先要)?(?:先学|学|学习)?(.+?)(?:然后再学|然后再|然后学|然后|再学|再)(?:学|学习)?(.+?)(规划|计划|推荐|给我规划|帮我规划|怎么学|如何学|学习路线|学习路径|入门|给我|帮我)?$/,
+    /^(.+?)和(.+?)(?:给我|帮我)?(?:规划|计划|怎么学|如何学|推荐|学习路线)?$/,
+  ]},
   // create_plan: study/learning intent ("怎么学X", "X入门", "X学习路线", "X学习路径")
   { intent: 'create_plan',   patterns: [
     /^(?:如果我想从零开始|如果从零开始)?(?:怎样学|怎么学|如何学|如何学习|想学|想学习|学|学习)(.+?)看哪些卡/,
@@ -109,6 +114,16 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     for (const pattern of group.patterns) {
       const match = q.match(pattern);
       if (match) {
+        // Multi-topic: match[1] and match[2] are separate topics
+        if (match[2] && match[2].trim()) {
+          const t1 = sanitizeTopic(match[1].trim());
+          const t2 = sanitizeTopic(match[2].trim());
+          topicRaw = `${t1} 和 ${t2}`;
+          intent = group.intent;
+          source = 'regex';
+          debugMsg = `multi-topic: topics=["${t1}","${t2}"]`;
+          break;
+        }
         const rawMatch = (match[1] || match.length > 1 ? match[1] : '').trim();
         // P3: alias resolution before sanitize
         topicRaw = CANONICAL_ALIAS[rawMatch] || sanitizeTopic(rawMatch);
@@ -282,8 +297,8 @@ export function sanitizeTopic(raw: string): string {
   // Remove intent prefixes (order matters: longer first)
   t = t.replace(/^(怎么学习|要怎么学|该怎么学|怎么学|如何学习|如何学|怎样学|我想了解|我想学|我要学|我想|我要|想学|想学习|学|学习|了解|掌握|搞懂|刷|复习|回顾|入门)\s*/i, '');
 
-  // Remove request tails after punctuation
-  t = t.replace(/[，,。！!？?\s]+.*$/s, '');
+  // Remove request tails after punctuation (COMMA only, not spaces)
+  t = t.replace(/[，,。！!？?]+.*$/s, '');
 
   // Remove trailing modifiers
   t = t.replace(/\s*(学习方法|方法|教程|知识点|总结|资料|路线|计划|入门|实战|案例|卡片|推荐|的区别|什么时候|用什么|怎么|怎样|如何|给我)$/g, '');
