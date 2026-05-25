@@ -149,19 +149,22 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   // ── Step 5: Protect specific topic ──
   const protectedTopic = protectSpecificTopic(q, topicRaw);
 
-  // ── Step 6: Concept expansion (graph first, legacy fallback) ──
+  // ── Step 6: Concept expansion (graph for canonical/deckHint, legacy for keywords) ──
   const graphResolved = resolveConceptFromGraph(protectedTopic);
   let conceptSource: ParsedSearchQuery['conceptSource'] = 'fallback';
-  let concept: ConceptEntry | undefined;
+  // Always load legacy dict for keyword coverage, graph only supplements canonical/deckHint
+  const concept = await conceptLookup(protectedTopic);
   let canonicalTopic: string;
   
   if (graphResolved.conceptGraphHit) {
     conceptSource = 'graph';
     canonicalTopic = graphResolved.canonicalTopic;
-  } else {
-    concept = await conceptLookup(protectedTopic);
-    conceptSource = concept ? 'legacy' : 'fallback';
+  } else if (concept) {
+    conceptSource = 'legacy';
     canonicalTopic = concept?.canonicalTopic || concept?.topic || protectedTopic;
+  } else {
+    conceptSource = 'fallback';
+    canonicalTopic = protectedTopic;
   }
 
   const topicChangeReason = buildTopicChangeReason(topicRaw, protectedTopic, canonicalTopic);
