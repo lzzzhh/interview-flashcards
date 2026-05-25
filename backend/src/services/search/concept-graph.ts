@@ -190,6 +190,63 @@ const NODES: ConceptNode[] = [
     relations: [
       { type: 'child', target: 'ensemble' },
     ]},
+  { id: 'backtracking', canonical: '回溯', aliases: ['回溯', '回溯算法', 'backtracking'], deckHint: 'leetcode', parentCategory: '算法',
+    coreKeywords: ['回溯', 'backtracking'], searchAliases: ['backtracking', '递归', 'DFS', '剪枝', 'permutation', 'combination'],
+    relations: [{ type: 'related', target: 'dfs' }] },
+  { id: 'reinforcement_learning', canonical: '强化学习', aliases: ['强化学习', 'reinforcement learning', 'RL'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['强化学习', 'reinforcement learning', 'RL'], searchAliases: ['rl', 'agent', 'environment', 'reward', 'Q-learning', 'policy', 'value', 'Bellman'],
+    relations: [{ type: 'related', target: 'ml' }] },
+  { id: 'pca', canonical: 'PCA', aliases: ['PCA', 'principal component analysis'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['PCA', 'principal component analysis'], searchAliases: ['pca', '降维', 'eigenvalue', '主成分', 'variance'],
+    relations: [] },
+  { id: 'feature_engineering', canonical: '特征工程', aliases: ['特征工程', 'feature engineering'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['特征工程', 'feature engineering'], searchAliases: ['feature', '特征选择', '特征提取', '特征缩放', '编码', '缺失值'],
+    relations: [] },
+  { id: 'cross_validation', canonical: '交叉验证', aliases: ['交叉验证', 'cross validation'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['交叉验证', 'cross validation'], searchAliases: ['cross val', 'k-fold', 'holdout', 'LOOCV'],
+    relations: [{ type: 'related', target: 'overfitting' }] },
+  { id: 'logistic_regression', canonical: '逻辑回归', aliases: ['逻辑回归', 'logistic regression'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['逻辑回归', 'logistic regression'], searchAliases: ['logistic', 'sigmoid', '二分类', 'odds'],
+    relations: [] },
+  { id: 'linear_regression', canonical: '线性回归', aliases: ['线性回归', 'linear regression'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['线性回归', 'linear regression'], searchAliases: ['linear', 'OLS', 'least squares', 'R方'],
+    relations: [] },
+  { id: 'knn', canonical: 'KNN', aliases: ['KNN', 'k nearest neighbors'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['KNN', 'k nearest neighbors'], searchAliases: ['knn', '距离', '欧氏', '惰性学习'],
+    relations: [] },
+  { id: 'kmeans', canonical: 'KMeans', aliases: ['KMeans', 'k均值'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['KMeans', 'k均值'], searchAliases: ['kmeans', '聚类', 'elbow', '轮廓系数'],
+    relations: [] },
+  { id: 'svm', canonical: 'SVM', aliases: ['SVM', 'support vector machine'], deckHint: 'machine-learning', parentCategory: '机器学习',
+    coreKeywords: ['SVM', 'support vector machine'], searchAliases: ['svm', '核函数', '最大间隔', 'KKT'],
+    relations: [] },
+  { id: 'cnn', canonical: 'CNN', aliases: ['CNN', 'convolutional neural network'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['CNN', 'convolutional neural network'], searchAliases: ['cnn', '卷积', 'pooling', 'feature map'],
+    relations: [] },
+  { id: 'rnn', canonical: 'RNN', aliases: ['RNN', 'recurrent neural network', 'LSTM'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['RNN', 'recurrent neural network', 'LSTM'], searchAliases: ['rnn', 'lstm', 'gru', '序列', 'sequence'],
+    relations: [] },
+  { id: 'batchnorm', canonical: 'BatchNorm', aliases: ['BatchNorm', 'batch normalization'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['BatchNorm', 'batch normalization'], searchAliases: ['batchnorm', 'normalization', 'layernorm'],
+    relations: [] },
+  { id: 'dropout', canonical: 'Dropout', aliases: ['Dropout', 'drop out'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['Dropout'], searchAliases: ['dropout', 'inverted'],
+    relations: [{ type: 'related', target: 'regularization' }] },
+  { id: 'optimizer', canonical: '优化器', aliases: ['优化器', 'optimizer'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['优化器', 'optimizer'], searchAliases: ['SGD', 'Adam', 'RMSprop', 'momentum', '学习率'],
+    relations: [] },
+  { id: 'loss_function', canonical: '损失函数', aliases: ['损失函数', 'loss function'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['损失函数', 'loss function'], searchAliases: ['交叉熵', 'MSE', 'hinge', 'focal'],
+    relations: [] },
+  { id: 'dl', canonical: '深度学习', aliases: ['深度学习', 'deep learning'], deckHint: 'deep-learning', parentCategory: '深度学习',
+    coreKeywords: ['深度学习', 'deep learning'], searchAliases: ['deep learning', '神经网络', '反向传播', 'gradient'],
+    relations: [{ type: 'child', target: 'cnn' }, { type: 'child', target: 'rnn' }, { type: 'child', target: 'transformer' }] },
+  { id: 'sql', canonical: 'SQL', aliases: ['SQL'], deckHint: 'statistics', parentCategory: '数据科学',
+    coreKeywords: ['SQL'], searchAliases: ['sql', 'query', 'join', 'group by', 'window', '索引'],
+    relations: [] },
+  { id: 'data_science', canonical: '数据科学', aliases: ['数据科学', 'data science'], deckHint: 'statistics', parentCategory: '数据科学',
+    coreKeywords: ['数据科学', 'data science'], searchAliases: ['data science', 'SQL', 'Python', 'pandas', '统计'],
+    relations: [] },
 ];
 
 // ── Graph Index ──
@@ -266,8 +323,9 @@ export function buildKeywordTiersFromGraph(
   const prereq = new Set<string>();
   const lowPrio = new Set<string>();
 
+  const maxDepth = mode === 'learning_path' ? 2 : 1;
   // Parent category → lowPriority only
-  const parents = walkEdges(topicId, ['parent'], 2);
+  const parents = walkEdges(topicId, ['parent'], 1);
   for (const pid of parents) {
     const pn = nodeById.get(pid);
     if (pn) {
