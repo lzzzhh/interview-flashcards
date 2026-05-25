@@ -124,7 +124,7 @@ const NODES: ConceptNode[] = [
     ],
     migrationStatus: 'manual', domain: 'machine-learning',
   },
-  { id: 'dfs', canonical: aliases: ['DFS', '深度优先搜索', 'depth first search'], deckHint: 'leetcode', parentCategory: '算法',
+  { id: 'dfs', canonical: 'DFS', aliases: ['DFS', '深度优先搜索', 'depth first search'], deckHint: 'leetcode', parentCategory: '算法',
     coreKeywords: ['DFS', '深度优先搜索', 'depth first search'], searchAliases: ['dfs', '深度', 'depth first', 'backtrack', '递归', 'stack'],
     relations: [
       { type: 'parent', target: 'graph_algorithm' }, { type: 'contrast', target: 'bfs' },
