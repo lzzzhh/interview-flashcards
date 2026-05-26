@@ -394,7 +394,7 @@ const NODES: ConceptNode[] = [
   // ── Generated (26 nodes) ──
   { id: 'hypothesis_test', canonical: '假设检验', aliases: ['假设检验', 'hypothesis testing', '统计检验', 'Hypothesis Testing'],
     deckHint: 'statistics', parentCategory: '统计学',
-    coreKeywords: ['假设检验', 'hypothesis testing'], searchAliases: ['假设检验', 'hypothesis testing'],
+    coreKeywords: ['假设检验', 'hypothesis testing'], searchAliases: ['假设检验','hypothesis testing','p值','p-value','显著性','t检验','t-test','z检验','卡方','ANOVA','F检验','第一类错误','第二类错误','拒绝域'],
     relations: [], migrationStatus: 'generated', domain: 'data-science-statistics',
   },
   { id: 'confidence_interval', canonical: '置信区间', aliases: ['置信区间'],
@@ -523,7 +523,7 @@ const NODES: ConceptNode[] = [
     relations: [], migrationStatus: 'generated', domain: 'leetcode',
   },
   { id: 'prefix_sum', canonical: '前缀和', aliases: ['前缀和','prefix sum','前缀数组','cumulative sum'], deckHint: 'leetcode', parentCategory: '算法',
-    coreKeywords: ['前缀和','prefix sum','差分数组','子数组和','cumulative sum'], searchAliases: ['前缀和','prefix','prefix sum','cumulative','subarray sum','range sum','difference array','差分'],
+    coreKeywords: ['前缀和','prefix sum','差分数组','子数组和','cumulative sum'], searchAliases: ['前缀和','prefix','prefix sum','cumulative','subarray sum','range sum','difference array','差分','前缀','pre'],
     relations: [{type:'parent',target:'algorithm'}], migrationStatus: 'generated', domain: 'leetcode',
   },
   { id: 'rag', canonical: 'RAG', aliases: ['RAG','rag','Retrieval-Augmented Generation','检索增强生成'], deckHint: 'agent', parentCategory: 'Agent',
