@@ -64,20 +64,6 @@ const STOPWORDS = new Set([
 
 // ── Regex intent patterns ──
 const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
-  // Compare detection FIRST (before create_plan, to avoid false create_plan on "X和Y区别")
-  { intent: 'compare_cards', patterns: [
-    /([\u4e00-\u9fff]+?)和([\u4e00-\u9fff]+?)(?:有什么区别|怎么区分|区别|先学哪个|对比|比较|哪个好|总搞混)/,
-    /(.+?)(?:和|vs\.?|VS|与)(.+?)(?:有什么区别|怎么区分|区别|先学哪个|对比|比较|哪个好|总搞混)/,
-  ]},
-  // Review detection BEFORE create_plan (看了几遍→review not create_plan)
-  { intent: 'review_weakness',  patterns: [
-    /^(?:复习|回顾|重温|我想复习|我要复习)(.+)/,
-    /^(.+)(?:复习|回顾)$/,
-    /^(.+?)(?:不太懂|很薄弱|老是搞混|完全没概念|看了几遍还是不懂|看了几遍还不懂|看了几遍还是不会).*怎么复习/,
-    /^(.+?)(?:看了几遍还是不懂|看了几遍还不懂|看了几遍还是不会)(?:.*)?(?:怎么补|怎么复习|补哪些|先学哪些)?$/,
-    /^(.+?)(?:看了几遍还是不懂|看了几遍还不懂|看了几遍还是不会)$/,
-    /^(.+?)(?:面试|被问到|总[答做]不好|没答好).*(?:怎么补|怎么复习|补哪些)/,
-  ]},
   // Multi-topic sequential: "先学X再学Y" / "X然后再学Y" / "X和Y给我规划"
   { intent: 'create_plan', patterns: [
     /^(?:我想|我要|想|要|先想|先要)?(?:先学|学|学习)?(.+?)(?:然后再学|然后再|然后学|然后|再学|再)(?:学|学习)?(.+?)(给我规划一下|给我规划|规划一下|帮我规划一下|规划|计划|推荐|怎么学|如何学|学习路线|学习路径|入门|给我|帮我)?$/,
@@ -96,6 +82,23 @@ const INTENT_PATTERNS: { intent: SearchIntent; patterns: RegExp[] }[] = [
     /^面试(.+?)(?:总[答做]不好|老是|被问到).*/,
     // Suffix patterns
     /^(.+?)(?:怎么学|如何学|如何学习|怎么学习|怎么入门|如何入门|学习方法|学习路线|的学习路径|学习路径|入门|从哪里开始学|从哪开始|应该先学什么|先学什么|有哪些卡|怎么补|怎么复习|怎么系统学|为什么|推荐几张卡|推荐几张|推荐卡)/,
+  ]},
+  { intent: 'review_weakness',  patterns: [
+    /^(?:复习|回顾|重温|我想复习|我要复习)(.+)/,
+    /^(.+)(?:复习|回顾)$/,
+    /^(.+?)(?:不太懂|很薄弱|老是搞混).*怎么复习/,
+    /^(.+?)(?:看了几遍还是不懂|看了几遍还不懂|看了几遍还是不会)/,
+    /^(.+?)(?:面试|被问到|总[答做]不好|没答好).*(?:怎么补|怎么复习|补哪些)/,
+  ]},
+  { intent: 'recommend_cards', patterns: [
+    /^(.+?)(?:，|,|给我推荐|推荐几张|推荐).*卡片/,
+    /^(.+?)(?:相关内容|学习清单|的卡片|卡)/,
+  ]},
+  { intent: 'compare_cards', patterns: [
+    /([\u4e00-\u9fff]+?)和([\u4e00-\u9fff]+?)(?:有什么区别|怎么区分|区别|先学哪个|对比|比较|哪个好|总搞混)/,
+  ]},
+  { intent: 'clarify', patterns: [
+    /^(应该先学|先看哪些|从哪开始)(?:什么|哪些|哪里)?$/,
   ]},
 ];
 
@@ -300,6 +303,8 @@ export function sanitizeTopic(raw: string): string {
   // Remove trailing modifiers
   t = t.replace(/\s*(学习方法|方法|教程|知识点|总结|资料|路线|计划|入门|实战|案例|卡片|推荐|的区别|什么时候|用什么|怎么|怎样|如何|给我)$/g, '');
 
+  // Strip trailing personal pronouns: "动态规划我" → "动态规划"
+  t = t.replace(/\s*(?:我|我的|一下)$/g, '');
   t = t.trim();
 
   // Strip compound negation prefixes + pronouns
