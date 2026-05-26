@@ -164,6 +164,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
         }
       }
     }
+  }
 
   // ── Step 3: LLM fallback ──
   if (!topicRaw) {
