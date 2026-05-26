@@ -33,7 +33,7 @@ const NODES: ConceptNode[] = [
     migrationStatus: 'manual', domain: 'machine-learning',
   },
   { id: 'xgboost', canonical: 'XGBoost', aliases: ['XGBoost', 'xgboost', 'extreme gradient boosting'], deckHint: 'machine-learning', parentCategory: '机器学习',
-    coreKeywords: ['XGBoost', 'extreme gradient boosting'], searchAliases: ['xgboost', 'xgb', 'extreme gradient boosting'],
+    coreKeywords: ['XGBoost', 'extreme gradient boosting'],    searchAliases: ['xgboost', 'xgb', 'extreme gradient boosting', 'GBDT', 'gradient boosting', 'boosting'],
     relations: [
       { type: 'parent', target: 'gbdt' }, { type: 'parent', target: 'boosting' },
       { type: 'child', target: 'ml' }, { type: 'related', target: 'random_forest' }, { type: 'related', target: 'feature_importance' },
