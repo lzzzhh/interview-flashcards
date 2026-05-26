@@ -796,6 +796,7 @@ export function buildKeywordTiersFromGraphWithLimits(
 
   const maxDepth = mode === 'learning-path' ? 2 : 1;
   const core = new Set(node.coreKeywords);
+  const expanded = new Set<string>();
   // Node's own searchAliases → always included as expanded
   for (const k of node.searchAliases) expanded.add(k);
   const prereq = new Set<string>();
