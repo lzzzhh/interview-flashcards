@@ -1,62 +1,43 @@
 # AI Search System — Current Status
 
-**Date**: 2026-05-25
-**Commit**: `e48aca5`
-**Status**: ✅ Production-Ready
+**Date**: 2026-05-26
+**Commit**: `db6012b`
+**Status**: ✅ Production-Ready (Graph-Only)
 
 ## Quick Summary
 
-AI Search module is production-ready. Core product queries pass at **93.4%**. 
-Search main pipeline is frozen. Next work should focus on telemetry, learning plan generation, and concept alias cleanup.
+Knowledge Graph migration complete. Legacy concept dictionary deleted. Search pipeline frozen. Core product queries at 93.4%.
 
 ## Key Metrics
 
 | Metric | Value |
 |--------|-------|
 | Core queries | 93.4% (156/167) |
-| Product-fit (core+common) | 91.2% (176/193) |
-| Weighted | 91.7% |
-| Excluded from benchmark | 5 cases |
+| Product-fit (core+common) | 90.7% (175/193) |
+| Release-gate Top15 | 77.7% |
+| Graph nodes | 109 |
+| Search pipeline | FROZEN |
 
-## Architecture Components
+## Architecture
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Concept Graph v1 | ✅ Stable | 79 nodes, 100% legacy coverage, lint PASS |
-| tierOwner | ✅ Graph | parent → lowPriority only |
-| CardConcept v0 | ✅ Runtime | Graph alias matching on card fields |
-| Query Understanding | ✅ Stable | Product-aligned intents, compare/strength detection |
-| Keyword Tiering | ✅ Stable | core/expanded/prerequisite/lowPriority from graph |
-| Eval Framework | ✅ 200-case | Product-fit weighted, realism classification |
-| FTS5/LIKE recall | ✅ Stable | 9-field likeSearch, bigram Chinese |
-| Reranker | ✅ Stable | deckBoost 0.25, minScore 0 |
-| Merge cap | ✅ 200 | topicGranularity-aware |
+| Component | Status |
+|-----------|--------|
+| Knowledge Graph v1 | 109 nodes, lint PASS, sole knowledge layer |
+| tierOwner | graph |
+| CardConcept v0 | runtime graph alias matching |
+| Query Understanding | regex-first + 6 product intents |
+| Eval | product-fit weighted + release-gate by group |
 
-## Non-Blocking Issues (17)
+## Non-Blocking Issues (18)
 
-- 7 merged cap (topic granularity)
-- 4 mustInclude (foundation concept coverage)
-- 3 intent (English concept compare alias)
-- 2 precision (concept-level matching in eval)
-- 1 topic (composite topic acceptable)
+- topic: 8 (composite/compare topics)
+- intent: 5 (compare regex + LLM boundary)
+- precision: 3 (concept-level matching)
+- mustInclude: 2 (foundation coverage)
 
-## Frozen Pipeline
+## Next
 
-Do NOT modify without baseline comparison:
-- hybridSearch
-- learningPlanSearch
-- reranker weights
-- deckBoost (0.25)
-- minScore (0)
-- vector recall
-- FTS5/LIKE recall
-- LLM rewrite
-- lexical rescue
-
-## Next Priorities
-
-1. Telemetry / analytics on search usage
-2. Learning plan generation from search results
-3. Concept alias cleanup (remove duplicates, normalize)
-4. CardConcept persistence (inferred → verified)
-5. UI: search explainability panel
+- CardConcept persistence
+- Learning plan generation from graph edges
+- Telemetry
+- Concept alias cleanup
