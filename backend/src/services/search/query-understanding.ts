@@ -1,7 +1,6 @@
 // backend/src/services/search/query-understanding.ts
 // Pipeline: rawQuery → normalize → intent → slot extraction → sanitizeTopic → protect → concept expansion → keyword tiering → rewrite
 
-import { conceptLookup, getAllTopics, type ConceptEntry } from './concept-dictionary';
 import { resolveConceptFromGraph, buildKeywordTiersFromGraphWithLimits, conceptGraphLookup } from './concept-graph';
 
 // ── Types ──
@@ -141,7 +140,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     const words = q.split(/[，,\s]+/).filter(w => w.length >= 2);
     for (const word of words) {
       const clean = sanitizeTopic(word);
-      const node = conceptGraphLookup(clean) || await conceptLookup(clean);
+      const node = conceptGraphLookup(clean);
       if (node) {
         topicRaw = clean;
         intent = 'search_cards';
@@ -193,7 +192,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   const graphResolved = resolveConceptFromGraph(protectedTopic);
   let conceptSource: ParsedSearchQuery['conceptSource'] = graphResolved.conceptGraphHit ? 'graph' : 'fallback';
   // Load concept dict only if graph misses (graph already has 100% coverage)
-  const concept = graphResolved.conceptGraphHit ? null : await conceptLookup(protectedTopic);
+  const concept = null; // conceptLookup no longer needed — graph covers 100%
   let canonicalTopic: string;
   
   if (graphResolved.conceptGraphHit) {
@@ -209,9 +208,9 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
 
   const topicChangeReason = buildTopicChangeReason(topicRaw, protectedTopic, canonicalTopic);
 
-  // ── Step 7: Keyword tiering (graph-owned for migrated concepts) ──
+  // ── Step 7: Keyword tiering (graph-owned, 100% coverage) ──
   let coreKeywords: string[], expandedKeywords: string[], lowPriorityKeywords: string[], prerequisiteKeywords: string[];
-  let tierOwner: 'graph' | 'legacy' | 'none' = 'none';
+  let tierOwner: 'graph' | 'legacy' | 'none' = 'graph';
   let legacySupplementalKeywords: string[] = [];
   
   if (graphResolved.conceptGraphHit) {

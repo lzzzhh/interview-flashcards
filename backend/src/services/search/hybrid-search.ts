@@ -15,7 +15,7 @@ import { getEmbeddingProvider } from '../embedding-provider';
 import { textToVector } from '../vector/local-embedding';
 import { understandQuery, sanitizeTopic, type ParsedSearchQuery } from './query-understanding';
 import { expandQuery } from './query-expander';
-import { conceptLookup } from './concept-dictionary';
+import { conceptGraphLookup, buildKeywordTiersFromGraphWithLimits } from './concept-graph';
 import { tokenizeBigrams } from './bigram';
 import {
   rerank,
@@ -117,19 +117,20 @@ interface RecallCandidate {
 async function quickParse(rawQuery: string): Promise<ParsedSearchQuery> {
   const q = rawQuery.trim();
   const topic = sanitizeTopic(q);
-  // Do concept dict lookup even in eval mode for keyword expansion
-  const concept = await conceptLookup(topic);
-  if (concept) {
+  // Graph-first concept lookup for keyword expansion
+  const graphNode = conceptGraphLookup(topic);
+  if (graphNode) {
     const hasStudySignal = /怎么学|如何学|怎样学|入门|学习路线|学习路径|怎么补|怎么复习|推荐|帮我|给我/.test(q);
     const intent = hasStudySignal ? 'create_plan' as const : 'search_cards' as const;
-    const coreKws = [topic, ...(concept.coreKeywords || [])];
-    const expandedKws = [...(concept.expandedKeywords || [])];
+    const tiers = buildKeywordTiersFromGraphWithLimits(graphNode.id, 'search');
+    const coreKws = [topic, ...tiers.coreKeywords];
+    const expandedKws = tiers.expandedKeywords;
     return {
-      rawQuery: q, intent, topicRaw: q, topic, canonicalTopic: concept.canonicalTopic || topic,
-      deckHint: concept.deckHint, parentCategory: concept.parentCategory,
-      subtopics: concept.subtopics || [], constraints: {},
+      rawQuery: q, intent, topicRaw: q, topic, canonicalTopic: graphNode.canonical,
+      deckHint: graphNode.deckHint, parentCategory: graphNode.parentCategory,
+      subtopics: [], constraints: {},
       coreKeywords: [...new Set(coreKws)], expandedKeywords: [...new Set(expandedKws)],
-      lowPriorityKeywords: concept.lowPriorityKeywords || [], prerequisiteKeywords: concept.prerequisiteKeywords || [],
+      lowPriorityKeywords: tiers.lowPriorityKeywords, prerequisiteKeywords: tiers.prerequisiteKeywords,
       rewrittenQuery: [...new Set([topic, ...coreKws, ...expandedKws])].join(' '),
       recallText: [...new Set([topic, ...coreKws, ...expandedKws])].join(' '),
       rerankText: [...new Set([topic, ...coreKws.slice(0, 3)])].join(' '),
