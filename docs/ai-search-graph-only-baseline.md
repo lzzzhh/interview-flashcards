@@ -1,80 +1,68 @@
-# AI Search — Graph-Only Baseline
+# AI Search — Graph-Only Lexical Baseline
 
-**Date**: 2026-05-26
-**Commit**: `db6012b`
+**Date**: 2026-05-27
+**Commit**: `e88e47f`
 **Branch**: `before-learning-list`
 
 ## Production Status: ✅ Release-Ready
 
-Search pipeline frozen. Knowledge Graph route validated. No legacy dictionary rollback.
+Knowledge Graph migration complete. Legacy dictionary deleted. Search pipeline frozen.
 
 ## Final Metrics
 
-| Metric | Value | Delta vs Legacy Dict |
-|--------|-------|---------------------|
-| **Core pass rate** | **93.4%** (156/167) | ±0% (matched) |
-| Product-fit (core+common) | **90.7%** (175/193) | -0.5pp |
-| Weighted | 91.4% | — |
-| Release-gate Top15 | 77.7% (397/443 groups) | — |
-| Graph nodes | 109 | — |
-| Excluded | 5 | — |
+| Metric | Value |
+|--------|-------|
+| **Core pass rate** | **93.4%** (156/167) |
+| Product-fit (core+common) | **90.7%** (175/193) |
+| Weighted | 91.4% |
+| Release-gate Top15 | **77.7%** (443 cases) |
+| Graph nodes | **109** |
+| Search pipeline | FROZEN |
+| Legacy dictionary | DELETED |
 
-## Remaining Non-Blocking Issues (18)
+## Active Recall Channels (77.7% Top15)
 
-| Type | Count | Status |
-|------|-------|--------|
-| topic | 8 | Composite/compare topics — eval design |
-| intent | 5 | Compare regex + LLM boundary |
-| precision | 3 | Concept-level matching |
-| mustInclude | 2 | Foundation coverage (eval design) |
+| Channel | Status | Description |
+|---------|--------|-------------|
+| FTS5 / likeSearch | ✅ Active | Primary: Chinese bigram + English token matching |
+| tag | ✅ Active | Card tag matching |
+| searchKeywords | ✅ Active | Card searchKeywords matching |
+| vector | ⏸ Deferred | Card embedding data missing |
+
+## Vector Recall — Deferred
+
+| Check | Status |
+|-------|--------|
+| Ollama bge-m3 | ✅ Running (dim=1024) |
+| sqlite-vec library | ✅ Initialized |
+| Card embedding data | ❌ Not populated |
+| 748 cards synced | ❌ Pending |
+| Embedding coverage | 0% |
+
+**Enablement plan (backlog):**
+1. Run full card embedding sync (748 cards × bge-m3)
+2. Verify vector count = card count
+3. Run readiness:check / readiness:audit
+4. Run vector shadow mode (record-only)
+5. Run gated vector active A/B
+6. Only enable if Core ≥93% and Product-fit ≥90%
 
 ## Architecture
 
 | Layer | State |
 |-------|-------|
-| Knowledge Graph | 109 nodes, 100% legacy coverage, lint PASS |
+| Knowledge Graph | 109 nodes, lint PASS |
 | tierOwner | graph (parent→lowPriority only) |
 | CardConcept | v0 runtime graph alias matching |
 | Query Understanding | regex-first (6 product intents) |
-| Keyword Tiering | graph-owned (core/expanded/prerequisite/lowPriority) |
-| Legacy Dictionary | **deleted** — no fallback |
-| Eval | product-fit weighted + release-gate by group |
+| LLM rewrite | DISABLED |
+| Reranker weights | FROZEN |
+| deckBoost | 0.25 (FROZEN) |
+| minScore | 0 (FROZEN) |
 
-## Frozen Pipeline
+## Remaining Non-Blocking Issues (18)
 
-NOT modified since baseline:
-- hybridSearch
-- reranker weights
-- deckBoost (0.25)
-- minScore (0)
-- vector recall
-- FTS5 / LIKE recall
-- LLM rewrite
-- lexical rescue
-
-## Verified Regressions
-
-| Query | Status |
-|-------|--------|
-| RNN | ✅ Fixed (searchAliases expanded) |
-| 注意力机制 / Attention | ✅ Concept coverage maintained |
-| mustInclude foundation | ✅ ≤2 failures |
-| merged hard fail | ✅ Reclassified (warning if finalCnt≥10) |
-
-## Regression Guards
-
-| Case | Query | Concept |
-|------|-------|---------|
-| RNN | RNN/循环神经网络 | RNN node + searchAliases |
-| Attention | 注意力机制/self-attention | Attention node |
-| Vector DB | 向量数据库 | Vector DB node |
-| MLOps | 模型部署/model deployment | model_deploy node |
-| STAR法则 | STAR method/行为面试 | star_method node |
-
-## Backlog (Non-Blocking)
-
-- fallback/none graph migration
-- merged policy refinement
-- broad career query exclusion
-- topic granularity warnings
-- product-fit diagnostic cleanup
+- topic: 8 (composite/compare topics)
+- intent: 5 (compare regex + LLM boundary)
+- precision: 3 (concept-level matching)
+- mustInclude: 2 (foundation coverage)
