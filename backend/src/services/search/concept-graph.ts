@@ -871,3 +871,7 @@ export function buildKeywordTiersFromGraphWithLimits(
     graphRelationsUsed: relUsed,
   };
 }
+
+export function getAllCanonicalTopics(): string[] {
+  return NODES.map(n => n.canonical).filter(Boolean);
+}

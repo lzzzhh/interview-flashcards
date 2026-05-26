@@ -1,7 +1,7 @@
 // backend/src/services/search/query-understanding.ts
 // Pipeline: rawQuery → normalize → intent → slot extraction → sanitizeTopic → protect → concept expansion → keyword tiering → rewrite
 
-import { resolveConceptFromGraph, buildKeywordTiersFromGraphWithLimits, conceptGraphLookup } from './concept-graph';
+import { resolveConceptFromGraph, buildKeywordTiersFromGraphWithLimits, conceptGraphLookup, getAllCanonicalTopics } from './concept-graph';
 
 // ── Types ──
 
@@ -378,7 +378,7 @@ function buildTopicChangeReason(topicRaw: string, protectedTopic: string, canoni
 // ── LLM full parse ──
 
 async function llmFullParse(query: string): Promise<{ intent: SearchIntent; topic: string; rewrittenQuery: string } | null> {
-  const knownTopics = (await getAllTopics()).join(', ');
+  const knownTopics = getAllCanonicalTopics().join(', ');
   const prompt = `你是搜索意图解析器。提取用户想学习的具体概念。
 
 已知话题：${knownTopics}
