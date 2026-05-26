@@ -2,7 +2,7 @@
 // Pipeline: rawQuery → normalize → intent → slot extraction → sanitizeTopic → protect → concept expansion → keyword tiering → rewrite
 
 import { conceptLookup, getAllTopics, type ConceptEntry } from './concept-dictionary';
-import { resolveConceptFromGraph, buildKeywordTiersFromGraphWithLimits } from './concept-graph';
+import { resolveConceptFromGraph, buildKeywordTiersFromGraphWithLimits, conceptGraphLookup } from './concept-graph';
 
 // ── Types ──
 
@@ -141,8 +141,8 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     const words = q.split(/[，,\s]+/).filter(w => w.length >= 2);
     for (const word of words) {
       const clean = sanitizeTopic(word);
-      const concept = await conceptLookup(clean);
-      if (concept) {
+      const node = conceptGraphLookup(clean) || await conceptLookup(clean);
+      if (node) {
         topicRaw = clean;
         intent = 'search_cards';
         source = 'regex';
@@ -189,11 +189,11 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   // ── Step 5: Protect specific topic ──
   const protectedTopic = protectSpecificTopic(q, topicRaw);
 
-  // ── Step 6: Concept expansion (graph for canonical/deckHint, legacy for keywords) ──
+  // ── Step 6: Concept expansion (graph-first, dict fallback) ──
   const graphResolved = resolveConceptFromGraph(protectedTopic);
-  let conceptSource: ParsedSearchQuery['conceptSource'] = 'fallback';
-  // Always load legacy dict for keyword coverage, graph only supplements canonical/deckHint
-  const concept = await conceptLookup(protectedTopic);
+  let conceptSource: ParsedSearchQuery['conceptSource'] = graphResolved.conceptGraphHit ? 'graph' : 'fallback';
+  // Load concept dict only if graph misses (graph already has 100% coverage)
+  const concept = graphResolved.conceptGraphHit ? null : await conceptLookup(protectedTopic);
   let canonicalTopic: string;
   
   if (graphResolved.conceptGraphHit) {
