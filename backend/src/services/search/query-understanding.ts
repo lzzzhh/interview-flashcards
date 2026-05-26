@@ -136,21 +136,34 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     if (topicRaw) break;
   }
 
-  // ── Step 2: If no regex match, try dict match from full query ──
+  // ── Step 2: If no regex match, try graph match (full topic first, then individual words) ──
   if (!topicRaw) {
-    const words = q.split(/[，,\s]+/).filter(w => w.length >= 2);
-    for (const word of words) {
-      const clean = sanitizeTopic(word);
-      const node = conceptGraphLookup(clean);
-      if (node) {
-        topicRaw = clean;
+    // Try full sanitized query first (prevents 技术栈→栈)
+    const fullTopic = sanitizeTopic(q);
+    if (fullTopic.length >= 2) {
+      const fullNode = conceptGraphLookup(fullTopic);
+      if (fullNode) {
+        topicRaw = fullTopic;
         intent = 'search_cards';
         source = 'regex';
-        debugMsg = `dict match: "${clean}"`;
-        break;
+        debugMsg = `graph exact: "${fullTopic}"`;
       }
     }
-  }
+    // Fall back to word-level match (longer words first, min 3 chars)
+    if (!topicRaw) {
+      const words = q.split(/[，,\s]+/).filter(w => w.length >= 3).sort((a,b)=>b.length-a.length);
+      for (const word of words) {
+        const clean = sanitizeTopic(word);
+        const node = conceptGraphLookup(clean);
+        if (node) {
+          topicRaw = clean;
+          intent = 'search_cards';
+          source = 'regex';
+          debugMsg = `graph word match: "${clean}"`;
+          break;
+        }
+      }
+    }
 
   // ── Step 3: LLM fallback ──
   if (!topicRaw) {
