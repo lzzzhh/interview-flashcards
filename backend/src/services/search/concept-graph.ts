@@ -639,7 +639,7 @@ for (const n of NODES) {
 
 // ── Helpers ──
 
-function walkEdges(fromId: string, types: RelationType[], depth: number): Set<string> {
+export function walkEdges(fromId: string, types: RelationType[], depth: number): Set<string> {
   const visited = new Set<string>();
   const queue: Array<{ id: string; d: number }> = [{ id: fromId, d: 0 }];
   visited.add(fromId);
