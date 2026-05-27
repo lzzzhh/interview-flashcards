@@ -174,7 +174,7 @@ const NODES: ConceptNode[] = [
     migrationStatus: 'manual', domain: 'machine-learning',
   },
   { id: 'sliding_window', canonical: '滑动窗口', aliases: ['滑动窗口', 'sliding window'], deckHint: 'leetcode', parentCategory: '算法',
-    coreKeywords: ['滑动窗口', 'sliding window'], searchAliases: ['sliding window', '窗口', '定长', '不定长'],
+    coreKeywords: ['滑动窗口', 'sliding window'], searchAliases: ['sliding window', '定长', '不定长', '移动窗口'],
     relations: [
       { type: 'related', target: 'two_pointer' },
     ],
