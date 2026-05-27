@@ -2,6 +2,9 @@
 import { understandQuery } from './query-understanding';
 import { conceptGraphLookup, buildKeywordTiersFromGraphWithLimits, walkEdges } from './concept-graph';
 import { fts5Search } from './fts5-search';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export interface LearningStage {
   name: string;
@@ -152,7 +155,24 @@ async function buildPlanFromNode(graphNode: any, query: string, topic: string): 
     stages.push({ name: '面试/练习', concepts: [topic], cards: practiceCards });
   }
 
-  // 7. Compute metrics
+  // 7. Hydrate card titles from DB
+  const allIds = stages.flatMap(s => s.cards.map(c => c.cardId));
+  const cardRecords = await prisma.card.findMany({
+    where: { id: { in: allIds } },
+    select: { id: true, titleCn: true, title: true, searchKeywords: true },
+  });
+  const cardMap = new Map(cardRecords.map(c => [c.id, c]));
+  for (const s of stages) {
+    for (const card of s.cards) {
+      const rec = cardMap.get(card.cardId);
+      if (rec) {
+        card.title = rec.title || '';
+        card.titleCn = rec.titleCn;
+      }
+    }
+  }
+
+  // 8. Compute metrics
   const emptyStages = stages.filter(s => s.cards.length === 0).length;
   const totalConcepts = concepts.foundation.length + concepts.core.length + concepts.related.length;
   const coveredConcepts = stages.reduce((sum, s) => sum + s.concepts.filter(c => {
