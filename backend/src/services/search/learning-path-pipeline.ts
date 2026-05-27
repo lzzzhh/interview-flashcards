@@ -44,7 +44,10 @@ export async function buildLearningPlan(query: string): Promise<LearningPlan> {
   
   // Fallback: strip learning-path suffixes and retry with alias mapping
   if (!graphNode && topic) {
-    let cleanTopic = query.replace(/(学习路线|怎么学|如何学|怎么入门|从零开始学|怎么入行|要学什么|要补什么|怎么快速|快速入门|开发学习|从入门到实践|书籍推荐|从哪开始学|怎么入行)$/g, '').trim();
+    let cleanTopic = query
+      .replace(/(学习路线|怎么学|如何学|怎么入门|从零开始学|怎么入行|要学什么|要补什么|怎么快速|快速入门|开发学习|从入门到实践|书籍推荐|从哪开始学|要怎么学|怎么快速|要掌握什么|需要什么数学基础|学习|入门)$/g, '')
+      .replace(/^(怎么|如何|怎样|想学|学|学习|了解|搞懂)\s*/g, '')
+      .trim();
     const ALIAS_MAP: Record<string, string> = {
       'LLM大模型': '大模型', '大模型微调': '大模型', '快速入门ML': '机器学习',
       '从零学AI需要哪些数学': '机器学习', '后端转算法': '算法',
@@ -57,6 +60,10 @@ export async function buildLearningPlan(query: string): Promise<LearningPlan> {
       '风控建模学习': '风控', '推荐系统学习': '推荐系统',
       '广告CTR预估': 'CTR', '强化学习从入门': '强化学习',
       '统计学习方法': '统计学', '模型部署从哪': '模型部署',
+      '到底怎么快速入门ML': '机器学习', 'ML': '机器学习',
+      '本科生想做数据科学要掌握什么': '数据科学',
+      '学AI先懂理论还是先会调包': '机器学习',
+      '想学推荐系统需要什么数学基础': '推荐系统',
     };
     cleanTopic = ALIAS_MAP[cleanTopic] || cleanTopic;
     if (cleanTopic !== topic) {
