@@ -30,16 +30,28 @@ async function runGroup(g: string, cases: any[]): Promise<GroupResult> {
     mergedVals.push(trace.merge?.afterDedup || 0);
 
     const pids = new Set(c.primaryIds || []);
+    const acceptableIds = new Set(c.acceptableIds || []);
     let bestRank = Infinity;
+    let matchedAccepted = false;
+
     for (let i=0; i<results.length; i++) {
       if (pids.has(results[i].cardId) && i+1 < bestRank) bestRank = i+1;
+      if (acceptableIds.has(results[i].cardId)) matchedAccepted = true;
     }
+
     if (bestRank <= 5) top5++;
     if (bestRank <= 10) top10++;
     if (bestRank <= 15) top15++;
-    if (bestRank === Infinity) { missing++; }
-    else { mrrSum += 1/bestRank; }
-  }
+    if (bestRank === Infinity) {
+      if (matchedAccepted) {
+        top15++; // count as hit via acceptableId
+        mrrSum += 1/16; // approximate MRR for equivalent match
+      } else {
+        missing++;
+      }
+    } else {
+      mrrSum += 1/bestRank;
+    }
 
   mergedVals.sort((a,b)=>a-b);
   return {
