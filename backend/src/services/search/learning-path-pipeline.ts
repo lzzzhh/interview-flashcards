@@ -37,14 +37,25 @@ export interface LearningPathMetrics {
 export async function buildLearningPlan(query: string): Promise<LearningPlan> {
   // 1. Understand query intent + topic
   const parsed = await understandQuery(query);
-  const topic = parsed.canonicalTopic || parsed.topic;
-  if (!topic) return emptyPlan(query, 'no_topic');
+  let topic = parsed.canonicalTopic || parsed.topic;
+  if (!topic) {
+    // Fallback: strip learning-path suffixes and retry
+    topic = query.replace(/(学习路线|怎么学|如何学|怎么入门|从零开始学|怎么入行|要学什么|要补什么|怎么快速|快速入门|开发学习)$/g, '').trim();
+    if (topic !== query) {
+      const retry = conceptGraphLookup(topic);
+      if (retry) return buildPlanFromNode(retry, query);
+    }
+    return emptyPlan(query, 'no_graph_node');
+  }
 
   // 2. Resolve graph node
   const graphNode = conceptGraphLookup(topic);
   if (!graphNode) return emptyPlan(query, 'no_graph_node');
 
-  // 3. Use graph edges to build concept stages
+  return buildPlanFromNode(graphNode, query);
+}
+
+async function buildPlanFromNode(graphNode: any, query: string): Promise<LearningPlan> {
   const edgesUsed: string[] = [];
 
   // Stage 1: Prerequisites + Foundation
