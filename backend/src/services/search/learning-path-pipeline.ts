@@ -40,7 +40,15 @@ export async function buildLearningPlan(query: string): Promise<LearningPlan> {
   let topic = parsed.canonicalTopic || parsed.topic;
   if (!topic) {
     // Fallback: strip learning-path suffixes and retry
-    topic = query.replace(/(学习路线|怎么学|如何学|怎么入门|从零开始学|怎么入行|要学什么|要补什么|怎么快速|快速入门|开发学习)$/g, '').trim();
+    topic = query.replace(/(学习路线|怎么学|如何学|怎么入门|从零开始学|怎么入行|要学什么|要补什么|怎么快速|快速入门|开发学习|从入门到实践|书籍推荐)$/g, '').trim();
+    // Alias mapping for common compound queries
+    const ALIAS_MAP: Record<string, string> = {
+      'LLM大模型': '大模型', '大模型微调': '大模型', '快速入门ML': '机器学习',
+      '从零学AI需要哪些数学': '机器学习', '后端转算法': '算法',
+      '从零学AI': '机器学习', 'AI数学': '机器学习',
+      '想做算法工程师': '算法', '模型部署': '模型部署',
+    };
+    topic = ALIAS_MAP[topic] || topic;
     if (topic !== query) {
       const retry = conceptGraphLookup(topic);
       if (retry) return buildPlanFromNode(retry, query, topic);
