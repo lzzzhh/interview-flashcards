@@ -44,11 +44,19 @@ export async function buildLearningPlan(query: string): Promise<LearningPlan> {
   
   // Fallback: strip learning-path suffixes and retry with alias mapping
   if (!graphNode && topic) {
-    let cleanTopic = query.replace(/(学习路线|怎么学|如何学|怎么入门|从零开始学|怎么入行|要学什么|要补什么|怎么快速|快速入门|开发学习|从入门到实践|书籍推荐)$/g, '').trim();
+    let cleanTopic = query.replace(/(学习路线|怎么学|如何学|怎么入门|从零开始学|怎么入行|要学什么|要补什么|怎么快速|快速入门|开发学习|从入门到实践|书籍推荐|从哪开始学|怎么入行)$/g, '').trim();
     const ALIAS_MAP: Record<string, string> = {
       'LLM大模型': '大模型', '大模型微调': '大模型', '快速入门ML': '机器学习',
       '从零学AI需要哪些数学': '机器学习', '后端转算法': '算法',
       '从零学AI': '机器学习', '想做算法工程师': '算法',
+      'AB实验平台': 'AB测试', 'CV图像分类': 'CV', 'CV图像': 'CV',
+      'NLP文本分类': 'NLP', 'CICD流水线': 'CI/CD',
+      'Agent开发': 'Agent', 'Agent开发学习': 'Agent',
+      '图神经网络学习': 'GNN', '因果推断学习': '因果推断',
+      '大数据Spark学习': 'Spark', '时间序列预测': '时间序列',
+      '风控建模学习': '风控', '推荐系统学习': '推荐系统',
+      '广告CTR预估': 'CTR', '强化学习从入门': '强化学习',
+      '统计学习方法': '统计学', '模型部署从哪': '模型部署',
     };
     cleanTopic = ALIAS_MAP[cleanTopic] || cleanTopic;
     if (cleanTopic !== topic) {
