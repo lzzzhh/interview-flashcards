@@ -64,6 +64,12 @@ export async function buildLearningPlan(query: string): Promise<LearningPlan> {
       '本科生想做数据科学要掌握什么': '数据科学',
       '学AI先懂理论还是先会调包': '机器学习',
       '想学推荐系统需要什么数学基础': '推荐系统',
+      '大数据Spark': 'Spark', '广告CTR预估': 'CTR',
+      '风控建模': '风控', 'AI先懂理论还是先会调包': '机器学习',
+      '自学CS基础': '算法', 'AI赛道': '机器学习',
+      '小众但卷的AI赛道有哪些': '机器学习',
+      '自学CS基础要学哪些课': '算法',
+      '要学哪些': '机器学习', '有哪些': '机器学习',
     };
     cleanTopic = ALIAS_MAP[cleanTopic] || cleanTopic;
     if (cleanTopic !== topic) {
