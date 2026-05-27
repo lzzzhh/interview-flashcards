@@ -190,7 +190,7 @@ const NODES: ConceptNode[] = [
 
   // ====== LLM/Agent ======
   { id: 'transformer', canonical: 'Transformer', aliases: ['Transformer', 'transformer'], deckHint: 'deep-learning', parentCategory: '深度学习',
-    coreKeywords: ['Transformer', 'transformer architecture'], searchAliases: ['transformer', 'attention is all you need'],
+    coreKeywords: ['Transformer', 'transformer architecture', 'self-attention', 'multi-head'], searchAliases: ['transformer', 'attention is all you need', 'encoder decoder', 'Vaswani', 'BERT', 'GPT architecture', 'positional encoding', 'scaled dot-product', 'pre-norm', 'post-norm'],
     relations: [
       { type: 'child', target: 'attention' },
       { type: 'foundation', target: 'rag' }, { type: 'foundation', target: 'agent' },
