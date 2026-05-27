@@ -7,6 +7,7 @@ export interface FTS5Result {
   cardId: string;
   rank: number;
   matchField: string;
+  matchCount?: number;
 }
 
 /** 初始化 FTS5 表和触发器 */
@@ -139,27 +140,33 @@ async function fts5RawSearch(escaped: string, limit: number, deckId?: string): P
   }
 }
 
-/** LIKE search helper: runs separate queries per term to avoid result crowding */
+/** LIKE search helper: counts term matches per card, ranks by relevance */
 async function likeSearch(terms: string[], limit: number): Promise<FTS5Result[]> {
   if (terms.length === 0) return [];
 
-  // For multiple terms, run separate queries and merge to avoid shorter/noisy terms crowding out good matches
-  const seen = new Set<string>();
-  const results: FTS5Result[] = [];
-
-  for (const t of terms.slice(0, 4)) { // max 4 terms
+  // Count matches per card across all terms
+  const cardMatches = new Map<string, number>();
+  for (const t of terms.slice(0, 8)) {
     const rows = await prisma.$queryRawUnsafe(
-      `SELECT id as cardId, 1 as rank FROM Card WHERE question LIKE ? OR titleCn LIKE ? OR title LIKE ? OR answer LIKE ? OR description LIKE ? OR approach LIKE ? OR tags LIKE ? OR searchKeywords LIKE ? OR subTopic LIKE ? LIMIT ?`,
+      `SELECT id as cardId FROM Card WHERE question LIKE ? OR titleCn LIKE ? OR title LIKE ? OR answer LIKE ? OR description LIKE ? OR approach LIKE ? OR tags LIKE ? OR searchKeywords LIKE ? OR subTopic LIKE ? LIMIT ?`,
       `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, `%${t}%`, limit,
     ) as any[];
     for (const row of (rows || [])) {
-      if (!seen.has(row.cardId)) {
-        results.push({ cardId: row.cardId, rank: row.rank, matchField: 'like' });
-        seen.add(row.cardId);
-      }
+      cardMatches.set(row.cardId, (cardMatches.get(row.cardId) || 0) + 1);
     }
   }
-  return results;
+
+  // Sort by match count descending, then return top N
+  const ranked = [...cardMatches.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
+
+  return ranked.map(([cardId, matchCount], idx) => ({
+    cardId,
+    rank: idx,
+    matchField: 'like',
+    matchCount,
+  }));
 }
 
 /** Extract meaningful Chinese terms: strip qualifiers, progressive truncation */

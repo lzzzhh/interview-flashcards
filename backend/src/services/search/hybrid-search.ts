@@ -604,13 +604,19 @@ async function recallFTS5(
 ): Promise<RecallCandidate[]> {
   const deckId = deckIds && deckIds.length === 1 ? deckIds[0] : undefined;
   const results = await fts5Search(query, limit, deckId);
-  return results.map(r => ({
-    cardId: r.cardId,
-    vectorScore: 0,
-    keywordScore: Math.max(0.08, 1 / (1 + Math.abs(Number(r.rank || 0)) * 0.005)), // FTS5: higher weight
-    matchedKeywords: [],
-    source: 'fts5' as const,
-  }));
+  // Score by FTS5 rank + matchCount: higher matchCount → higher score
+  const maxMatches = results.length > 0 ? Math.max(1, ...results.map(r => r.matchCount || 1)) : 1;
+  return results.map(r => {
+    const normalized = (r.matchCount || 1) / maxMatches;
+    const rankScore = 1 / (1 + (r.rank || 0) * 0.05);
+    return {
+      cardId: r.cardId,
+      vectorScore: 0,
+      keywordScore: 0.3 + normalized * 0.5 + rankScore * 0.2, // match-dominant scoring
+      matchedKeywords: [],
+      source: 'fts5' as const,
+    };
+  });
 }
 
 /** 通道 2: 标签召回（bigram 匹配 tags 字段） */
