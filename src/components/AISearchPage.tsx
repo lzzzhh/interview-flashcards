@@ -69,7 +69,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
     return searched && planItems.length === 0 ? hasPlanIntent(query) : planExpanded || (searched && hasPlanIntent(query));
   }, [searched, query, planExpanded, planSaved, planItems.length]);
 
-  const handleSearch = async (threshold = 0.3) => {
+  const handleSearch = async (threshold = 0) => {
     if (!query.trim()) return;
     setLoading(true);
     setPlanExpanded(false);

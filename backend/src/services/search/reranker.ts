@@ -23,9 +23,9 @@ export interface RerankProfile {
 
 export const DEFAULT_PROFILE: RerankProfile = {
   name: 'default',
-  wVector: 0.40,
-  wKeyword: 0.15,
-  wField: 0.35,
+  wVector: 0.10,
+  wKeyword: 0.60,
+  wField: 0.20,
   wLearning: 0.10,
   deckBoost: 0.25,
   statsLexicalBoost: false,
