@@ -43,7 +43,7 @@ export async function buildLearningPlan(query: string): Promise<LearningPlan> {
     topic = query.replace(/(学习路线|怎么学|如何学|怎么入门|从零开始学|怎么入行|要学什么|要补什么|怎么快速|快速入门|开发学习)$/g, '').trim();
     if (topic !== query) {
       const retry = conceptGraphLookup(topic);
-      if (retry) return buildPlanFromNode(retry, query);
+      if (retry) return buildPlanFromNode(retry, query, topic);
     }
     return emptyPlan(query, 'no_graph_node');
   }
@@ -52,10 +52,10 @@ export async function buildLearningPlan(query: string): Promise<LearningPlan> {
   const graphNode = conceptGraphLookup(topic);
   if (!graphNode) return emptyPlan(query, 'no_graph_node');
 
-  return buildPlanFromNode(graphNode, query);
+  return buildPlanFromNode(graphNode, query, topic);
 }
 
-async function buildPlanFromNode(graphNode: any, query: string): Promise<LearningPlan> {
+async function buildPlanFromNode(graphNode: any, query: string, topic: string): Promise<LearningPlan> {
   const edgesUsed: string[] = [];
 
   // Stage 1: Prerequisites + Foundation
