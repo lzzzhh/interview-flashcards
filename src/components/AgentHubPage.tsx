@@ -6,7 +6,6 @@ const TEXT_MUTED = 'var(--text-muted)';
 const TEXT_PRIMARY = 'var(--text-primary)';
 const CARD_BG = 'var(--card-bg)';
 const CARD_BORDER = 'var(--card-border)';
-const BG = 'var(--bg)';
 
 const AGENTS = [
   { key: 'search', icon: Search, title: 'AI 智能搜索', desc: '语义搜索所有卡片，快速定位薄弱知识点', color: '#3B82F6' },
@@ -23,7 +22,7 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: BG, color: TEXT_PRIMARY }}>
+    <div className="dark-bg light-bg" style={{ display: 'flex', flexDirection: 'column', height: '100%', color: TEXT_PRIMARY }}>
       <div style={{ display: 'flex', alignItems: 'center', padding: '16px', borderBottom: `1px solid ${CARD_BORDER}` }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', color: TEXT_MUTED, cursor: 'pointer', fontSize: '20px' }}>
           ←
