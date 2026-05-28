@@ -1,4 +1,4 @@
-import { Search, FileText, Briefcase, Sparkles, Mic, ListChecks } from 'lucide-react';
+import { ArrowLeft, Search, FileText, Briefcase, Sparkles, Mic, ListChecks, ChevronRight } from 'lucide-react';
 
 type Props = { onBack: () => void; onNavigate: (page: string) => void };
 
@@ -22,50 +22,61 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
   };
 
   return (
-    <div className="dark-bg light-bg" style={{ display: 'flex', flexDirection: 'column', height: '100%', color: TEXT_PRIMARY }}>
-      <div style={{ display: 'flex', alignItems: 'center', padding: '16px', borderBottom: `1px solid ${CARD_BORDER}` }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', color: TEXT_MUTED, cursor: 'pointer', fontSize: '20px' }}>
-          ←
-        </button>
-        <h1 style={{ flex: 1, textAlign: 'center', fontSize: '18px', fontWeight: 600, margin: 0 }}>AI Agent 中心</h1>
-        <div style={{ width: '20px' }} />
-      </div>
+    <div className="dark-bg homepage-glass-stage flex min-h-screen flex-col transition-colors" style={{ color: TEXT_PRIMARY }}>
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-8">
+        <div className="flex shrink-0 items-center gap-3 border-b py-4" style={{ borderColor: CARD_BORDER }}>
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors hover:bg-white/45 dark:hover:bg-white/10"
+            style={{ color: TEXT_MUTED }}
+            title="返回"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+          <div className="min-w-0 flex-1 text-center">
+            <h1 className="text-[18px] font-bold leading-tight" style={{ color: TEXT_PRIMARY }}>
+              AI Agent 中心
+            </h1>
+          </div>
+          <div className="h-9 w-9 shrink-0" />
+        </div>
 
-      <div style={{ padding: '16px', overflow: 'auto', flex: 1 }}>
-        <p style={{ color: TEXT_MUTED, fontSize: '13px', marginBottom: '16px' }}>
-          选择一个 AI 功能开始使用
-        </p>
+        <div className="min-h-0 flex-1 overflow-y-auto py-5">
+          <p className="mb-4 text-[13px]" style={{ color: TEXT_MUTED }}>
+            选择一个 AI 功能开始使用
+          </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {AGENTS.map(agent => (
-            <button
-              key={agent.key}
-              onClick={() => handleAgentClick(agent)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '14px 16px',
-                background: CARD_BG,
-                borderRadius: '12px',
-                border: `1px solid ${CARD_BORDER}`,
-                cursor: 'pointer',
-                width: '100%',
-                textAlign: 'left',
-              }}
-            >
-              <div style={{
-                width: '44px', height: '44px', borderRadius: '10px',
-                background: `${agent.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <agent.icon size={22} color={agent.color} />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: TEXT_PRIMARY }}>{agent.title}</h3>
-                <p style={{ margin: '2px 0 0', fontSize: '12px', color: TEXT_MUTED }}>{agent.desc}</p>
-              </div>
-            </button>
-          ))}
+          <div className="flex flex-col gap-3">
+            {AGENTS.map((agent) => (
+              <button
+                key={agent.key}
+                type="button"
+                onClick={() => handleAgentClick(agent)}
+                className="group flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left transition-colors hover:opacity-90"
+                style={{
+                  backgroundColor: CARD_BG,
+                  borderColor: CARD_BORDER,
+                }}
+              >
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: `${agent.color}22` }}
+                >
+                  <agent.icon className="h-[22px] w-[22px]" color={agent.color} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-[15px] font-bold leading-tight" style={{ color: TEXT_PRIMARY }}>
+                    {agent.title}
+                  </h3>
+                  <p className="mt-1 text-[12px] leading-snug" style={{ color: TEXT_MUTED }}>
+                    {agent.desc}
+                  </p>
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5" style={{ color: TEXT_MUTED }} />
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
