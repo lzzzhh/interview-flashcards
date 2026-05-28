@@ -45,7 +45,6 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const { dispatch } = useAppContext();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [debugInfo, setDebugInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [warmingUp, setWarmingUp] = useState(true);
@@ -56,7 +55,6 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const [planLoading, setPlanLoading] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
-  const [activeThreshold, setActiveThreshold] = useState(0.3);
 
   useEffect(() => {
     fetch(`${API_BASE}/health/warmup`, { method: 'POST' })
@@ -76,12 +74,10 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
     setPlanSaved(false);
     setPlanItems([]);
     setExpanded(false);
-    setActiveThreshold(threshold);
     try {
       const res = await hybridSearch({ query: query.trim(), minScore: threshold, maxResults: 50 });
       setResults(res.results);
       setSearched(true);
-      if ((res as any).debug) setDebugInfo((res as any).debug);
     } catch { setResults([]); }
     setLoading(false);
   };
@@ -190,23 +186,6 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
             )
           ) : (
             <>
-              {/* Search Trace */}
-              {debugInfo && (
-                <div className="mb-4 rounded-xl p-3 border" style={{ backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(255,255,255,0.1)' }}>
-                  <p className="text-[11px] font-bold mb-2" style={{ color: '#6B7280' }}>search trace</p>
-                  <div className="space-y-1 text-[10px] font-mono" style={{ color: '#9CA3AF' }}>
-                    <div>request: <span style={{ color: '#E5E7EB' }}>{debugInfo.request?.rawQuery || '-'}</span> · maxResults={debugInfo.request?.maxResults || '-'} · minScore={debugInfo.request?.minScore || '-'}</div>
-                    <div>intent: <span style={{ color: '#60A5FA' }}>{debugInfo.understanding?.intent || '-'}</span> · topic: <span style={{ color: '#34D399' }}>{debugInfo.understanding?.topic || '-'}</span> · source: {debugInfo.understanding?.source || '-'}</div>
-                    <div>rewrite: <span style={{ color: '#F59E0B' }}>{debugInfo.rewrite?.rewrittenQuery?.slice(0, 80) || '-'}</span></div>
-                    <div>channels: fts5={debugInfo.retrieval?.fts5?.count || '-'} tag={debugInfo.retrieval?.tag?.count || '-'} kw={debugInfo.retrieval?.searchKeywords?.count || '-'} vec={debugInfo.retrieval?.vector?.count || '-'}</div>
-                    <div>merge: {debugInfo.merge?.beforeDedup || '-'} → {debugInfo.merge?.afterDedup || '-'} · hydrate: {debugInfo.hydration?.requested || '-'}</div>
-                    <div>filters: {debugInfo.filters?.before || '-'} → {debugInfo.filters?.after || '-'} · removed: {debugInfo.filters?.removed?.length || 0}</div>
-                    <div>rerank: {debugInfo.rerank?.profile || '-'}</div>
-                    <div>threshold: min={debugInfo.threshold?.minScore || '-'} · {debugInfo.threshold?.before || '-'} → {debugInfo.threshold?.after || '-'} · removed: {debugInfo.threshold?.removed?.length || 0}</div>
-                    <div>final: <span style={{ color: (debugInfo.final?.returned || 0) > 0 ? '#34D399' : '#EF4444' }}>{debugInfo.final?.returned || 0}</span> results · {debugInfo.timingMs ? Object.entries(debugInfo.timingMs).map(([k,v]) => k + ':' + v + 'ms').join(' ') : '-ms'}</div>
-                  </div>
-                </div>
-              )}
               {results.length === 0 ? (
             <p className="text-center text-[13px] mt-8" style={{ color: TEXT_MUTED }}>未找到相关卡片</p>
           ) : (
@@ -285,7 +264,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
               )}
 
               <p className="text-[12px]" style={{ color: TEXT_MUTED }}>
-                {results.length} 条结果 · score ≥ {activeThreshold.toFixed(2)}
+                {results.length} 条结果
                 {expanded && <span className="ml-1" style={{ color: AMBER }}>（已扩大范围）</span>}
               </p>
               {results.length > 0 && results.length < 3 && !expanded && (

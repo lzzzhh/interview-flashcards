@@ -53,7 +53,7 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
                 key={agent.key}
                 type="button"
                 onClick={() => handleAgentClick(agent)}
-                className="group flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left transition-colors hover:opacity-90"
+                className="group flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left backdrop-blur-xl transition-colors hover:bg-white/45 dark:hover:bg-white/12"
                 style={{
                   backgroundColor: CARD_BG,
                   borderColor: CARD_BORDER,
