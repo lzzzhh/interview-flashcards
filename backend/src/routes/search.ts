@@ -1,6 +1,6 @@
 // backend/src/routes/search.ts — AI 搜索路由
 import { FastifyInstance } from 'fastify';
-import { hybridSearch, quickParse } from '../services/search/hybrid-search';
+import { hybridSearch } from '../services/search/hybrid-search';
 import { buildLearningPlan } from '../services/search/learning-path-pipeline';
 import { fts5Search } from '../services/search/fts5-search';
 import { HybridSearchSchema, validate } from './schemas';

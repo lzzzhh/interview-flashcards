@@ -28,6 +28,8 @@ import {
   applyDiversityRerank,
 } from './reranker';
 import { buildStagedPlan, LEARNING_STAGES, type StagedPlan, type CardInfo } from './study-concept-graph';
+import { applyEvidenceGating, type GatingContext } from './evidence-gating';
+import { intentToConfigKey } from './gating-config';
 
 // ---- 类型 ----
 
@@ -113,52 +115,11 @@ interface RecallCandidate {
 
 // ---- 主入口 ----
 
-/** Fast parse without LLM — for eval mode */
-async function quickParse(rawQuery: string): Promise<ParsedSearchQuery> {
-  const q = rawQuery.trim();
-  const topic = sanitizeTopic(q);
-  // Graph-first concept lookup for keyword expansion
-  const graphNode = conceptGraphLookup(topic);
-  if (graphNode) {
-    const hasStudySignal = /怎么学|如何学|怎样学|入门|学习路线|学习路径|怎么补|怎么复习|推荐|帮我|给我/.test(q);
-    const intent = hasStudySignal ? 'create_plan' as const : 'search_cards' as const;
-    const tiers = buildKeywordTiersFromGraphWithLimits(graphNode.id, 'search');
-    const coreKws = [topic, ...tiers.coreKeywords];
-    const expandedKws = tiers.expandedKeywords;
-    return {
-      rawQuery: q, intent, topicRaw: q, topic, canonicalTopic: graphNode.canonical,
-      deckHint: graphNode.deckHint, parentCategory: graphNode.parentCategory,
-      subtopics: [], constraints: {},
-      coreKeywords: [...new Set(coreKws)], expandedKeywords: [...new Set(expandedKws)],
-      lowPriorityKeywords: tiers.lowPriorityKeywords, prerequisiteKeywords: tiers.prerequisiteKeywords,
-      rewrittenQuery: [...new Set([topic, ...coreKws, ...expandedKws])].join(' '),
-      recallText: [...new Set([topic, ...coreKws, ...expandedKws])].join(' '),
-      rerankText: [...new Set([topic, ...coreKws.slice(0, 3)])].join(' '),
-      confidence: 0.8, source: 'fallback', topicChangeReason: 'eval+dict', filteredStopwords: [],
-      debug: 'quickParse+dict',
-    };
-  }
-  return {
-    rawQuery: q, intent: 'search_cards', topicRaw: q, topic, canonicalTopic: topic,
-    deckHint: undefined, parentCategory: undefined, subtopics: [],
-    constraints: {}, coreKeywords: [topic], expandedKeywords: [], lowPriorityKeywords: [], prerequisiteKeywords: [],
-    rewrittenQuery: topic, recallText: topic, rerankText: topic,
-    confidence: 0.3, source: 'fallback', topicChangeReason: 'eval mode', filteredStopwords: [],
-    debug: 'quickParse',
-  };
-}
-
 export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[]> {
   // Resolve parameters: new fields take priority, fallback to legacy topK
   const maxResults = input.maxResults ?? input.topK ?? DEFAULT_MAX_RESULTS;
   const minScore = input.minScore ?? DEFAULT_MIN_SCORE;
-  const candidateLimit = Math.min(input.candidateLimit ?? DEFAULT_CANDIDATE_LIMIT, 1000);
-
-  // 1. Query understanding (for intent/topic/debug)
-  // Skip LLM in eval mode to match baseline speed
-  const parsed = process.env.EVAL_SUPPRESS_DEBUG
-    ? await quickParse(input.query)
-    : await understandQuery(input.query);
+  const parsed = await understandQuery(input.query);
   const { intent, topic, canonicalTopic, deckHint, coreKeywords, expandedKeywords, lowPriorityKeywords, subtopics, recallText, rerankText, rewrittenQuery } = parsed;
   const isStudyIntent = intent === 'study' || intent === 'plan' || intent === 'recommend_cards';
 
@@ -187,8 +148,9 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const deckIds = deckHint ? [deckHint] : undefined;
 
   // 2. 多路召回（并行）— 召回池大小由 candidateLimit 控制
-  const poolSize = candidateLimit;
-  const tagPoolSize = candidateLimit;
+  const effectiveCandidateLimit = input.candidateLimit ?? DEFAULT_CANDIDATE_LIMIT;
+  const poolSize = effectiveCandidateLimit;
+  const tagPoolSize = effectiveCandidateLimit;
 
   const [
     fts5Pool,
@@ -199,7 +161,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     recallFTS5(finalRecallText, poolSize, input.deckIds),
     recallByTags(finalRecallText, expandedKeywords.slice(0, 12), tagPoolSize),
     recallBySearchKeywords(finalRecallText, expandedKeywords.slice(0, 12), tagPoolSize),
-    recallVector(finalRecallText, candidateLimit),
+    recallVector(finalRecallText, effectiveCandidateLimit),
   ]);
 
   // 3. Union + dedup
@@ -528,15 +490,45 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     });
   }
 
-  // Sort by finalScore descending, then apply threshold and limit
+  // Sort by finalScore descending
   results.sort((a, b) => b.score - a.score);
+
+  // ── Evidence Gating ──
+  // Build gating context from query understanding
+  const gatingCtx: GatingContext = {
+    topic,
+    canonicalTopic,
+    coreKeywords,
+    expandedKeywords,
+    deckHint,
+    deckIds: input.deckIds,
+    intent,
+  };
+
+  const gatingInput = results.map(r => ({
+    cardId: r.cardId,
+    title: r.title,
+    titleCn: undefined as string | null | undefined,
+    question: undefined as string | null | undefined,
+    answer: undefined as string | null | undefined,
+    tags: r.tags,
+    searchKeywords: undefined as string | null | undefined,
+    deckId: r.deckId,
+    deckName: r.deckName,
+    finalScore: r.score,
+  }));
+
+  const gatingOutput = applyEvidenceGating(gatingInput, gatingCtx);
+
+  // Filter results: keep only gated-passed cards
+  const passedIds = new Set(gatingOutput.results.map(g => g.cardId));
+  let allResults = results.filter(r => passedIds.has(r.cardId));
 
   // Build trace if debug mode
   if (input.debug) {
-    const beforeThreshold = results.length;
-    const filtered = effectiveMinScore > 0 ? results.filter(r => r.score >= effectiveMinScore) : results;
-    const finalResults = filtered.slice(0, effectiveMaxResults);
-    const thresholdRemoved = beforeThreshold - filtered.length;
+    const beforeThreshold = gatingOutput.stats.total;
+    const finalResults = allResults.slice(0, effectiveMaxResults);
+    const thresholdRemoved = beforeThreshold - allResults.length;
 
     const trace: any = {
       traceId: `trace_${Date.now()}`,
@@ -578,8 +570,19 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
         })),
       },
       threshold: {
-        minScore: effectiveMinScore, before: beforeThreshold, after: beforeThreshold - thresholdRemoved,
-        removed: thresholdRemoved > 0 ? results.filter(r => r.score < effectiveMinScore).slice(0, 10).map(r => ({ cardId: r.cardId, title: r.title, score: r.score })) : [],
+        minScore: gatingOutput.stats.dynamicMinScore,
+        type: gatingOutput.stats.thresholdType,
+        config: intentToConfigKey(intent),
+        before: beforeThreshold,
+        after: gatingOutput.stats.passed,
+        removed: thresholdRemoved,
+        gating: {
+          strong: gatingOutput.stats.strong,
+          good: gatingOutput.stats.good,
+          weak: gatingOutput.stats.weak,
+          offTopic: gatingOutput.stats.offTopic,
+          top5Pure: gatingOutput.stats.top5Pure,
+        },
       },
       final: {
         returned: finalResults.length,
@@ -590,8 +593,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     return finalResults;
   }
 
-  const filtered = effectiveMinScore > 0 ? results.filter(r => r.score >= effectiveMinScore) : results;
-  return filtered.slice(0, effectiveMaxResults);
+  return allResults.slice(0, effectiveMaxResults);
 }
 
 // ---- 召回通道 ----
