@@ -156,21 +156,21 @@ async function buildPlanFromNode(graphNode: any, query: string, topic: string): 
   }
 
   // 7. Hydrate card titles from DB
-  const allIds = stages.flatMap(s => s.cards.map(c => c.cardId));
-  const cardRecords = await prisma.card.findMany({
-    where: { id: { in: allIds } },
-    select: { id: true, titleCn: true, title: true, searchKeywords: true },
-  });
-  const cardMap = new Map(cardRecords.map(c => [c.id, c]));
-  for (const s of stages) {
-    for (const card of s.cards) {
-      const rec = cardMap.get(card.cardId);
-      if (rec) {
-        card.title = rec.title || '';
-        card.titleCn = rec.titleCn;
+    const allIds = stages.flatMap(s => s.cards.map(c => c.cardId));
+    const cardRecords = await prisma.card.findMany({
+      where: { id: { in: allIds } },
+      select: { id: true, titleCn: true, title: true, question: true, searchKeywords: true },
+    });
+    const cardMap = new Map(cardRecords.map(c => [c.id, c]));
+    for (const s of stages) {
+      for (const card of s.cards) {
+        const rec = cardMap.get(card.cardId);
+        if (rec) {
+          card.title = rec.title || rec.question || '';
+          card.titleCn = rec.titleCn;
+        }
       }
     }
-  }
 
   // 8. Compute metrics
   const emptyStages = stages.filter(s => s.cards.length === 0).length;

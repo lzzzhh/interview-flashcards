@@ -5,51 +5,35 @@ import prisma from '../db/prisma';
 const USER_ID = 'demo-user';
 
 export async function learningPlanRoutes(app: FastifyInstance) {
-  // GET /api/learning-plans — 列表
   app.get('/api/learning-plans', async () => {
-    const plans = await prisma.learningPlan.findMany({
-      where: { userId: USER_ID },
-      orderBy: { createdAt: 'desc' },
-      select: { id: true, title: true, query: true, items: true, createdAt: true, updatedAt: true },
-    });
-    return plans.map(p => {
-      const items = safeParse(p.items);
-      return {
-        id: p.id, title: p.title, query: p.query,
-        createdAt: p.createdAt, updatedAt: p.updatedAt,
-        items,
-        itemCount: items.length,
-      };
+    const rows = await prisma.$queryRawUnsafe(
+      `SELECT id, title, query, items, createdAt, updatedAt FROM LearningPlan WHERE userId = ? ORDER BY createdAt DESC`,
+      USER_ID,
+    ) as any[];
+    return rows.map((p: any) => {
+      const items = safeParse(String(p.items || '[]'));
+      return { id: p.id, title: p.title, query: p.query, createdAt: p.createdAt, updatedAt: p.updatedAt, items, itemCount: items.length };
     });
   });
 
-  // GET /api/learning-plans/:id — 详情
   app.get('/api/learning-plans/:id', async (req) => {
     const { id } = req.params as { id: string };
-    const plan = await prisma.learningPlan.findFirst({
-      where: { id, userId: USER_ID },
-    });
-    if (!plan) return { error: 'Not found' };
-    return {
-      ...plan,
-      items: safeParse(plan.items),
-    };
+    const rows = await prisma.$queryRawUnsafe(
+      `SELECT * FROM LearningPlan WHERE id = ? AND userId = ?`, id, USER_ID,
+    ) as any[];
+    if (!rows.length) return { error: 'Not found' };
+    const p = rows[0];
+    return { ...p, items: safeParse(String(p.items || '[]')) };
   });
 
   // POST /api/learning-plans — 保存
   app.post('/api/learning-plans', async (req) => {
-    const { title, query, items } = req.body as {
-      title: string; query: string; items: { cardId: string; deckId: string; title: string }[];
-    };
-    const plan = await prisma.learningPlan.create({
-      data: {
-        userId: USER_ID,
-        title: title || query,
-        query,
-        items: JSON.stringify(items),
-      },
-    });
-    return { ...plan, items };
+    const { title, query, items, id } = req.body as any;
+    await prisma.$executeRawUnsafe(
+      `INSERT INTO LearningPlan (id, userId, title, query, items, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      id || `plan-${Date.now()}`, USER_ID, title || query, query, JSON.stringify(items),
+    );
+    return { ok: true, id: id || `plan-${Date.now()}` };
   });
 
   // DELETE /api/learning-plans/:id
