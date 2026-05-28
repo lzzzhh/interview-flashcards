@@ -2,6 +2,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ArrowLeft, Search, Trash2, Database, Download, Upload, ChevronDown, FileJson, FileSpreadsheet, FileInput, BrainCircuit } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { getDeckCards } from '../api/cards';
 import { CATEGORIES } from '../constants';
 import { loadProgress } from '../utils/storage';
 import { loadCustomDecks, loadCustomCards } from '../utils/customDecks';
@@ -185,6 +186,42 @@ export default function CardDatabasePage({ onBack }: Props) {
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
+
+  // Load all cards from API when database page mounts
+  useEffect(() => {
+    const DECK_IDS = ['statistics', 'machine-learning', 'deep-learning', 'llm', 'agent', 'jargon', 'workplace', 'vibe-coding'];
+    let cancelled = false;
+    async function load() {
+      const allFlash: FlashCard[] = [];
+      for (const deckId of DECK_IDS) {
+        if (cancelled) return;
+        try {
+          const resp = await getDeckCards(deckId, 999);
+          if (resp?.cards) {
+            for (const dto of resp.cards) {
+              allFlash.push({
+                id: dto.id,
+                category: (dto.deckId as any),
+                question: dto.question || dto.titleCn || dto.title || '',
+                answer: dto.answer || '',
+                tags: dto.tags || [],
+                subTopic: dto.subTopic || undefined,
+                difficulty: (dto.difficulty as 'easy' | 'medium' | 'hard') || 'medium',
+                source: dto.source || undefined,
+                sm2: { state: 'new' as const, easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+                favorited: false,
+              } satisfies QACard);
+            }
+          }
+        } catch {}
+      }
+      if (!cancelled && allFlash.length > 0) {
+        dispatch({ type: 'LOADED_QUEUE', payload: { cards: allFlash, mode: 'new' } });
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [dispatch]);
 
   // 点击外部关闭导出菜单
   useEffect(() => {

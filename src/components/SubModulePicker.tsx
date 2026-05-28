@@ -2,7 +2,7 @@
 // src/components/SubModulePicker.tsx — 子模块选择页面
 // ============================================================
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { SUB_MODULES, CATEGORIES, type SubModuleMeta } from '../constants';
@@ -10,7 +10,9 @@ import ModulePageTemplate, { type ModuleTopicCardModel } from './ModulePageTempl
 import CardBrowser from './CardBrowser';
 import CardEditor from './CardEditor';
 import StatsDashboard from './StatsDashboard';
-import type { FlashCard } from '../types';
+import type { FlashCard, QACard } from '../types';
+import { getDeckCards } from '../api/cards';
+import type { CardDTO } from '../api/types';
 
 interface Props {
   onBack: () => void;
@@ -85,6 +87,43 @@ export default function SubModulePicker({ onBack }: Props) {
   const [deleteMode, setDeleteMode] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
+
+  // Load cards from API when entering a sub-module
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const deckId = category === 'leetcode' ? 'leetcode' :
+        category === 'statistics' ? 'statistics' :
+        category === 'machine-learning' ? 'machine-learning' :
+        category === 'deep-learning' ? 'deep-learning' :
+        category === 'jargon' ? 'jargon' :
+        category === 'workplace' ? 'workplace' :
+        category === 'vibe-coding' ? 'vibe-coding' :
+        category === 'llm' ? 'llm' :
+        category === 'agent' ? 'agent' : category;
+      try {
+        const resp = await getDeckCards(deckId, 500);
+        if (cancelled || !resp?.cards?.length) return;
+        const cards: FlashCard[] = resp.cards.map((dto: CardDTO) => ({
+          id: dto.id,
+          category: (dto.deckId as any),
+          question: dto.question || dto.titleCn || dto.title || '',
+          answer: dto.answer || '',
+          tags: dto.tags || [],
+          subTopic: dto.subTopic || undefined,
+          difficulty: (dto.difficulty as 'easy' | 'medium' | 'hard') || 'medium',
+          source: dto.source || undefined,
+          sm2: { state: 'new' as const, easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
+          favorited: false,
+        } satisfies QACard));
+        dispatch({ type: 'LOADED_QUEUE', payload: { cards, mode: 'new' } });
+      } catch (e) {
+        console.warn('[SubModulePicker] load cards failed:', e);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [category, dispatch]);
 
   const subModules = useMemo(() => [...builtInSubs, ...customTopics], [builtInSubs, customTopics]);
 
