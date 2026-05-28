@@ -137,7 +137,9 @@ function AppInner() {
     if (profileSubPage === 'api-settings') return <ApiSettingsPage onBack={() => setProfileSubPage(null)} />;
     if (profileSubPage === 'learning-plans' && learningPlanId) return <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} onStudyPlan={(cardIds) => {
       dispatch({ type: 'START_PLAN_STUDY', payload: { cardIds } });
-      setStudyCategory('leetcode'); // dummy category for routing, cards come from planCardIds
+      setLearningPlanId(null);
+      setProfileSubPage(null);
+      setTimeout(() => setStudyCategory('leetcode'), 50);
     }} />;
     if (profileSubPage === 'learning-plans') return <LearningPlanListPage onBack={() => setProfileSubPage(null)} onViewPlan={(id) => setLearningPlanId(id)} />;
     return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
