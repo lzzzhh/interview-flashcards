@@ -1,6 +1,7 @@
 // backend/src/routes/search.ts — AI 搜索路由
 import { FastifyInstance } from 'fastify';
-import { hybridSearch, learningPlanSearch } from '../services/search/hybrid-search';
+import { hybridSearch, quickParse } from '../services/search/hybrid-search';
+import { buildLearningPlan } from '../services/search/learning-path-pipeline';
 import { fts5Search } from '../services/search/fts5-search';
 import { HybridSearchSchema, validate } from './schemas';
 
@@ -35,11 +36,21 @@ export async function searchRoutes(app: FastifyInstance) {
 
   app.post('/api/search/learning-plan', async (req) => {
     const body = req.body as any;
-    const plan = await learningPlanSearch({
-      query: body.query || '',
-      deckIds: body.deckIds,
-      filters: body.filters,
-    });
-    return { plan, total: plan.totalCards };
+    const plan = await buildLearningPlan(body.query || '');
+    const stagesObj: Record<string, any[]> = {};
+    for (const s of plan.stages) {
+      stagesObj[s.name] = s.cards.map(c => ({
+        cardId: c.cardId,
+        deckId: '',
+        title: c.titleCn || c.title || c.cardId,
+        score: c.score,
+        conceptMatch: c.conceptMatch,
+        source: 'graph',
+      }));
+    }
+    return {
+      plan: { topic: plan.canonicalTopic, stages: stagesObj },
+      totalCards: plan.debug.totalCards,
+    };
   });
 }
