@@ -50,7 +50,7 @@ export default function VectorDatabasePage({ onBack }: Props) {
       .catch(() => setModules([{ module: 'ai-search', count: 715, label: 'AI 智能搜索' }]))
       .finally(() => setModuleLoading(false));
 
-    // 预热 bge-m3
+    
     fetch(`${API_BASE}/health/warmup`, { method: 'POST' })
       .then(() => setWarmingUp(false))
       .catch(() => setWarmingUp(false));
