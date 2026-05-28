@@ -4,7 +4,7 @@
   <a href="https://github.com/lzzzhh/interview-flashcards/actions/workflows/build.yml"><img src="https://github.com/lzzzhh/interview-flashcards/actions/workflows/build.yml/badge.svg" alt="Build"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React 19">
-  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript" alt="TypeScript">
   <img src="https://img.shields.io/badge/Tauri-v2-FFC131?logo=tauri" alt="Tauri v2">
   <img src="https://img.shields.io/badge/TailwindCSS-v4-06B6D4?logo=tailwindcss" alt="TailwindCSS v4">
   <img src="https://img.shields.io/badge/Fastify-5-000000?logo=fastify" alt="Fastify">
@@ -49,7 +49,7 @@ curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/in
 - **今日待完成**：复习 / 新卡 / 学习中 实时统计，一键开始今日学习
 - **推荐学习**：SM-2 算法智能推荐最需复习的卡片，支持左右滑动和点击跳转
 - **我的牌组**：9 个内置模块 + 自定义牌组，显示复习/新卡数量
-- **底部 Tab Bar**：首页 / 全部牌组 / 学习统计 / 我的
+- **底部 Tab Bar**：首页 / 全部牌组 / 学习统计 / Agent / 我的
 
 ### 🧠 主动回忆 + 间隔重复
 
@@ -101,6 +101,27 @@ curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/in
 - 每日新卡上限（可折叠）
 - 数据导出 / 导入（覆盖全部模块 + 自定义牌组）
 
+
+### 🤖 Agent 工作台
+
+Agent Hub 统一管理 AI Agent 配置，支持多 Agent 协作与工具调用。
+
+### 🎤 AI 模拟面试
+
+基于卡片内容生成面试问题，模拟真实面试场景，支持语音输入与 AI 追问。
+
+### 📝 求职准备
+
+整合目标岗位 JD 解析、技能差距分析与面试策略建议。
+
+### 📄 简历项目
+
+管理简历中的项目经历，AI 辅助优化项目描述与 STAR 法则表述。
+
+### 🏷️ 标签管理
+
+跨模块标签系统，支持自定义标签创建、批量分配与按标签筛选卡片。
+
 ### 🎹 快捷键
 
 | 快捷键 | 功能 |
@@ -140,7 +161,7 @@ curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/in
 │  ┌───────────────────────────────────────────────┐  │
 │  │              React 前端 (SPA)                  │  │
 │  │  ┌─────────┐ ┌────────┐ ┌──────────────────┐  │  │
-│  │  │ HomePage │ │StudyPage│ │ Stats/Deck/      │  │  │
+│  │  │ HomePage │ │CardView│ │ Stats/Deck/      │  │  │
 │  │  │         │ │        │ │ Profile/Search   │  │  │
 │  │  └────┬─────┘ └───┬────┘ └────────┬─────────┘  │  │
 │  │       │            │              │             │  │
