@@ -39,17 +39,19 @@ export async function learningPlanRoutes(app: FastifyInstance) {
   // DELETE /api/learning-plans/:id
   app.delete('/api/learning-plans/:id', async (req) => {
     const { id } = req.params as { id: string };
-    await prisma.learningPlan.deleteMany({ where: { id, userId: USER_ID } });
+    await prisma.$executeRawUnsafe(`DELETE FROM LearningPlan WHERE id = ? AND userId = ?`, id, USER_ID);
     return { ok: true };
   });
 
   // POST /api/learning-plans/:id/generate — LLM 生成学习计划
   app.post('/api/learning-plans/:id/generate', async (req) => {
     const { id } = req.params as { id: string };
-    const plan = await prisma.learningPlan.findFirst({ where: { id, userId: USER_ID } });
-    if (!plan) return { error: 'Not found' };
-
-    const items = safeParse(plan.items);
+    const rows = await prisma.$queryRawUnsafe(
+      `SELECT * FROM LearningPlan WHERE id = ? AND userId = ?`, id, USER_ID,
+    ) as any[];
+    if (!rows.length) return { error: 'Not found' };
+    const plan = rows[0];
+    const items = safeParse(String(plan.items || '[]'));
     if (!items.length) return { error: 'No cards in plan' };
 
     // Build prompt for LLM
@@ -94,10 +96,10 @@ ${cardList}
         const llmData = await llmRes.json() as any;
         const studyPlan = llmData.choices?.[0]?.message?.content || '';
         if (studyPlan) {
-          await prisma.learningPlan.update({
-            where: { id },
-            data: { studyPlan, updatedAt: new Date() },
-          });
+          await prisma.$executeRawUnsafe(
+            `UPDATE LearningPlan SET studyPlan = ?, updatedAt = datetime('now') WHERE id = ?`,
+            studyPlan, id,
+          );
           return { studyPlan };
         }
       }
@@ -107,10 +109,10 @@ ${cardList}
 
     // Fallback: rule-based plan
     const fallbackPlan = buildFallbackPlan(items);
-    await prisma.learningPlan.update({
-      where: { id },
-      data: { studyPlan: fallbackPlan, updatedAt: new Date() },
-    });
+    await prisma.$executeRawUnsafe(
+      `UPDATE LearningPlan SET studyPlan = ?, updatedAt = datetime('now') WHERE id = ?`,
+      fallbackPlan, id,
+    );
     return { studyPlan: fallbackPlan };
   });
 }
