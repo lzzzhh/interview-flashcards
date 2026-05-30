@@ -274,7 +274,7 @@ export async function documentRoutes(app: FastifyInstance) {
     const drafts = await prisma.cardDraft.findMany({
       where,
       orderBy: { createdAt: 'desc' },
-      take: 100,
+      take: 500,
     });
     return drafts.map(formatDraft);
   });
