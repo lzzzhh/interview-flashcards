@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle, Loader2, ChevronRight, UploadCloud, ChevronDown } from 'lucide-react';
 import { API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
-import { loadCustomDecks } from '../utils/customDecks';
 
 interface IngestResult {
   sourceId: string;
