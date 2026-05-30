@@ -36,7 +36,6 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   const [error, setError] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
   const [showDeckMenu, setShowDeckMenu] = useState(false);
-  const [progress, setProgress] = useState<{ stage: string; step: number; total: number; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const deckMenuRef = useRef<HTMLDivElement>(null);
 
@@ -72,13 +71,12 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   const handleSubmit = async () => {
     if (!filePath.trim()) { setError('请选择或输入文件路径'); return; }
     setError('');
-    setResult(null);
     setStatus('uploading');
     try {
+      setStatus('parsing');
       const formData = new FormData();
-      let docId: string | null = null;
-
       if (droppedFile && (droppedFile as any).path) {
+        // Tauri mode: send path to backend for direct file read
         const ext = filePath.split('.').pop()?.toLowerCase() || '';
         const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
         const res = await fetch(`${API_BASE}/ingest/documents`, {
@@ -87,20 +85,17 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
         });
         if (!res.ok) throw new Error(await res.text().then(t => { try { return JSON.parse(t).error || t; } catch { return t; } }));
         const data = await res.json();
-        docId = data.sourceId;
         setResult(data);
-        setStatus('done');
-        return;
-      }
-
-      if (droppedFile) {
+      } else if (droppedFile) {
+        // Browser mode: multipart upload
         formData.append('targetDeckId', targetDeckId);
         formData.append('file', droppedFile);
         const res = await fetch(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
         if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
         const data = await res.json();
-        docId = data.id;
+        setResult({ sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.chunkCount || 0, fullTextLength: data.fullTextLength || 0, warnings: [], draftCount: data.draftCount || 0 });
       } else {
+        // Fallback: path-based (development mode)
         const ext = filePath.split('.').pop()?.toLowerCase() || '';
         const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
         const ft = typeMap[ext] || 'txt';
@@ -110,35 +105,9 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
         });
         if (!res.ok) throw new Error(await res.text().then(t => JSON.parse(t).error || t));
         const data = await res.json();
-        docId = data.sourceId;
+        setResult(data);
       }
-
-      // Poll for progress + results
-      if (docId) {
-        setStatus('parsing');
-        const poll = setInterval(async () => {
-          try {
-            const [prog, docs] = await Promise.all([
-              fetch(`${API_BASE}/documents/${docId}/progress`).then(r => r.json()),
-              fetch(`${API_BASE}/documents/${docId}`).then(r => r.json()),
-            ]);
-            setProgress(prog);
-            if (docs.status === 'draft_ready' || docs.status === 'failed') {
-              clearInterval(poll);
-              const drafts = await fetch(`${API_BASE}/documents/${docId}/drafts`).then(r => r.json());
-              if (docs.status === 'failed') {
-                setProgress(null);
-                setError(`处理失败: ${docs.parseError || '未知错误'}`);
-                setStatus('error');
-              } else {
-                setResult({ sourceId: docId!, fileName: droppedFile?.name || filePath || 'document', sourceType: 'pdf', chunkCount: 0, fullTextLength: 0, warnings: [], draftCount: drafts.length });
-                setStatus('done');
-                setProgress({ stage: '完成', step: 5, total: 5, message: `完成！${drafts.length} 张草稿` });
-              }
-            }
-          } catch { /* polling error, ignore */ }
-        }, 2000);
-      }
+      setStatus('done');
     } catch (err: any) {
       setError(err.message || '上传失败');
       setStatus('error');
@@ -263,25 +232,6 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 </div>
               </div>
 
-              {(status === 'uploading' || progress) && (
-                <div className="mt-3">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[12px] font-medium">{progress?.message || '处理中...'}</span>
-                    <span className="text-[12px]" style={{ color: TEXT_MUTED }}>{progress?.step || 0}/{progress?.total || 5}</span>
-                  </div>
-                  <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
-                    <div className="h-full rounded-full transition-all duration-500" style={{
-                      width: `${((progress?.step || 1) / (progress?.total || 5)) * 100}%`,
-                      backgroundColor: ACCENT,
-                      animation: progress?.stage === '完成' ? 'none' : undefined,
-                    }} />
-                  </div>
-                  <div className="flex justify-center mt-3">
-                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: ACCENT }} />
-                    <span className="text-[12px] ml-2" style={{ color: TEXT_MUTED }}>AI 正在分析文档内容，请稍候...</span>
-                  </div>
-                </div>
-              )}
               <button
                 onClick={handleSubmit}
                 disabled={status === 'uploading' || status === 'parsing' || !filePath.trim()}
@@ -314,9 +264,9 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 <div className="text-[13px] space-y-1" style={{ color: TEXT_MUTED }}>
                   <div className="flex items-center gap-2"><FileText className="w-3.5 h-3.5" /><span>{result.fileName}（{result.sourceType}）</span></div>
                   <div>文本长度：{(result.fullTextLength ?? 0).toLocaleString()} 字符</div>
-                  <div>分块数：{result.chunkCount ?? 0}</div>
+                  <div>分块数：{(result.chunkCount ?? 0)}</div>
                 </div>
-                {result.warnings?.length > 0 && <div className="text-[12px] mt-1" style={{ color: '#F59E0B' }}>{result.warnings.join('；')}</div>}
+                {(result.warnings?.length ?? 0) > 0 && <div className="text-[12px] mt-1" style={{ color: '#F59E0B' }}>{result.warnings.join('；')}</div>}
               </div>
 
               <button onClick={() => onNavigate('drafts')} className="w-full rounded-xl p-3.5 flex items-center justify-center gap-2 text-[14px] font-medium" style={{ backgroundColor: ACCENT, color: '#fff' }}>
