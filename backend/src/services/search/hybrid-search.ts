@@ -329,6 +329,38 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     }
   }
 
+  // 7b. Topic match boost — reward cards where canonicalTopic/coreKeywords match key fields
+  // This helps ranking_gap cases: correct cards in Top50 get pushed into Top15
+  const topicLower = (canonicalTopic || topic || '').toLowerCase();
+  const allMatchTerms = [...new Set([
+    topicLower,
+    ...coreKeywords.map(k => k.toLowerCase()),
+    ...expandedKeywords.slice(0, 8).map(k => k.toLowerCase()),
+  ])].filter(t => t.length > 1);
+  if (allMatchTerms.length > 0) {
+    for (const card of cards) {
+      let topicBoost = 0;
+      const cardSKW = (card.searchKeywords || '').toLowerCase();
+      const cardTags = card.tags ? safeJsonParse(card.tags).map((t: string) => t.toLowerCase()) : [];
+      const cardTitle = (card.title || card.titleCn || '').toLowerCase();
+
+      // searchKeywords exact match → +0.15
+      if (allMatchTerms.some(t => cardSKW.includes(t))) topicBoost = Math.max(topicBoost, 0.15);
+      // tags exact match → +0.12
+      if (allMatchTerms.some(t => cardTags.some(tag => tag.includes(t) || t.includes(tag)))) topicBoost = Math.max(topicBoost, 0.12);
+      // title exact match → +0.10
+      if (allMatchTerms.some(t => cardTitle.includes(t))) topicBoost = Math.max(topicBoost, 0.10);
+      // multiple field confirmed → extra +0.05
+      const matchCount = [cardSKW, cardTags.join(' '), cardTitle].filter(f => allMatchTerms.some(t => f.includes(t))).length;
+      if (matchCount >= 2) topicBoost += 0.05;
+
+      if (topicBoost > 0) {
+        const existing = extraBoosts.get(card.id) || 0;
+        extraBoosts.set(card.id, existing + topicBoost);
+      }
+    }
+  }
+
   // 8. Rerank
   const ranked = rerank(rerankInput, cardDetails, profile, extraBoosts);
 
@@ -505,18 +537,21 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     intent,
   };
 
-  const gatingInput = results.map(r => ({
-    cardId: r.cardId,
-    title: r.title,
-    titleCn: undefined as string | null | undefined,
-    question: undefined as string | null | undefined,
-    answer: undefined as string | null | undefined,
-    tags: r.tags,
-    searchKeywords: undefined as string | null | undefined,
-    deckId: r.deckId,
-    deckName: r.deckName,
-    finalScore: r.score,
-  }));
+  const gatingInput = results.map(r => {
+    const card = cardMap.get(r.cardId);
+    return {
+      cardId: r.cardId,
+      title: r.title,
+      titleCn: card?.titleCn ?? null,
+      question: card?.question ?? null,
+      answer: card?.answer ?? null,
+      tags: r.tags,
+      searchKeywords: card?.searchKeywords ?? null,
+      deckId: r.deckId,
+      deckName: r.deckName,
+      finalScore: r.score,
+    };
+  });
 
   const gatingOutput = applyEvidenceGating(gatingInput, gatingCtx);
 

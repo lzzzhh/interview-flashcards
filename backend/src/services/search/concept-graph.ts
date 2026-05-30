@@ -606,6 +606,16 @@ const NODES: ConceptNode[] = [{ id: 'ensemble', canonical: '集成学习', alias
 { id: 'cicd_pipe', canonical: 'CI/CD流水线', aliases: ['CI/CD流水线','ci/cd pipeline','持续集成流水线'], deckHint: 'data-engineering', parentCategory: '数据工程',
     coreKeywords: ['CI/CD','流水线','pipeline','Jenkins','GitHub Actions'], searchAliases: ['ci/cd','cicd','pipeline','jenkins','github actions','devops','自动化部署'],
     relations: [{type:'parent',target:'cicd'},{type:'prerequisite',target:'cicd'}], migrationStatus: 'generated', domain: 'data-science-statistics',
+  },
+
+{ id: 'self_rag', canonical: 'Self-RAG', aliases: ['Self-RAG','self-rag','Self-Reflection','self-reflection','自我反思'], deckHint: 'agent', parentCategory: 'Agent开发',
+    coreKeywords: ['Self-RAG','self-rag','自我反思','self-reflection'], searchAliases: ['self reflection','self rag','retrieval augmented','反思'],
+    relations: [{type:'parent',target:'rag'},{type:'related',target:'agent'}], migrationStatus: 'manual', domain: 'ai-agent',
+  },
+
+{ id: 'vectordb', canonical: '向量数据库', aliases: ['向量数据库','VectorDB','vector db','Vector Database','vector database','向量DB'], deckHint: 'agent', parentCategory: 'Agent开发',
+    coreKeywords: ['向量数据库','VectorDB','vector database'], searchAliases: ['vector db','向量数据库','vector database','milvus','pinecone','chroma','faiss','ann'],
+    relations: [{type:'parent',target:'rag'},{type:'related',target:'agent'},{type:'related',target:'embedding'}], migrationStatus: 'manual', domain: 'ai-agent',
   }];
 
 // ── Graph Index ──

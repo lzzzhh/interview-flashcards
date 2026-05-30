@@ -1,19 +1,19 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import multipart from '@fastify/multipart';
 import { deckRoutes } from './routes/decks';
 import { dashboardRoutes } from './routes/dashboard';
 import { reviewRoutes } from './routes/reviews';
 import { studyRoutes } from './routes/study';
 import { cardRoutes } from './routes/cards';
 import { migrationRoutes } from './routes/migrations';
-import { ingestRoutes } from './routes/ingest';
 import { searchRoutes } from './routes/search';
-import { cardDraftRoutes } from './routes/card-drafts';
 import { jobPrepRoutes } from './routes/job-prep';
 import { maintenanceRoutes } from './routes/maintenance';
 import { settingsRoutes } from './routes/settings';
 import { statsRoutes } from './routes/stats';
 import { learningPlanRoutes } from './routes/learning-plans';
+import { documentRoutes, ingestRedirectRoutes } from './routes/documents';
 import { initFTS5 } from './services/search/fts5-search';
 import { setLLMProvider, OpenAIChatProvider } from './services/llm-provider';
 import { setEmbeddingProvider, OpenAIEmbeddingProvider, getEmbeddingProvider } from './services/embedding-provider';
@@ -88,20 +88,21 @@ async function start() {
   await initLLMProviders();
 
   await app.register(cors, { origin: true });
+  await app.register(multipart, { limits: { fileSize: 50 * 1024 * 1024 } }); // 50MB max
   await app.register(deckRoutes);
   await app.register(dashboardRoutes);
   await app.register(reviewRoutes);
   await app.register(studyRoutes);
   await app.register(cardRoutes);
   await app.register(migrationRoutes);
-  await app.register(ingestRoutes);
   await app.register(searchRoutes);
-  await app.register(cardDraftRoutes);
   await app.register(jobPrepRoutes);
   await app.register(maintenanceRoutes);
   await app.register(settingsRoutes);
   await app.register(statsRoutes);
   await app.register(learningPlanRoutes);
+  await app.register(ingestRedirectRoutes);
+  await app.register(documentRoutes);
 
   // 初始化 FTS5 索引
   initFTS5().catch(() => {});

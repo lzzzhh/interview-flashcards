@@ -101,46 +101,129 @@ model DeckDailyLimit {
   @@id([userId, deckId])
 }
 
-// ============ Phase 2: Agent 相关新增表 ============
+// ============ Document-to-Flashcards v1 ============
+
+model DocumentSource {
+  id         String   @id @default(cuid())
+  filename   String
+  fileType   String
+  fileSize   Int
+  filePath   String
+  status     String   @default("uploaded")
+  parseError String?
+  createdAt  String?
+  updatedAt  String?
+
+  blocks DocumentBlock[]
+  chunks DocumentChunk[]
+}
+
+model DocumentBlock {
+  id           String  @id @default(cuid())
+  documentId   String
+  pageNumber   Int?
+  sectionPath  String?
+  type         String
+  text         String
+  bboxJson     String?
+  source       String
+  confidence   Float?
+  orderIndex   Int
+
+  document DocumentSource @relation(fields: [documentId], references: [id])
+
+  @@index([documentId, orderIndex])
+}
+
+model DocumentChunk {
+  id            String  @id @default(cuid())
+  documentId    String
+  title         String?
+  text          String
+  blockIdsJson  String  @default("[]")
+  sourceRefsJson String @default("[]")
+  tokenCount    Int?
+  orderIndex    Int
+
+  document DocumentSource @relation(fields: [documentId], references: [id])
+
+  @@index([documentId, orderIndex])
+}
+
+model ExtractedConcept {
+  id              String  @id @default(cuid())
+  documentId      String
+  chunkId         String
+  conceptName     String
+  normalizedName  String?
+  definition      String?
+  keyPointsJson   String  @default("[]")
+  examplesJson    String?
+  formulasJson    String?
+  prerequisitesJson String?
+  commonConfusionsJson String?
+  candidateTagsJson String  @default("[]")
+  graphMatchJson  String?
+  confidence      Float
+  sourceRefsJson  String  @default("[]")
+
+  createdAt String?
+
+  @@index([documentId])
+  @@index([chunkId])
+}
 
 model CardDraft {
-  id           String   @id
-  sourceId     String?
-  deckId       String
-  type         String   @default("qa")
-  question     String
-  answer       String
-  tags         String?
-  difficulty   String?
-  subTopic     String?
-  reason       String?
-  qualityScore Float?
-  status       String   @default("draft")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id               String   @id @default(cuid())
+  documentId       String?
+  chunkId          String?
+  conceptId        String?
+  type             String   @default("concept")
+  question         String
+  answer           String
+  tagsJson         String   @default("[]")
+  searchKeywordsJson String @default("[]")
+  canonicalTopic   String?
+  graphNodeId      String?
+  graphStatus      String?
+  confidence       Float    @default(1.0)
+  status           String   @default("draft")
+  canonicalConcept String?
+  learningObjective String?  // definition | principle | procedure | formula | comparison | application | example | pitfall
+  atomicFactsJson  String?   // JSON array of atomic fact statements
+  answerScope      String?   // scope/angle of the answer
+  duplicateCheckJson String?
+  duplicateGroupId String?    // group ID for grouped review
+  sourceRefsJson   String   @default("[]")
+  reviewNote       String?
+  importedCardId   String?
+  deckId           String?
+  createdAt        String?
+  updatedAt        String?
+
+  reviews CardDraftReview[]
+
+  @@index([documentId])
+  @@index([status])
 }
 
-model SourceDocument {
-  id         String   @id
-  fileName   String?
-  sourceType String
-  parser     String
-  fullText   String
-  metadata   String?
-  textHash   String
-  createdAt  DateTime @default(now())
-  chunks     SourceChunk[]
+model CardDraftReview {
+  id         String   @id @default(cuid())
+  draftId    String
+  action     String   // approve | edit | reject | mark_duplicate | merge | mark_out_of_scope
+  beforeJson String?  // snapshot before action
+  afterJson  String?  // snapshot after action
+  note       String?
+  createdAt  String?
+
+  draft CardDraft @relation(fields: [draftId], references: [id])
+
+  @@index([draftId])
 }
 
-model SourceChunk {
-  id         String   @id
-  sourceId   String
-  chunkIndex Int
-  text       String
-  tokenCount Int?
-  hash       String
-  source     SourceDocument @relation(fields: [sourceId], references: [id])
-}
+// ============ Phase 2: Agent 相关新增表 ============
+
+// Replaced by Document-to-Flashcards CardDraft below
 
 model JobPrepSession {
   id           String   @id

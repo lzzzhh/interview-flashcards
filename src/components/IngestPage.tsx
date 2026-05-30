@@ -1,7 +1,7 @@
 // src/components/IngestPage.tsx — 资料制卡（文档上传）
 import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle, Loader2, ChevronRight, UploadCloud, ChevronDown } from 'lucide-react';
-import { apiPost } from '../api/client';
+import { apiPost, API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
 import { loadCustomDecks } from '../utils/customDecks';
 
@@ -28,6 +28,7 @@ const ACCEPTED_TYPES = '.pdf,.docx,.doc,.txt,.md';
 
 export default function IngestPage({ onBack, onNavigate }: Props) {
   const [filePath, setFilePath] = useState('');
+  const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [targetDeckId, setTargetDeckId] = useState('custom-ingest');
   const [status, setStatus] = useState<'idle' | 'uploading' | 'parsing' | 'done' | 'error'>('idle');
   const [result, setResult] = useState<IngestResult | null>(null);
@@ -60,12 +61,39 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     setError('');
     setStatus('uploading');
     try {
-      const ext = filePath.split('.').pop()?.toLowerCase() || '';
-      const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
-      const fileType = typeMap[ext] || 'txt';
       setStatus('parsing');
-      const res = await apiPost<IngestResult>('/ingest/documents', { filePath, fileType, targetDeckId });
-      setResult(res);
+      const formData = new FormData();
+      if (droppedFile) {
+        // Multipart upload (works in browser and Tauri)
+        formData.append('file', droppedFile);
+        const res = await fetch(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
+        if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+        const data = await res.json();
+        setResult({ sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.draftCount || 0, fullTextLength: 0, warnings: [] });
+      } else if (droppedFile && (droppedFile as any).path) {
+        // Tauri mode: send path to backend for direct file read
+        const ext = filePath.split('.').pop()?.toLowerCase() || '';
+        const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
+        const res = await fetch(`${API_BASE}/ingest/documents`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filePath, fileType: typeMap[ext] || 'txt', targetDeckId }),
+        });
+        if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+        const data = await res.json();
+        setResult(data);
+      } else {
+        // Fallback: path-based (development mode)
+        const ext = filePath.split('.').pop()?.toLowerCase() || '';
+        const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
+        const ft = typeMap[ext] || 'txt';
+        const res = await fetch(`${API_BASE}/ingest/documents`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filePath, fileType: ft, targetDeckId }),
+        });
+        if (!res.ok) throw new Error(await res.text().then(t => JSON.parse(t).error || t));
+        const data = await res.json();
+        setResult(data);
+      }
       setStatus('done');
     } catch (err: any) {
       setError(err.message || '上传失败');
@@ -91,7 +119,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
       setStatus('error');
       return;
     }
-    // Tauri 模式下 File 可能有 path 属性
+    setDroppedFile(file);
     const path = (file as any).path || file.name;
     setFilePath(path);
     setError('');

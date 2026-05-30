@@ -42,7 +42,7 @@ export interface GatingConfig {
 
 export const DEFAULT_GATING_CONFIG: GatingConfig = {
   search_cards: {
-    baseMinScore: 0.7,
+    baseMinScore: 0.35,
     topScoreRatio: 0.35,
     minStrongGoodBeforeWeak: 10,
     allowWeakFallback: true,

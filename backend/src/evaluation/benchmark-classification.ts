@@ -104,6 +104,31 @@ export const BENCHMARK_META: Record<string, CaseMeta> = {
   'ML里如何处理缺失值': { benchmarkScope: 'search', intentType: 'concept_card_search', normalizedQuery: '缺失值处理 插补 删除 均值填充', source: 'legacy' },
   '噪声标签怎么训练模型': { benchmarkScope: 'search', intentType: 'concept_card_search', normalizedQuery: '噪声标签 label noise robust training', source: 'legacy' },
 
+  // ═══ excluded: coverage_gap — no matching cards in current library ═══
+  'Type I Error 和 Type II Error': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '什么是Confounder': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '数据隐私和模型训练矛盾': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '为什么要shuffle数据': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '多个模型的结果怎么融合起来': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '怎么判断模型是不是学过头了': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  'pandas处理大数据内存溢出': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '数据和直觉不一致听谁的': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '第一类错误和第二类错误谁更严重': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  'HNSW索引向量数据库': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  'JSON Mode和Function Calling区别': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  'LangChain和LlamaIndex对比': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '智能客服意图识别怎么做': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  'few-shot为什么给例子就能学': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '特征工程零散怎么系统学': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  'Batch Size对收敛有什么影响': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  'Precision Recall trade-off可视化': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '在线推理离线批处理架构区别': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '最近在复习机器学习基础，想问一下偏差和方差到底怎么理解，有什么直观的例子吗': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '深度学习金融风控可解释性': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '我在做图像分类任务，模型训练了好几个小时一直在震荡不收敛，可能是什么原因': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  'pandas百万数据内存溢出怎么办': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+  '最近想跳槽但是简历投出去都没有回音，想请教一下怎么写简历才能让 HR 眼前一亮': { benchmarkScope: 'excluded', intentType: 'not_card_search_intent', excludeReason: 'out_of_scope', labelQuality: 'needs_review' },
+
   // ═══ search: concept_card_search (default for all remaining) ═══
   // All other queries default to search/concept_card_search below
 };

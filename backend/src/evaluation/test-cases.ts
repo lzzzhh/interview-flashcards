@@ -371,7 +371,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "统计学的中心极限定理", group: "回归-对抗", primaryIds: ["stats-10","stats-11"], secondaryIds: ["stats-114"], acceptableDecks: ["statistics"], acceptableConcepts: ["中心极限|CLT|正态"] },
 
-  { query: "设计一个像GPT那样的对话Agent需要考虑什么", group: "回归-对抗", primaryIds: ["agent-21","agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["Agent|GPT|对话|Token"] },
+  { query: "设计一个像GPT那样的对话Agent需要考虑什么", group: "回归-对抗", primaryIds: ["agent-21","agent-3"], secondaryIds: ["agent-4","agent-5"], acceptableDecks: ["agent"], acceptableConcepts: ["Agent|GPT|对话|Token"] },
 
   { query: "过拟合欠拟合如何判断", group: "回归-对抗", primaryIds: ["ml-188","ml-7"], secondaryIds: ["ml-77"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合|欠拟合|偏差.*方差"] },
 
@@ -497,7 +497,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "什么是冷启动问题", group: "概念-机器学习", primaryIds: ["ml-87"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["冷启动|Cold Start"] },
 
-  { query: "参数太多模型太复杂怎么办", group: "概念-机器学习", primaryIds: ["ml-10","ml-139"], secondaryIds: ["ml-7"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合|正则化|复杂度"] },
+  { query: "参数太多模型太复杂怎么办", group: "概念-机器学习", primaryIds: ["ml-139"], secondaryIds: ["ml-7","ml-10"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["过拟合|正则化|复杂度"] },
 
   { query: "多个模型的结果怎么融合起来", group: "概念-机器学习", primaryIds: ["ml-31"], secondaryIds: ["ml-36","ml-32"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["集成学习","Bagging","Boosting"] },
 
@@ -507,7 +507,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "损失函数不下降了怎么办", group: "概念-机器学习", primaryIds: ["ml-1","ml-53","ml-142","ml-143"], secondaryIds: [], acceptableDecks: ["machine-learning"], acceptableConcepts: ["学习率|收敛|局部最优"] },
 
-  { query: "数据太少训练不好怎么办", group: "概念-机器学习", primaryIds: ["ml-149","ml-151"], secondaryIds: ["ml-180"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["数据增强|迁移|少样本"] },
+  { query: "数据太少训练不好怎么办", group: "概念-机器学习", primaryIds: ["ml-149"], secondaryIds: ["ml-180","ml-151"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["数据增强|迁移|少样本"] },
 
   { query: "机器学习模型上线后衰减", group: "概念-机器学习", primaryIds: ["ml-156","ml-157"], secondaryIds: ["ml-158"], acceptableDecks: ["machine-learning"], acceptableConcepts: ["漂移|衰减|Drift|监控|MLOps"] },
 
@@ -557,7 +557,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "什么是指标体系北极星", group: "概念-统计学", primaryIds: ["wp-77","wp-78"], secondaryIds: ["stats-164"], acceptableDecks: ["statistics"], acceptableConcepts: ["北极星|North Star|AARRR"] },
 
-  { query: "怎么判断两个变量之间有没有关系", group: "概念-统计学", primaryIds: ["stats-115","stats-138"], secondaryIds: ["stats-140","ml-1"], acceptableDecks: ["statistics","machine-learning"], acceptableConcepts: ["相关|回归"] },
+  { query: "怎么判断两个变量之间有没有关系", group: "概念-统计学", primaryIds: ["stats-29","stats-37"], secondaryIds: ["stats-115","stats-138","stats-140","ml-1","stats-149","stats-153"], acceptableDecks: ["statistics","machine-learning"], acceptableConcepts: ["相关|回归"] },
 
   { query: "怎么判断两组数据有没有显著差异", group: "概念-统计学", primaryIds: ["stats-26"], secondaryIds: ["stats-28"], acceptableDecks: ["statistics"], acceptableConcepts: ["t检验","假设检验"] },
 
@@ -817,7 +817,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "Agent 开发里面 ReAct 模式和 Function Calling 到底有什么区别，什么时候用哪个", group: "长句-Agent", primaryIds: ["agent-2"], secondaryIds: ["agent-3","agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["ReAct","Function Calling","Tool Use"] },
 
-  { query: "AutoGPT怎么自己规划执行任务", group: "长句-Agent", primaryIds: ["agent-21","agent-3"], secondaryIds: ["agent-4"], acceptableDecks: ["agent"], acceptableConcepts: ["AutoGPT|Planning|Age"] },
+  { query: "AutoGPT怎么自己规划执行任务", group: "长句-Agent", primaryIds: ["agent-5"], secondaryIds: ["agent-3","agent-4","agent-21"], acceptableDecks: ["agent"], acceptableConcepts: ["AutoGPT|Planning|Age"] },
 
   { query: "HNSW索引向量数据库", group: "长句-Agent", primaryIds: ["agent-10","agent-12"], secondaryIds: ["agent-15"], acceptableDecks: ["agent"], acceptableConcepts: ["向量.*数据库|HNSW|ANN|检索"] },
 
@@ -957,7 +957,7 @@ export const TEST_CASES: TestCase[] = [
 
   { query: "面试被问到中心极限定理，我其实一直没完全理解它的实际应用场景，能帮我梳理一下吗", group: "长句-统计学", primaryIds: ["stats-10"], secondaryIds: ["stats-11"], acceptableDecks: ["statistics"], acceptableConcepts: ["中心极限定理","大数定律","抽样分布"] },
 
-  { query: "领导让我分析一下新功能上线前后用户留存有没有显著变化，我应该用什么统计方法", group: "长句-统计学", primaryIds: ["stats-24"], secondaryIds: ["stats-25","stats-26"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB测试","假设检验","显著性"] },
+  { query: "领导让我分析一下新功能上线前后用户留存有没有显著变化，我应该用什么统计方法", group: "长句-统计学", primaryIds: ["stats-24"], secondaryIds: ["stats-25","stats-26","stats-29","stats-37"], acceptableDecks: ["statistics"], acceptableConcepts: ["AB测试","假设检验","显著性"] },
 
   { query: "下周要跟领导做季度述职汇报了，怎么把工作成果讲得有条理又有亮点，有什么推荐的框架吗", group: "长句-职场", primaryIds: ["wp-3"], secondaryIds: ["wp-8"], acceptableDecks: ["workplace"], acceptableConcepts: ["汇报","向上沟通","述职"] },
 

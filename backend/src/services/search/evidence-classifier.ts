@@ -99,12 +99,15 @@ export function classifyEvidence(
   // Title exact match
   const titleBigrams = tokenizeBigrams(titleText);
   const topicBigrams = tokenizeBigrams(topicLower);
+  const normalize = (s: string) => s.replace(/[\s-]+/g, '');
   const titleExactHit = titleBigrams.some(b => topicBigrams.includes(b)) ||
-    titleText.includes(topicLower);
+    titleText.includes(topicLower) ||
+    normalize(titleText).includes(normalize(topicLower));
 
   // Question exact match
   const questionExactHit = questionText.includes(topicLower) ||
-    (questionText.length > 0 && tokenizeBigrams(questionText).some(b => topicBigrams.includes(b)));
+    (questionText.length > 0 && tokenizeBigrams(questionText).some(b => topicBigrams.includes(b))) ||
+    normalize(questionText).includes(normalize(topicLower));
 
   // Tag exact match
   const tagExactHit = tagText.some(t =>
@@ -113,13 +116,13 @@ export function classifyEvidence(
     primaryAliases.has(t));
 
   // Canonical topic hit
-  const canonicalHit = canonicalLower && allText.includes(canonicalLower);
+  const canonicalHit = canonicalLower && (allText.includes(canonicalLower) || normalize(allText).includes(normalize(canonicalLower)));
 
   // Primary alias hit
-  const primaryAliasHit = [...primaryAliases].some(a => a.length > 1 && allText.includes(a));
+  const primaryAliasHit = [...primaryAliases].some(a => a.length > 1 && (allText.includes(a) || normalize(allText).includes(normalize(a))));
 
   // Equivalents term hit (from concept graph)
-  const equivTermHit = [...equivTerms].some(t => t.length > 1 && allText.includes(t));
+  const equivTermHit = [...equivTerms].some(t => t.length > 1 && (allText.includes(t) || normalize(allText).includes(normalize(t))));
 
   let strongCount = 0;
   if (titleExactHit) { strongCount++; reasons.push('title-exact'); }
