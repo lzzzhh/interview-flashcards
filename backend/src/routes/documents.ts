@@ -12,6 +12,7 @@ import {
   extractConceptsFromDocument,
   generateDraftsFromDocument,
 } from '../services/document-pipeline';
+import { getPipelineProgress } from '../services/document-pipeline';
 
 const UPLOAD_DIR = join(process.cwd(), 'data', 'uploads');
 if (!existsSync(UPLOAD_DIR)) mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -208,11 +209,6 @@ export async function documentRoutes(app: FastifyInstance) {
       await extractConceptsFromDocument(docId);
       await generateDraftsFromDocument(docId);
       const summary = await summarizeGeneratedDocument(docId, targetDeckId);
-
-      const drafts = await prisma.cardDraft.findMany({
-        where: { documentId: docId },
-        orderBy: { createdAt: 'desc' },
-      });
 
       return {
         id: docId,
@@ -667,6 +663,21 @@ export async function documentRoutes(app: FastifyInstance) {
     }
 
     return { results };
+  });
+
+  // GET /api/documents/:id/progress — pipeline progress
+  app.get('/api/documents/:id/progress', async (req) => {
+    const { id } = req.params as { id: string };
+    const progress = getPipelineProgress(id);
+    if (!progress) {
+      const doc = await prisma.documentSource.findUnique({ where: { id }, select: { status: true } });
+      if (!doc) return { stage: 'not_found', step: 0, total: 5, message: '文档未找到' };
+      if (doc.status === 'uploaded') return { stage: 'waiting', step: 0, total: 5, message: '等待处理...' };
+      if (doc.status === 'draft_ready') return { stage: 'done', step: 5, total: 5, message: '完成！' };
+      if (doc.status === 'failed') return { stage: 'failed', step: 0, total: 5, message: '处理失败' };
+      return { stage: doc.status, step: 1, total: 5, message: `状态: ${doc.status}` };
+    }
+    return progress;
   });
 
   // DELETE /api/documents/:id

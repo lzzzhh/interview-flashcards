@@ -36,6 +36,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   const [error, setError] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
   const [showDeckMenu, setShowDeckMenu] = useState(false);
+  const [progress, setProgress] = useState<{ stage: string; step: number; total: number; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const deckMenuRef = useRef<HTMLDivElement>(null);
 
@@ -71,9 +72,15 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   const handleSubmit = async () => {
     if (!filePath.trim()) { setError('请选择或输入文件路径'); return; }
     setError('');
+    setResult(null);
     setStatus('uploading');
+    const stages = ['上传文件', '解析文档', '切分段落', '提取知识点', '生成草稿', '完成'];
+    let s = 0;
+    const interval = setInterval(() => {
+      s = Math.min(s + 1, stages.length - 2);
+      setProgress({ stage: stages[s], step: s + 1, total: stages.length, message: stages[s] });
+    }, 2000);
     try {
-      setStatus('parsing');
       const formData = new FormData();
       if (droppedFile && (droppedFile as any).path) {
         // Tauri mode: send path to backend for direct file read
@@ -108,7 +115,11 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
         setResult(data);
       }
       setStatus('done');
+      clearInterval(interval);
+      setProgress({ stage: '完成', step: stages.length, total: stages.length, message: '完成！' });
     } catch (err: any) {
+      clearInterval(interval);
+      setProgress(null);
       setError(err.message || '上传失败');
       setStatus('error');
     }
@@ -232,6 +243,25 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 </div>
               </div>
 
+              {(status === 'uploading' || progress) && (
+                <div className="mt-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[12px] font-medium">{progress?.message || '处理中...'}</span>
+                    <span className="text-[12px]" style={{ color: TEXT_MUTED }}>{progress?.step || 0}/{progress?.total || 5}</span>
+                  </div>
+                  <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                    <div className="h-full rounded-full transition-all duration-500" style={{
+                      width: `${((progress?.step || 1) / (progress?.total || 5)) * 100}%`,
+                      backgroundColor: ACCENT,
+                      animation: progress?.stage === '完成' ? 'none' : undefined,
+                    }} />
+                  </div>
+                  <div className="flex justify-center mt-3">
+                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: ACCENT }} />
+                    <span className="text-[12px] ml-2" style={{ color: TEXT_MUTED }}>AI 正在分析文档内容，请稍候...</span>
+                  </div>
+                </div>
+              )}
               <button
                 onClick={handleSubmit}
                 disabled={status === 'uploading' || status === 'parsing' || !filePath.trim()}

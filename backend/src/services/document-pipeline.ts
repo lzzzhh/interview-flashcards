@@ -7,6 +7,24 @@ import { matchConceptToGraph } from './document-graph-matcher';
 import { checkDuplicate, intraDocumentDedup } from './document-dedup';
 import type { ParsedDocument, DocumentChunk, ExtractedConceptData, CardDraftData, SourceRef } from './document-parser/types';
 
+// In-memory progress tracking (keyed by documentId)
+export interface PipelineProgress {
+  stage: string;    // parsing | chunking | extracting | generating | dedup | done | failed
+  step: number;     // current step
+  total: number;    // total steps
+  message: string;  // human-readable message
+}
+
+const progressMap = new Map<string, PipelineProgress>();
+
+export function getPipelineProgress(documentId: string): PipelineProgress | null {
+  return progressMap.get(documentId) || null;
+}
+
+function setProgress(documentId: string, stage: string, step: number, total: number, message: string) {
+  progressMap.set(documentId, { stage, step, total, message });
+}
+
 // Admin/logistics content patterns — skip or mark out_of_scope
 const ADMIN_PATTERNS = [
   /exam\s*(date|time|location|schedule|duration|cover|venue)/i,
@@ -39,6 +57,7 @@ export async function uploadDocument(
 }
 
 export async function parseDocument(documentId: string): Promise<void> {
+  setProgress(documentId, 'parsing', 1, 5, '正在解析文档...');
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
 
@@ -64,21 +83,11 @@ export async function parseDocument(documentId: string): Promise<void> {
         },
       });
     }
-
-    await prisma.documentSource.update({
-      where: { id: documentId },
-      data: { status: 'parsed' },
-    });
-  } catch (e: any) {
-    await prisma.documentSource.update({
-      where: { id: documentId },
-      data: { status: 'failed', parseError: e.message },
-    });
-    throw e;
   }
 }
 
 export async function chunkDocument(documentId: string): Promise<void> {
+  setProgress(documentId, 'chunking', 2, 5, '正在切分文档段落...');
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
 
@@ -108,12 +117,15 @@ export async function chunkDocument(documentId: string): Promise<void> {
     })),
   };
 
-    const result = chunkBlocks(parsedDoc);
+  const chunks = chunkBlocks(parsedDoc);
 
+    // Delete old chunks if re-chunking
     await prisma.documentChunk.deleteMany({ where: { documentId } });
 
+    const total = chunks.length;
+    let i = 0;
     for (const chunk of result) {
-    await prisma.documentChunk.create({
+      await prisma.documentChunk.create({
       data: {
         id: chunk.id,
         documentId: chunk.documentId,
@@ -134,6 +146,7 @@ export async function chunkDocument(documentId: string): Promise<void> {
 }
 
 export async function extractConceptsFromDocument(documentId: string): Promise<void> {
+  setProgress(documentId, 'extracting', 3, 5, `正在通过 LLM 提取知识点...`);
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
 
@@ -144,8 +157,9 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
     orderBy: { orderIndex: 'asc' },
   });
 
-  for (const dbChunk of dbChunks) {
-    const chunk: DocumentChunk = {
+  const totalChunks = dbChunks.length;
+  for (let chunkIdx = 0; chunkIdx < dbChunks.length; chunkIdx++) {
+    const dbChunk = dbChunks[chunkIdx];
       id: dbChunk.id,
       documentId: dbChunk.documentId,
       title: dbChunk.title ?? undefined,
@@ -165,6 +179,8 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
       console.warn(`[document-pipeline] concept extraction skipped for chunk ${chunk.id}: ${e.message || e}`);
       return [] as ExtractedConceptData[];
     });
+
+    setProgress(documentId, 'extracting', chunkIdx, totalChunks, `提取知识点 (${chunkIdx}/${totalChunks})`);
 
     for (const c of concepts) {
       const graphMatch = matchConceptToGraph(c.conceptName);
@@ -196,6 +212,7 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
 }
 
 export async function generateDraftsFromDocument(documentId: string): Promise<void> {
+  setProgress(documentId, 'generating', 4, 5, '正在生成卡片草稿...');
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
 
@@ -314,6 +331,7 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
     where: { id: documentId },
     data: { status: 'draft_ready' },
   });
+  setProgress(documentId, 'done', 5, 5, '完成！');
 }
 
 export async function runFullPipeline(
