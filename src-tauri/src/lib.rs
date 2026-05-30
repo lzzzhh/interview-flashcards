@@ -166,6 +166,14 @@ fn rotate_backups(main_path: &PathBuf) -> Result<(), String> {
 #[tauri::command]
 fn get_data_path() -> String { data_file_path().to_string_lossy().to_string() }
 
+#[tauri::command]
+fn choose_document_file() -> Option<String> {
+    rfd::FileDialog::new()
+        .add_filter("Documents", &["pdf", "docx", "doc", "txt", "md"])
+        .pick_file()
+        .map(|path| path.to_string_lossy().to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // 启动后端
@@ -175,7 +183,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            read_data, write_data, get_data_path,
+            read_data, write_data, get_data_path, choose_document_file,
         ])
         .run(tauri::generate_context!())
         .expect("启动失败");

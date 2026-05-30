@@ -28,6 +28,35 @@ function extToType(ext: string): string | null {
   return m[ext.toLowerCase()] || null;
 }
 
+function multipartFieldValue(field: unknown): string | undefined {
+  const value = (field as any)?.value;
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
+async function summarizeGeneratedDocument(documentId: string, targetDeckId?: string) {
+  if (targetDeckId) {
+    await prisma.cardDraft.updateMany({
+      where: { documentId },
+      data: { deckId: targetDeckId },
+    });
+  }
+
+  const [chunks, draftCount, textAgg] = await Promise.all([
+    prisma.documentChunk.count({ where: { documentId } }),
+    prisma.cardDraft.count({ where: { documentId } }),
+    prisma.documentChunk.aggregate({
+      where: { documentId },
+      _sum: { tokenCount: true },
+    }),
+  ]);
+
+  return {
+    chunkCount: chunks,
+    draftCount,
+    fullTextLength: (textAgg._sum.tokenCount || 0) * 4,
+  };
+}
+
 // Legacy redirect: /api/ingest/documents → documentRoutes
 // Supports both multipart upload and JSON { filePath, fileType } for Tauri drag-drop
 export async function ingestRedirectRoutes(app: FastifyInstance) {
@@ -39,6 +68,7 @@ export async function ingestRedirectRoutes(app: FastifyInstance) {
       const ext = filename.includes('.') ? '.' + filename.split('.').pop()!.toLowerCase() : '';
       const typeMap: Record<string, string> = { '.pdf': 'pdf', '.md': 'markdown', '.markdown': 'markdown', '.txt': 'txt' };
       const fileTypeNorm = typeMap[ext] || 'pdf';
+      const targetDeckId = multipartFieldValue((data as any).fields?.targetDeckId);
 
       const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       const savePath = join(UPLOAD_DIR, `${docId}${ext}`);
@@ -53,13 +83,14 @@ export async function ingestRedirectRoutes(app: FastifyInstance) {
       await extractConceptsFromDocument(docId);
       await generateDraftsFromDocument(docId);
 
-      const chunks = await prisma.documentChunk.count({ where: { documentId: docId } });
-      return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, chunkCount: chunks, fullTextLength: size, warnings: [] };
+      const summary = await summarizeGeneratedDocument(docId, targetDeckId);
+      return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, ...summary, warnings: [] };
     }
 
     // Fallback: JSON path-based (Tauri drag-drop provides file.path)
     const body = req.body as any;
     const filePath = body?.filePath;
+    const targetDeckId = typeof body?.targetDeckId === 'string' ? body.targetDeckId : undefined;
     if (!filePath) return reply.status(400).send({ error: 'No file provided. Use multipart upload or send filePath in JSON body.' });
 
     // Tauri provides the absolute file path on disk
@@ -80,8 +111,8 @@ export async function ingestRedirectRoutes(app: FastifyInstance) {
     await extractConceptsFromDocument(docId);
     await generateDraftsFromDocument(docId);
 
-    const chunks = await prisma.documentChunk.count({ where: { documentId: docId } });
-    return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, chunkCount: chunks, fullTextLength: 0, warnings: [] };
+    const summary = await summarizeGeneratedDocument(docId, targetDeckId);
+    return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, ...summary, warnings: [] };
   });
 }
 
@@ -161,6 +192,7 @@ export async function documentRoutes(app: FastifyInstance) {
     const ext = filename.includes('.') ? '.' + filename.split('.').pop()!.toLowerCase() : '';
     const fileType = extToType(ext) || allowedMime[data.mimetype] || null;
     if (!fileType) return reply.status(400).send({ error: `Unsupported file type: ${ext || data.mimetype}` });
+    const targetDeckId = multipartFieldValue((data as any).fields?.targetDeckId);
 
     const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const savePath = join(UPLOAD_DIR, `${docId}${ext}`);
@@ -175,6 +207,7 @@ export async function documentRoutes(app: FastifyInstance) {
       await chunkDocument(docId);
       await extractConceptsFromDocument(docId);
       await generateDraftsFromDocument(docId);
+      const summary = await summarizeGeneratedDocument(docId, targetDeckId);
 
       const drafts = await prisma.cardDraft.findMany({
         where: { documentId: docId },
@@ -186,6 +219,8 @@ export async function documentRoutes(app: FastifyInstance) {
         filename,
         fileType,
         status: 'draft_ready',
+        chunkCount: summary.chunkCount,
+        fullTextLength: summary.fullTextLength,
         draftCount: drafts.length,
         drafts: drafts.map(formatDraft),
       };

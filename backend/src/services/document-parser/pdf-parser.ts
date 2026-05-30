@@ -20,7 +20,8 @@ export async function parsePdfTextLayer(
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.js');
   pdfjsLib.GlobalWorkerOptions.workerSrc = '';
   const dataBuffer = await readFile(pdfPath);
-  const doc = await pdfjsLib.getDocument({ data: dataBuffer.buffer }).promise;
+  const data = new Uint8Array(dataBuffer);
+  const doc = await pdfjsLib.getDocument({ data }).promise;
   const blocks: ParsedBlock[] = [];
   const mdLines: string[] = [];
   let blockIndex = 0;

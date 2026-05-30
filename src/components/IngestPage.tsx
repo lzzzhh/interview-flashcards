@@ -1,7 +1,7 @@
 // src/components/IngestPage.tsx — 资料制卡（文档上传）
 import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle, Loader2, ChevronRight, UploadCloud, ChevronDown } from 'lucide-react';
-import { apiPost, API_BASE } from '../api/client';
+import { API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
 import { loadCustomDecks } from '../utils/customDecks';
 
@@ -12,6 +12,7 @@ interface IngestResult {
   chunkCount: number;
   fullTextLength: number;
   warnings: string[];
+  draftCount?: number;
 }
 
 interface Props {
@@ -33,12 +34,23 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   const [status, setStatus] = useState<'idle' | 'uploading' | 'parsing' | 'done' | 'error'>('idle');
   const [result, setResult] = useState<IngestResult | null>(null);
   const [error, setError] = useState('');
-  const [generating, setGenerating] = useState(false);
-  const [genResult, setGenResult] = useState<{ generated: number } | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [showDeckMenu, setShowDeckMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const deckMenuRef = useRef<HTMLDivElement>(null);
+
+  const selectFilePath = (path: string) => {
+    const ext = path.split('.').pop()?.toLowerCase() || '';
+    if (!['pdf', 'docx', 'doc', 'txt', 'md'].includes(ext)) {
+      setError(`不支持的格式 .${ext}`);
+      setStatus('error');
+      return;
+    }
+    setDroppedFile(null);
+    setFilePath(path);
+    setError('');
+    setStatus('idle');
+  };
 
   // 牌组选项
   const deckOptions = [
@@ -63,24 +75,25 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     try {
       setStatus('parsing');
       const formData = new FormData();
-      if (droppedFile) {
-        // Multipart upload (works in browser and Tauri)
-        formData.append('file', droppedFile);
-        const res = await fetch(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
-        if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
-        const data = await res.json();
-        setResult({ sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.draftCount || 0, fullTextLength: 0, warnings: [] });
-      } else if (droppedFile && (droppedFile as any).path) {
+      if (droppedFile && (droppedFile as any).path) {
         // Tauri mode: send path to backend for direct file read
         const ext = filePath.split('.').pop()?.toLowerCase() || '';
         const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
         const res = await fetch(`${API_BASE}/ingest/documents`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filePath, fileType: typeMap[ext] || 'txt', targetDeckId }),
+          body: JSON.stringify({ filePath: (droppedFile as any).path, fileType: typeMap[ext] || 'txt', targetDeckId }),
         });
-        if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+        if (!res.ok) throw new Error(await res.text().then(t => { try { return JSON.parse(t).error || t; } catch { return t; } }));
         const data = await res.json();
         setResult(data);
+      } else if (droppedFile) {
+        // Browser mode: multipart upload
+        formData.append('targetDeckId', targetDeckId);
+        formData.append('file', droppedFile);
+        const res = await fetch(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
+        if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+        const data = await res.json();
+        setResult({ sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.chunkCount || 0, fullTextLength: data.fullTextLength || 0, warnings: [], draftCount: data.draftCount || 0 });
       } else {
         // Fallback: path-based (development mode)
         const ext = filePath.split('.').pop()?.toLowerCase() || '';
@@ -101,15 +114,18 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     }
   };
 
-  const handleGenerateDrafts = async () => {
-    if (!result) return;
-    setGenerating(true);
+  const chooseFile = async () => {
     try {
-      const res = await apiPost<{ generated: number }>('/card-drafts/generate', { sourceId: result.sourceId, deckId: targetDeckId });
-      setGenResult(res);
-    } catch (err: any) {
-      setError('生成草稿失败: ' + (err.message || ''));
-    } finally { setGenerating(false); }
+      const { invoke } = await import('@tauri-apps/api/core');
+      const selected = await invoke<string | null>('choose_document_file');
+      if (selected) {
+        selectFilePath(selected);
+        return;
+      }
+    } catch {
+      // Browser mode falls back to the native file input.
+    }
+    fileInputRef.current?.click();
   };
 
   const handleFileDrop = (file: File) => {
@@ -151,7 +167,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                 onDragLeave={(e) => { e.preventDefault(); setIsDragOver(false); }}
                 onDrop={(e) => { e.preventDefault(); setIsDragOver(false); const f = e.dataTransfer.files?.[0]; if (f) handleFileDrop(f); }}
-                onClick={() => fileInputRef.current?.click()}
+                onClick={chooseFile}
                 className="rounded-2xl border-2 border-dashed p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all"
                 style={{
                   borderColor: isDragOver ? ACCENT : CARD_BORDER,
@@ -253,17 +269,11 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 {result.warnings.length > 0 && <div className="text-[12px] mt-1" style={{ color: '#F59E0B' }}>{result.warnings.join('；')}</div>}
               </div>
 
-              {!genResult ? (
-                <button onClick={handleGenerateDrafts} disabled={generating} className="w-full rounded-xl p-3.5 flex items-center justify-center gap-2 text-[14px] font-medium transition-opacity disabled:opacity-40" style={{ backgroundColor: '#8B5CF6', color: '#fff' }}>
-                  {generating ? <><Loader2 className="w-4 h-4 animate-spin" /> LLM 生成卡片中...</> : <>✨ 生成复习卡片</>}
-                </button>
-              ) : (
-                <button onClick={() => onNavigate('drafts')} className="w-full rounded-xl p-3.5 flex items-center justify-center gap-2 text-[14px] font-medium" style={{ backgroundColor: ACCENT, color: '#fff' }}>
-                  查看草稿（{genResult.generated} 张）<ChevronRight className="w-4 h-4" />
-                </button>
-              )}
+              <button onClick={() => onNavigate('drafts')} className="w-full rounded-xl p-3.5 flex items-center justify-center gap-2 text-[14px] font-medium" style={{ backgroundColor: ACCENT, color: '#fff' }}>
+                查看草稿（{result.draftCount ?? 0} 张）<ChevronRight className="w-4 h-4" />
+              </button>
 
-              <button onClick={() => { setStatus('idle'); setResult(null); setGenResult(null); setError(''); setFilePath(''); }} className="w-full rounded-xl p-3 text-[13px] text-center" style={{ color: TEXT_MUTED }}>
+              <button onClick={() => { setStatus('idle'); setResult(null); setError(''); setFilePath(''); }} className="w-full rounded-xl p-3 text-[13px] text-center" style={{ color: TEXT_MUTED }}>
                 重新上传文档
               </button>
             </div>

@@ -196,6 +196,8 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
 
+  await prisma.documentSource.update({ where: { id: documentId }, data: { status: 'generating' } });
+
   const dbConcepts = await prisma.extractedConcept.findMany({
     where: { documentId },
   });
@@ -220,7 +222,13 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
     const sourceText = chunk?.text || '';
     const chunkRefs: SourceRef[] = chunk?.sourceRefsJson ? JSON.parse(chunk.sourceRefsJson) : [];
 
-    const drafts = await generateDrafts(concept, sourceText, chunkRefs);
+    let drafts: CardDraftData[];
+    try {
+      drafts = await generateDrafts(concept, sourceText, chunkRefs);
+    } catch (e: any) {
+      console.warn(`[document-pipeline] draft generation skipped for concept ${dbConcept.id}: ${e.message || e}`);
+      continue;
+    }
 
     for (const d of drafts) {
       // Append learningObjective to searchKeywords for future dedup matching

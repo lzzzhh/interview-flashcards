@@ -34,9 +34,11 @@ export class OpenAIChatProvider implements LLMProvider {
   }
 
   async chat(request: LLMRequest): Promise<LLMResponse> {
+    const timeoutMs = Number(process.env.LLM_TIMEOUT_MS || 45000);
     const res = await fetch(`${this.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` },
+      signal: AbortSignal.timeout(timeoutMs),
       body: JSON.stringify({
         model: request.model,
         messages: request.messages,
