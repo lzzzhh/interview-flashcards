@@ -20,17 +20,20 @@ export interface LLMResponse {
 
 export interface LLMProvider {
   name: string;
+  defaultModel: string;
   chat(request: LLMRequest): Promise<LLMResponse>;
 }
 
 export class OpenAIChatProvider implements LLMProvider {
   name = 'openai';
+  defaultModel: string;
   private baseUrl: string;
   private apiKey: string;
 
-  constructor(baseUrl: string, apiKey: string) {
+  constructor(baseUrl: string, apiKey: string, model: string) {
     this.baseUrl = baseUrl;
     this.apiKey = apiKey;
+    this.defaultModel = model;
   }
 
   async chat(request: LLMRequest): Promise<LLMResponse> {

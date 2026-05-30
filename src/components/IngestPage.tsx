@@ -30,7 +30,7 @@ const ACCEPTED_TYPES = '.pdf,.docx,.doc,.txt,.md';
 export default function IngestPage({ onBack, onNavigate }: Props) {
   const [filePath, setFilePath] = useState('');
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
-  const [targetDeckId, setTargetDeckId] = useState('custom-ingest');
+  const [targetDeckId, setTargetDeckId] = useState('statistics');
   const [status, setStatus] = useState<'idle' | 'uploading' | 'parsing' | 'done' | 'error'>('idle');
   const [result, setResult] = useState<IngestResult | null>(null);
   const [error, setError] = useState('');
@@ -54,11 +54,9 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     setStatus('idle');
   };
 
-  // 牌组选项
+  // 牌组选项（内置 + 自定义牌组）
   const deckOptions = [
     ...CATEGORIES.map(c => ({ id: c.key, label: c.label })),
-    ...loadCustomDecks().map(d => ({ id: d.id, label: d.name })),
-    { id: 'custom-ingest', label: '自定义（custom-ingest）' },
   ];
 
   useEffect(() => {
@@ -331,8 +329,8 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 {(result.warnings?.length ?? 0) > 0 && <div className="text-[12px] mt-1" style={{ color: '#F59E0B' }}>{result.warnings.join('；')}</div>}
               </div>
 
-              <button onClick={() => onNavigate('drafts')} className="w-full rounded-xl p-3.5 flex items-center justify-center gap-2 text-[14px] font-medium" style={{ backgroundColor: ACCENT, color: '#fff' }}>
-                查看草稿（{result.draftCount ?? 0} 张）<ChevronRight className="w-4 h-4" />
+               <button onClick={() => onNavigate(result?.sourceId ? `drafts:${result.sourceId}` : 'drafts')} className="w-full rounded-xl p-3.5 flex items-center justify-center gap-2 text-[14px] font-medium" style={{ backgroundColor: ACCENT, color: '#fff' }}>
+                 查看草稿（{result.draftCount ?? 0} 张）<ChevronRight className="w-4 h-4" />
               </button>
 
               <button onClick={() => { setStatus('idle'); setResult(null); setError(''); setProgressMessage(''); setFilePath(''); }} className="w-full rounded-xl p-3 text-[13px] text-center" style={{ color: TEXT_MUTED }}>

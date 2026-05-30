@@ -42,8 +42,7 @@ async function initLLMProviders() {
   const embeddingModel = (await readConfig('embedding_model', 'EMBEDDING_MODEL')) || 'bge-m3';
 
   if (baseUrl && apiKey) {
-    const llmProvider = new OpenAIChatProvider(baseUrl, apiKey);
-    (llmProvider as any).defaultModel = model;
+    const llmProvider = new OpenAIChatProvider(baseUrl, apiKey, model);
     setLLMProvider(llmProvider);
     console.log(`[providers] LLM ready: ${baseUrl} (model: ${model})`);
 

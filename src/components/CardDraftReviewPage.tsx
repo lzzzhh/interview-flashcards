@@ -91,7 +91,8 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
         setDryRunResult(r);
         setMessage(`验证完成: ${r.willCreateCards}/${r.totalChecked} 可导入`);
       } else {
-        const r = await batchReview([...selected], action, { deckId: selectedDeck, note: '批量操作' });
+        // For approve, use selectedDeck as default; drafts with their own deckId will be handled server-side
+        const r = await batchReview([...selected], action, { deckId: selectedDeck || undefined, note: '批量操作' });
         const ok = r.results.filter(x => x.status !== 'error').length;
         const err = r.results.filter(x => x.status === 'error').length;
         setMessage(`操作完成: ${ok} 成功, ${err} 失败`);
@@ -106,8 +107,10 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
     setProcessing(true);
     try {
       if (action === 'approve') {
-        if (!selectedDeck) { setMessage('请先选择目标 deck'); setProcessing(false); return; }
-        await approveDraft(id, selectedDeck);
+        const draft = drafts.find(d => d.id === id);
+        const deck = selectedDeck || draft?.deckId;
+        if (!deck) { setMessage('请先选择目标 deck'); setProcessing(false); return; }
+        await approveDraft(id, deck);
       } else if (action === 'reject') {
         await rejectDraft(id);
       } else {

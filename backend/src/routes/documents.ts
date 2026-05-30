@@ -80,50 +80,26 @@ async function runDocumentPipeline(documentId: string, targetDeckId?: string) {
   }
 }
 
-// Legacy redirect: /api/ingest/documents → documentRoutes
-// Supports both multipart upload and JSON { filePath, fileType } for Tauri drag-drop
+// Legacy redirect: /api/ingest/documents → documentRoutes (multipart only)
 export async function ingestRedirectRoutes(app: FastifyInstance) {
   app.post('/api/ingest/documents', async (req, reply) => {
-    // Try multipart first (browser drag-drop)
+    // Only accept multipart file upload (not JSON path-based for security)
     const data = await req.file().catch(() => null);
-    if (data) {
-      const filename = data.filename;
-      const ext = filename.includes('.') ? '.' + filename.split('.').pop()!.toLowerCase() : '';
-      const typeMap: Record<string, string> = { '.pdf': 'pdf', '.md': 'markdown', '.markdown': 'markdown', '.txt': 'txt' };
-      const fileTypeNorm = typeMap[ext] || 'pdf';
-      const targetDeckId = multipartFieldValue((data as any).fields?.targetDeckId);
-
-      const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-      const savePath = join(UPLOAD_DIR, `${docId}${ext}`);
-      const ws = createWriteStream(savePath);
-      const { pipeline: pipeline2 } = await import('stream/promises');
-      await pipeline2(data.file, ws);
-      const size = statSync(savePath).size;
-
-      await uploadDocument(docId, filename, fileTypeNorm as any, size, savePath);
-      Promise.resolve().then(() => runDocumentPipeline(docId, targetDeckId));
-      return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, status: 'processing' };
-    }
-
-    // Fallback: JSON path-based (Tauri drag-drop provides file.path)
-    const body = req.body as any;
-    const filePath = body?.filePath;
-    const targetDeckId = typeof body?.targetDeckId === 'string' ? body.targetDeckId : undefined;
-    if (!filePath) return reply.status(400).send({ error: 'No file provided. Use multipart upload or send filePath in JSON body.' });
-
-    // Tauri provides the absolute file path on disk
-    const { existsSync } = await import('fs');
-    if (!existsSync(filePath)) {
-      return reply.status(400).send({ error: `File not found: ${filePath}` });
-    }
-
-    const filename = filePath.split('/').pop() || filePath;
+    if (!data) return reply.status(400).send({ error: 'Only multipart file upload is supported. Use the Tauri file picker.' });
+    const filename = data.filename;
     const ext = filename.includes('.') ? '.' + filename.split('.').pop()!.toLowerCase() : '';
     const typeMap: Record<string, string> = { '.pdf': 'pdf', '.md': 'markdown', '.markdown': 'markdown', '.txt': 'txt' };
-    const fileTypeNorm = body?.fileType || typeMap[ext] || 'pdf';
+    const fileTypeNorm = typeMap[ext] || 'pdf';
+    const targetDeckId = multipartFieldValue((data as any).fields?.targetDeckId);
 
     const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    await uploadDocument(docId, filename, fileTypeNorm as any, 0, filePath);
+    const savePath = join(UPLOAD_DIR, `${docId}${ext}`);
+    const ws = createWriteStream(savePath);
+    const { pipeline: pipeline2 } = await import('stream/promises');
+    await pipeline2(data.file, ws);
+    const size = statSync(savePath).size;
+
+    await uploadDocument(docId, filename, fileTypeNorm as any, size, savePath);
     Promise.resolve().then(() => runDocumentPipeline(docId, targetDeckId));
     return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, status: 'processing' };
   });
@@ -545,7 +521,7 @@ export async function documentRoutes(app: FastifyInstance) {
     if (!v.success) return reply.status(400).send({ error: v.error });
     const { draftIds, action, deckId, note, edits } = v.data;
 
-    const results: { id: string; status: string; error?: string }[] = [];
+    const results: { id: string; status: string; error?: string; cardId?: string }[] = [];
 
     for (const id of draftIds) {
       try {
@@ -553,6 +529,7 @@ export async function documentRoutes(app: FastifyInstance) {
           case 'approve': {
             const draft = await prisma.cardDraft.findUnique({ where: { id } });
             if (!draft) { results.push({ id, status: 'error', error: 'Not found' }); continue; }
+            // Use draft's own deckId if already set
             const targetDeck = deckId || draft.deckId;
             if (!targetDeck) { results.push({ id, status: 'error', error: 'deckId required' }); continue; }
 
@@ -615,6 +592,8 @@ export async function documentRoutes(app: FastifyInstance) {
             break;
           }
           case 'merge': {
+            // Group action: execute once, not per-ID
+            if (id !== draftIds[0]) continue;
             // Merge: keep first draft's content, mark rest as merged
             const primaryId = draftIds[0];
             for (const did of draftIds) {
@@ -631,7 +610,8 @@ export async function documentRoutes(app: FastifyInstance) {
             break;
           }
           case 'keep_both': {
-            // Keep both: clear duplicate group, add note
+            // Group action: execute once, not per-ID
+            if (id !== draftIds[0]) continue;
             for (const did of draftIds) {
               await prisma.cardDraft.update({ where: { id: did }, data: { duplicateGroupId: null, reviewNote: note || 'Keep both — reviewed' } });
               await prisma.cardDraftReview.create({ data: { draftId: did, action: 'keep_both', note: note || null, createdAt: new Date().toISOString() } });
@@ -640,7 +620,8 @@ export async function documentRoutes(app: FastifyInstance) {
             break;
           }
           case 'keep_best': {
-            // Keep best: approve best, reject others
+            // Group action: execute once, not per-ID
+            if (id !== draftIds[0]) continue;
             const bestId = draftIds[0];
             for (const did of draftIds) {
               if (did === bestId) continue;

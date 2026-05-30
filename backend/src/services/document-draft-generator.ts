@@ -65,10 +65,11 @@ export async function generateDrafts(
   chunkRefs?: SourceRef[],
 ): Promise<CardDraftData[]> {
   const llm = getLLMProvider();
-  if (!llm) throw new Error('LLM provider not initialized');
+  if (!llm) throw new Error('llm_not_configured: LLM provider not initialized. Please configure LLM_API_KEY and LLM_BASE_URL.');
 
+  const model = llm.defaultModel || process.env.LLM_MODEL || 'deepseek-chat';
   const response = await llm.chat({
-    model: process.env.LLM_MODEL || 'deepseek-chat',
+    model,
     messages: [
       { role: 'system', content: DRAFT_PROMPT },
       {
