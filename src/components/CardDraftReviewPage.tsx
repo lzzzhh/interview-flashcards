@@ -175,7 +175,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
 
       {/* Dry-run result */}
       {dryRunResult && (
-        <div className="mx-4 mt-2 p-3 rounded-xl text-[12px]" style={{ backgroundColor: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}>
+        <div className="mx-4 mt-2 p-3 rounded-2xl border backdrop-blur-xl text-[12px]" style={{ backgroundColor: CARD_BG, borderColor: AMBER }}>
           <div className="font-medium mb-1">Dry Run 验证结果</div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
             <span>可导入: {dryRunResult.willCreateCards}</span>
@@ -211,7 +211,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
             <div className="text-center py-8" style={{ color: TEXT_MUTED }}>无重复组</div>
           ) : (
             [...groups.entries()].map(([gid, gdrafts]) => (
-              <div key={gid} className="p-3 rounded-xl border" style={{ backgroundColor: CARD_BG, borderColor: AMBER }}>
+               <div key={gid} className="p-3 rounded-2xl border backdrop-blur-xl" style={{ backgroundColor: CARD_BG, borderColor: AMBER }}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[12px] font-bold" style={{ color: AMBER }}>
                     <Layers size={14} className="inline mr-1" />重复组 ({gdrafts.length} 张)
@@ -224,7 +224,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
                   </div>
                 </div>
                 {gdrafts.map(d => (
-                  <div key={d.id} className="text-[12px] py-1 px-2 rounded-lg mb-1" style={{ backgroundColor: 'rgba(127,127,127,0.06)' }}>
+                  <div key={d.id} className="text-[12px] py-1 px-2 rounded-lg mb-1" style={{ backgroundColor: 'var(--card-border)' }}>
                     <span className="font-medium">[{d.learningObjective}]</span> {d.question}
                   </div>
                 ))}
@@ -234,9 +234,9 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
         ) : (
           // Draft list
           filteredDrafts.map(d => (
-            <div key={d.id} className="rounded-xl border overflow-hidden" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+            <div key={d.id} className="rounded-2xl border backdrop-blur-xl overflow-hidden transition-colors" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
               {/* Header row */}
-              <label className="flex items-start gap-3 p-3 cursor-pointer" onClick={() => setSelected(s => { const n = new Set(s); n.has(d.id) ? n.delete(d.id) : n.add(d.id); return n; })}>
+              <label className="flex items-start gap-3 p-3 cursor-pointer hover:bg-white/45 dark:hover:bg-white/5" onClick={() => setSelected(s => { const n = new Set(s); n.has(d.id) ? n.delete(d.id) : n.add(d.id); return n; })}>
                 <input type="checkbox" checked={selected.has(d.id)} onChange={() => {}} className="mt-0.5 rounded" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -257,7 +257,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
                       </span>
                     )}
                   </div>
-                  <div className="text-[13px] font-medium leading-snug">{d.question}</div>
+                  <div className="text-[13px] font-medium leading-snug" style={{ color: TEXT_PRIMARY }}>{d.question}</div>
                   {d.duplicateGroupId && (
                     <div className="text-[10px] mt-1" style={{ color: AMBER }}>
                       <Layers size={12} className="inline mr-0.5" />重复组: {d.duplicateGroupId.slice(-8)}
@@ -275,7 +275,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
                 <div className="px-3 pb-3 pt-0 space-y-2 text-[12px]" style={{ borderTop: `1px solid ${CARD_BORDER}` }}>
                   <div className="pt-2">
                     <div className="font-medium mb-0.5" style={{ color: TEXT_MUTED }}>Answer</div>
-                    <div className="leading-relaxed whitespace-pre-wrap">{d.answer}</div>
+                    <div className="leading-relaxed whitespace-pre-wrap" style={{ color: TEXT_PRIMARY, opacity: 0.9 }}>{d.answer}</div>
                   </div>
 
                   <div className="flex flex-wrap gap-1">
@@ -285,8 +285,8 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
                   {d.atomicFacts && d.atomicFacts.length > 0 && (
                     <div>
                       <div className="font-medium mb-0.5" style={{ color: TEXT_MUTED }}>原子事实</div>
-                      <ul className="list-disc list-inside space-y-0.5">
-                        {d.atomicFacts.map((f, i) => <li key={i}>{f}</li>)}
+                      <ul className="list-disc list-inside space-y-0.5" style={{ color: TEXT_PRIMARY }}>
+                        {d.atomicFacts.map((f, i) => <li key={i} style={{ color: TEXT_PRIMARY, opacity: 0.85 }}>{f}</li>)}
                       </ul>
                     </div>
                   )}
@@ -299,7 +299,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
 
                   {/* Source refs */}
                   {d.sourceRefs?.slice(0, 3).map((sr, i) => (
-                     <div key={i} className="p-2 rounded-lg text-[11px]" style={{ backgroundColor: 'rgba(127,127,127,0.06)' }}>
+                     <div key={i} className="p-2 rounded-lg text-[11px]" style={{ backgroundColor: 'var(--card-border)', color: TEXT_MUTED }}>
                       <div className="flex gap-2 mb-0.5">
                         <span style={{ color: TEXT_MUTED }}>Page {sr.pageNumber || '?'}</span>
                         <span style={{ color: TEXT_MUTED }}>{sr.source}</span>
@@ -316,10 +316,10 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
                     <button onClick={() => handleSingle(d.id, 'reject')} className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-white" style={{ backgroundColor: '#EF4444' }}>
                       <X size={12} className="inline mr-1" />拒绝
                     </button>
-                    <button onClick={() => handleSingle(d.id, 'mark_out_of_scope')} className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium" style={{ backgroundColor: 'rgba(107,114,128,0.2)', color: TEXT_MUTED }}>
+                     <button onClick={() => handleSingle(d.id, 'mark_out_of_scope')} className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium backdrop-blur-xl" style={{ backgroundColor: 'var(--card-border)', color: TEXT_MUTED }}>
                       超出范围
                     </button>
-                    <button onClick={() => handleSingle(d.id, 'mark_duplicate')} className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium" style={{ backgroundColor: 'rgba(139,92,246,0.2)', color: '#8B5CF6' }}>
+                     <button onClick={() => handleSingle(d.id, 'mark_duplicate')} className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium backdrop-blur-xl" style={{ backgroundColor: 'var(--card-border)', color: '#8B5CF6' }}>
                       标记重复
                     </button>
                   </div>
