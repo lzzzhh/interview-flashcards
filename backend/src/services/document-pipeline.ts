@@ -83,6 +83,17 @@ export async function parseDocument(documentId: string): Promise<void> {
         },
       });
     }
+
+    await prisma.documentSource.update({
+      where: { id: documentId },
+      data: { status: 'parsed' },
+    });
+  } catch (e: any) {
+    await prisma.documentSource.update({
+      where: { id: documentId },
+      data: { status: 'failed', parseError: e.message },
+    });
+    throw e;
   }
 }
 
@@ -160,6 +171,7 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
   const totalChunks = dbChunks.length;
   for (let chunkIdx = 0; chunkIdx < dbChunks.length; chunkIdx++) {
     const dbChunk = dbChunks[chunkIdx];
+    const chunk: DocumentChunk = {
       id: dbChunk.id,
       documentId: dbChunk.documentId,
       title: dbChunk.title ?? undefined,
