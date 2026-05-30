@@ -161,7 +161,10 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
       continue;
     }
 
-    const concepts = await extractConcepts(chunk);
+    const concepts = await extractConcepts(chunk).catch((e) => {
+      console.warn(`[document-pipeline] concept extraction skipped for chunk ${chunk.id}: ${e.message || e}`);
+      return [] as ExtractedConceptData[];
+    });
 
     for (const c of concepts) {
       const graphMatch = matchConceptToGraph(c.conceptName);

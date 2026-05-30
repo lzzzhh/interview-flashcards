@@ -46,6 +46,28 @@ export function apiDelete<T>(path: string): Promise<T> {
   return request<T>(path, { method: 'DELETE' });
 }
 
+/** 长耗时请求（600s 超时，用于文档上传/处理） */
+export async function longRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 600000); // 10min
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(body || `HTTP ${res.status}`);
+    }
+    return res.json();
+  } catch (err: any) {
+    if (err.name === 'AbortError') throw new Error('处理超时，请尝试减小文档或增加 LLM_TIMEOUT');
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 /** 检查后端是否在线 */
 export async function checkBackendHealth(): Promise<boolean> {
   try {
