@@ -34,6 +34,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   const [status, setStatus] = useState<'idle' | 'uploading' | 'parsing' | 'done' | 'error'>('idle');
   const [result, setResult] = useState<IngestResult | null>(null);
   const [error, setError] = useState('');
+  const [progressMessage, setProgressMessage] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
   const [showDeckMenu, setShowDeckMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,6 +50,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     setDroppedFile(null);
     setFilePath(path);
     setError('');
+    setProgressMessage('');
     setStatus('idle');
   };
 
@@ -68,9 +70,68 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     return () => document.removeEventListener('mousedown', h);
   }, [showDeckMenu]);
 
+  const readError = async (res: Response) => {
+    const text = await res.text();
+    try {
+      return JSON.parse(text).error || text || `请求失败: ${res.status}`;
+    } catch {
+      return text || `请求失败: ${res.status}`;
+    }
+  };
+
+  const fetchJson = async (url: string, init?: RequestInit) => {
+    try {
+      const res = await fetch(url, init);
+      if (!res.ok) throw new Error(await readError(res));
+      return res.json();
+    } catch (err: any) {
+      if (err?.message === 'Load failed' || err?.message === 'Failed to fetch') {
+        throw new Error('无法连接本地后端，请确认桌面端后端已启动后重试');
+      }
+      throw err;
+    }
+  };
+
+  const waitForProcessing = async (initial: any): Promise<IngestResult> => {
+    const sourceId = initial.sourceId || initial.id;
+    if (!sourceId) throw new Error('后端没有返回文档 ID');
+
+    for (let attempt = 0; attempt < 1200; attempt++) {
+      const progress = await fetchJson(`${API_BASE}/documents/${sourceId}/progress`);
+      setProgressMessage(progress.message || '正在处理文档...');
+
+      if (progress.stage === 'failed') {
+        throw new Error(progress.message || '资料制卡失败');
+      }
+
+      if (progress.stage === 'done') {
+        const [doc, drafts] = await Promise.all([
+          fetchJson(`${API_BASE}/documents/${sourceId}`),
+          fetchJson(`${API_BASE}/documents/${sourceId}/drafts`),
+        ]);
+        const chunks = Array.isArray(doc.chunks) ? doc.chunks : [];
+        const tokenTotal = chunks.reduce((sum: number, chunk: any) => sum + (chunk.tokenCount || 0), 0);
+        return {
+          sourceId,
+          fileName: initial.fileName || doc.filename,
+          sourceType: initial.sourceType || doc.fileType || 'pdf',
+          chunkCount: chunks.length,
+          fullTextLength: tokenTotal * 4,
+          warnings: [],
+          draftCount: Array.isArray(drafts) ? drafts.length : 0,
+        };
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+
+    throw new Error('资料制卡超时，请稍后到草稿页查看结果');
+  };
+
   const handleSubmit = async () => {
     if (!filePath.trim()) { setError('请选择或输入文件路径'); return; }
     setError('');
+    setProgressMessage('');
     setStatus('uploading');
     try {
       setStatus('parsing');
@@ -79,33 +140,29 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
         // Tauri mode: send path to backend for direct file read
         const ext = filePath.split('.').pop()?.toLowerCase() || '';
         const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
-        const res = await fetch(`${API_BASE}/ingest/documents`, {
+        const data = await fetchJson(`${API_BASE}/ingest/documents`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ filePath: (droppedFile as any).path, fileType: typeMap[ext] || 'txt', targetDeckId }),
         });
-        if (!res.ok) throw new Error(await res.text().then(t => { try { return JSON.parse(t).error || t; } catch { return t; } }));
-        const data = await res.json();
-        setResult(data);
+        setResult(data.status === 'processing' ? await waitForProcessing(data) : data);
       } else if (droppedFile) {
         // Browser mode: multipart upload
         formData.append('targetDeckId', targetDeckId);
         formData.append('file', droppedFile);
-        const res = await fetch(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
-        if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
-        const data = await res.json();
-        setResult({ sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.chunkCount || 0, fullTextLength: data.fullTextLength || 0, warnings: [], draftCount: data.draftCount || 0 });
+        const data = await fetchJson(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
+        setResult(data.status === 'processing'
+          ? await waitForProcessing(data)
+          : { sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.chunkCount || 0, fullTextLength: data.fullTextLength || 0, warnings: [], draftCount: data.draftCount || 0 });
       } else {
         // Fallback: path-based (development mode)
         const ext = filePath.split('.').pop()?.toLowerCase() || '';
         const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
         const ft = typeMap[ext] || 'txt';
-        const res = await fetch(`${API_BASE}/ingest/documents`, {
+        const data = await fetchJson(`${API_BASE}/ingest/documents`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ filePath, fileType: ft, targetDeckId }),
         });
-        if (!res.ok) throw new Error(await res.text().then(t => JSON.parse(t).error || t));
-        const data = await res.json();
-        setResult(data);
+        setResult(data.status === 'processing' ? await waitForProcessing(data) : data);
       }
       setStatus('done');
     } catch (err: any) {
@@ -139,6 +196,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     const path = (file as any).path || file.name;
     setFilePath(path);
     setError('');
+    setProgressMessage('');
     setStatus('idle');
   };
 
@@ -244,6 +302,10 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                   <><Upload className="w-4 h-4" /> 开始解析</>
                 )}
               </button>
+
+              {(status === 'uploading' || status === 'parsing') && progressMessage && (
+                <div className="text-center text-[12px]" style={{ color: TEXT_MUTED }}>{progressMessage}</div>
+              )}
             </>
           )}
 
@@ -273,7 +335,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 查看草稿（{result.draftCount ?? 0} 张）<ChevronRight className="w-4 h-4" />
               </button>
 
-              <button onClick={() => { setStatus('idle'); setResult(null); setError(''); setFilePath(''); }} className="w-full rounded-xl p-3 text-[13px] text-center" style={{ color: TEXT_MUTED }}>
+              <button onClick={() => { setStatus('idle'); setResult(null); setError(''); setProgressMessage(''); setFilePath(''); }} className="w-full rounded-xl p-3 text-[13px] text-center" style={{ color: TEXT_MUTED }}>
                 重新上传文档
               </button>
             </div>

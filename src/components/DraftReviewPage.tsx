@@ -28,8 +28,8 @@ export default function DraftReviewPage({ onBack }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiGet<{ drafts: Draft[] }>('/card-drafts?status=draft')
-      .then(d => setDrafts(d.drafts || []))
+    apiGet<{ drafts: Draft[] } | Draft[]>('/card-drafts?status=draft')
+      .then(d => setDrafts(Array.isArray(d) ? d : d.drafts || []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

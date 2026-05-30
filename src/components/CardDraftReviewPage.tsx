@@ -45,14 +45,22 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [d, dk] = await Promise.all([
-      getDrafts(documentId ? undefined : tab === 'all' ? undefined : tab === 'groups' ? undefined : tab),
-      getDecks(),
-    ]);
-    if (documentId) setDrafts(d.filter(dr => dr.documentId === documentId));
-    else setDrafts(d);
-    setDecks(dk);
-    setLoading(false);
+    setMessage('');
+    try {
+      const [d, dk] = await Promise.all([
+        getDrafts(documentId ? undefined : tab === 'all' ? undefined : tab === 'groups' ? undefined : tab),
+        getDecks(),
+      ]);
+      if (documentId) setDrafts(d.filter(dr => dr.documentId === documentId));
+      else setDrafts(d);
+      setDecks(dk);
+    } catch (e: any) {
+      setDrafts([]);
+      setDecks([]);
+      setMessage(`加载失败: ${e?.message || '请稍后重试'}`);
+    } finally {
+      setLoading(false);
+    }
   }, [documentId, tab]);
 
   useEffect(() => { load(); }, [load]);
@@ -125,11 +133,11 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" style={{ color: TEXT_PRIMARY }}>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b shrink-0" style={{ borderColor: CARD_BORDER }}>
         <button onClick={onBack} className="p-1.5 rounded-xl hover:opacity-70"><ArrowLeft size={20} /></button>
-        <span className="font-semibold text-[15px]">卡片草稿审核</span>
+        <span className="font-semibold text-[15px]" style={{ color: TEXT_PRIMARY }}>卡片草稿审核</span>
         <span className="text-[12px] ml-auto" style={{ color: TEXT_MUTED }}>{drafts.length} 张草稿</span>
       </div>
 
@@ -147,7 +155,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
       {/* Deck selector + actions */}
       <div className="flex items-center gap-2 px-4 py-2 border-b shrink-0" style={{ borderColor: CARD_BORDER }}>
         <select value={selectedDeck} onChange={e => setSelectedDeck(e.target.value)}
-          className="text-[12px] px-2 py-1.5 rounded-xl border bg-transparent" style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}>
+          className="text-[12px] px-2 py-1.5 rounded-xl border" style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY, backgroundColor: CARD_BG }}>
           <option value="">选择目标 deck...</option>
           {decks.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
         </select>
@@ -211,12 +219,12 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
                   <div className="flex gap-1">
                     <button onClick={() => handleGroupResolve(gid, 'merge')} className="px-2 py-1 rounded-lg text-[10px] font-medium text-white" style={{ backgroundColor: '#8B5CF6' }}><Merge size={12} className="inline mr-0.5" />合并</button>
                     <button onClick={() => handleGroupResolve(gid, 'keep_best')} className="px-2 py-1 rounded-lg text-[10px] font-medium text-white" style={{ backgroundColor: ACCENT }}>保留最佳</button>
-                    <button onClick={() => handleGroupResolve(gid, 'keep_both')} className="px-2 py-1 rounded-lg text-[10px] font-medium border" style={{ borderColor: CARD_BORDER }}>全部保留</button>
+                      <button onClick={() => handleGroupResolve(gid, 'keep_both')} className="px-2 py-1 rounded-lg text-[10px] font-medium border" style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}>全部保留</button>
                     <button onClick={() => handleGroupResolve(gid, 'reject')} className="px-2 py-1 rounded-lg text-[10px] font-medium text-white" style={{ backgroundColor: '#EF4444' }}>全部拒绝</button>
                   </div>
                 </div>
                 {gdrafts.map(d => (
-                  <div key={d.id} className="text-[12px] py-1 px-2 rounded-lg mb-1" style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}>
+                  <div key={d.id} className="text-[12px] py-1 px-2 rounded-lg mb-1" style={{ backgroundColor: 'rgba(127,127,127,0.06)' }}>
                     <span className="font-medium">[{d.learningObjective}]</span> {d.question}
                   </div>
                 ))}
@@ -291,7 +299,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
 
                   {/* Source refs */}
                   {d.sourceRefs?.slice(0, 3).map((sr, i) => (
-                    <div key={i} className="p-2 rounded-lg text-[11px]" style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}>
+                     <div key={i} className="p-2 rounded-lg text-[11px]" style={{ backgroundColor: 'rgba(127,127,127,0.06)' }}>
                       <div className="flex gap-2 mb-0.5">
                         <span style={{ color: TEXT_MUTED }}>Page {sr.pageNumber || '?'}</span>
                         <span style={{ color: TEXT_MUTED }}>{sr.source}</span>

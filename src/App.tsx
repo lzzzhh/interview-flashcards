@@ -18,7 +18,7 @@ import StatsPage from './components/StatsPage';
 import ProfilePage from './components/ProfilePage';
 import AISearchPage from './components/AISearchPage';
 import AgentHubPage from './components/AgentHubPage';
-import DraftReviewPage from './components/DraftReviewPage';
+import CardDraftReviewPage from './components/CardDraftReviewPage';
 import JobPrepPage from './components/JobPrepPage';
 import IngestPage from './components/IngestPage';
 import ApiSettingsPage from './components/ApiSettingsPage';
@@ -149,7 +149,7 @@ function AppInner() {
   if (showSearch) {
     if (agentPage === 'search') return <AISearchPage onBack={() => setAgentPage(null)} onEnterStudy={handleEnterStudy} />;
     if (agentPage === 'ingest') return <IngestPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
-    if (agentPage === 'drafts') return <DraftReviewPage onBack={() => setAgentPage(null)} />;
+    if (agentPage === 'drafts') return <CardDraftReviewPage onBack={() => setAgentPage(null)} />;
     if (agentPage === 'jobprep') return <JobPrepPage onBack={() => setAgentPage(null)} />;
     if (agentPage === 'mock-interview') return <MockInterviewPage onBack={() => setAgentPage(null)} />;
     if (agentPage === 'resume-project') return <ResumeProjectPage onBack={() => setAgentPage(null)} />;

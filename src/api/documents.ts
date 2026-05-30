@@ -69,5 +69,6 @@ export function rejectDraft(id: string, note?: string) {
 }
 
 export function getDecks() {
-  return apiGet<{ id: string; name: string; type: string }[]>('/decks');
+  return apiGet<{ decks: { id: string; name: string; type: string }[] } | { id: string; name: string; type: string }[]>('/decks')
+    .then(res => Array.isArray(res) ? res : res.decks || []);
 }

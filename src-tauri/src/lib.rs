@@ -15,6 +15,8 @@ fn spawn_backend() -> Option<Child> {
     let home = dirs_next::home_dir().unwrap_or_else(|| PathBuf::from("."));
 
     let candidates: Vec<PathBuf> = vec![
+        // 生产模式：避免 GUI app 直接访问 Desktop 下的项目目录
+        home.join("Library").join("Application Support").join("interview-flashcards").join("backend"),
         // 开发模式：项目根目录下的 backend/
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).parent()?.join("backend"),
         // 生产模式：app bundle 同级或上级的 backend/
@@ -29,21 +31,30 @@ fn spawn_backend() -> Option<Child> {
     let backend_dir = candidates.into_iter().find(|p| p.join("package.json").exists())?;
     log::info!("启动后端: {}", backend_dir.display());
 
+    let log_dir = home.join("Library").join("Logs").join("interview-flashcards");
+    let _ = fs::create_dir_all(&log_dir);
+    let log_path = log_dir.join("backend.log");
+
     // 尝试多种方式找到 npm/node
-    let local_npm = format!("{}/.local/bin/npm", home.display());
     let local_node = format!("{}/.local/bin/node", home.display());
 
+    let path_env = format!(
+        "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:{}",
+        home.join(".local/bin").display()
+    );
+
     let npm_cmds: Vec<&str> = vec![
-        "npm",
         "/opt/homebrew/bin/npm",
         "/usr/local/bin/npm",
-        &local_npm,
     ];
 
     for npm in &npm_cmds {
         match Command::new(npm)
             .args(["run", "dev"])
             .current_dir(&backend_dir)
+            .env("PATH", &path_env)
+            .env("PWD", &backend_dir)
+            .env("ELECTRON_RUN_AS_NODE", "1")
             .spawn()
         {
             Ok(child) => {
@@ -54,19 +65,48 @@ fn spawn_backend() -> Option<Child> {
         }
     }
 
-    // 最后尝试用 node 直接运行 tsx
+    // 最后尝试用 node 直接加载 tsx。桌面端由 LaunchServices 启动时 PATH
+    // 可能会先命中不适合运行本项目的 node，所以优先使用用户本地 node。
+    // 使用 `--import` 的绝对 loader 路径可以绕过 tsx CLI wrapper；同时不要把
+    // cwd 放在 Desktop 下，避免 GUI app 被 macOS 桌面目录权限拦住。
+    let tsx_loader_path = backend_dir.join("node_modules").join("tsx").join("dist").join("loader.mjs");
+    let server_path = backend_dir.join("src").join("server.ts");
     let node_cmds: Vec<&str> = vec![
-        "node",
+        &local_node,
         "/opt/homebrew/bin/node",
         "/usr/local/bin/node",
-        &local_node,
+        "node",
     ];
     for node in &node_cmds {
-        match Command::new(node)
-            .args(["node_modules/.bin/tsx", "src/server.ts"])
-            .current_dir(&backend_dir)
-            .spawn()
-        {
+        let stdout = fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&log_path)
+            .ok();
+        let stderr = fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&log_path)
+            .ok();
+
+        let mut command = Command::new(node);
+        command
+            .arg("--import")
+            .arg(&tsx_loader_path)
+            .arg(&server_path)
+            .current_dir(&home)
+            .env("PATH", &path_env)
+            .env("PWD", &home)
+            .env("ELECTRON_RUN_AS_NODE", "1")
+            .env("NODE_ENV", "development");
+        if let Some(file) = stdout {
+            command.stdout(file);
+        }
+        if let Some(file) = stderr {
+            command.stderr(file);
+        }
+
+        match command.spawn() {
             Ok(child) => {
                 log::info!("后端已启动 via node (pid: {})", child.id());
                 return Some(child);

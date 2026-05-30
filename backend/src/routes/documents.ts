@@ -58,6 +58,28 @@ async function summarizeGeneratedDocument(documentId: string, targetDeckId?: str
   };
 }
 
+async function runDocumentPipeline(documentId: string, targetDeckId?: string) {
+  try {
+    await parseDocument(documentId);
+    await chunkDocument(documentId);
+    await extractConceptsFromDocument(documentId);
+    await generateDraftsFromDocument(documentId);
+    if (targetDeckId) {
+      await prisma.cardDraft.updateMany({
+        where: { documentId },
+        data: { deckId: targetDeckId },
+      });
+    }
+  } catch (e: any) {
+    const message = e?.message || String(e);
+    setProgress(documentId, 'failed', 0, 5, `错误: ${message}`);
+    await prisma.documentSource.update({
+      where: { id: documentId },
+      data: { status: 'failed', parseError: message },
+    }).catch(() => {});
+  }
+}
+
 // Legacy redirect: /api/ingest/documents → documentRoutes
 // Supports both multipart upload and JSON { filePath, fileType } for Tauri drag-drop
 export async function ingestRedirectRoutes(app: FastifyInstance) {
@@ -79,15 +101,7 @@ export async function ingestRedirectRoutes(app: FastifyInstance) {
       const size = statSync(savePath).size;
 
       await uploadDocument(docId, filename, fileTypeNorm as any, size, savePath);
-      // Run pipeline in background
-      Promise.resolve().then(async () => {
-        try {
-          await parseDocument(docId);
-          await chunkDocument(docId);
-          await extractConceptsFromDocument(docId);
-          await generateDraftsFromDocument(docId);
-        } catch { /* progress tracked in memory */ }
-      });
+      Promise.resolve().then(() => runDocumentPipeline(docId, targetDeckId));
       return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, status: 'processing' };
     }
 
@@ -110,15 +124,7 @@ export async function ingestRedirectRoutes(app: FastifyInstance) {
 
     const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     await uploadDocument(docId, filename, fileTypeNorm as any, 0, filePath);
-    // Run pipeline in background
-    Promise.resolve().then(async () => {
-      try {
-        await parseDocument(docId);
-        await chunkDocument(docId);
-        await extractConceptsFromDocument(docId);
-        await generateDraftsFromDocument(docId);
-      } catch { /* progress tracked in memory */ }
-    });
+    Promise.resolve().then(() => runDocumentPipeline(docId, targetDeckId));
     return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, status: 'processing' };
   });
 }
@@ -210,17 +216,7 @@ export async function documentRoutes(app: FastifyInstance) {
 
     await uploadDocument(docId, filename, fileType as any, size, savePath);
 
-    // Run pipeline asynchronously — return immediately
-    Promise.resolve().then(async () => {
-      try {
-        await parseDocument(docId);
-        await chunkDocument(docId);
-        await extractConceptsFromDocument(docId);
-        await generateDraftsFromDocument(docId);
-      } catch (e: any) {
-        setProgress(docId, 'failed', 0, 5, `错误: ${e.message || e}`);
-      }
-    });
+    Promise.resolve().then(() => runDocumentPipeline(docId, targetDeckId));
 
     return { id: docId, filename, fileType, status: 'processing', message: '文档已上传，正在后台处理...' };
   });
