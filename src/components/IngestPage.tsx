@@ -74,10 +74,14 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     setError('');
     setResult(null);
     setStatus('uploading');
+    const stages = ['上传文件', '解析文档', '切分段落', '提取知识点', '生成草稿', '完成'];
+    let s = 0;
+    const interval = setInterval(() => {
+      s = Math.min(s + 1, stages.length - 2);
+      setProgress({ stage: stages[s], step: s + 1, total: stages.length, message: stages[s] });
+    }, 2000);
     try {
       const formData = new FormData();
-      let docId: string | null = null;
-
       if (droppedFile && (droppedFile as any).path) {
         const ext = filePath.split('.').pop()?.toLowerCase() || '';
         const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
@@ -88,19 +92,16 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
         if (!res.ok) throw new Error(await res.text().then(t => { try { return JSON.parse(t).error || t; } catch { return t; } }));
         const data = await res.json();
         docId = data.sourceId;
-        setResult(data);
-        setStatus('done');
-        return;
-      }
-
-      if (droppedFile) {
+      } else if (droppedFile) {
+        // Browser mode: multipart upload
         formData.append('targetDeckId', targetDeckId);
         formData.append('file', droppedFile);
         const res = await fetch(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
         if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
         const data = await res.json();
-        docId = data.id;
+        setResult({ sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.chunkCount || 0, fullTextLength: data.fullTextLength || 0, warnings: [], draftCount: data.draftCount || 0 });
       } else {
+        // Fallback: path-based (development mode)
         const ext = filePath.split('.').pop()?.toLowerCase() || '';
         const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
         const ft = typeMap[ext] || 'txt';
@@ -110,36 +111,14 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
         });
         if (!res.ok) throw new Error(await res.text().then(t => JSON.parse(t).error || t));
         const data = await res.json();
-        docId = data.sourceId;
+        setResult(data);
       }
-
-      // Poll for progress + results
-      if (docId) {
-        setStatus('parsing');
-        const poll = setInterval(async () => {
-          try {
-            const [prog, docs] = await Promise.all([
-              fetch(`${API_BASE}/documents/${docId}/progress`).then(r => r.json()),
-              fetch(`${API_BASE}/documents/${docId}`).then(r => r.json()),
-            ]);
-            setProgress(prog);
-            if (docs.status === 'draft_ready' || docs.status === 'failed') {
-              clearInterval(poll);
-              const drafts = await fetch(`${API_BASE}/documents/${docId}/drafts`).then(r => r.json());
-              if (docs.status === 'failed') {
-                setProgress(null);
-                setError(`处理失败: ${docs.parseError || '未知错误'}`);
-                setStatus('error');
-              } else {
-                setResult({ sourceId: docId!, fileName: droppedFile?.name || filePath || 'document', sourceType: 'pdf', chunkCount: 0, fullTextLength: 0, warnings: [], draftCount: drafts.length });
-                setStatus('done');
-                setProgress({ stage: '完成', step: 5, total: 5, message: `完成！${drafts.length} 张草稿` });
-              }
-            }
-          } catch { /* polling error, ignore */ }
-        }, 2000);
-      }
+      setStatus('done');
+      clearInterval(interval);
+      setProgress({ stage: '完成', step: stages.length, total: stages.length, message: '完成！' });
     } catch (err: any) {
+      clearInterval(interval);
+      setProgress(null);
       setError(err.message || '上传失败');
       setStatus('error');
     }
