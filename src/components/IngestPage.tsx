@@ -313,10 +313,9 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 </div>
                 <div className="text-[13px] space-y-1" style={{ color: TEXT_MUTED }}>
                   <div className="flex items-center gap-2"><FileText className="w-3.5 h-3.5" /><span>{result.fileName}（{result.sourceType}）</span></div>
-                  <div>文本长度：{result.fullTextLength.toLocaleString()} 字符</div>
-                  <div>分块数：{result.chunkCount}</div>
-                </div>
-                {result.warnings.length > 0 && <div className="text-[12px] mt-1" style={{ color: '#F59E0B' }}>{result.warnings.join('；')}</div>}
+                  <div>文本长度：{(result.fullTextLength ?? 0).toLocaleString()} 字符</div>
+                  <div>分块数：{result.chunkCount ?? 0}</div>
+                {result.warnings?.length > 0 && <div className="text-[12px] mt-1" style={{ color: '#F59E0B' }}>{result.warnings.join('；')}</div>}
               </div>
 
               <button onClick={() => onNavigate('drafts')} className="w-full rounded-xl p-3.5 flex items-center justify-center gap-2 text-[14px] font-medium" style={{ backgroundColor: ACCENT, color: '#fff' }}>
