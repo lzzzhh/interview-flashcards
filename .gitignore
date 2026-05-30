@@ -35,3 +35,9 @@ __pycache__/
 # Local database
 *.db
 *.backup.lc-id
+backend/data/
+_arch_diagram.html
+backend/src/diag-zero-results.ts
+backend/src/evaluation/gating-ab-test.ts
+backend/src/evaluation/regression-gating.ts
+backend/src/evaluation/weak-group-triage.ts
