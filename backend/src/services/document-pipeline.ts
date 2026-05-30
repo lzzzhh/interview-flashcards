@@ -21,7 +21,7 @@ export function getPipelineProgress(documentId: string): PipelineProgress | null
   return progressMap.get(documentId) || null;
 }
 
-function setProgress(documentId: string, stage: string, step: number, total: number, message: string) {
+export function setProgress(documentId: string, stage: string, step: number, total: number, message: string) {
   progressMap.set(documentId, { stage, step, total, message });
 }
 
@@ -130,13 +130,11 @@ export async function chunkDocument(documentId: string): Promise<void> {
 
   const chunks = chunkBlocks(parsedDoc);
 
-    // Delete old chunks if re-chunking
-    await prisma.documentChunk.deleteMany({ where: { documentId } });
+  await prisma.documentChunk.deleteMany({ where: { documentId } });
 
-    const total = chunks.length;
-    let i = 0;
-    for (const chunk of result) {
-      await prisma.documentChunk.create({
+  let i = 0;
+  for (const chunk of chunks) {
+    await prisma.documentChunk.create({
       data: {
         id: chunk.id,
         documentId: chunk.documentId,

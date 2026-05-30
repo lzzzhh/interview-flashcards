@@ -12,7 +12,7 @@ import {
   extractConceptsFromDocument,
   generateDraftsFromDocument,
 } from '../services/document-pipeline';
-import { getPipelineProgress } from '../services/document-pipeline';
+import { getPipelineProgress, setProgress } from '../services/document-pipeline';
 
 const UPLOAD_DIR = join(process.cwd(), 'data', 'uploads');
 if (!existsSync(UPLOAD_DIR)) mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -79,13 +79,16 @@ export async function ingestRedirectRoutes(app: FastifyInstance) {
       const size = statSync(savePath).size;
 
       await uploadDocument(docId, filename, fileTypeNorm as any, size, savePath);
-      await parseDocument(docId);
-      await chunkDocument(docId);
-      await extractConceptsFromDocument(docId);
-      await generateDraftsFromDocument(docId);
-
-      const summary = await summarizeGeneratedDocument(docId, targetDeckId);
-      return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, ...summary, warnings: [] };
+      // Run pipeline in background
+      Promise.resolve().then(async () => {
+        try {
+          await parseDocument(docId);
+          await chunkDocument(docId);
+          await extractConceptsFromDocument(docId);
+          await generateDraftsFromDocument(docId);
+        } catch { /* progress tracked in memory */ }
+      });
+      return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, status: 'processing' };
     }
 
     // Fallback: JSON path-based (Tauri drag-drop provides file.path)
@@ -107,13 +110,16 @@ export async function ingestRedirectRoutes(app: FastifyInstance) {
 
     const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     await uploadDocument(docId, filename, fileTypeNorm as any, 0, filePath);
-    await parseDocument(docId);
-    await chunkDocument(docId);
-    await extractConceptsFromDocument(docId);
-    await generateDraftsFromDocument(docId);
-
-    const summary = await summarizeGeneratedDocument(docId, targetDeckId);
-    return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, ...summary, warnings: [] };
+    // Run pipeline in background
+    Promise.resolve().then(async () => {
+      try {
+        await parseDocument(docId);
+        await chunkDocument(docId);
+        await extractConceptsFromDocument(docId);
+        await generateDraftsFromDocument(docId);
+      } catch { /* progress tracked in memory */ }
+    });
+    return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, status: 'processing' };
   });
 }
 
@@ -184,7 +190,7 @@ export async function documentRoutes(app: FastifyInstance) {
     }
   });
 
-  // POST /api/documents/process — full pipeline in one call
+  // POST /api/documents/process — async: returns immediately, poll for progress/results
   app.post('/api/documents/process', async (req, reply) => {
     const data = await req.file();
     if (!data) return reply.status(400).send({ error: 'No file uploaded' });
@@ -202,27 +208,21 @@ export async function documentRoutes(app: FastifyInstance) {
     await pipeline(data.file, ws);
     const size = statSync(savePath).size;
 
-    try {
-      await uploadDocument(docId, filename, fileType as any, size, savePath);
-      await parseDocument(docId);
-      await chunkDocument(docId);
-      await extractConceptsFromDocument(docId);
-      await generateDraftsFromDocument(docId);
-      const summary = await summarizeGeneratedDocument(docId, targetDeckId);
+    await uploadDocument(docId, filename, fileType as any, size, savePath);
 
-      return {
-        id: docId,
-        filename,
-        fileType,
-        status: 'draft_ready',
-        chunkCount: summary.chunkCount,
-        fullTextLength: summary.fullTextLength,
-        draftCount: drafts.length,
-        drafts: drafts.map(formatDraft),
-      };
-    } catch (e: any) {
-      return reply.status(500).send({ error: e.message, documentId: docId });
-    }
+    // Run pipeline asynchronously — return immediately
+    Promise.resolve().then(async () => {
+      try {
+        await parseDocument(docId);
+        await chunkDocument(docId);
+        await extractConceptsFromDocument(docId);
+        await generateDraftsFromDocument(docId);
+      } catch (e: any) {
+        setProgress(docId, 'failed', 0, 5, `错误: ${e.message || e}`);
+      }
+    });
+
+    return { id: docId, filename, fileType, status: 'processing', message: '文档已上传，正在后台处理...' };
   });
 
   // GET /api/documents — list
