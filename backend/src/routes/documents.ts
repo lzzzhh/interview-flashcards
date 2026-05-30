@@ -1,0 +1,687 @@
+import { FastifyInstance } from 'fastify';
+import { pipeline } from 'stream/promises';
+import { createWriteStream, mkdirSync, existsSync, statSync } from 'fs';
+import { join } from 'path';
+import prisma from '../db/prisma';
+import { z } from 'zod';
+import { validate } from './schemas';
+import {
+  uploadDocument,
+  parseDocument,
+  chunkDocument,
+  extractConceptsFromDocument,
+  generateDraftsFromDocument,
+} from '../services/document-pipeline';
+
+const UPLOAD_DIR = join(process.cwd(), 'data', 'uploads');
+if (!existsSync(UPLOAD_DIR)) mkdirSync(UPLOAD_DIR, { recursive: true });
+
+const allowedMime: Record<string, string> = {
+  'application/pdf': 'pdf',
+  'text/markdown': 'markdown',
+  'text/plain': 'txt',
+  'text/x-markdown': 'markdown',
+};
+
+function extToType(ext: string): string | null {
+  const m: Record<string, string> = { '.pdf': 'pdf', '.md': 'markdown', '.markdown': 'markdown', '.txt': 'txt' };
+  return m[ext.toLowerCase()] || null;
+}
+
+// Legacy redirect: /api/ingest/documents → documentRoutes
+// Supports both multipart upload and JSON { filePath, fileType } for Tauri drag-drop
+export async function ingestRedirectRoutes(app: FastifyInstance) {
+  app.post('/api/ingest/documents', async (req, reply) => {
+    // Try multipart first (browser drag-drop)
+    const data = await req.file().catch(() => null);
+    if (data) {
+      const filename = data.filename;
+      const ext = filename.includes('.') ? '.' + filename.split('.').pop()!.toLowerCase() : '';
+      const typeMap: Record<string, string> = { '.pdf': 'pdf', '.md': 'markdown', '.markdown': 'markdown', '.txt': 'txt' };
+      const fileTypeNorm = typeMap[ext] || 'pdf';
+
+      const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const savePath = join(UPLOAD_DIR, `${docId}${ext}`);
+      const ws = createWriteStream(savePath);
+      const { pipeline: pipeline2 } = await import('stream/promises');
+      await pipeline2(data.file, ws);
+      const size = statSync(savePath).size;
+
+      await uploadDocument(docId, filename, fileTypeNorm as any, size, savePath);
+      await parseDocument(docId);
+      await chunkDocument(docId);
+      await extractConceptsFromDocument(docId);
+      await generateDraftsFromDocument(docId);
+
+      const chunks = await prisma.documentChunk.count({ where: { documentId: docId } });
+      return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, chunkCount: chunks, fullTextLength: size, warnings: [] };
+    }
+
+    // Fallback: JSON path-based (Tauri drag-drop provides file.path)
+    const body = req.body as any;
+    const filePath = body?.filePath;
+    if (!filePath) return reply.status(400).send({ error: 'No file provided. Use multipart upload or send filePath in JSON body.' });
+
+    // Tauri provides the absolute file path on disk
+    const { existsSync } = await import('fs');
+    if (!existsSync(filePath)) {
+      return reply.status(400).send({ error: `File not found: ${filePath}` });
+    }
+
+    const filename = filePath.split('/').pop() || filePath;
+    const ext = filename.includes('.') ? '.' + filename.split('.').pop()!.toLowerCase() : '';
+    const typeMap: Record<string, string> = { '.pdf': 'pdf', '.md': 'markdown', '.markdown': 'markdown', '.txt': 'txt' };
+    const fileTypeNorm = body?.fileType || typeMap[ext] || 'pdf';
+
+    const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    await uploadDocument(docId, filename, fileTypeNorm as any, 0, filePath);
+    await parseDocument(docId);
+    await chunkDocument(docId);
+    await extractConceptsFromDocument(docId);
+    await generateDraftsFromDocument(docId);
+
+    const chunks = await prisma.documentChunk.count({ where: { documentId: docId } });
+    return { sourceId: docId, fileName: filename, sourceType: fileTypeNorm, chunkCount: chunks, fullTextLength: 0, warnings: [] };
+  });
+}
+
+export async function documentRoutes(app: FastifyInstance) {
+  // POST /api/documents/upload — upload file
+  app.post('/api/documents/upload', async (req, reply) => {
+    const data = await req.file();
+    if (!data) return reply.status(400).send({ error: 'No file uploaded' });
+
+    const filename = data.filename;
+    const ext = filename.includes('.') ? '.' + filename.split('.').pop()!.toLowerCase() : '';
+    const fileType = extToType(ext) || allowedMime[data.mimetype] || null;
+    if (!fileType) return reply.status(400).send({ error: `Unsupported file type: ${ext || data.mimetype}` });
+
+    const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const savePath = join(UPLOAD_DIR, `${docId}${ext}`);
+
+    const ws = createWriteStream(savePath);
+    await pipeline(data.file, ws);
+    const size = statSync(savePath).size;
+
+    await uploadDocument(docId, filename, fileType as any, size, savePath);
+
+    return { id: docId, filename, fileType, fileSize: size, status: 'uploaded' };
+  });
+
+  // POST /api/documents/:id/parse
+  app.post('/api/documents/:id/parse', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    try {
+      await parseDocument(id);
+      return { id, status: 'parsed' };
+    } catch (e: any) {
+      return reply.status(500).send({ error: e.message });
+    }
+  });
+
+  // POST /api/documents/:id/chunk
+  app.post('/api/documents/:id/chunk', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    try {
+      await chunkDocument(id);
+      return { id, status: 'chunked' };
+    } catch (e: any) {
+      return reply.status(500).send({ error: e.message });
+    }
+  });
+
+  // POST /api/documents/:id/extract-concepts
+  app.post('/api/documents/:id/extract-concepts', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    try {
+      await extractConceptsFromDocument(id);
+      return { id, status: 'concepts_extracted' };
+    } catch (e: any) {
+      return reply.status(500).send({ error: e.message });
+    }
+  });
+
+  // POST /api/documents/:id/generate-drafts
+  app.post('/api/documents/:id/generate-drafts', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    try {
+      await generateDraftsFromDocument(id);
+      return { id, status: 'draft_ready' };
+    } catch (e: any) {
+      return reply.status(500).send({ error: e.message });
+    }
+  });
+
+  // POST /api/documents/process — full pipeline in one call
+  app.post('/api/documents/process', async (req, reply) => {
+    const data = await req.file();
+    if (!data) return reply.status(400).send({ error: 'No file uploaded' });
+
+    const filename = data.filename;
+    const ext = filename.includes('.') ? '.' + filename.split('.').pop()!.toLowerCase() : '';
+    const fileType = extToType(ext) || allowedMime[data.mimetype] || null;
+    if (!fileType) return reply.status(400).send({ error: `Unsupported file type: ${ext || data.mimetype}` });
+
+    const docId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const savePath = join(UPLOAD_DIR, `${docId}${ext}`);
+
+    const ws = createWriteStream(savePath);
+    await pipeline(data.file, ws);
+    const size = statSync(savePath).size;
+
+    try {
+      await uploadDocument(docId, filename, fileType as any, size, savePath);
+      await parseDocument(docId);
+      await chunkDocument(docId);
+      await extractConceptsFromDocument(docId);
+      await generateDraftsFromDocument(docId);
+
+      const drafts = await prisma.cardDraft.findMany({
+        where: { documentId: docId },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      return {
+        id: docId,
+        filename,
+        fileType,
+        status: 'draft_ready',
+        draftCount: drafts.length,
+        drafts: drafts.map(formatDraft),
+      };
+    } catch (e: any) {
+      return reply.status(500).send({ error: e.message, documentId: docId });
+    }
+  });
+
+  // GET /api/documents — list
+  app.get('/api/documents', async () => {
+    const docs = await prisma.documentSource.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+    return docs.map(d => ({
+      id: d.id,
+      filename: d.filename,
+      fileType: d.fileType,
+      fileSize: d.fileSize,
+      status: d.status,
+      parseError: d.parseError,
+      createdAt: d.createdAt,
+    }));
+  });
+
+  // GET /api/documents/:id/drafts
+  app.get('/api/documents/:id/drafts', async (req) => {
+    const { id } = req.params as { id: string };
+    const drafts = await prisma.cardDraft.findMany({
+      where: { documentId: id },
+      orderBy: { createdAt: 'desc' },
+    });
+    return drafts.map(formatDraft);
+  });
+
+  // GET /api/documents/:id
+  app.get('/api/documents/:id', async (req) => {
+    const { id } = req.params as { id: string };
+    const doc = await prisma.documentSource.findUnique({
+      where: { id },
+      include: {
+        chunks: {
+          orderBy: { orderIndex: 'asc' },
+          take: 20,
+        },
+      },
+    });
+    if (!doc) return { error: 'Not found' };
+    return doc;
+  });
+
+  // GET /api/card-drafts — list all drafts
+  app.get('/api/card-drafts', async (req) => {
+    const url = new URL(req.url, 'http://x');
+    const status = url.searchParams.get('status');
+    const where: any = {};
+    if (status) where.status = status;
+
+    const drafts = await prisma.cardDraft.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+    return drafts.map(formatDraft);
+  });
+
+  // PATCH /api/card-drafts/:id — edit draft
+  app.patch('/api/card-drafts/:id', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const UpdateDraftSchema = z.object({
+      question: z.string().optional(),
+      answer: z.string().optional(),
+      tags: z.array(z.string()).optional(),
+      searchKeywords: z.array(z.string()).optional(),
+      canonicalTopic: z.string().nullable().optional(),
+      deckId: z.string().optional(),
+      reviewNote: z.string().optional(),
+    });
+    const v = validate(UpdateDraftSchema, req.body);
+    if (!v.success) return reply.status(400).send({ error: v.error });
+
+    const updateData: any = {};
+    const body = v.data;
+    if (body.question !== undefined) updateData.question = body.question;
+    if (body.answer !== undefined) updateData.answer = body.answer;
+    if (body.tags !== undefined) updateData.tagsJson = JSON.stringify(body.tags);
+    if (body.searchKeywords !== undefined) updateData.searchKeywordsJson = JSON.stringify(body.searchKeywords);
+    if (body.canonicalTopic !== undefined) updateData.canonicalTopic = body.canonicalTopic;
+    if (body.deckId !== undefined) updateData.deckId = body.deckId;
+    if (body.reviewNote !== undefined) updateData.reviewNote = body.reviewNote;
+
+    const updated = await prisma.cardDraft.update({
+      where: { id },
+      data: updateData,
+    });
+    return formatDraft(updated);
+  });
+
+  // POST /api/card-drafts/:id/approve — approve for import
+  app.post('/api/card-drafts/:id/approve', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const draft = await prisma.cardDraft.findUnique({ where: { id } });
+    if (!draft) return reply.status(404).send({ error: 'Draft not found' });
+
+    const body = req.body as any || {};
+    const deckId = body.deckId || draft.deckId;
+    if (!deckId) return reply.status(400).send({ error: 'deckId required before approve' });
+
+    // Final validation
+    const tags: string[] = JSON.parse(draft.tagsJson || '[]');
+    const searchKeywords: string[] = JSON.parse(draft.searchKeywordsJson || '[]');
+    if (!draft.question || !draft.answer) return reply.status(400).send({ error: 'question and answer required' });
+    if (tags.length === 0) return reply.status(400).send({ error: 'at least one tag required' });
+
+    // Check duplicate status
+    const dupCheck = draft.duplicateCheckJson ? JSON.parse(draft.duplicateCheckJson) : null;
+    if (['possible_duplicate', 'exact_duplicate', 'semantic_duplicate'].includes(dupCheck?.status)) {
+      return reply.status(400).send({
+        error: `Duplicate status "${dupCheck?.status}" — resolve before approve.`,
+        matchedCardIds: dupCheck?.matchedCardIds,
+      });
+    }
+
+    // Check unresolved duplicate group
+    if (draft.duplicateGroupId) {
+      const groupDrafts = await prisma.cardDraft.findMany({
+        where: { duplicateGroupId: draft.duplicateGroupId, status: { notIn: ['rejected', 'out_of_scope'] } },
+        select: { id: true, status: true },
+      });
+      const unresolved = groupDrafts.filter(g => g.status !== 'approved');
+      if (unresolved.length > 1) {
+        return reply.status(400).send({
+          error: `Duplicate group ${draft.duplicateGroupId} has ${unresolved.length} unresolved drafts. Resolve via merge/reject/keep_both before approve.`,
+          groupDraftIds: unresolved.map(g => g.id),
+        });
+      }
+    }
+
+    const cardId = `draft_${id}`;
+    await prisma.card.create({
+      data: {
+        id: cardId,
+        deckId,
+        type: 'qa',
+        question: draft.question,
+        answer: draft.answer,
+        tags: JSON.stringify(tags),
+        searchKeywords: JSON.stringify(searchKeywords),
+        source: `document:${draft.documentId}`,
+      },
+    });
+
+    await prisma.cardDraft.update({
+      where: { id },
+      data: { status: 'approved', importedCardId: cardId, deckId },
+    });
+
+    await prisma.cardDraftReview.create({
+      data: {
+        draftId: id,
+        action: 'approve',
+        afterJson: JSON.stringify({ importedCardId: cardId }),
+        createdAt: new Date().toISOString(),
+      },
+    });
+
+    return { id, status: 'approved', cardId };
+  });
+
+  // POST /api/card-drafts/:id/reject
+  app.post('/api/card-drafts/:id/reject', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const body = req.body as any || {};
+
+    await prisma.cardDraft.update({
+      where: { id },
+      data: { status: 'rejected', reviewNote: body.note || null },
+    });
+
+    await prisma.cardDraftReview.create({
+      data: { draftId: id, action: 'reject', note: body.note || null, createdAt: new Date().toISOString() },
+    });
+
+    return { id, status: 'rejected' };
+  });
+
+  // POST /api/card-drafts/:id/mark-duplicate
+  app.post('/api/card-drafts/:id/mark-duplicate', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const body = req.body as any || {};
+
+    const dupCheck = { status: 'possible_duplicate', matchedCardIds: body.matchedCardIds || [], reason: body.note || '' };
+    await prisma.cardDraft.update({
+      where: { id },
+      data: { status: 'duplicate', duplicateCheckJson: JSON.stringify(dupCheck), reviewNote: body.note || null },
+    });
+
+    await prisma.cardDraftReview.create({
+      data: { draftId: id, action: 'mark_duplicate', note: body.note || null, createdAt: new Date().toISOString() },
+    });
+
+    return { id, status: 'duplicate' };
+  });
+
+  // POST /api/card-drafts/:id/mark-out-of-scope
+  app.post('/api/card-drafts/:id/mark-out-of-scope', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const body = req.body as any || {};
+
+    await prisma.cardDraft.update({
+      where: { id },
+      data: { status: 'out_of_scope', reviewNote: body.note || null },
+    });
+
+    await prisma.cardDraftReview.create({
+      data: { draftId: id, action: 'mark_out_of_scope', note: body.note || null, createdAt: new Date().toISOString() },
+    });
+
+    return { id, status: 'out_of_scope' };
+  });
+
+  // POST /api/card-drafts/import-dry-run — validate drafts before import
+  app.post('/api/card-drafts/import-dry-run', async (req, reply) => {
+    const { draftIds } = req.body as { draftIds?: string[] };
+    const where: any = draftIds?.length ? { id: { in: draftIds } } : { status: 'draft' };
+    const drafts = await prisma.cardDraft.findMany({ where, take: 50 });
+
+    const result = {
+      totalChecked: drafts.length,
+      willCreateCards: 0,
+      blockedDrafts: [] as string[],
+      unresolvedDuplicates: [] as string[],
+      missingDeckId: [] as string[],
+      missingTags: [] as string[],
+      missingSearchKeywords: [] as string[],
+      graphPending: [] as string[],
+    };
+
+    for (const d of drafts) {
+      const dupCheck = d.duplicateCheckJson ? JSON.parse(d.duplicateCheckJson) : {};
+      const tags = JSON.parse(d.tagsJson || '[]');
+      const kw = JSON.parse(d.searchKeywordsJson || '[]');
+      const blocked: string[] = [];
+
+      if (['exact_duplicate', 'semantic_duplicate', 'possible_duplicate'].includes(dupCheck.status)) {
+        result.unresolvedDuplicates.push(d.id); blocked.push('dup');
+      }
+      if (d.duplicateGroupId) {
+        const gp = await prisma.cardDraft.findMany({ where: { duplicateGroupId: d.duplicateGroupId, status: { notIn: ['rejected', 'out_of_scope'] } }, select: { id: true } });
+        if (gp.length > 1) { result.unresolvedDuplicates.push(d.id); blocked.push('dup-group'); }
+      }
+      if (!d.deckId) { result.missingDeckId.push(d.id); blocked.push('deck'); }
+      if (tags.length === 0) { result.missingTags.push(d.id); blocked.push('tags'); }
+      if (kw.length === 0) { result.missingSearchKeywords.push(d.id); blocked.push('kw'); }
+      if (d.graphStatus === 'graph_pending') result.graphPending.push(d.id);
+
+      if (blocked.length > 0) result.blockedDrafts.push(d.id);
+      else result.willCreateCards++;
+    }
+
+    return result;
+  });
+
+  // POST /api/card-drafts/batch-import — small batch import (max 20)
+  app.post('/api/card-drafts/batch-import', async (req, reply) => {
+    const v = validate(z.object({
+      draftIds: z.array(z.string()).min(1).max(20),
+      deckId: z.string().min(1),
+    }), req.body);
+    if (!v.success) return reply.status(400).send({ error: v.error });
+
+    const { draftIds, deckId } = v.data;
+    const results: { id: string; status: string; cardId?: string; error?: string }[] = [];
+
+    for (const id of draftIds) {
+      try {
+        const draft = await prisma.cardDraft.findUnique({ where: { id } });
+        if (!draft) { results.push({ id, status: 'error', error: 'Not found' }); continue; }
+
+        const tags = JSON.parse(draft.tagsJson || '[]');
+        const kw = JSON.parse(draft.searchKeywordsJson || '[]');
+        const dupCheck = draft.duplicateCheckJson ? JSON.parse(draft.duplicateCheckJson) : {};
+
+        if (!draft.question || !draft.answer) { results.push({ id, status: 'error', error: 'q/a empty' }); continue; }
+        if (tags.length === 0) { results.push({ id, status: 'error', error: 'no tags' }); continue; }
+        if (['exact_duplicate', 'semantic_duplicate', 'possible_duplicate'].includes(dupCheck.status)) {
+          results.push({ id, status: 'error', error: `dup: ${dupCheck.status}` }); continue;
+        }
+        if (draft.duplicateGroupId) {
+          const gp = await prisma.cardDraft.findMany({ where: { duplicateGroupId: draft.duplicateGroupId, status: { notIn: ['rejected', 'out_of_scope'] } }, select: { id: true } });
+          if (gp.length > 1) { results.push({ id, status: 'error', error: 'dup group unresolved' }); continue; }
+        }
+
+        const cardId = `draft_${id}`;
+        await prisma.card.create({
+          data: {
+            id: cardId, deckId, type: 'qa',
+            question: draft.question, answer: draft.answer,
+            tags: JSON.stringify(tags), searchKeywords: JSON.stringify(kw),
+            source: `document:${draft.documentId}`,
+          },
+        });
+        await prisma.cardDraft.update({ where: { id }, data: { status: 'approved', importedCardId: cardId, deckId } });
+        await prisma.cardDraftReview.create({ data: { draftId: id, action: 'approve', afterJson: JSON.stringify({ importedCardId: cardId }), createdAt: new Date().toISOString() } });
+        results.push({ id, status: 'approved', cardId });
+      } catch (e: any) {
+        results.push({ id, status: 'error', error: e.message });
+      }
+    }
+
+    return { results, imported: results.filter(r => r.status === 'approved').length };
+  });
+
+  // POST /api/card-drafts/batch-review — batch review action
+  app.post('/api/card-drafts/batch-review', async (req, reply) => {
+    const BatchReviewSchema = z.object({
+      draftIds: z.array(z.string()).min(1).max(200),
+      action: z.enum(['approve', 'edit', 'reject', 'mark_duplicate', 'mark_out_of_scope', 'merge', 'keep_both', 'keep_best']),
+      deckId: z.string().optional(),
+      note: z.string().optional(),
+      edits: z.record(z.object({
+        question: z.string().optional(),
+        answer: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        searchKeywords: z.array(z.string()).optional(),
+        canonicalTopic: z.string().nullable().optional(),
+      })).optional(),
+    });
+    const v = validate(BatchReviewSchema, req.body);
+    if (!v.success) return reply.status(400).send({ error: v.error });
+    const { draftIds, action, deckId, note, edits } = v.data;
+
+    const results: { id: string; status: string; error?: string }[] = [];
+
+    for (const id of draftIds) {
+      try {
+        switch (action) {
+          case 'approve': {
+            const draft = await prisma.cardDraft.findUnique({ where: { id } });
+            if (!draft) { results.push({ id, status: 'error', error: 'Not found' }); continue; }
+            const targetDeck = deckId || draft.deckId;
+            if (!targetDeck) { results.push({ id, status: 'error', error: 'deckId required' }); continue; }
+
+            const tags = JSON.parse(draft.tagsJson || '[]');
+            const kw = JSON.parse(draft.searchKeywordsJson || '[]');
+            if (!draft.question || !draft.answer) { results.push({ id, status: 'error', error: 'question/answer required' }); continue; }
+            if (tags.length === 0) { results.push({ id, status: 'error', error: 'at least one tag required' }); continue; }
+
+            const dupCheck = draft.duplicateCheckJson ? JSON.parse(draft.duplicateCheckJson) : null;
+            if (['possible_duplicate', 'exact_duplicate', 'semantic_duplicate'].includes(dupCheck?.status)) {
+              results.push({ id, status: 'error', error: `Duplicate unresolved: ${dupCheck?.status}` }); continue;
+            }
+
+            const cardId = `draft_${id}`;
+            await prisma.card.create({
+              data: {
+                id: cardId, deckId: targetDeck, type: 'qa',
+                question: draft.question, answer: draft.answer,
+                tags: JSON.stringify(tags), searchKeywords: JSON.stringify(kw),
+                source: `document:${draft.documentId}`,
+              },
+            });
+            await prisma.cardDraft.update({ where: { id }, data: { status: 'approved', importedCardId: cardId, deckId: targetDeck } });
+            await prisma.cardDraftReview.create({ data: { draftId: id, action: 'approve', afterJson: JSON.stringify({ importedCardId: cardId }), createdAt: new Date().toISOString() } });
+            results.push({ id, status: 'approved', cardId });
+            break;
+          }
+          case 'reject': {
+            await prisma.cardDraft.update({ where: { id }, data: { status: 'rejected', reviewNote: note || null } });
+            await prisma.cardDraftReview.create({ data: { draftId: id, action: 'reject', note: note || null, createdAt: new Date().toISOString() } });
+            results.push({ id, status: 'rejected' });
+            break;
+          }
+          case 'mark_duplicate': {
+            await prisma.cardDraft.update({
+              where: { id },
+              data: { status: 'duplicate', duplicateCheckJson: JSON.stringify({ status: 'possible_duplicate' }), reviewNote: note || null },
+            });
+            await prisma.cardDraftReview.create({ data: { draftId: id, action: 'mark_duplicate', note: note || null, createdAt: new Date().toISOString() } });
+            results.push({ id, status: 'duplicate' });
+            break;
+          }
+          case 'mark_out_of_scope': {
+            await prisma.cardDraft.update({ where: { id }, data: { status: 'out_of_scope', reviewNote: note || null } });
+            await prisma.cardDraftReview.create({ data: { draftId: id, action: 'mark_out_of_scope', note: note || null, createdAt: new Date().toISOString() } });
+            results.push({ id, status: 'out_of_scope' });
+            break;
+          }
+          case 'edit': {
+            const edit = edits?.[id];
+            if (!edit) { results.push({ id, status: 'error', error: 'No edits provided' }); continue; }
+            const updateData: any = {};
+            if (edit.question !== undefined) updateData.question = edit.question;
+            if (edit.answer !== undefined) updateData.answer = edit.answer;
+            if (edit.tags !== undefined) updateData.tagsJson = JSON.stringify(edit.tags);
+            if (edit.searchKeywords !== undefined) updateData.searchKeywordsJson = JSON.stringify(edit.searchKeywords);
+            if (edit.canonicalTopic !== undefined) updateData.canonicalTopic = edit.canonicalTopic;
+            await prisma.cardDraft.update({ where: { id }, data: updateData });
+            results.push({ id, status: 'edited' });
+            break;
+          }
+          case 'merge': {
+            // Merge: keep first draft's content, mark rest as merged
+            const primaryId = draftIds[0];
+            for (const did of draftIds) {
+              if (did === primaryId) continue;
+              await prisma.cardDraft.update({ where: { id: did }, data: { status: 'merged', duplicateGroupId: null, reviewNote: `Merged into ${primaryId}` } });
+              await prisma.cardDraftReview.create({ data: { draftId: did, action: 'merge', note: `Merged into ${primaryId}`, createdAt: new Date().toISOString() } });
+            }
+            // Update primary: clear group, set note
+            await prisma.cardDraft.update({ where: { id: primaryId }, data: { duplicateGroupId: null, reviewNote: note || 'Merged from group' } });
+            results.push({ id: primaryId, status: 'merged_primary' });
+            for (const did of draftIds) {
+              if (did !== primaryId) results.push({ id: did, status: 'merged' });
+            }
+            break;
+          }
+          case 'keep_both': {
+            // Keep both: clear duplicate group, add note
+            for (const did of draftIds) {
+              await prisma.cardDraft.update({ where: { id: did }, data: { duplicateGroupId: null, reviewNote: note || 'Keep both — reviewed' } });
+              await prisma.cardDraftReview.create({ data: { draftId: did, action: 'keep_both', note: note || null, createdAt: new Date().toISOString() } });
+              results.push({ id: did, status: 'keep_both' });
+            }
+            break;
+          }
+          case 'keep_best': {
+            // Keep best: approve best, reject others
+            const bestId = draftIds[0];
+            for (const did of draftIds) {
+              if (did === bestId) continue;
+              await prisma.cardDraft.update({ where: { id: did }, data: { status: 'rejected', duplicateGroupId: null, reviewNote: `Dup of ${bestId}` } });
+              await prisma.cardDraftReview.create({ data: { draftId: did, action: 'reject', note: `Keep best: ${bestId}`, createdAt: new Date().toISOString() } });
+              results.push({ id: did, status: 'rejected_as_dup' });
+            }
+            await prisma.cardDraft.update({ where: { id: bestId }, data: { duplicateGroupId: null, reviewNote: note || 'Kept as best' } });
+            results.push({ id: bestId, status: 'keep_best' });
+            break;
+          }
+        }
+      } catch (e: any) {
+        results.push({ id, status: 'error', error: e.message });
+      }
+    }
+
+    return { results };
+  });
+
+  // DELETE /api/documents/:id
+  app.delete('/api/documents/:id', async (req) => {
+    const { id } = req.params as { id: string };
+    const doc = await prisma.documentSource.findUnique({ where: { id } });
+    if (doc?.filePath) {
+      try { await import('fs/promises').then(fs => fs.unlink(doc.filePath)); } catch {}
+    }
+    await prisma.documentBlock.deleteMany({ where: { documentId: id } });
+    await prisma.documentChunk.deleteMany({ where: { documentId: id } });
+    await prisma.extractedConcept.deleteMany({ where: { documentId: id } });
+    await prisma.cardDraft.deleteMany({ where: { documentId: id } });
+    await prisma.documentSource.delete({ where: { id } });
+    return { deleted: true };
+  });
+}
+
+function formatDraft(d: any) {
+  return {
+    id: d.id,
+    documentId: d.documentId,
+    chunkId: d.chunkId,
+    conceptId: d.conceptId,
+    type: d.type,
+    question: d.question,
+    answer: d.answer,
+    tags: safeJsonParse(d.tagsJson),
+    searchKeywords: safeJsonParse(d.searchKeywordsJson),
+    canonicalTopic: d.canonicalTopic,
+    canonicalConcept: d.canonicalConcept,
+    learningObjective: d.learningObjective,
+    atomicFacts: safeJsonParse(d.atomicFactsJson),
+    answerScope: d.answerScope,
+    graphNodeId: d.graphNodeId,
+    graphStatus: d.graphStatus,
+    confidence: d.confidence,
+    status: d.status,
+    duplicateCheck: safeJsonParse(d.duplicateCheckJson),
+    duplicateGroupId: d.duplicateGroupId,
+    sourceRefs: safeJsonParse(d.sourceRefsJson),
+    reviewNote: d.reviewNote,
+    importedCardId: d.importedCardId,
+    deckId: d.deckId,
+    createdAt: d.createdAt,
+    updatedAt: d.updatedAt,
+  };
+}
+
+function safeJsonParse(s: string | null | undefined): any {
+  if (!s) return null;
+  try { return JSON.parse(s); } catch { return null; }
+}
