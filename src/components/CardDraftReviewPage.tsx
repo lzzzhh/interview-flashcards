@@ -133,7 +133,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
   }
 
   return (
-    <div className="homepage-glass-stage flex-1 flex flex-col overflow-hidden transition-colors" style={{ color: TEXT_PRIMARY }}>
+    <div className="bg-white dark:bg-[#111111] flex-1 flex flex-col overflow-hidden transition-colors" style={{ color: TEXT_PRIMARY }}>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b shrink-0" style={{ borderColor: CARD_BORDER }}>
         <button onClick={onBack} className="p-1.5 rounded-xl hover:opacity-70"><ArrowLeft size={20} /></button>
