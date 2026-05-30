@@ -133,7 +133,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden" style={{ color: TEXT_PRIMARY }}>
+    <div className="homepage-glass-stage flex-1 flex flex-col overflow-hidden transition-colors" style={{ color: TEXT_PRIMARY }}>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b shrink-0" style={{ borderColor: CARD_BORDER }}>
         <button onClick={onBack} className="p-1.5 rounded-xl hover:opacity-70"><ArrowLeft size={20} /></button>
@@ -175,7 +175,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
 
       {/* Dry-run result */}
       {dryRunResult && (
-        <div className="mx-4 mt-2 p-3 rounded-2xl border backdrop-blur-xl text-[12px]" style={{ backgroundColor: CARD_BG, borderColor: AMBER }}>
+        <div className="mx-4 mt-2 p-3 rounded-2xl border text-[12px]" style={{ backgroundColor: CARD_BG, borderColor: AMBER }}>
           <div className="font-medium mb-1">Dry Run 验证结果</div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
             <span>可导入: {dryRunResult.willCreateCards}</span>
@@ -211,7 +211,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
             <div className="text-center py-8" style={{ color: TEXT_MUTED }}>无重复组</div>
           ) : (
             [...groups.entries()].map(([gid, gdrafts]) => (
-               <div key={gid} className="p-3 rounded-2xl border backdrop-blur-xl" style={{ backgroundColor: CARD_BG, borderColor: AMBER }}>
+               <div key={gid} className="p-3 rounded-2xl border" style={{ backgroundColor: CARD_BG, borderColor: AMBER }}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[12px] font-bold" style={{ color: AMBER }}>
                     <Layers size={14} className="inline mr-1" />重复组 ({gdrafts.length} 张)
@@ -234,7 +234,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
         ) : (
           // Draft list
           filteredDrafts.map(d => (
-            <div key={d.id} className="rounded-2xl border backdrop-blur-xl overflow-hidden transition-colors" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+            <div key={d.id} className="rounded-2xl border overflow-hidden" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
               {/* Header row */}
               <label className="flex items-start gap-3 p-3 cursor-pointer hover:bg-white/45 dark:hover:bg-white/5" onClick={() => setSelected(s => { const n = new Set(s); n.has(d.id) ? n.delete(d.id) : n.add(d.id); return n; })}>
                 <input type="checkbox" checked={selected.has(d.id)} onChange={() => {}} className="mt-0.5 rounded" />
