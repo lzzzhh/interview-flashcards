@@ -1,7 +1,7 @@
 // src/components/IngestPage.tsx — 资料制卡（文档上传）
 import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle, Loader2, ChevronRight, UploadCloud, ChevronDown } from 'lucide-react';
-import { API_BASE, longRequest } from '../api/client';
+import { API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
 import { loadCustomDecks } from '../utils/customDecks';
 
