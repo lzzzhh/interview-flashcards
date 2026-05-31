@@ -5,6 +5,7 @@ import { extractConcepts } from './document-concept-extractor';
 import { generateDrafts } from './document-draft-generator';
 import { matchConceptToGraph } from './document-graph-matcher';
 import { checkDuplicate, intraDocumentDedup } from './document-dedup';
+import { translateDrafts } from './document-translator';
 import type { ParsedDocument, DocumentChunk, ExtractedConceptData, CardDraftData, SourceRef } from './document-parser/types';
 
 // In-memory progress tracking (keyed by documentId)
@@ -258,6 +259,13 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
     } catch (e: any) {
       console.warn(`[document-pipeline] draft generation skipped for concept ${dbConcept.id}: ${e.message || e}`);
       continue;
+    }
+
+    // Translate English-predominant drafts to Chinese (excluding sourceRefs)
+    try {
+      drafts = await translateDrafts(drafts);
+    } catch (e: any) {
+      console.warn(`[document-pipeline] draft translation skipped: ${e.message || e}`);
     }
 
     for (const d of drafts) {
