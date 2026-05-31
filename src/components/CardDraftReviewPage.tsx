@@ -95,19 +95,25 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
     setProcessing(true);
     setMessage('');
     setDryRunResult(null);
+    const ids = [...selected];
+    const CHUNK = 200;
     try {
       if (action === 'import') {
         if (!selectedDeck) { setMessage('请先选择目标 deck'); setProcessing(false); return; }
-        const r = await batchImport([...selected], selectedDeck);
+        const r = await batchImport(ids.slice(0, 20), selectedDeck);
         setMessage(`导入完成: ${r.imported}/${r.results.length} 张`);
       } else if (action === 'dry-run') {
-        const r = await importDryRun([...selected]);
+        const r = await importDryRun(ids.slice(0, 50));
         setDryRunResult(r);
       } else {
-        const r = await batchReview([...selected], action, { deckId: selectedDeck || undefined, note: '批量操作' });
-        const ok = r.results.filter(x => x.status !== 'error').length;
-        const err = r.results.filter(x => x.status === 'error').length;
-        setMessage(`操作完成: ${ok} 成功, ${err} 失败`);
+        let totalOk = 0, totalErr = 0;
+        for (let i = 0; i < ids.length; i += CHUNK) {
+          const chunk = ids.slice(i, i + CHUNK);
+          const r = await batchReview(chunk, action, { deckId: selectedDeck || undefined, note: '批量操作' });
+          totalOk += r.results.filter(x => x.status !== 'error').length;
+          totalErr += r.results.filter(x => x.status === 'error').length;
+        }
+        setMessage(`操作完成: ${totalOk} 成功, ${totalErr} 失败`);
       }
       setSelected(new Set());
       await load();

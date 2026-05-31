@@ -505,7 +505,7 @@ export async function documentRoutes(app: FastifyInstance) {
   // POST /api/card-drafts/batch-review — batch review action
   app.post('/api/card-drafts/batch-review', async (req, reply) => {
     const BatchReviewSchema = z.object({
-      draftIds: z.array(z.string()).min(1).max(200),
+      draftIds: z.array(z.string()).min(1).max(500),
       action: z.enum(['approve', 'edit', 'reject', 'mark_duplicate', 'mark_out_of_scope', 'merge', 'keep_both', 'keep_best']),
       deckId: z.string().optional(),
       note: z.string().optional(),
