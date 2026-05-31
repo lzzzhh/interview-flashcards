@@ -145,34 +145,13 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     try {
       setStatus('parsing');
       const formData = new FormData();
-      if (droppedFile && (droppedFile as any).path) {
-        // Tauri mode: send path to backend for direct file read
-        const ext = filePath.split('.').pop()?.toLowerCase() || '';
-        const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
-        const data = await fetchJson(`${API_BASE}/ingest/documents`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filePath: (droppedFile as any).path, fileType: typeMap[ext] || 'txt', targetDeckId }),
-        });
-        setResult(data.status === 'processing' ? await waitForProcessing(data) : data);
-      } else if (droppedFile) {
-        // Browser mode: multipart upload
-        formData.append('targetDeckId', targetDeckId);
-        formData.append('file', droppedFile);
-        const data = await fetchJson(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
-        setResult(data.status === 'processing'
-          ? await waitForProcessing(data)
-          : { sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.chunkCount || 0, fullTextLength: data.fullTextLength || 0, warnings: [], draftCount: data.draftCount || 0 });
-      } else {
-        // Fallback: path-based (development mode)
-        const ext = filePath.split('.').pop()?.toLowerCase() || '';
-        const typeMap: Record<string, string> = { pdf: 'pdf', docx: 'docx', doc: 'docx', txt: 'txt', md: 'md' };
-        const ft = typeMap[ext] || 'txt';
-        const data = await fetchJson(`${API_BASE}/ingest/documents`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filePath, fileType: ft, targetDeckId }),
-        });
-        setResult(data.status === 'processing' ? await waitForProcessing(data) : data);
-      }
+      formData.append('targetDeckId', targetDeckId);
+      formData.append('file', droppedFile!);
+      const data = await fetchJson(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
+      const result = data.status === 'processing'
+        ? await waitForProcessing(data)
+        : { sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.chunkCount || 0, fullTextLength: data.fullTextLength || 0, warnings: [], draftCount: data.draftCount || 0 };
+      setResult(result);
       setStatus('done');
     } catch (err: any) {
       setError(err.message || '上传失败');
