@@ -14,20 +14,35 @@ const EXTRACTION_PROMPT = `你是知识卡片生成系统的概念抽取器。
 - 如果概念只是随口提到，不要抽为主概念。
 - 每个概念必须给出 sourceRefs（直接用 chunk 中的 sourceRefs 片段）。
 
-输出 JSON：
+语言要求：
+- conceptName 如果是公认英文技术名词，保留英文原名，例如 XGBoost、K-Means、Transformer、RAG。
+- definition、keyPoints、examples、prerequisites、commonConfusions 使用简体中文。
+- candidateTags 使用中文标签为主，同时保留关键英文术语标签。
+- 把专有技术名词、算法名、模型名保留英文，不要硬翻译成生硬中文。
+- sourceRefs.quote 保留原文，不要翻译。
+
+术语保留规则：
+以下类型必须保留英文：
+1. 全大写缩写：SQL、AUC、ROC、GPU、API、MLE、PCA、SVM、RAG、RLHF、BERT、GPT
+2. 含数字或符号的技术词：BERT-base、GPT-4、L2、top-k、n-1、λ
+3. 算法/模型/库名：XGBoost、K-Means、LightGBM、PyTorch、TensorFlow
+4. 英文专有名词短语：Random Forest、Gradient Boosting、Support Vector Machine
+可以补中文解释，但不要替换英文名称。
+
+输出 JSON 示例：
 {
   "concepts": [
     {
-      "conceptName": "概念名称",
-      "definition": "定义",
-      "keyPoints": ["要点1", "要点2"],
-      "examples": ["例子1"],
-      "formulas": ["公式1"],
-      "prerequisites": ["前置知识"],
-      "commonConfusions": ["常见混淆"],
-      "candidateTags": ["标签1"],
-      "confidence": 0.0-1.0,
-      "sourceRefs": [{"quote": "原文片段"}]
+      "conceptName": "XGBoost",
+      "definition": "XGBoost 是一种基于梯度提升树的集成学习算法，通过加入正则化和二阶泰勒展开来提升精度和速度。",
+      "keyPoints": ["基于 Gradient Boosting 框架", "使用正则化防止过拟合", "支持自定义损失函数"],
+      "examples": ["在 Kaggle 竞赛中被广泛使用"],
+      "formulas": [],
+      "prerequisites": ["决策树", "集成学习", "梯度下降"],
+      "commonConfusions": ["XGBoost 不是深度学习模型，是基于树的集成方法"],
+      "candidateTags": ["机器学习", "集成学习", "XGBoost", "boosting"],
+      "confidence": 0.9,
+      "sourceRefs": [{"quote": "原文英文片段"}]
     }
   ]
 }`;
