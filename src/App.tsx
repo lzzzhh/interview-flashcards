@@ -29,7 +29,7 @@ import ResumeProjectPage from './components/ResumeProjectPage';
 import LearningPlanListPage from './components/LearningPlanListPage';
 import LearningPlanDetailPage from './components/LearningPlanDetailPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import type { Category, FlashCard } from './types';
+import type { FlashCard } from './types';
 
 function StudyPage({ onBack }: { onBack: () => void }) {
   const { state, dispatch, currentCard, totalNew, dueCountByCategory } = useAppContext();
