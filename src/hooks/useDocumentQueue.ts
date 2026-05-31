@@ -4,7 +4,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { API_BASE } from '../api/client';
 
-export interface QueueItem {
+async function getDraftCount(docId: string): Promise<number> {
+  try {
+    const res = await fetch(`${API_BASE}/documents/${docId}/drafts`);
+    const drafts = await res.json();
+    return Array.isArray(drafts) ? drafts.length : 0;
+  } catch { return -1; }
+}
   docId: string;
   filename: string;
   status: 'processing' | 'done' | 'failed';
@@ -133,6 +139,22 @@ export function useDocumentQueue() {
 
   useEffect(() => {
     items = loadFromStorage();
+    // Clean stale queue items (documents whose drafts have been deleted)
+    const checkStale = async () => {
+      const stale: string[] = [];
+      for (const item of items) {
+        if (item.status === 'done') {
+          const fresh = await getDraftCount(item.docId);
+          if (fresh === 0) stale.push(item.docId);
+        }
+      }
+      if (stale.length > 0) {
+        items = items.filter(i => !stale.includes(i.docId));
+        notify();
+      }
+    };
+    checkStale();
+
     // Resume polling for any still-processing items
     if (items.some(i => i.status === 'processing')) {
       startPolling();
