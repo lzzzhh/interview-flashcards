@@ -18,7 +18,7 @@ const AGENTS = [
 ];
 
 export default function AgentHubPage({ onBack, onNavigate }: Props) {
-  const { processingCount, doneCount, pendingDraftCount } = useDocumentQueue();
+  const { processingCount, pendingDraftCount } = useDocumentQueue();
 
   function handleAgentClick(agent: typeof AGENTS[0]) {
     onNavigate(agent.key);
@@ -62,14 +62,14 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
                   borderColor: CARD_BORDER,
                 }}
               >
-                {(agent.key === 'ingest' && (processingCount > 0 || pendingDraftCount > 0)) && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 z-10">
-                    {pendingDraftCount > 0 ? pendingDraftCount : processingCount}
+                {(agent.key === 'ingest' && processingCount > 0) && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center px-1 z-10">
+                    {processingCount}
                   </span>
                 )}
-                {(agent.key === 'drafts' && doneCount > 0) && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-green-500 text-white text-[10px] font-bold flex items-center justify-center px-1 z-10">
-                    {doneCount}
+                {(agent.key === 'drafts' && pendingDraftCount > 0) && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center px-1 z-10">
+                    {pendingDraftCount}
                   </span>
                 )}
                 <div

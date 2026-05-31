@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { ArrowLeft, Check, X, Merge, Layers, Eye, Loader2, Search, Undo2, ChevronDown } from 'lucide-react';
-import { getDrafts, batchReview, batchImport, importDryRun, approveDraft, rejectDraft, getDecks } from '../api/documents';
+import { ArrowLeft, Check, X, Merge, Layers, Eye, Loader2, Search, Undo2, ChevronDown, Edit3, Save } from 'lucide-react';
+import { getDrafts, batchReview, batchImport, importDryRun, approveDraft, rejectDraft, getDecks, patchDraft } from '../api/documents';
 import { loadCustomDecks } from '../utils/customDecks';
+import { useDocumentQueue } from '../hooks/useDocumentQueue';
 import type { CardDraftDTO } from '../api/documents';
 
 interface Props {
@@ -50,6 +51,7 @@ let undoStack: { id: string; prevStatus: string } | null = null;
 
 export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: Props) {
   const [allDrafts, setAllDrafts] = useState<CardDraftDTO[]>([]);
+  const { refreshDraftCounts, refreshDraftCountForDoc } = useDocumentQueue();
   const [decks, setDecks] = useState<{ id: string; name: string }[]>([]);
   const [selectedDeck, setSelectedDeck] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -65,6 +67,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
   const [sortByConfidence, setSortByConfidence] = useState(false);
   const [approveResult, setApproveResult] = useState<{ count: number; deckId: string } | null>(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [editingDraft, setEditingDraft] = useState<{ id: string; question: string; answer: string; tags: string } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -78,11 +81,13 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
       const fileDecks = loadCustomDecks().map(d => ({ id: d.id, name: d.name }));
       const merged = [...dk, ...fileDecks.filter(f => !dk.find(d2 => d2.id === f.id))];
       setDecks(merged);
-      // Default deck from first draft with deckId
       if (!selectedDeck) {
         const first = d.find(dr => dr.deckId);
         if (first?.deckId) setSelectedDeck(first.deckId);
       }
+      // Refresh queue draft counts (stale after review actions)
+      if (documentId) refreshDraftCountForDoc(documentId);
+      else refreshDraftCounts();
     } catch (e: any) {
       setAllDrafts([]);
       setDecks([]);
@@ -90,7 +95,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
     } finally {
       setLoading(false);
     }
-  }, [documentId, tab, selectedDeck]);
+  }, [documentId, tab, selectedDeck, refreshDraftCounts, refreshDraftCountForDoc]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -139,8 +144,21 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
     try {
       if (action === 'import') {
         if (!selectedDeck) { setMessage('请先选择目标 deck'); setProcessing(false); return; }
-        const r = await batchImport(ids.slice(0, 20), selectedDeck);
-        setMessage(`导入完成: ${r.imported}/${r.results.length} 张`);
+        const BATCH_SIZE = 20;
+        let totalImported = 0;
+        let totalResults = 0;
+        for (let i = 0; i < ids.length; i += BATCH_SIZE) {
+          const chunk = ids.slice(i, i + BATCH_SIZE);
+          setBatchProgress(`导入中 ${totalImported + 1}-${Math.min(i + BATCH_SIZE, ids.length)}/${ids.length}...`);
+          const r = await batchImport(chunk, selectedDeck);
+          totalImported += r.imported;
+          totalResults += r.results.length;
+        }
+        setBatchProgress('');
+        setMessage(`导入完成: ${totalImported}/${totalResults} 张`);
+        if (totalImported > 0 && selectedDeck) {
+          setApproveResult({ count: totalImported, deckId: selectedDeck });
+        }
       } else if (action === 'dry-run') {
         const r = await importDryRun(ids.slice(0, 50), selectedDeck || undefined);
         setDryRunResult(r);
@@ -189,6 +207,24 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
       setMessage('操作完成');
       await load();
     } catch (e: any) { setMessage(`错误: ${e.message}`); }
+    setProcessing(false);
+  }
+
+  async function handleEditSave() {
+    if (!editingDraft || !selectedDeck) return;
+    setProcessing(true);
+    try {
+      const tags = editingDraft.tags.split(',').map(t => t.trim()).filter(Boolean);
+      await patchDraft(editingDraft.id, {
+        question: editingDraft.question,
+        answer: editingDraft.answer,
+        tags,
+      });
+      await approveDraft(editingDraft.id, selectedDeck);
+      setEditingDraft(null);
+      setMessage('已保存并导入');
+      await load();
+    } catch (e: any) { setMessage(`编辑失败: ${e.message}`); }
     setProcessing(false);
   }
 
@@ -367,15 +403,25 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
           <div className="px-5 mb-2">
             <div className="rounded-2xl border p-3 text-[12px]"
               style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.3)' }}>
-              <span style={{ color: '#22C55E' }}>✓ 已导入 {approveResult.count} 张卡片到 {decks.find(d => d.id === approveResult.deckId)?.name || approveResult.deckId}</span>
+              <div className="flex items-center gap-2 mb-2">
+                <span style={{ color: '#22C55E' }}>✓ 已导入 {approveResult.count} 张卡片到 {decks.find(d => d.id === approveResult.deckId)?.name || approveResult.deckId}</span>
+                <button onClick={() => setApproveResult(null)}
+                  className="text-[10px]" style={{ color: TEXT_MUTED }}>关闭</button>
+              </div>
               {onNavigate && (
-                <button onClick={() => onNavigate(`deck:${approveResult.deckId}`)}
-                  className="ml-2 text-[11px] font-medium underline" style={{ color: BLUE }}>
-                  查看牌组
-                </button>
+                <div className="flex gap-2">
+                  <button onClick={() => onNavigate(`deck:${approveResult.deckId}:new`)}
+                    className="px-3 py-1.5 rounded-xl text-[11px] font-medium text-white"
+                    style={{ backgroundColor: BLUE }}>
+                    开始学习新卡
+                  </button>
+                  <button onClick={() => onNavigate(`deck:${approveResult.deckId}`)}
+                    className="px-3 py-1.5 rounded-xl text-[11px] font-medium border"
+                    style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}>
+                    查看牌组
+                  </button>
+                </div>
               )}
-              <button onClick={() => setApproveResult(null)}
-                className="ml-2 text-[11px]" style={{ color: TEXT_MUTED }}>关闭</button>
             </div>
           </div>
         )}
@@ -521,6 +567,46 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
                     {expanded === d.id && (
                       <div className="px-3 pb-3 pt-0 space-y-3 text-[12px]"
                         style={{ borderTop: '1px solid var(--card-border)' }}>
+                        {editingDraft?.id === d.id ? (
+                          <>
+                            <div className="pt-3">
+                              <div className="text-[10px] font-semibold uppercase tracking-wide mb-1" style={{ color: TEXT_MUTED }}>Question</div>
+                              <textarea value={editingDraft.question}
+                                onChange={e => setEditingDraft({ ...editingDraft, question: e.target.value })}
+                                className="w-full rounded-lg border px-2.5 py-2 text-[12px] bg-transparent resize-none"
+                                style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}
+                                rows={3} />
+                            </div>
+                            <div>
+                              <div className="text-[10px] font-semibold uppercase tracking-wide mb-1" style={{ color: TEXT_MUTED }}>Answer</div>
+                              <textarea value={editingDraft.answer}
+                                onChange={e => setEditingDraft({ ...editingDraft, answer: e.target.value })}
+                                className="w-full rounded-lg border px-2.5 py-2 text-[12px] bg-transparent resize-none"
+                                style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}
+                                rows={5} />
+                            </div>
+                            <div>
+                              <div className="text-[10px] font-semibold uppercase tracking-wide mb-1" style={{ color: TEXT_MUTED }}>Tags (逗号分隔)</div>
+                              <input value={editingDraft.tags}
+                                onChange={e => setEditingDraft({ ...editingDraft, tags: e.target.value })}
+                                className="w-full rounded-lg border px-2.5 py-2 text-[12px] bg-transparent"
+                                style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }} />
+                            </div>
+                            <div className="flex gap-1 flex-wrap pt-1">
+                              <button onClick={handleEditSave} disabled={processing || !selectedDeck}
+                                className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-white"
+                                style={{ backgroundColor: '#22C55E', opacity: processing || !selectedDeck ? 0.4 : 1 }}>
+                                <Save size={12} className="inline mr-1" />保存并通过
+                              </button>
+                              <button onClick={() => setEditingDraft(null)}
+                                className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium border"
+                                style={{ borderColor: CARD_BORDER, color: TEXT_MUTED }}>
+                                取消
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
                         <div className="pt-3">
                           <div className="text-[10px] font-semibold uppercase tracking-wide mb-1" style={{ color: TEXT_MUTED }}>Answer</div>
                           <div className="leading-relaxed whitespace-pre-wrap" style={{ color: TEXT_PRIMARY, opacity: 0.88 }}>{d.answer}</div>
@@ -566,6 +652,13 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
                         )}
 
                         <div className="flex gap-1 flex-wrap pt-1">
+                          <button onClick={() => {
+                            setEditingDraft({ id: d.id, question: d.question, answer: d.answer, tags: d.tags.join(', ') });
+                          }}
+                            className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-white"
+                            style={{ backgroundColor: ORANGE }}>
+                            <Edit3 size={12} className="inline mr-1" />编辑
+                          </button>
                           <button onClick={() => handleSingle(d.id, 'approve')}
                             className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-white"
                             style={{ backgroundColor: BLUE }}>
@@ -587,6 +680,8 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
                             标记重复
                           </button>
                         </div>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>

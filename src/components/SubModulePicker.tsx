@@ -194,6 +194,7 @@ export default function SubModulePicker({ onBack }: Props) {
   };
 
   const handleReviewAll = () => dispatch({ type: 'SET_STUDY_MODE', payload: 'review' });
+  const handleNewAll = () => dispatch({ type: 'SET_STUDY_MODE', payload: 'new' });
   const moduleDue = dueCountByCategory[category] ?? 0;
   const totalNewCards = Object.values(state.cardsById).filter(c => !c.sm2.state || c.sm2.state === 'new').length;
   const totalCards = Object.keys(state.cardsById).length;
@@ -208,6 +209,7 @@ export default function SubModulePicker({ onBack }: Props) {
         topics={topics}
         onBack={onBack}
         onStartReview={handleReviewAll}
+        onStartNewCards={handleNewAll}
         onTopicClick={handleStudyNew}
         onOpenCardManager={() => setShowBrowser(true)}
         onCreateTopic={() => setShowCreate(true)}

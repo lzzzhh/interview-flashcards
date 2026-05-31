@@ -701,6 +701,13 @@ export async function documentRoutes(app: FastifyInstance) {
     return progress;
   });
 
+  // POST /api/documents/:id/cancel — cancel pipeline processing
+  app.post('/api/documents/:id/cancel', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    cancelPipeline(id);
+    return { cancelled: true };
+  });
+
   // DELETE /api/documents/:id
   app.delete('/api/documents/:id', async (req) => {
     const { id } = req.params as { id: string };

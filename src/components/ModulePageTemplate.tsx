@@ -20,6 +20,7 @@ interface Props {
   topics: ModuleTopicCardModel[];
   onBack: () => void;
   onStartReview: () => void;
+  onStartNewCards?: () => void;
   onTopicClick: (topic: ModuleTopicCardModel) => void;
   onOpenCardManager?: () => void;
   onCreateTopic?: () => void;
@@ -37,7 +38,7 @@ const CARD_BORDER = 'var(--card-border)';
 
 export default function ModulePageTemplate({
   categoryLabel, moduleDue, totalNewCards, totalCards, topics,
-  onBack, onStartReview, onTopicClick, onOpenCardManager, onCreateTopic, onDeleteTopic, onEnterDeleteMode, deleteMode,
+  onBack, onStartReview, onStartNewCards, onTopicClick, onOpenCardManager, onCreateTopic, onDeleteTopic, onEnterDeleteMode, deleteMode,
 }: Props) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -95,13 +96,24 @@ export default function ModulePageTemplate({
             <StatBlock label="新卡" value={totalNewCards} color={BLUE} />
             <StatBlock label="总卡片" value={totalCards} color="#CBD5E1" />
           </div>
-          <button
-            onClick={onStartReview}
-            className="w-full py-1 rounded-xl text-[14px] font-bold text-white"
-            style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
-          >
-            开始复习
-          </button>
+          <div className="flex gap-2">
+            {onStartNewCards && (
+              <button
+                onClick={onStartNewCards}
+                className="flex-1 py-1 rounded-xl text-[14px] font-bold text-white"
+                style={{ background: `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
+              >
+                开始学习新卡
+              </button>
+            )}
+            <button
+              onClick={onStartReview}
+              className="flex-1 py-1 rounded-xl text-[14px] font-bold text-white"
+              style={{ background: onStartNewCards ? `linear-gradient(135deg, ${ORANGE}, #EA580C)` : `linear-gradient(135deg, ${BLUE}, #2563EB)` }}
+            >
+              开始复习
+            </button>
+          </div>
         </div>
 
         {/* Delete Banner */}

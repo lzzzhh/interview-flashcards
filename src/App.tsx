@@ -125,14 +125,20 @@ function AppInner() {
     if (cardId) dispatch({ type: 'JUMP_TO_CARD', payload: { category, cardId } });
   }, [dispatch]);
 
-  // Handle deck:xxx navigation as side effect (avoids returning null content)
+  // Handle deck:xxx and deck:xxx:new navigation as side effect
   useEffect(() => {
     if (agentPage?.startsWith('deck:')) {
-      const deckId = agentPage.slice(5);
+      const rest = agentPage.slice(5);
+      const parts = rest.split(':');
+      const deckId = parts[0];
+      const startNew = parts[1] === 'new';
       setAgentPage(null);
       handleEnterStudy(deckId, undefined, { exitOnBack: true });
+      if (startNew) {
+        dispatch({ type: 'SET_STUDY_MODE', payload: 'new' });
+      }
     }
-  }, [agentPage, handleEnterStudy]);
+  }, [agentPage, handleEnterStudy, dispatch]);
 
   // Compute content — avoid early returns so ProcessingBadge renders globally
   let content: React.ReactNode = null;

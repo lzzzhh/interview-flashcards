@@ -4,11 +4,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { API_BASE } from '../api/client';
 
+const PENDING_STATUSES = ['draft', 'needs_review', 'duplicate'];
+
 async function getDraftCount(docId: string): Promise<number> {
   try {
     const res = await fetch(`${API_BASE}/documents/${docId}/drafts`);
     const drafts = await res.json();
-    return Array.isArray(drafts) ? drafts.length : 0;
+    if (!Array.isArray(drafts)) return 0;
+    return drafts.filter((d: any) => PENDING_STATUSES.includes(d.status)).length;
   } catch { return -1; }
 }
 
@@ -62,19 +65,22 @@ async function pollProgress(docId: string) {
     item.progress = progress.step && progress.total ? Math.round((progress.step / progress.total) * 100) : item.progress;
     item.message = progress.message || item.message;
 
-    if (progress.stage === 'failed') {
+    if (progress.stage === 'failed' || progress.stage === 'cancelled') {
       item.status = 'failed';
-      item.message = progress.message || '处理失败';
+      item.message = progress.message || (progress.stage === 'cancelled' ? '已取消' : '处理失败');
       notify();
       return;
     }
 
     if (progress.stage === 'done') {
-      // Fetch draft count
       try {
         const draftsRes = await fetch(`${API_BASE}/documents/${docId}/drafts`);
         const drafts = await draftsRes.json();
-        item.draftCount = Array.isArray(drafts) ? drafts.length : 0;
+        if (Array.isArray(drafts)) {
+          item.draftCount = drafts.filter((d: any) => PENDING_STATUSES.includes(d.status)).length;
+        } else {
+          item.draftCount = 0;
+        }
       } catch { item.draftCount = 0; }
       item.status = 'done';
       item.progress = 100;
@@ -134,6 +140,23 @@ function clearQueue() {
   stopPolling();
 }
 
+async function refreshDraftCounts() {
+  for (const item of items) {
+    if (item.status === 'done') {
+      const count = await getDraftCount(item.docId);
+      item.draftCount = count;
+    }
+  }
+  notify();
+}
+
+async function refreshDraftCountForDoc(docId: string) {
+  const item = items.find(i => i.docId === docId);
+  if (!item || item.status !== 'done') return;
+  item.draftCount = await getDraftCount(docId);
+  notify();
+}
+
 // ── Hook ──
 
 export function useDocumentQueue() {
@@ -180,5 +203,7 @@ export function useDocumentQueue() {
     addToQueue: useCallback(addToQueue, []),
     removeFromQueue: useCallback(removeFromQueue, []),
     clearQueue: useCallback(clearQueue, []),
+    refreshDraftCounts: useCallback(refreshDraftCounts, []),
+    refreshDraftCountForDoc: useCallback(refreshDraftCountForDoc, []),
   };
 }

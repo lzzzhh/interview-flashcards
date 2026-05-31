@@ -27,7 +27,7 @@ const TEXT_MUTED = 'var(--text-muted)';
 const CARD_BG = 'var(--card-bg)';
 const CARD_BORDER = 'var(--card-border)';
 const ACCENT = '#10B981';
-const ACCEPTED_TYPES = '.pdf,.docx,.doc,.txt,.md';
+const ACCEPTED_TYPES = '.pdf,.txt,.md';
 
 export default function IngestPage({ onBack, onNavigate }: Props) {
   const [filePath, setFilePath] = useState('');
@@ -118,7 +118,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
 
   const handleFileDrop = (file: File) => {
     const ext = file.name.split('.').pop()?.toLowerCase() || '';
-    if (!['pdf', 'docx', 'doc', 'txt', 'md'].includes(ext)) {
+    if (!['pdf', 'txt', 'md'].includes(ext)) {
       setError(`不支持的格式 .${ext}`);
       setStatus('error');
       return;
@@ -146,7 +146,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
       <div className="flex-1 flex items-start justify-center">
         <div className="relative z-10 w-full max-w-md px-5 py-6 pb-24 space-y-4">
           <div className="rounded-xl p-3 border text-[13px]" style={{ backgroundColor: `${ACCENT}10`, borderColor: `${ACCENT}30`, color: TEXT_MUTED }}>
-            上传 PDF、Word、TXT 或 Markdown 文档，AI 将自动提取知识点并生成复习卡片。
+            上传 PDF、TXT 或 Markdown 文档，AI 将自动提取知识点并生成复习卡片。
           </div>
 
           {!isDone && (
@@ -171,7 +171,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 ) : (
                   <>
                     <p className="text-[13px] font-medium" style={{ color: TEXT_PRIMARY }}>拖拽文件到此处</p>
-                    <p className="text-[11px]" style={{ color: TEXT_MUTED }}>或点击选择 · 支持 PDF / Word / TXT / MD</p>
+                    <p className="text-[11px]" style={{ color: TEXT_MUTED }}>或点击选择 · 支持 PDF / TXT / MD</p>
                   </>
                 )}
                 <input ref={fileInputRef} type="file" accept={ACCEPTED_TYPES} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileDrop(f); }} className="hidden" />
@@ -239,14 +239,9 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
               )}
 
               {status === 'queued' && (
-                <div className="rounded-xl p-3 border flex flex-col gap-2 text-[13px]" style={{ borderColor: `${ACCENT}40`, backgroundColor: `${ACCENT}10` }}>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" style={{ color: ACCENT }} />
-                    <span style={{ color: TEXT_PRIMARY }}>已加入后台队列，可在右上角查看进度</span>
-                  </div>
-                  <button onClick={() => onNavigate('drafts')} className="self-start text-[12px] font-medium underline" style={{ color: ACCENT }}>
-                    查看草稿
-                  </button>
+                <div className="rounded-xl p-3 border flex items-center gap-2 text-[13px]" style={{ borderColor: `${ACCENT}40`, backgroundColor: `${ACCENT}10` }}>
+                  <CheckCircle className="w-4 h-4" style={{ color: ACCENT }} />
+                  <span style={{ color: TEXT_PRIMARY }}>已加入后台队列，可继续上传</span>
                 </div>
               )}
             </>
