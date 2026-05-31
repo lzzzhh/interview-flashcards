@@ -116,7 +116,7 @@ function AppInner() {
   const [agentPage, setAgentPage] = useState<string | null>(null);
   const { dispatch } = useAppContext();
   const handleEnterStudy = useCallback(async (category: string, cardId?: string) => {
-    setStudyCategory(category); setShowDecks(false);
+    setStudyCategory(category); setShowDecks(false); setShowSearch(false); setShowProfile(false); setShowStats(false);
     dispatch({ type: 'SET_CATEGORY', payload: category });
     dispatch({ type: 'SET_API_SOURCE', payload: false });
     if (cardId) dispatch({ type: 'JUMP_TO_CARD', payload: { category, cardId } });
