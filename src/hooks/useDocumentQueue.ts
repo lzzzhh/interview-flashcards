@@ -11,6 +11,8 @@ async function getDraftCount(docId: string): Promise<number> {
     return Array.isArray(drafts) ? drafts.length : 0;
   } catch { return -1; }
 }
+
+export interface QueueItem {
   docId: string;
   filename: string;
   status: 'processing' | 'done' | 'failed';
