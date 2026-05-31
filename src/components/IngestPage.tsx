@@ -33,7 +33,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   const [filePath, setFilePath] = useState('');
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [targetDeckId, setTargetDeckId] = useState('statistics');
-  const [status, setStatus] = useState<'idle' | 'uploading' | 'parsing' | 'done' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'uploading' | 'parsing' | 'queued' | 'done' | 'error'>('idle');
   const [result, setResult] = useState<IngestResult | null>(null);
   const [error, setError] = useState('');
   const [progressMessage, setProgressMessage] = useState('');
@@ -103,17 +103,8 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
       addToQueue(docId, data.filename || droppedFile!.name || filePath);
       setFilePath('');
       setDroppedFile(null);
-      setStatus('done');
-      setResult({
-        sourceId: docId,
-        fileName: data.filename || droppedFile!.name || filePath,
-        sourceType: 'pdf',
-        chunkCount: 0,
-        fullTextLength: 0,
-        warnings: [],
-        draftCount: 0,
-      });
-      setProgressMessage('已加入后台队列，可继续上传文件');
+      setStatus('queued');
+      setProgressMessage('');
     } catch (err: any) {
       setError(err.message || '上传失败');
       setStatus('error');
@@ -245,6 +236,18 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
 
               {(status === 'uploading' || status === 'parsing') && progressMessage && (
                 <div className="text-center text-[12px]" style={{ color: TEXT_MUTED }}>{progressMessage}</div>
+              )}
+
+              {status === 'queued' && (
+                <div className="rounded-xl p-3 border flex flex-col gap-2 text-[13px]" style={{ borderColor: `${ACCENT}40`, backgroundColor: `${ACCENT}10` }}>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" style={{ color: ACCENT }} />
+                    <span style={{ color: TEXT_PRIMARY }}>已加入后台队列，可在右上角查看进度</span>
+                  </div>
+                  <button onClick={() => onNavigate('drafts')} className="self-start text-[12px] font-medium underline" style={{ color: ACCENT }}>
+                    查看草稿
+                  </button>
+                </div>
               )}
             </>
           )}
