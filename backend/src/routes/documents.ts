@@ -287,7 +287,24 @@ export async function documentRoutes(app: FastifyInstance) {
     return formatDraft(updated);
   });
 
-  // POST /api/card-drafts/:id/approve — approve for import
+  async function ensureDeckExists(deckId: string, deckName?: string) {
+  const existing = await prisma.deck.findUnique({ where: { id: deckId } });
+  if (!existing) {
+    const maxOrder = await prisma.deck.aggregate({ _max: { sortOrder: true } });
+    await prisma.deck.create({
+      data: {
+        id: deckId,
+        name: deckName || deckId,
+        type: 'custom',
+        icon: 'FileText',
+        sortOrder: (maxOrder._max.sortOrder ?? 0) + 1,
+      },
+    });
+    console.log(`[documentRoutes] Created deck "${deckId}"`);
+  }
+}
+
+// POST /api/card-drafts/:id/approve — approve for import
   app.post('/api/card-drafts/:id/approve', async (req, reply) => {
     const { id } = req.params as { id: string };
     const draft = await prisma.cardDraft.findUnique({ where: { id } });
@@ -326,6 +343,8 @@ export async function documentRoutes(app: FastifyInstance) {
         });
       }
     }
+
+    await ensureDeckExists(deckId);
 
     const cardId = `draft_${id}`;
     await prisma.card.create({
@@ -482,6 +501,8 @@ export async function documentRoutes(app: FastifyInstance) {
           if (gp.length > 1) { results.push({ id, status: 'error', error: 'dup group unresolved' }); continue; }
         }
 
+        await ensureDeckExists(deckId);
+
         const cardId = `draft_${id}`;
         await prisma.card.create({
           data: {
@@ -542,6 +563,8 @@ export async function documentRoutes(app: FastifyInstance) {
             if (['possible_duplicate', 'exact_duplicate', 'semantic_duplicate'].includes(dupCheck?.status)) {
               results.push({ id, status: 'error', error: `Duplicate unresolved: ${dupCheck?.status}` }); continue;
             }
+
+            await ensureDeckExists(targetDeck);
 
             const cardId = `draft_${id}`;
             await prisma.card.create({
