@@ -162,23 +162,23 @@ function AppInner() {
     else if (agentPage === 'resume-project') content = <ResumeProjectPage onBack={() => setAgentPage(null)} />;
     else content = <AgentHubPage onBack={() => setShowSearch(false)} onNavigate={setAgentPage} />;
   } else {
-    content = (
-      <>
-        <div className={studyCategory ? 'hidden' : ''}>
-          <HomePage onEnterStudy={handleEnterStudy} onShowDecks={() => setShowDecks(true)} onShowStats={() => setShowStats(true)} onShowProfile={() => setShowProfile(true)} onShowSearch={() => setShowSearch(true)} />
-        </div>
-        {studyCategory && (
-          <div className="page-enter" key={studyCategory}>
-            <StudyPage onBack={() => { dispatch({ type: 'STOP_PLAN_STUDY' }); setStudyCategory(null); }} />
+      content = (
+        <>
+          <div className={studyCategory ? 'hidden' : ''}>
+            <HomePage onEnterStudy={handleEnterStudy} onShowDecks={() => setShowDecks(true)} onShowStats={() => setShowStats(true)} onShowProfile={() => setShowProfile(true)} onShowSearch={() => setShowSearch(true)} />
           </div>
-        )}
-      </>
-    );
+        </>
+      );
   }
 
   return (
     <>
       {content}
+      {studyCategory && (
+        <div className="fixed inset-0 z-50 page-enter" key={studyCategory}>
+          <StudyPage onBack={() => { dispatch({ type: 'STOP_PLAN_STUDY' }); setStudyCategory(null); }} />
+        </div>
+      )}
       <ProcessingBadge onViewDrafts={(docId: string) => {
         setShowSearch(true);
         setAgentPage(`drafts:${docId}`);
