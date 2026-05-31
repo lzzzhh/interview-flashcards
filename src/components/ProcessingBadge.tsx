@@ -18,6 +18,8 @@ async function cancelOnServer(docId: string) {
     await fetch(`${API_BASE}/documents/${docId}/cancel`, { method: 'POST' });
   } catch {}
 }
+
+export default function ProcessingBadge({ onViewDrafts }: Props) {
   const { items, processingCount, doneCount, removeFromQueue, clearQueue } = useDocumentQueue();
   const [open, setOpen] = useState(false);
 
