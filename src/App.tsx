@@ -149,8 +149,14 @@ function AppInner() {
   if (showSearch) {
     if (agentPage === 'search') return <AISearchPage onBack={() => setAgentPage(null)} onEnterStudy={handleEnterStudy} />;
     if (agentPage === 'ingest') return <IngestPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
-    if (agentPage === 'drafts') return <CardDraftReviewPage onBack={() => setAgentPage(null)} />;
-    if (agentPage?.startsWith('drafts:')) return <CardDraftReviewPage onBack={() => setAgentPage(null)} documentId={agentPage.slice(7)} />;
+    if (agentPage === 'drafts') return <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
+    if (agentPage?.startsWith('drafts:')) return <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} documentId={agentPage.slice(7)} />;
+    if (agentPage?.startsWith('deck:')) {
+      const deckId = agentPage.slice(5);
+      // Navigate to study that deck
+      handleEnterStudy(deckId);
+      return null;
+    }
     if (agentPage === 'jobprep') return <JobPrepPage onBack={() => setAgentPage(null)} />;
     if (agentPage === 'mock-interview') return <MockInterviewPage onBack={() => setAgentPage(null)} />;
     if (agentPage === 'resume-project') return <ResumeProjectPage onBack={() => setAgentPage(null)} />;
