@@ -64,7 +64,6 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortByConfidence, setSortByConfidence] = useState(false);
   const [approveResult, setApproveResult] = useState<{ count: number; deckId: string } | null>(null);
-  const [undoLabel, setUndoLabel] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const load = useCallback(async () => {
@@ -178,13 +177,13 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
         const deck = selectedDeck || draft?.deckId;
         if (!deck) { setMessage('请先选择目标 deck'); setProcessing(false); return; }
         await approveDraft(id, deck);
-        setUndoLabel('已通过，可撤销');
+        setMessage('操作完成（可撤销）');
       } else if (action === 'reject') {
         await rejectDraft(id);
-        setUndoLabel('已拒绝，可撤销');
+        setMessage('操作完成（可撤销）');
       } else {
         await batchReview([id], action, { note: '单张操作' });
-        setUndoLabel('');
+        setMessage('操作完成');
       }
       setMessage('操作完成');
       await load();
@@ -196,20 +195,21 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
     if (!undoStack) return;
     setProcessing(true);
     const { id, prevStatus } = undoStack;
-    approveDraft(id, prevStatus === 'approved' ? 'DUMMY' : '').then(async () => {
-      // Restore via batch-review
-      await batchReview([id], prevStatus === 'rejected' ? 'UNDO' as any : 'UNDO' as any, { note: '撤销' });
-      undoStack = null;
-      setUndoLabel('');
-      setMessage('已撤销');
-      await load();
-      setProcessing(false);
-    }).catch(() => {
-      // Fallback: just reload
-      setUndoLabel('');
-      setProcessing(false);
-      load();
-    });
+    // Restore previous status by directly using the batch-review endpoint
+    batchReview([id], 'UNDO_RESTORE' as any, { note: `Undo to ${prevStatus}` })
+      .then(async () => {
+        undoStack = null;
+        setMessage('已撤销');
+        await load();
+        setProcessing(false);
+      })
+      .catch(async () => {
+        // Reload as fallback
+        undoStack = null;
+        setMessage('撤销失败，已刷新状态');
+        await load();
+        setProcessing(false);
+      });
   }
 
   async function handleGroupResolve(groupId: string, action: string) {
