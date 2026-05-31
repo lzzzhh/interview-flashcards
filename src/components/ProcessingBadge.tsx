@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Loader2, X, ChevronRight, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import { useDocumentQueue } from '../hooks/useDocumentQueue';
+import { API_BASE } from '../api/client';
 
 interface Props {
   onViewDrafts: (docId: string) => void;
@@ -12,7 +13,11 @@ const TEXT_MUTED = 'var(--text-muted)';
 const CARD_BG = 'var(--card-bg)';
 const CARD_BORDER = 'var(--card-border)';
 
-export default function ProcessingBadge({ onViewDrafts }: Props) {
+async function cancelOnServer(docId: string) {
+  try {
+    await fetch(`${API_BASE}/documents/${docId}/cancel`, { method: 'POST' });
+  } catch {}
+}
   const { items, processingCount, doneCount, removeFromQueue, clearQueue } = useDocumentQueue();
   const [open, setOpen] = useState(false);
 
@@ -49,7 +54,10 @@ export default function ProcessingBadge({ onViewDrafts }: Props) {
               制卡队列 ({items.length})
             </span>
             <div className="flex items-center gap-2">
-              <button onClick={clearQueue} className="text-[10px] px-2 py-0.5 rounded-lg border" style={{ borderColor: CARD_BORDER, color: TEXT_MUTED }}>
+              <button onClick={() => {
+                items.filter(i => i.status === 'processing').forEach(i => cancelOnServer(i.docId));
+                clearQueue();
+              }} className="text-[10px] px-2 py-0.5 rounded-lg border" style={{ borderColor: CARD_BORDER, color: TEXT_MUTED }}>
                 清除全部
               </button>
               <button onClick={() => setOpen(false)} className="p-0.5">
@@ -109,6 +117,11 @@ export default function ProcessingBadge({ onViewDrafts }: Props) {
                       className="px-2 py-1 rounded-lg text-[10px] font-medium flex items-center gap-0.5"
                       style={{ backgroundColor: BLUE, color: '#fff' }}>
                       <ChevronRight size={12} />草稿
+                    </button>
+                  )}
+                  {item.status === 'processing' && (
+                    <button onClick={() => { cancelOnServer(item.docId); removeFromQueue(item.docId); }} className="p-0.5">
+                      <X size={14} style={{ color: '#EF4444' }} />
                     </button>
                   )}
                   {item.status !== 'processing' && (

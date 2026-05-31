@@ -12,7 +12,7 @@ import {
   extractConceptsFromDocument,
   generateDraftsFromDocument,
 } from '../services/document-pipeline';
-import { getPipelineProgress, setProgress } from '../services/document-pipeline';
+import { getPipelineProgress, setProgress, cancelPipeline } from '../services/document-pipeline';
 
 const UPLOAD_DIR = join(process.cwd(), 'data', 'uploads');
 if (!existsSync(UPLOAD_DIR)) mkdirSync(UPLOAD_DIR, { recursive: true });

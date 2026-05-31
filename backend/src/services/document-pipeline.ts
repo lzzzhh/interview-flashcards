@@ -18,8 +18,19 @@ export interface PipelineProgress {
 
 const progressMap = new Map<string, PipelineProgress>();
 
+const cancelledSet = new Set<string>();
+
 export function getPipelineProgress(documentId: string): PipelineProgress | null {
   return progressMap.get(documentId) || null;
+}
+
+export function cancelPipeline(documentId: string) {
+  cancelledSet.add(documentId);
+  setProgress(documentId, 'cancelled', 0, 5, '已取消');
+}
+
+function isCancelled(documentId: string): boolean {
+  return cancelledSet.has(documentId);
 }
 
 export function setProgress(documentId: string, stage: string, step: number, total: number, message: string) {
@@ -58,6 +69,7 @@ export async function uploadDocument(
 }
 
 export async function parseDocument(documentId: string): Promise<void> {
+  if (isCancelled(documentId)) return;
   setProgress(documentId, 'parsing', 1, 5, '正在解析文档...');
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
@@ -99,6 +111,7 @@ export async function parseDocument(documentId: string): Promise<void> {
 }
 
 export async function chunkDocument(documentId: string): Promise<void> {
+  if (isCancelled(documentId)) return;
   setProgress(documentId, 'chunking', 2, 5, '正在切分文档段落...');
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
@@ -156,6 +169,7 @@ export async function chunkDocument(documentId: string): Promise<void> {
 }
 
 export async function extractConceptsFromDocument(documentId: string): Promise<void> {
+  if (isCancelled(documentId)) return;
   setProgress(documentId, 'extracting', 3, 5, `正在通过 LLM 提取知识点...`);
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
@@ -223,6 +237,7 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
 }
 
 export async function generateDraftsFromDocument(documentId: string): Promise<void> {
+  if (isCancelled(documentId)) return;
   setProgress(documentId, 'generating', 4, 5, '正在生成卡片草稿...');
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
