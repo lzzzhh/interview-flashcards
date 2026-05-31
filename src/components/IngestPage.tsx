@@ -1,8 +1,9 @@
 // src/components/IngestPage.tsx — 资料制卡（文档上传）
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle, Loader2, ChevronRight, UploadCloud, ChevronDown } from 'lucide-react';
 import { API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
+import { loadCustomDecks } from '../utils/customDecks';
 
 interface IngestResult {
   sourceId: string;
@@ -54,8 +55,10 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   };
 
   // 牌组选项（内置 + 自定义牌组）
-  const deckOptions = [
+  const deckOptions = useMemo(() => [
     ...CATEGORIES.map(c => ({ id: c.key, label: c.label })),
+    ...loadCustomDecks().map(d => ({ id: d.id, label: d.name })),
+  ], []);
   ];
 
   useEffect(() => {
