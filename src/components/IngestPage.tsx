@@ -48,7 +48,6 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
       setStatus('error');
       return;
     }
-    setDroppedFile(null);
     setFilePath(path);
     setError('');
     setProgressMessage('');
@@ -160,16 +159,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   };
 
   const chooseFile = async () => {
-    try {
-      const { invoke } = await import('@tauri-apps/api/core');
-      const selected = await invoke<string | null>('choose_document_file');
-      if (selected) {
-        selectFilePath(selected);
-        return;
-      }
-    } catch {
-      // Browser mode falls back to the native file input.
-    }
+    // Use HTML file input — works in both browser and Tauri
     fileInputRef.current?.click();
   };
 
