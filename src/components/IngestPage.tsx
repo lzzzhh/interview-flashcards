@@ -5,6 +5,7 @@ import { API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
 import { loadCustomDecks } from '../utils/customDecks';
 import { getDecks } from '../api/documents';
+import { useDocumentQueue } from '../hooks/useDocumentQueue';
 
 interface IngestResult {
   sourceId: string;
@@ -36,6 +37,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   const [result, setResult] = useState<IngestResult | null>(null);
   const [error, setError] = useState('');
   const [progressMessage, setProgressMessage] = useState('');
+  const { addToQueue } = useDocumentQueue();
   const [isDragOver, setIsDragOver] = useState(false);
   const [showDeckMenu, setShowDeckMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -87,58 +89,31 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     }
   };
 
-  const waitForProcessing = async (initial: any): Promise<IngestResult> => {
-    const sourceId = initial.sourceId || initial.id;
-    if (!sourceId) throw new Error('后端没有返回文档 ID');
-
-    for (let attempt = 0; attempt < 1200; attempt++) {
-      const progress = await fetchJson(`${API_BASE}/documents/${sourceId}/progress`);
-      setProgressMessage(progress.message || '正在处理文档...');
-
-      if (progress.stage === 'failed') {
-        throw new Error(progress.message || '资料制卡失败');
-      }
-
-      if (progress.stage === 'done') {
-        const [doc, drafts] = await Promise.all([
-          fetchJson(`${API_BASE}/documents/${sourceId}`),
-          fetchJson(`${API_BASE}/documents/${sourceId}/drafts`),
-        ]);
-        const chunks = Array.isArray(doc.chunks) ? doc.chunks : [];
-        const tokenTotal = chunks.reduce((sum: number, chunk: any) => sum + (chunk.tokenCount || 0), 0);
-        return {
-          sourceId,
-          fileName: initial.fileName || doc.filename,
-          sourceType: initial.sourceType || doc.fileType || 'pdf',
-          chunkCount: chunks.length,
-          fullTextLength: tokenTotal * 4,
-          warnings: [],
-          draftCount: Array.isArray(drafts) ? drafts.length : 0,
-        };
-      }
-
-      await new Promise(resolve => setTimeout(resolve, 1500));
-    }
-
-    throw new Error('资料制卡超时，请稍后到草稿页查看结果');
-  };
-
   const handleSubmit = async () => {
     if (!filePath.trim()) { setError('请选择或输入文件路径'); return; }
     setError('');
     setProgressMessage('');
     setStatus('uploading');
     try {
-      setStatus('parsing');
       const formData = new FormData();
       formData.append('targetDeckId', targetDeckId);
       formData.append('file', droppedFile!);
       const data = await fetchJson(`${API_BASE}/documents/process`, { method: 'POST', body: formData });
-      const result = data.status === 'processing'
-        ? await waitForProcessing(data)
-        : { sourceId: data.id, fileName: data.filename, sourceType: data.fileType || 'pdf', chunkCount: data.chunkCount || 0, fullTextLength: data.fullTextLength || 0, warnings: [], draftCount: data.draftCount || 0 };
-      setResult(result);
+      const docId = data.sourceId || data.id;
+      addToQueue(docId, data.filename || droppedFile!.name || filePath);
+      setFilePath('');
+      setDroppedFile(null);
       setStatus('done');
+      setResult({
+        sourceId: docId,
+        fileName: data.filename || droppedFile!.name || filePath,
+        sourceType: 'pdf',
+        chunkCount: 0,
+        fullTextLength: 0,
+        warnings: [],
+        draftCount: 0,
+      });
+      setProgressMessage('已加入后台队列，可继续上传文件');
     } catch (err: any) {
       setError(err.message || '上传失败');
       setStatus('error');

@@ -1,4 +1,5 @@
 import { ArrowLeft, Search, FileText, Briefcase, Sparkles, Mic, ListChecks, ChevronRight } from 'lucide-react';
+import { useDocumentQueue } from '../hooks/useDocumentQueue';
 
 type Props = { onBack: () => void; onNavigate: (page: string) => void };
 
@@ -17,9 +18,11 @@ const AGENTS = [
 ];
 
 export default function AgentHubPage({ onBack, onNavigate }: Props) {
-  const handleAgentClick = (agent: typeof AGENTS[number]) => {
+  const { processingCount, doneCount, pendingDraftCount } = useDocumentQueue();
+
+  function handleAgentClick(agent: typeof AGENTS[0]) {
     onNavigate(agent.key);
-  };
+  }
 
   return (
     <div className="dark-bg homepage-glass-stage flex min-h-screen flex-col transition-colors" style={{ color: TEXT_PRIMARY }}>
@@ -53,12 +56,22 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
                 key={agent.key}
                 type="button"
                 onClick={() => handleAgentClick(agent)}
-                className="group flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left backdrop-blur-xl transition-colors hover:bg-white/45 dark:hover:bg-white/12"
+                className="group relative flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left backdrop-blur-xl transition-colors hover:bg-white/45 dark:hover:bg-white/12"
                 style={{
                   backgroundColor: CARD_BG,
                   borderColor: CARD_BORDER,
                 }}
               >
+                {(agent.key === 'ingest' && (processingCount > 0 || pendingDraftCount > 0)) && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 z-10">
+                    {pendingDraftCount > 0 ? pendingDraftCount : processingCount}
+                  </span>
+                )}
+                {(agent.key === 'drafts' && doneCount > 0) && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-green-500 text-white text-[10px] font-bold flex items-center justify-center px-1 z-10">
+                    {doneCount}
+                  </span>
+                )}
                 <div
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
                   style={{ backgroundColor: `${agent.color}22` }}

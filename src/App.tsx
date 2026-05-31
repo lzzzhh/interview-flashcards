@@ -19,6 +19,7 @@ import ProfilePage from './components/ProfilePage';
 import AISearchPage from './components/AISearchPage';
 import AgentHubPage from './components/AgentHubPage';
 import CardDraftReviewPage from './components/CardDraftReviewPage';
+import ProcessingBadge from './components/ProcessingBadge';
 import JobPrepPage from './components/JobPrepPage';
 import IngestPage from './components/IngestPage';
 import ApiSettingsPage from './components/ApiSettingsPage';
@@ -122,57 +123,60 @@ function AppInner() {
     if (cardId) dispatch({ type: 'JUMP_TO_CARD', payload: { category, cardId } });
   }, [dispatch]);
 
+  // Compute content — avoid early returns so ProcessingBadge renders globally
+  let content: React.ReactNode = null;
+
   if (showDecks) {
-    return <DeckPage onEnterStudy={handleEnterStudy} onBack={() => setShowDecks(false)} />;
-  }
-
-  if (showStats) {
-    return <StatsPage onBack={() => setShowStats(false)} />;
-  }
-
-  if (showProfile) {
-    if (profileSubPage === 'card-database') return <CardDatabasePage onBack={() => setProfileSubPage(null)} />;
-    if (profileSubPage === 'vector-database') return <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
-    if (profileSubPage === 'tag-manager') return <TagManagerPage onBack={() => setProfileSubPage(null)} />;
-    if (profileSubPage === 'api-settings') return <ApiSettingsPage onBack={() => setProfileSubPage(null)} />;
-    if (profileSubPage === 'learning-plans' && learningPlanId) return <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} onStudyPlan={(cardIds) => {
+    content = <DeckPage onEnterStudy={handleEnterStudy} onBack={() => setShowDecks(false)} />;
+  } else if (showStats) {
+    content = <StatsPage onBack={() => setShowStats(false)} />;
+  } else if (showProfile) {
+    if (profileSubPage === 'card-database') content = <CardDatabasePage onBack={() => setProfileSubPage(null)} />;
+    else if (profileSubPage === 'vector-database') content = <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
+    else if (profileSubPage === 'tag-manager') content = <TagManagerPage onBack={() => setProfileSubPage(null)} />;
+    else if (profileSubPage === 'api-settings') content = <ApiSettingsPage onBack={() => setProfileSubPage(null)} />;
+    else if (profileSubPage === 'learning-plans' && learningPlanId) content = <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} onStudyPlan={(cardIds: string[]) => {
       dispatch({ type: 'START_PLAN_STUDY', payload: { cardIds } });
       setShowProfile(false);
       setLearningPlanId(null);
       setProfileSubPage(null);
-      setStudyCategory('leetcode'); // dummy category for routing, cards come from planCardIds
+      setStudyCategory('leetcode');
     }} />;
-    if (profileSubPage === 'learning-plans') return <LearningPlanListPage onBack={() => setProfileSubPage(null)} onViewPlan={(id) => setLearningPlanId(id)} />;
-    return <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
-  }
-
-  if (showSearch) {
-    if (agentPage === 'search') return <AISearchPage onBack={() => setAgentPage(null)} onEnterStudy={handleEnterStudy} />;
-    if (agentPage === 'ingest') return <IngestPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
-    if (agentPage === 'drafts') return <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
-    if (agentPage?.startsWith('drafts:')) return <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} documentId={agentPage.slice(7)} />;
-    if (agentPage?.startsWith('deck:')) {
-      const deckId = agentPage.slice(5);
-      // Navigate to study that deck
-      handleEnterStudy(deckId);
-      return null;
-    }
-    if (agentPage === 'jobprep') return <JobPrepPage onBack={() => setAgentPage(null)} />;
-    if (agentPage === 'mock-interview') return <MockInterviewPage onBack={() => setAgentPage(null)} />;
-    if (agentPage === 'resume-project') return <ResumeProjectPage onBack={() => setAgentPage(null)} />;
-    return <AgentHubPage onBack={() => setShowSearch(false)} onNavigate={setAgentPage} />;
+    else if (profileSubPage === 'learning-plans') content = <LearningPlanListPage onBack={() => setProfileSubPage(null)} onViewPlan={(id: string) => setLearningPlanId(id)} />;
+    else content = <ProfilePage onBack={() => { setShowProfile(false); setProfileSubPage(null); }} onNavigate={setProfileSubPage} />;
+  } else if (showSearch) {
+    if (agentPage === 'search') content = <AISearchPage onBack={() => setAgentPage(null)} onEnterStudy={handleEnterStudy} />;
+    else if (agentPage === 'ingest') content = <IngestPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
+    else if (agentPage === 'drafts') content = <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
+    else if (agentPage?.startsWith('drafts:')) content = <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} documentId={agentPage.slice(7)} />;
+    else if (agentPage?.startsWith('deck:')) {
+      handleEnterStudy(agentPage.slice(5));
+    } else if (agentPage === 'jobprep') content = <JobPrepPage onBack={() => setAgentPage(null)} />;
+    else if (agentPage === 'mock-interview') content = <MockInterviewPage onBack={() => setAgentPage(null)} />;
+    else if (agentPage === 'resume-project') content = <ResumeProjectPage onBack={() => setAgentPage(null)} />;
+    else content = <AgentHubPage onBack={() => setShowSearch(false)} onNavigate={setAgentPage} />;
+  } else {
+    content = (
+      <>
+        <div className={studyCategory ? 'hidden' : ''}>
+          <HomePage onEnterStudy={handleEnterStudy} onShowDecks={() => setShowDecks(true)} onShowStats={() => setShowStats(true)} onShowProfile={() => setShowProfile(true)} onShowSearch={() => setShowSearch(true)} />
+        </div>
+        {studyCategory && (
+          <div className="page-enter" key={studyCategory}>
+            <StudyPage onBack={() => { dispatch({ type: 'STOP_PLAN_STUDY' }); setStudyCategory(null); }} />
+          </div>
+        )}
+      </>
+    );
   }
 
   return (
     <>
-      <div className={studyCategory ? 'hidden' : ''}>
-        <HomePage onEnterStudy={handleEnterStudy} onShowDecks={() => setShowDecks(true)} onShowStats={() => setShowStats(true)} onShowProfile={() => setShowProfile(true)} onShowSearch={() => setShowSearch(true)} />
-      </div>
-      {studyCategory && (
-        <div className="page-enter" key={studyCategory}>
-          <StudyPage onBack={() => { dispatch({ type: 'STOP_PLAN_STUDY' }); setStudyCategory(null); }} />
-        </div>
-      )}
+      {content}
+      <ProcessingBadge onViewDrafts={(docId: string) => {
+        setShowSearch(true);
+        setAgentPage(`drafts:${docId}`);
+      }} />
     </>
   );
 }
