@@ -115,13 +115,21 @@ function AppInner() {
   const [showSearch, setShowSearch] = useState(false);
   const [agentPage, setAgentPage] = useState<string | null>(null);
   const { dispatch } = useAppContext();
-  const handleEnterStudy = useCallback(async (category: Category, cardId?: string) => {
+  const handleEnterStudy = useCallback(async (category: string, cardId?: string) => {
     setStudyCategory(category); setShowDecks(false);
-    // 始终先进入子模块选择页，不直接加载学习队列
     dispatch({ type: 'SET_CATEGORY', payload: category });
     dispatch({ type: 'SET_API_SOURCE', payload: false });
     if (cardId) dispatch({ type: 'JUMP_TO_CARD', payload: { category, cardId } });
   }, [dispatch]);
+
+  // Handle deck:xxx navigation as side effect (avoids returning null content)
+  useEffect(() => {
+    if (agentPage?.startsWith('deck:')) {
+      const deckId = agentPage.slice(5);
+      setAgentPage(null);
+      handleEnterStudy(deckId);
+    }
+  }, [agentPage, handleEnterStudy]);
 
   // Compute content — avoid early returns so ProcessingBadge renders globally
   let content: React.ReactNode = null;
@@ -149,9 +157,7 @@ function AppInner() {
     else if (agentPage === 'ingest') content = <IngestPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
     else if (agentPage === 'drafts') content = <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
     else if (agentPage?.startsWith('drafts:')) content = <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} documentId={agentPage.slice(7)} />;
-    else if (agentPage?.startsWith('deck:')) {
-      handleEnterStudy(agentPage.slice(5));
-    } else if (agentPage === 'jobprep') content = <JobPrepPage onBack={() => setAgentPage(null)} />;
+    else if (agentPage === 'jobprep') content = <JobPrepPage onBack={() => setAgentPage(null)} />;
     else if (agentPage === 'mock-interview') content = <MockInterviewPage onBack={() => setAgentPage(null)} />;
     else if (agentPage === 'resume-project') content = <ResumeProjectPage onBack={() => setAgentPage(null)} />;
     else content = <AgentHubPage onBack={() => setShowSearch(false)} onNavigate={setAgentPage} />;
