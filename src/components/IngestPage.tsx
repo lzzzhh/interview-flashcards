@@ -259,7 +259,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
 
               {/* 目标牌组下拉 */}
               <div className="space-y-2">
-                <label className="text-[13px] font-medium" style={{ color: TEXT_PRIMARY }}>目标牌组</label>
+                <label className="text-[13px] font-medium" style={{ color: TEXT_PRIMARY }}>选择牌组</label>
                 <div className="relative" ref={deckMenuRef}>
                   <button
                     onClick={() => setShowDeckMenu(!showDeckMenu)}

@@ -183,7 +183,7 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
               <select value={selectedDeck} onChange={e => setSelectedDeck(e.target.value)}
                 className="flex-1 text-[12px] px-2 py-1.5 rounded-xl border"
                 style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY, backgroundColor: CARD_BG }}>
-                <option value="">选择目标 deck...</option>
+                <option value="">选择牌组...</option>
                 {decks.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
               <button onClick={() => handleBatch('dry-run')} disabled={processing || selected.size === 0}
