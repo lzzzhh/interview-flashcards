@@ -41,19 +41,6 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const deckMenuRef = useRef<HTMLDivElement>(null);
 
-  const selectFilePath = (path: string) => {
-    const ext = path.split('.').pop()?.toLowerCase() || '';
-    if (!['pdf', 'docx', 'doc', 'txt', 'md'].includes(ext)) {
-      setError(`不支持的格式 .${ext}`);
-      setStatus('error');
-      return;
-    }
-    setFilePath(path);
-    setError('');
-    setProgressMessage('');
-    setStatus('idle');
-  };
-
   const [deckOptions, setDeckOptions] = useState<{ id: string; label: string }[]>(
     CATEGORIES.map(c => ({ id: c.key, label: c.label }))
   );
