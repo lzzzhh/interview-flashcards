@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle, Loader2, ChevronRight, UploadCloud, ChevronDown } from 'lucide-react';
 import { API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
+import { loadCustomDecks } from '../utils/customDecks';
 import { getDecks } from '../api/documents';
 
 interface IngestResult {
@@ -58,15 +59,15 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     CATEGORIES.map(c => ({ id: c.key, label: c.label }))
   );
 
-  // Fetch custom decks from API
+  // Merge API decks + file-storage custom decks
   useEffect(() => {
-    getDecks().then(decks => {
-      const custom = decks.filter(d => !CATEGORIES.find(c => c.key === d.id));
-      setDeckOptions([
-        ...CATEGORIES.map(c => ({ id: c.key, label: c.label })),
-        ...custom.map(d => ({ id: d.id, label: d.name })),
-      ]);
-    }).catch(() => {});
+    const apiDecks = getDecks().then(decks => decks.map(d => ({ id: d.id, label: d.name })));
+    const fileDecks = loadCustomDecks().map(d => ({ id: d.id, label: d.name }));
+    apiDecks.then(list => {
+      const seen = new Set(CATEGORIES.map(c => c.key));
+      const extra = [...fileDecks, ...list].filter(d => !seen.has(d.id));
+      setDeckOptions([...CATEGORIES.map(c => ({ id: c.key, label: c.label })), ...extra]);
+    });
   }, []);
 
   useEffect(() => {

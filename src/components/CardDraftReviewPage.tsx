@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Check, X, Merge, Layers, Eye, Loader2 } from 'lucide-react';
 import { getDrafts, batchReview, batchImport, importDryRun, approveDraft, rejectDraft, getDecks } from '../api/documents';
+import { loadCustomDecks } from '../utils/customDecks';
 import type { CardDraftDTO } from '../api/documents';
 
 interface Props {
@@ -64,7 +65,9 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
       ]);
       if (documentId) setDrafts(d.filter(dr => dr.documentId === documentId));
       else setDrafts(d);
-      setDecks(dk);
+      const fileDecks = loadCustomDecks().map(d => ({ id: d.id, name: d.name }));
+      const merged = [...dk, ...fileDecks.filter(f => !dk.find(d => d.id === f.id))];
+      setDecks(merged);
     } catch (e: any) {
       setDrafts([]);
       setDecks([]);
