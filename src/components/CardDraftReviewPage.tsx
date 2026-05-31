@@ -182,7 +182,21 @@ export default function CardDraftReviewPage({ onBack, documentId }: Props) {
             </div>
 
             {/* Deck selector + actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => {
+                  const all = tab === 'groups' ? [] : filteredDrafts.map(d => d.id);
+                  if (all.length > 0 && all.every(id => selected.has(id))) {
+                    setSelected(new Set());
+                  } else {
+                    setSelected(new Set(all));
+                  }
+                }}
+                disabled={tab === 'groups' || filteredDrafts.length === 0}
+                className="text-[11px] font-medium px-2 py-1 rounded-lg border transition-colors"
+                style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY, opacity: tab === 'groups' || filteredDrafts.length === 0 ? 0.4 : 1 }}>
+                {filteredDrafts.length > 0 && filteredDrafts.every(d => selected.has(d.id)) ? '取消全选' : '全选'} ({selected.size}/{filteredDrafts.length})
+              </button>
               <select value={selectedDeck} onChange={e => setSelectedDeck(e.target.value)}
                 className="flex-1 text-[12px] px-2 py-1.5 rounded-xl border"
                 style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY, backgroundColor: CARD_BG }}>
