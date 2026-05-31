@@ -29,8 +29,7 @@ function reinitProviders() {
     getConfig('embedding_model'),
   ]).then(([baseUrl, apiKey, model, embeddingModel]) => {
     if (baseUrl && apiKey) {
-      const provider = new OpenAIChatProvider(baseUrl, apiKey);
-      (provider as any).defaultModel = model || 'deepseek-chat';
+      const provider = new OpenAIChatProvider(baseUrl, apiKey, model || 'deepseek-chat');
       setLLMProvider(provider);
 
       // DeepSeek 不原生支持 embedding，但仍可尝试

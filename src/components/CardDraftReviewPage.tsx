@@ -68,7 +68,6 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
 
   const load = useCallback(async () => {
     setLoading(true);
-    setMessage('');
     try {
       const [d, dk] = await Promise.all([
         getDrafts(documentId ? undefined : tab === 'all' ? undefined : tab === 'groups' ? undefined : tab),
@@ -143,7 +142,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
         const r = await batchImport(ids.slice(0, 20), selectedDeck);
         setMessage(`导入完成: ${r.imported}/${r.results.length} 张`);
       } else if (action === 'dry-run') {
-        const r = await importDryRun(ids.slice(0, 50));
+        const r = await importDryRun(ids.slice(0, 50), selectedDeck || undefined);
         setDryRunResult(r);
       } else {
         let totalOk = 0, totalErr = 0, done = 0;
@@ -161,8 +160,10 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
           setApproveResult({ count: totalOk, deckId: selectedDeck });
         }
       }
-      setSelected(new Set());
-      await load();
+      if (action !== 'dry-run') {
+        setSelected(new Set());
+        await load();
+      }
     } catch (e: any) { setMessage(`错误: ${e.message}`); }
     setProcessing(false);
   }
@@ -195,8 +196,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
     if (!undoStack) return;
     setProcessing(true);
     const { id, prevStatus } = undoStack;
-    // Restore previous status by directly using the batch-review endpoint
-    batchReview([id], 'UNDO_RESTORE' as any, { note: `Undo to ${prevStatus}` })
+    batchReview([id], 'restore_status', { restoreStatus: prevStatus, note: `Undo to ${prevStatus}` })
       .then(async () => {
         undoStack = null;
         setMessage('已撤销');

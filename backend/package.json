@@ -6,7 +6,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "lint": "tsc --noEmit",
+    "lint": "tsc --noEmit -p tsconfig.lint.json",
     "evaluate": "tsx src/evaluation/runner.ts",
     "evaluate:validate": "tsx src/evaluation/validate.ts",
     "evaluate:v8-ablation": "tsx src/evaluation/v8-ablation-runner.ts",

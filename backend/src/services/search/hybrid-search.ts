@@ -121,7 +121,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   const minScore = input.minScore ?? DEFAULT_MIN_SCORE;
   const parsed = await understandQuery(input.query);
   const { intent, topic, canonicalTopic, deckHint, coreKeywords, expandedKeywords, lowPriorityKeywords, subtopics, recallText, rerankText, rewrittenQuery } = parsed;
-  const isStudyIntent = intent === 'study' || intent === 'plan' || intent === 'recommend_cards';
+  const isStudyIntent = intent === 'create_plan' || intent === 'recommend_cards';
 
   // 1b. Old expandQuery for primary recall (proven baseline)
   const { keywords: oldKW, normalizedQuery: oldNorm } = expandQuery(input.query);
@@ -374,7 +374,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   }
 
   // 8c. Learning-path mode: prerequisite boost + diversity spread
-  const isLearningPath = intent === 'study' || intent === 'plan' || intent === 'recommend_cards';
+  const isLearningPath = intent === 'create_plan' || intent === 'recommend_cards';
   if (isLearningPath) {
     const allPrereq = new Set(parsed.prerequisiteKeywords.map(k => k.toLowerCase()));
 
@@ -593,7 +593,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
       hydration: { requested: candidateMap.size, hydrated: cards.length, missing: [] },
       filters: { before: cards.length, after: cards.length, removed: [] },
       rerank: {
-        profile: profile.id || 'default',
+        profile: profile.name || 'default',
         top: finalResults.slice(0, 5).map(r => ({
           cardId: r.cardId, title: r.title, finalScore: r.score,
           vectorScore: r.scoreBreakdown?.vectorScore || 0,

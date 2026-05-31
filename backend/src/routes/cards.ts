@@ -20,7 +20,7 @@ export async function cardRoutes(app: FastifyInstance) {
     const searchKeywords = generateSearchKeywords({
       title: body.title, titleCn: body.titleCn,
       question: body.question, answer: body.answer,
-      tags: body.tags, description: body.description,
+      tags: body.tags ? JSON.stringify(body.tags) : null, description: body.description,
       subTopic: body.subTopic, deckId: body.deckId,
     });
 
@@ -60,7 +60,7 @@ export async function cardRoutes(app: FastifyInstance) {
       titleCn: body.titleCn ?? card.titleCn,
       question: body.question ?? card.question,
       answer: body.answer ?? card.answer,
-      tags: body.tags ?? card.tags,
+      tags: body.tags ? JSON.stringify(body.tags) : card.tags,
       description: body.description ?? card.description,
       subTopic: body.subTopic ?? card.subTopic,
       deckId: card.deckId,

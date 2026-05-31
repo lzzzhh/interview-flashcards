@@ -31,7 +31,7 @@ import LearningPlanDetailPage from './components/LearningPlanDetailPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import type { FlashCard } from './types';
 
-function StudyPage({ onBack }: { onBack: () => void }) {
+function StudyPage({ onBack, exitOnBack = false }: { onBack: () => void; exitOnBack?: boolean }) {
   const { state, dispatch, currentCard, totalNew, dueCountByCategory } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showBrowser, setShowBrowser] = useState(false);
@@ -59,7 +59,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
         {/* Top bar — fixed height */}
         <div className="sticky top-0 z-20 shrink-0 py-3 flex items-center justify-between backdrop-blur-lg dark:bg-transparent -mx-3 sm:-mx-4 px-3 sm:px-4">
-          <button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm">
+          <button onClick={() => exitOnBack ? onBack() : dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm">
             <ArrowLeft className="w-4 h-4" /> 返回
           </button>
           <div className="flex items-center gap-0.5">
@@ -72,7 +72,7 @@ function StudyPage({ onBack }: { onBack: () => void }) {
 
         {/* Status messages */}
         {state.studyMode === 'new' && totalNew === 0 && (
-          <div className="shrink-0 text-center py-8 text-gray-400">🎉 所有卡片都已学过！<button onClick={() => dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button></div>
+          <div className="shrink-0 text-center py-8 text-gray-400">🎉 所有卡片都已学过！<button onClick={() => exitOnBack ? onBack() : dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button></div>
         )}
 
         {/* Card area — fills remaining space, fixed height per card */}
@@ -114,9 +114,12 @@ function AppInner() {
   const [learningPlanId, setLearningPlanId] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [agentPage, setAgentPage] = useState<string | null>(null);
+  const [studyExitOnBack, setStudyExitOnBack] = useState(false);
   const { dispatch } = useAppContext();
-  const handleEnterStudy = useCallback(async (category: string, cardId?: string) => {
+  const handleEnterStudy = useCallback(async (category: string, cardId?: string, options?: { exitOnBack?: boolean }) => {
     setStudyCategory(category); setShowDecks(false); setShowSearch(false); setShowProfile(false); setShowStats(false);
+    setAgentPage(null);
+    setStudyExitOnBack(Boolean(options?.exitOnBack));
     dispatch({ type: 'SET_CATEGORY', payload: category });
     dispatch({ type: 'SET_API_SOURCE', payload: false });
     if (cardId) dispatch({ type: 'JUMP_TO_CARD', payload: { category, cardId } });
@@ -127,7 +130,7 @@ function AppInner() {
     if (agentPage?.startsWith('deck:')) {
       const deckId = agentPage.slice(5);
       setAgentPage(null);
-      handleEnterStudy(deckId);
+      handleEnterStudy(deckId, undefined, { exitOnBack: true });
     }
   }, [agentPage, handleEnterStudy]);
 
@@ -176,7 +179,7 @@ function AppInner() {
       {content}
       {studyCategory && (
         <div className="fixed inset-0 z-50 page-enter" key={studyCategory}>
-          <StudyPage onBack={() => { dispatch({ type: 'STOP_PLAN_STUDY' }); setStudyCategory(null); }} />
+          <StudyPage exitOnBack={studyExitOnBack} onBack={() => { dispatch({ type: 'STOP_PLAN_STUDY' }); setStudyCategory(null); setStudyExitOnBack(false); }} />
         </div>
       )}
       <ProcessingBadge onViewDrafts={(docId: string) => {

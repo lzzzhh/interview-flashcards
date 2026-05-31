@@ -161,7 +161,7 @@ export async function checkDuplicate(
           });
           if (highOverlap) {
             // Try LLM judge for final decision
-            const llmStatus = await llmJudge(card, { cardId: sameObjectiveCards[0].id, question, answer, ...card });
+            const llmStatus = await llmJudge(card, { ...card, cardId: sameObjectiveCards[0].id, question, answer });
             if (llmStatus === 'semantic_duplicate') {
               return {
                 status: 'semantic_duplicate',

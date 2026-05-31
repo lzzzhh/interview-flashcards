@@ -11,6 +11,8 @@ export interface ConceptNode {
   deckHint?: string; parentCategory?: string;
   coreKeywords: string[]; searchAliases: string[];
   relations: Relation[];
+  migrationStatus?: string;
+  domain?: string;
 }
 
 export interface KeywordTiers {

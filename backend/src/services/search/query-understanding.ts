@@ -188,7 +188,7 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   // ── Step 4b: Multi-topic compare detection (after suffix patterns, Chinese concepts only)
   const compareMatch = q.match(/([\u4e00-\u9fff]+?)和([\u4e00-\u9fff]+?)(?:有什么区别|怎么区分|区别|先学哪个|对比|比较)/);
   if (compareMatch && !topicRaw) {
-    intent = 'compare';
+    intent = 'compare_cards';
     topicRaw = [compareMatch[1].trim(), compareMatch[2].trim()].join(' 和 ');
     source = 'regex';
     debugMsg = `compare: topics=["${compareMatch[1].trim()}","${compareMatch[2].trim()}"]`;
@@ -207,15 +207,11 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   const graphResolved = resolveConceptFromGraph(protectedTopic);
   let conceptSource: ParsedSearchQuery['conceptSource'] = graphResolved.conceptGraphHit ? 'graph' : 'fallback';
   // Load concept dict only if graph misses (graph already has 100% coverage)
-  const concept = null; // conceptLookup no longer needed — graph covers 100%
   let canonicalTopic: string;
   
   if (graphResolved.conceptGraphHit) {
     conceptSource = 'graph';
     canonicalTopic = graphResolved.canonicalTopic;
-  } else if (concept) {
-    conceptSource = 'legacy';
-    canonicalTopic = concept?.canonicalTopic || concept?.topic || protectedTopic;
   } else {
     conceptSource = 'fallback';
     canonicalTopic = protectedTopic;
@@ -241,24 +237,6 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
     // Prerequisites from graph relations
     prerequisiteKeywords = graphTiers.prerequisiteKeywords;
     
-    // Legacy dict as supplemental (adaptive: generated=10, manual/reviewed=6)
-    if (concept) {
-      const supLimit = graphResolved.graphNodeId ? 6 : 6; // manual nodes = 6
-      legacySupplementalKeywords = (concept.expandedKeywords || [])
-        .filter(k => !coreKeywords.includes(k) && !expandedKeywords.includes(k))
-        .filter(k => !STOPWORDS.has(k) && !isStopword(k))
-        .slice(0, supLimit);
-      expandedKeywords = [...expandedKeywords, ...legacySupplementalKeywords];
-    }
-  } else if (concept) {
-    // Legacy-only: dict provides all keywords
-    tierOwner = 'legacy';
-    coreKeywords = concept.coreKeywords?.length
-      ? [...new Set([canonicalTopic, ...concept.coreKeywords])]
-      : [canonicalTopic];
-    expandedKeywords = concept.expandedKeywords || [];
-    lowPriorityKeywords = concept.lowPriorityKeywords || [];
-    prerequisiteKeywords = concept.prerequisiteKeywords || [];
   } else {
     tierOwner = 'none';
     coreKeywords = [canonicalTopic];
@@ -280,12 +258,12 @@ export async function understandQuery(rawQuery: string): Promise<ParsedSearchQue
   return {
     rawQuery: q,
     intent, topicRaw, topic: protectedTopic, canonicalTopic,
-    deckHint: concept?.deckHint,
-    parentCategory: concept?.parentCategory,
-    subtopics: concept?.subtopics || [],
+    deckHint: graphResolved.deckHint,
+    parentCategory: graphResolved.parentCategory,
+    subtopics: [],
     constraints: intent === 'review_weakness' ? { onlyDue: true } : {},
     coreKeywords, expandedKeywords, lowPriorityKeywords,
-    prerequisiteKeywords: concept?.prerequisiteKeywords || [],
+    prerequisiteKeywords,
     rewrittenQuery: recallText,
     recallText, rerankText,
     confidence: source !== 'fallback' ? 0.8 : 0.2,

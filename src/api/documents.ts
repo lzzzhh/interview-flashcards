@@ -44,16 +44,16 @@ export function patchDraft(id: string, data: Record<string, any>) {
   return apiPatch<CardDraftDTO>(`/card-drafts/${id}`, data);
 }
 
-export function batchReview(draftIds: string[], action: string, options?: { deckId?: string; note?: string; edits?: Record<string, any> }) {
+export function batchReview(draftIds: string[], action: string, options?: { deckId?: string; note?: string; restoreStatus?: string; edits?: Record<string, any> }) {
   return apiPost<{ results: { id: string; status: string; cardId?: string; error?: string }[] }>('/card-drafts/batch-review', { draftIds, action, ...options });
 }
 
-export function importDryRun(draftIds: string[]) {
+export function importDryRun(draftIds: string[], deckId?: string) {
   return apiPost<{
     totalChecked: number; willCreateCards: number; blockedDrafts: string[];
     unresolvedDuplicates: string[]; missingDeckId: string[]; missingTags: string[];
     missingSearchKeywords: string[]; graphPending: string[];
-  }>('/card-drafts/import-dry-run', { draftIds });
+  }>('/card-drafts/import-dry-run', { draftIds, deckId });
 }
 
 export function batchImport(draftIds: string[], deckId: string) {

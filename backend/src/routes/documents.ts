@@ -431,7 +431,7 @@ export async function documentRoutes(app: FastifyInstance) {
 
   // POST /api/card-drafts/import-dry-run — validate drafts before import
   app.post('/api/card-drafts/import-dry-run', async (req, reply) => {
-    const { draftIds } = req.body as { draftIds?: string[] };
+    const { draftIds, deckId } = req.body as { draftIds?: string[]; deckId?: string };
     const where: any = draftIds?.length ? { id: { in: draftIds } } : { status: 'draft' };
     const drafts = await prisma.cardDraft.findMany({ where, take: 50 });
 
@@ -459,7 +459,7 @@ export async function documentRoutes(app: FastifyInstance) {
         const gp = await prisma.cardDraft.findMany({ where: { duplicateGroupId: d.duplicateGroupId, status: { notIn: ['rejected', 'out_of_scope'] } }, select: { id: true } });
         if (gp.length > 1) { result.unresolvedDuplicates.push(d.id); blocked.push('dup-group'); }
       }
-      if (!d.deckId) { result.missingDeckId.push(d.id); blocked.push('deck'); }
+      if (!deckId && !d.deckId) { result.missingDeckId.push(d.id); blocked.push('deck'); }
       if (tags.length === 0) { result.missingTags.push(d.id); blocked.push('tags'); }
       if (kw.length === 0) { result.missingSearchKeywords.push(d.id); blocked.push('kw'); }
       if (d.graphStatus === 'graph_pending') result.graphPending.push(d.id);
@@ -527,9 +527,10 @@ export async function documentRoutes(app: FastifyInstance) {
   app.post('/api/card-drafts/batch-review', async (req, reply) => {
     const BatchReviewSchema = z.object({
       draftIds: z.array(z.string()).min(1).max(500),
-      action: z.enum(['approve', 'edit', 'reject', 'mark_duplicate', 'mark_out_of_scope', 'merge', 'keep_both', 'keep_best']),
+      action: z.enum(['approve', 'edit', 'reject', 'mark_duplicate', 'mark_out_of_scope', 'merge', 'keep_both', 'keep_best', 'restore_status']),
       deckId: z.string().optional(),
       note: z.string().optional(),
+      restoreStatus: z.enum(['draft', 'needs_review', 'approved', 'rejected', 'duplicate', 'merged', 'out_of_scope']).optional(),
       edits: z.record(z.object({
         question: z.string().optional(),
         answer: z.string().optional(),
@@ -540,7 +541,7 @@ export async function documentRoutes(app: FastifyInstance) {
     });
     const v = validate(BatchReviewSchema, req.body);
     if (!v.success) return reply.status(400).send({ error: v.error });
-    const { draftIds, action, deckId, note, edits } = v.data;
+    const { draftIds, action, deckId, note, restoreStatus, edits } = v.data;
 
     const results: { id: string; status: string; error?: string; cardId?: string }[] = [];
 
@@ -654,6 +655,26 @@ export async function documentRoutes(app: FastifyInstance) {
             }
             await prisma.cardDraft.update({ where: { id: bestId }, data: { duplicateGroupId: null, reviewNote: note || 'Kept as best' } });
             results.push({ id: bestId, status: 'keep_best' });
+            break;
+          }
+          case 'restore_status': {
+            if (!restoreStatus) { results.push({ id, status: 'error', error: 'restoreStatus required' }); continue; }
+            const draft = await prisma.cardDraft.findUnique({ where: { id } });
+            if (!draft) { results.push({ id, status: 'error', error: 'Not found' }); continue; }
+            if (draft.importedCardId) {
+              await prisma.reviewLog.deleteMany({ where: { cardId: draft.importedCardId } });
+              await prisma.cardProgress.deleteMany({ where: { cardId: draft.importedCardId } });
+              await prisma.$executeRawUnsafe('DELETE FROM card_fts WHERE cardId = ?', draft.importedCardId).catch(() => {});
+              await prisma.card.delete({ where: { id: draft.importedCardId } }).catch(() => {});
+            }
+            await prisma.cardDraft.update({
+              where: { id },
+              data: { status: restoreStatus, importedCardId: null, reviewNote: note || null },
+            });
+            await prisma.cardDraftReview.create({
+              data: { draftId: id, action: 'restore_status', note: note || null, createdAt: new Date().toISOString() },
+            });
+            results.push({ id, status: restoreStatus });
             break;
           }
         }

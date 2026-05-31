@@ -20,7 +20,7 @@ export interface VectorStore {
   /** 批量插入 */
   upsertBatch(items: { objectId: string; objectType: string; vector: number[] }[]): Promise<void>;
   /** 向量搜索（余弦相似度） */
-  search(vector: number[], topK: number, filter?: { objectType?: string; deckId?: string }): Promise<VectorSearchResult[]>;
+  search(vector: number[], topK: number, filter?: { objectType?: string; deckId?: string; field?: string; module?: string }): Promise<VectorSearchResult[]>;
   /** 删除向量 */
   delete(objectId: string, objectType: string): Promise<void>;
   /** 重建所有索引 */

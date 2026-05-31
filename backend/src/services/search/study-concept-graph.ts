@@ -73,7 +73,7 @@ const STAGE_RULES: StageRule[] = [
 
 // ── Stage Classification ──
 
-interface CardInfo {
+export interface CardInfo {
   cardId: string;
   title: string;
   deckId: string;

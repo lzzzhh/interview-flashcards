@@ -316,7 +316,7 @@ const KEYWORD_DECK_MAP: Record<string, string> = {
   '集成学习': 'machine-learning', 'k-means': 'machine-learning', 'kmeans': 'machine-learning',
   '决策树': 'machine-learning', '逻辑回归': 'machine-learning', '支持向量机': 'machine-learning',
   '随机森林': 'machine-learning', '交叉验证': 'machine-learning', 'bagging': 'machine-learning',
-  'boosting': 'machine-learning', '集成学习': 'machine-learning', 'ensemble': 'machine-learning',
+  'boosting': 'machine-learning', 'ensemble': 'machine-learning',
   'roc': 'machine-learning', 'auc': 'machine-learning',
   't-sne': 'machine-learning', 'dbscan': 'machine-learning',
   '半监督': 'machine-learning', '主动学习': 'machine-learning', '迁移学习': 'machine-learning',
@@ -357,7 +357,6 @@ const KEYWORD_DECK_MAP: Record<string, string> = {
   'rag': 'agent', '检索增强': 'agent', '向量数据库': 'agent',
   'react': 'agent', 'agent': 'agent', 'function calling': 'agent',
   'tool use': 'agent', '混合检索': 'agent', 'hybrid search': 'agent',
-  'rerank': 'agent',
   // Vibe Coding
   'mcp': 'vibe-coding', 'agent team': 'vibe-coding', 'sub-agent': 'vibe-coding',
   'claude.md': 'vibe-coding',
@@ -365,7 +364,7 @@ const KEYWORD_DECK_MAP: Record<string, string> = {
   '赋能': 'jargon', '闭环': 'jargon', '复盘': 'jargon', '底层逻辑': 'jargon',
   '抓手': 'jargon', 'okr': 'jargon', 'kpi': 'jargon',
   // 职场
-  '向上管理': 'workplace', 'star法则': 'workplace', '汇报': 'workplace',
+  '向上管理': 'workplace', '汇报': 'workplace',
   '周报': 'workplace', '涨薪': 'workplace',
 };
 

@@ -8,7 +8,7 @@ import CardBrowser from './CardBrowser';
 import type { Category } from '../types';
 
 interface Props {
-  onEnterStudy: (category: Category) => void;
+  onEnterStudy: (category: string, cardId?: string, options?: { exitOnBack?: boolean }) => void;
   onBack: () => void;
 }
 
@@ -39,7 +39,7 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
     setNewLimit(20);
   };
 
-  const handleEditCards = (cat: Category) => {
+  const handleEditCards = (cat: string) => {
     dispatch({ type: 'SET_CATEGORY', payload: cat });
     setShowBrowser(true);
   };
@@ -91,7 +91,7 @@ export default function DeckPage({ onEnterStudy, onBack }: Props) {
             })}
             {customDecks.map((deck) => (
               <div key={deck.id} className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-left border" style={{ borderColor: CARD_BORDER, backgroundColor: DECK_ITEM_BG }}>
-                <button onClick={() => onEnterStudy(deck.id)} className="flex-1 min-w-0 flex items-center gap-3 text-left">
+                <button onClick={() => onEnterStudy(deck.id, undefined, { exitOnBack: true })} className="flex-1 min-w-0 flex items-center gap-3 text-left">
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{deck.name}</h3>
                     <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>自定义牌组</p>
