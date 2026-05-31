@@ -59,7 +59,6 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     ...CATEGORIES.map(c => ({ id: c.key, label: c.label })),
     ...loadCustomDecks().map(d => ({ id: d.id, label: d.name })),
   ], []);
-  ];
 
   useEffect(() => {
     if (!showDeckMenu) return;
