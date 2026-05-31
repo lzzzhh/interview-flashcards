@@ -1,9 +1,9 @@
 // src/components/IngestPage.tsx — 资料制卡（文档上传）
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle, Loader2, ChevronRight, UploadCloud, ChevronDown } from 'lucide-react';
 import { API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
-import { loadCustomDecks } from '../utils/customDecks';
+import { getDecks } from '../api/documents';
 
 interface IngestResult {
   sourceId: string;
@@ -54,11 +54,20 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
     setStatus('idle');
   };
 
-  // 牌组选项（内置 + 自定义牌组）
-  const deckOptions = useMemo(() => [
-    ...CATEGORIES.map(c => ({ id: c.key, label: c.label })),
-    ...loadCustomDecks().map(d => ({ id: d.id, label: d.name })),
-  ], []);
+  const [deckOptions, setDeckOptions] = useState<{ id: string; label: string }[]>(
+    CATEGORIES.map(c => ({ id: c.key, label: c.label }))
+  );
+
+  // Fetch custom decks from API
+  useEffect(() => {
+    getDecks().then(decks => {
+      const custom = decks.filter(d => !CATEGORIES.find(c => c.key === d.id));
+      setDeckOptions([
+        ...CATEGORIES.map(c => ({ id: c.key, label: c.label })),
+        ...custom.map(d => ({ id: d.id, label: d.name })),
+      ]);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!showDeckMenu) return;
