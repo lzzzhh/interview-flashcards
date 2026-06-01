@@ -11,6 +11,7 @@ import {
   chunkDocument,
   extractConceptsFromDocument,
   generateDraftsFromDocument,
+  isPipelineCancelledError,
 } from '../services/document-pipeline';
 import { getPipelineProgress, setProgress, cancelPipeline } from '../services/document-pipeline';
 
@@ -71,6 +72,14 @@ async function runDocumentPipeline(documentId: string, targetDeckId?: string) {
       });
     }
   } catch (e: any) {
+    if (isPipelineCancelledError(e)) {
+      setProgress(documentId, 'cancelled', 0, 5, '已取消');
+      await prisma.documentSource.update({
+        where: { id: documentId },
+        data: { status: 'failed', parseError: '已取消' },
+      }).catch(() => {});
+      return;
+    }
     const message = e?.message || String(e);
     setProgress(documentId, 'failed', 0, 5, `错误: ${message}`);
     await prisma.documentSource.update({
@@ -704,7 +713,12 @@ export async function documentRoutes(app: FastifyInstance) {
   // POST /api/documents/:id/cancel — cancel pipeline processing
   app.post('/api/documents/:id/cancel', async (req, reply) => {
     const { id } = req.params as { id: string };
-    cancelPipeline(id);
+    const doc = await prisma.documentSource.findUnique({ where: { id }, select: { status: true } });
+    if (!doc) return reply.status(404).send({ error: 'Document not found' });
+    if (doc.status === 'draft_ready' || doc.status === 'failed') {
+      return { cancelled: false, status: doc.status };
+    }
+    await cancelPipeline(id);
     return { cancelled: true };
   });
 
@@ -718,6 +732,11 @@ export async function documentRoutes(app: FastifyInstance) {
     await prisma.documentBlock.deleteMany({ where: { documentId: id } });
     await prisma.documentChunk.deleteMany({ where: { documentId: id } });
     await prisma.extractedConcept.deleteMany({ where: { documentId: id } });
+    const drafts = await prisma.cardDraft.findMany({ where: { documentId: id }, select: { id: true } });
+    const draftIds = drafts.map(d => d.id);
+    if (draftIds.length > 0) {
+      await prisma.cardDraftReview.deleteMany({ where: { draftId: { in: draftIds } } });
+    }
     await prisma.cardDraft.deleteMany({ where: { documentId: id } });
     await prisma.documentSource.delete({ where: { id } });
     return { deleted: true };

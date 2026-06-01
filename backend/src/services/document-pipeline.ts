@@ -20,20 +20,42 @@ const progressMap = new Map<string, PipelineProgress>();
 
 const cancelledSet = new Set<string>();
 
+export class PipelineCancelledError extends Error {
+  constructor() {
+    super('已取消');
+    this.name = 'PipelineCancelledError';
+  }
+}
+
 export function getPipelineProgress(documentId: string): PipelineProgress | null {
   return progressMap.get(documentId) || null;
 }
 
-export function cancelPipeline(documentId: string) {
+export async function cancelPipeline(documentId: string) {
   cancelledSet.add(documentId);
   setProgress(documentId, 'cancelled', 0, 5, '已取消');
+  await prisma.documentSource.update({
+    where: { id: documentId },
+    data: { status: 'failed', parseError: '已取消' },
+  }).catch(() => {});
 }
 
 function isCancelled(documentId: string): boolean {
   return cancelledSet.has(documentId);
 }
 
+function throwIfCancelled(documentId: string) {
+  if (isCancelled(documentId)) throw new PipelineCancelledError();
+}
+
+export function isPipelineCancelledError(error: unknown): boolean {
+  return error instanceof PipelineCancelledError ||
+    (error instanceof Error && error.name === 'PipelineCancelledError');
+}
+
 export function setProgress(documentId: string, stage: string, step: number, total: number, message: string) {
+  const current = progressMap.get(documentId);
+  if (current?.stage === 'cancelled' && stage !== 'cancelled' && stage !== 'failed') return;
   progressMap.set(documentId, { stage, step, total, message });
 }
 
@@ -69,7 +91,7 @@ export async function uploadDocument(
 }
 
 export async function parseDocument(documentId: string): Promise<void> {
-  if (isCancelled(documentId)) return;
+  throwIfCancelled(documentId);
   setProgress(documentId, 'parsing', 1, 5, '正在解析文档...');
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
@@ -78,9 +100,11 @@ export async function parseDocument(documentId: string): Promise<void> {
 
   try {
     const parsed = await parseFile(doc.filePath, doc.filename, doc.fileType as any, documentId);
+    throwIfCancelled(documentId);
 
     // Save blocks
     for (const block of parsed.blocks) {
+      throwIfCancelled(documentId);
       await prisma.documentBlock.create({
         data: {
           id: block.id,
@@ -97,6 +121,7 @@ export async function parseDocument(documentId: string): Promise<void> {
       });
     }
 
+    throwIfCancelled(documentId);
     await prisma.documentSource.update({
       where: { id: documentId },
       data: { status: 'parsed' },
@@ -111,7 +136,7 @@ export async function parseDocument(documentId: string): Promise<void> {
 }
 
 export async function chunkDocument(documentId: string): Promise<void> {
-  if (isCancelled(documentId)) return;
+  throwIfCancelled(documentId);
   setProgress(documentId, 'chunking', 2, 5, '正在切分文档段落...');
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
@@ -143,11 +168,13 @@ export async function chunkDocument(documentId: string): Promise<void> {
   };
 
   const chunks = chunkBlocks(parsedDoc);
+  throwIfCancelled(documentId);
 
   await prisma.documentChunk.deleteMany({ where: { documentId } });
 
   let i = 0;
   for (const chunk of chunks) {
+    throwIfCancelled(documentId);
     await prisma.documentChunk.create({
       data: {
         id: chunk.id,
@@ -162,6 +189,7 @@ export async function chunkDocument(documentId: string): Promise<void> {
     });
   }
 
+  throwIfCancelled(documentId);
   await prisma.documentSource.update({
     where: { id: documentId },
     data: { status: 'parsed' },
@@ -169,7 +197,7 @@ export async function chunkDocument(documentId: string): Promise<void> {
 }
 
 export async function extractConceptsFromDocument(documentId: string): Promise<void> {
-  if (isCancelled(documentId)) return;
+  throwIfCancelled(documentId);
   setProgress(documentId, 'extracting', 3, 5, `正在通过 LLM 提取知识点...`);
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
@@ -183,6 +211,7 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
 
   const totalChunks = dbChunks.length;
   for (let chunkIdx = 0; chunkIdx < dbChunks.length; chunkIdx++) {
+    throwIfCancelled(documentId);
     const dbChunk = dbChunks[chunkIdx];
     const chunk: DocumentChunk = {
       id: dbChunk.id,
@@ -205,9 +234,11 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
       return [] as ExtractedConceptData[];
     });
 
+    throwIfCancelled(documentId);
     setProgress(documentId, 'extracting', chunkIdx, totalChunks, `提取知识点 (${chunkIdx}/${totalChunks})`);
 
     for (const c of concepts) {
+      throwIfCancelled(documentId);
       const graphMatch = matchConceptToGraph(c.conceptName);
       await prisma.extractedConcept.create({
         data: {
@@ -230,6 +261,7 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
     }
   }
 
+  throwIfCancelled(documentId);
   await prisma.documentSource.update({
     where: { id: documentId },
     data: { status: 'parsed' },
@@ -237,7 +269,7 @@ export async function extractConceptsFromDocument(documentId: string): Promise<v
 }
 
 export async function generateDraftsFromDocument(documentId: string): Promise<void> {
-  if (isCancelled(documentId)) return;
+  throwIfCancelled(documentId);
   setProgress(documentId, 'generating', 4, 5, '正在生成卡片草稿...');
   const doc = await prisma.documentSource.findUnique({ where: { id: documentId } });
   if (!doc) throw new Error('Document not found');
@@ -249,6 +281,7 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
   });
 
   for (const dbConcept of dbConcepts) {
+    throwIfCancelled(documentId);
     const concept: ExtractedConceptData = {
       conceptName: dbConcept.conceptName,
       definition: dbConcept.definition ?? undefined,
@@ -275,6 +308,7 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
       console.warn(`[document-pipeline] draft generation skipped for concept ${dbConcept.id}: ${e.message || e}`);
       continue;
     }
+    throwIfCancelled(documentId);
 
     // Translate English-predominant drafts to Chinese (excluding sourceRefs)
     try {
@@ -282,8 +316,10 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
     } catch (e: any) {
       console.warn(`[document-pipeline] draft translation skipped: ${e.message || e}`);
     }
+    throwIfCancelled(documentId);
 
     for (const d of drafts) {
+      throwIfCancelled(documentId);
       // Append learningObjective to searchKeywords for future dedup matching
       const enrichedKeywords = [...d.searchKeywords];
       if (d.learningObjective) enrichedKeywords.push(d.learningObjective);
@@ -332,6 +368,7 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
   }
 
   // Intra-document dedup: group drafts by canonicalConcept+learningObjective
+  throwIfCancelled(documentId);
   const allDrafts = await prisma.cardDraft.findMany({
     where: { documentId },
     select: { id: true, canonicalConcept: true, learningObjective: true, atomicFactsJson: true },
@@ -345,6 +382,7 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
     }))
   );
   for (const [draftId, groupId] of intraDedup) {
+    throwIfCancelled(documentId);
     const existing = await prisma.cardDraft.findUnique({ where: { id: draftId }, select: { duplicateCheckJson: true } });
     const currentDup = existing?.duplicateCheckJson ? JSON.parse(existing.duplicateCheckJson) : {};
     await prisma.cardDraft.update({
@@ -360,6 +398,7 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
     });
   }
 
+  throwIfCancelled(documentId);
   await prisma.documentSource.update({
     where: { id: documentId },
     data: { status: 'draft_ready' },
