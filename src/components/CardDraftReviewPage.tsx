@@ -223,6 +223,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
       await approveDraft(editingDraft.id, selectedDeck);
       setEditingDraft(null);
       setMessage('已保存并导入');
+      setApproveResult({ count: 1, deckId: selectedDeck });
       await load();
     } catch (e: any) { setMessage(`编辑失败: ${e.message}`); }
     setProcessing(false);

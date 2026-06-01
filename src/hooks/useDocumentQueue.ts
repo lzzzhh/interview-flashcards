@@ -9,10 +9,11 @@ const PENDING_STATUSES = ['draft', 'needs_review', 'duplicate'];
 async function getDraftCount(docId: string): Promise<number> {
   try {
     const res = await fetch(`${API_BASE}/documents/${docId}/drafts`);
+    if (!res.ok) return -1; // document doesn't exist
     const drafts = await res.json();
     if (!Array.isArray(drafts)) return 0;
     return drafts.filter((d: any) => PENDING_STATUSES.includes(d.status)).length;
-  } catch { return -1; }
+  } catch { return -1; } // network error → treat as not found
 }
 
 export interface QueueItem {
@@ -144,7 +145,7 @@ async function refreshDraftCounts() {
   for (const item of items) {
     if (item.status === 'done') {
       const count = await getDraftCount(item.docId);
-      item.draftCount = count;
+      item.draftCount = Math.max(0, count);
     }
   }
   notify();
@@ -153,7 +154,8 @@ async function refreshDraftCounts() {
 async function refreshDraftCountForDoc(docId: string) {
   const item = items.find(i => i.docId === docId);
   if (!item || item.status !== 'done') return;
-  item.draftCount = await getDraftCount(docId);
+  const count = await getDraftCount(docId);
+  item.draftCount = Math.max(0, count);
   notify();
 }
 
@@ -164,13 +166,13 @@ export function useDocumentQueue() {
 
   useEffect(() => {
     items = loadFromStorage();
-    // Clean stale queue items (documents whose drafts have been deleted)
+    // Clean stale queue items (documents deleted from DB)
     const checkStale = async () => {
       const stale: string[] = [];
       for (const item of items) {
         if (item.status === 'done') {
           const fresh = await getDraftCount(item.docId);
-          if (fresh === 0) stale.push(item.docId);
+          if (fresh < 0) stale.push(item.docId); // only remove if doc doesn't exist
         }
       }
       if (stale.length > 0) {

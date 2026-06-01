@@ -101,8 +101,8 @@ export default function ProcessingBadge({ onViewDrafts }: Props) {
                     </div>
                   )}
                   {item.status === 'done' && (
-                    <div className="text-[11px]" style={{ color: '#22C55E' }}>
-                      {item.draftCount > 0 ? `✅ ${item.draftCount} 张草稿` : '生成完成'}
+                    <div className="text-[11px]" style={{ color: item.draftCount > 0 ? '#22C55E' : TEXT_MUTED }}>
+                      {item.draftCount > 0 ? `✅ ${item.draftCount} 张草稿` : '无待审核草稿'}
                     </div>
                   )}
                   {item.status === 'failed' && (
@@ -114,7 +114,7 @@ export default function ProcessingBadge({ onViewDrafts }: Props) {
 
                 {/* Actions */}
                 <div className="shrink-0 flex items-center gap-1">
-                  {item.status === 'done' && (
+                  {item.status === 'done' && item.draftCount > 0 && (
                     <button onClick={() => onViewDrafts(item.docId)}
                       className="px-2 py-1 rounded-lg text-[10px] font-medium flex items-center gap-0.5"
                       style={{ backgroundColor: BLUE, color: '#fff' }}>

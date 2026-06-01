@@ -90,7 +90,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   };
 
   const handleSubmit = async () => {
-    if (!filePath.trim()) { setError('请选择或输入文件路径'); return; }
+    if (!droppedFile) { setError('请先选择文件'); return; }
     setError('');
     setProgressMessage('');
     setStatus('uploading');
@@ -183,11 +183,10 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
                 <input
                   type="text"
                   value={filePath}
-                  onChange={e => setFilePath(e.target.value)}
-                  placeholder="例如：/Users/name/Documents/面试宝典.pdf"
+                  readOnly
+                  placeholder="选择文件后自动填充"
                   className="w-full rounded-lg border px-3 py-2.5 text-[13px] bg-transparent"
                   style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}
-                  disabled={status === 'uploading' || status === 'parsing'}
                 />
               </div>
 
@@ -223,7 +222,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
 
               <button
                 onClick={handleSubmit}
-                disabled={status === 'uploading' || status === 'parsing' || !filePath.trim()}
+                disabled={status === 'uploading' || status === 'parsing' || !droppedFile}
                 className="w-full rounded-xl p-3.5 flex items-center justify-center gap-2 text-[14px] font-medium transition-opacity disabled:opacity-40"
                 style={{ backgroundColor: ACCENT, color: '#fff' }}
               >
