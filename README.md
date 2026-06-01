@@ -1,4 +1,4 @@
-# 📚 Interview Flashcards — 面经闪卡
+# Interview Flashcards
 
 <p align="center">
   <a href="https://github.com/lzzzhh/interview-flashcards/actions/workflows/build.yml"><img src="https://github.com/lzzzhh/interview-flashcards/actions/workflows/build.yml/badge.svg" alt="Build"></a>
@@ -12,210 +12,197 @@
 </p>
 
 <p align="center">
-  <img src="icon.png" width="128" alt="面经闪卡图标" />
+  <img src="icon.png" width="128" alt="Interview Flashcards icon" />
 </p>
 
 <p align="center">
-  Active Recall + SM-2 间隔重复驱动的面试复习桌面应用。<br>
-  <b>AI 智能搜索</b> · <b>学习清单生成</b> · <b>向量语义匹配</b><br>
-  内置卡片覆盖算法 · 统计学 · 机器学习 · 深度学习 · 大模型 · Agent · Vibe Coding · 行业黑话 · 职场话术。
+  A desktop flashcard app for interview preparation, powered by Active Recall and SM-2 spaced repetition.<br>
+  <b>AI Semantic Search</b> . <b>Learning Plans</b> . <b>Vector Matching</b><br>
+  Built-in card coverage: Algorithms . Statistics . Machine Learning . Deep Learning . LLM . Agent . Vibe Coding . Industry Jargon . Workplace Communication.
 </p>
 
 ---
 
-## 快速开始
+## Quick Start
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/install.sh | bash
 ```
 
-或从 [Releases](https://github.com/lzzzhh/interview-flashcards/releases) 下载：
+Or download from [Releases](https://github.com/lzzzhh/interview-flashcards/releases):
 
-| 平台 | 安装包 |
-|------|--------|
-| 🍎 macOS (Apple Silicon) | `面经闪卡_aarch64.dmg` |
-| 🍎 macOS (Intel) | `面经闪卡_x86_64.dmg` |
-| 🪟 Windows | NSIS `.exe` 安装包 |
-| 🐧 Linux | `.deb` 安装包 |
-
----
-
-## 功能亮点
-
-### 🏠 全新首页设计
-
-三栏式首页：今日待完成 → 推荐学习 → 我的牌组，底部 Tab Bar 导航。
-
-- **今日待完成**：复习 / 新卡 / 学习中 实时统计，一键开始今日学习
-- **推荐学习**：SM-2 算法智能推荐最需复习的卡片，支持左右滑动和点击跳转
-- **我的牌组**：9 个内置模块 + 自定义牌组，显示复习/新卡数量
-- **底部 Tab Bar**：首页 / 全部牌组 / 学习统计 / Agent / 我的
-
-### 🧠 主动回忆 + 间隔重复
-
-卡片默认隐藏答案，先回忆、再揭示。算法题支持「思路」和「代码」独立展开，问答题支持 Markdown + LaTeX 渲染。
-
-- **增强版 SM-2 调度** — 记录 `new / learning / review / relearning` 状态
-- **五级评分系统** — 按钮实时显示预期间隔：`<1天`、`3天`、`2周`、`1月`
-- **到期复习队列** — 复习模式只展示到期卡片，新卡模式每日上限控制
-- **撤回上次评分** — `Ctrl/Cmd + Z` 回滚
-
-### 📊 九大内置模块
-
-| 模块 | 覆盖范围 |
-|------|----------|
-| 🔥 力扣 | Hot 100 |
-| 📊 统计学 | 描述统计、概率论、假设检验、贝叶斯等 |
-| 🤖 机器学习 | 监督/无监督、集成学习、特征工程等 |
-| 🧩 深度学习 | 神经网络训练、生成模型等 |
-| 🧠 大模型 | Transformer、RAG、训练微调等 |
-| 🤖 Agent | Agent 架构、工具调用、记忆等 |
-| 🔮 Vibe Coding | /command、Skill、Agent Team、MCP、Hooks 等 |
-| 💬 黑话 | 互联网黑话、职场术语 |
-| 👔 职场 | 向上沟通、面试技巧等 |
-
-### 🔍 AI 智能搜索（需要后端 + Ollama）
-
-基于 bge-m3 向量嵌入的语义搜索，支持中文自然语言查询，自动匹配最相关的面试卡片。
-
-- **多路召回**：FTS5 全文搜索 + 标签匹配 + 语义向量检索
-- **智能排序**：字段加权 + 学习状态 Boost + 牌组匹配度
-- **语义理解**：同义词、中英混合、自然语言查询
-
-### 📋 AI 学习清单
-
-搜索后输入学习意图（如「学习决策树」「想掌握 SVM」），AI 自动筛选相关卡片并按学习优先级排序生成学习计划。清单保存在本地，可在「我的 → 学习清单」中查看和跳转学习。
-
-### 🗄️ 向量数据库
-
-可视化向量存储管理，支持多模块切换，实时查看嵌入记录与语义搜索结果。
-
-### 📈 学习统计
-
-独立统计页，展示：
-
-- 总卡片、已掌握、待复习
-- 连续学习天数、今日已学
-- 掌握率进度条、复习阶段分布
-- 模块分布进度条
-- 每日新卡上限（可折叠）
-- 数据导出 / 导入（覆盖全部模块 + 自定义牌组）
-
-
-### 🤖 Agent 工作台
-
-Agent Hub 统一管理 AI Agent 配置，支持多 Agent 协作与工具调用。
-
-### 🎤 AI 模拟面试
-
-基于卡片内容生成面试问题，模拟真实面试场景，支持语音输入与 AI 追问。
-
-### 📝 求职准备
-
-整合目标岗位 JD 解析、技能差距分析与面试策略建议。
-
-### 📄 简历项目
-
-管理简历中的项目经历，AI 辅助优化项目描述与 STAR 法则表述。
-
-### 🏷️ 标签管理
-
-跨模块标签系统，支持自定义标签创建、批量分配与按标签筛选卡片。
-
-### 🎹 快捷键
-
-| 快捷键 | 功能 |
-|--------|------|
-| `←` `→` | 翻页 |
-| `Space` | 显示 / 隐藏答案 |
-| `1` – `5` | 评分 |
-| `D` | 切换深色模式 |
-| `Ctrl/Cmd + Z` | 撤回评分 |
+| Platform | Package |
+|----------|---------|
+| macOS (Apple Silicon) | `Interview-Flashcards_aarch64.dmg` |
+| macOS (Intel) | `Interview-Flashcards_x86_64.dmg` |
+| Windows | NSIS `.exe` installer |
+| Linux | `.deb` package |
 
 ---
 
-## 技术栈
+## Features
 
-| 层级 | 技术选型 |
-|------|----------|
-| 前端 | React 19 + TypeScript + Vite 8 |
-| 样式 | TailwindCSS v4 + CSS 变量主题 |
-| 数学渲染 | react-markdown + KaTeX |
-| 图标 | lucide-react |
-| 桌面框架 | Tauri v2 (Rust) |
-| **后端 API** | **Fastify + Prisma + SQLite** |
-| 向量嵌入 | bge-m3 via Ollama (本地部署) |
-| 全文搜索 | SQLite FTS5 + 中文 bigram 分词 |
-| 间隔重复 | SM-2 算法（前后端双份，后端优先） |
-| CI/CD | GitHub Actions (macOS/Win/Linux) |
+### Home Page
 
-## 架构
+Three-column layout: Today's Tasks . Recommended Study . My Decks, with bottom tab bar navigation.
+
+- **Today's Tasks**: Real-time stats for review / new cards / in-progress, one-click daily study start
+- **Recommended Study**: SM-2 algorithm intelligently recommends cards needing review, supports swipe and tap navigation
+- **My Decks**: 9 built-in modules + custom decks, showing review/new card counts
+- **Bottom Tab Bar**: Home / All Decks / Stats / Agent / Profile
+
+### Active Recall + Spaced Repetition
+
+Cards hide answers by default -- recall first, then reveal. Algorithm cards support independent "Approach" and "Code" sections. Q&A cards support Markdown + LaTeX rendering.
+
+- **Enhanced SM-2 Scheduling**: Tracks `new / learning / review / relearning` states
+- **Five-level Rating System**: Buttons show real-time predicted intervals: `<1d`, `3d`, `2w`, `1m`
+- **Due Review Queue**: Review mode only shows due cards; new card mode has daily limit control
+- **Undo Last Rating**: `Ctrl/Cmd + Z` to rollback
+
+### Nine Built-in Modules
+
+| Module | Coverage |
+|--------|----------|
+| LeetCode | Hot 100 |
+| Statistics | Descriptive stats, probability, hypothesis testing, Bayesian |
+| Machine Learning | Supervised/unsupervised, ensemble methods, feature engineering |
+| Deep Learning | Neural network training, generative models |
+| LLM | Transformers, RAG, training & fine-tuning |
+| Agent | Agent architecture, tool calling, memory |
+| Vibe Coding | /command, Skill, Agent Team, MCP, Hooks |
+| Jargon | Internet slang, industry terminology |
+| Workplace | Upward communication, interview techniques |
+
+### AI Semantic Search (requires backend + Ollama)
+
+Semantic search based on bge-m3 vector embeddings, supporting Chinese natural language queries with automatic matching of relevant interview cards.
+
+- **Multi-channel Recall**: FTS5 full-text search + tag matching + semantic vector retrieval
+- **Smart Ranking**: Field weighting + learning state boost + deck match scoring
+- **Semantic Understanding**: Synonyms, mixed Chinese/English, natural language queries
+
+### AI Learning Plans
+
+After searching, input a learning intent (e.g. "learn decision trees", "master SVM"). AI automatically selects relevant cards and sorts by learning priority to generate a study plan. Plans are saved locally and accessible under Profile > Learning Plans for review and jump-to-study.
+
+### Vector Database
+
+Visual vector store management with multi-module switching, real-time embedded record viewing, and semantic search results.
+
+### Study Statistics
+
+Dedicated stats page showing:
+
+- Total cards, mastered, pending review
+- Streak days, today's learned
+- Mastery rate progress bar, review stage distribution
+- Module distribution progress bars
+- Daily new card limit (collapsible)
+- Data export / import (covers all modules + custom decks)
+
+### Agent Hub
+
+Unified AI Agent management. Currently supports AI Search, document-to-flashcard import, and draft review. Additional agents (Job Preparation, Mock Interview, Resume Project) are planned.
+
+### Tag Management
+
+Cross-module tagging system with custom tag creation, batch assignment, and tag-based card filtering.
+
+### Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `←` `→` | Navigate cards |
+| `Space` | Show / hide answer |
+| `1` – `5` | Rate card |
+| `D` | Toggle dark mode |
+| `Ctrl/Cmd + Z` | Undo rating |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 19 + TypeScript + Vite 8 |
+| Styling | TailwindCSS v4 + CSS variable theming |
+| Math Rendering | react-markdown + KaTeX |
+| Icons | lucide-react |
+| Desktop Framework | Tauri v2 (Rust) |
+| **Backend API** | **Fastify + Prisma + SQLite** |
+| Vector Embeddings | bge-m3 via Ollama (local deployment) |
+| Full-text Search | SQLite FTS5 + Chinese bigram tokenizer |
+| Spaced Repetition | SM-2 algorithm (backend priority) |
+| CI/CD | GitHub Actions (macOS / Windows / Linux) |
+
+## Architecture
 
 <p align="center">
-  <img src="docs/assets/architecture.png" alt="面经闪卡项目架构图" width="920">
+  <img src="docs/assets/architecture.png" alt="Project architecture diagram" width="920">
 </p>
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    Tauri 桌面壳                       │
-│  ┌───────────────────────────────────────────────┐  │
-│  │              React 前端 (SPA)                  │  │
-│  │  ┌─────────┐ ┌────────┐ ┌──────────────────┐  │  │
-│  │  │ HomePage │ │CardView│ │ Stats/Deck/      │  │  │
-│  │  │         │ │        │ │ Profile/Search   │  │  │
-│  │  └────┬─────┘ └───┬────┘ └────────┬─────────┘  │  │
-│  │       │            │              │             │  │
-│  │  ┌────▼────────────▼──────────────▼─────────┐  │  │
-│  │  │         Repository / API Client          │  │  │
-│  │  └────────────────────┬─────────────────────┘  │  │
-│  └───────────────────────┼────────────────────────┘  │
-│                          │                           │
-│  ┌───────────────────────▼────────────────────────┐  │
-│  │         原生存储 (Rust fs / localStorage)       │  │
-│  └────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────┐
-│              后端 API (Fastify :3001)                │
-│  ┌──────────┐ ┌────────┐ ┌──────────┐ ┌─────────┐  │
-│  │ /api/    │ │ /api/  │ │ /api/    │ │ /api/   │  │
-│  │  decks   │ │ cards  │ │ reviews  │ │ study   │  │
-│  └────┬─────┘ └───┬────┘ └────┬─────┘ └────┬────┘  │
-│  ┌────┴─────┐ ┌────┴───────────────────────────┐  │
-│  │ /api/    │ │ /api/search (AI 搜索 + 学习清单) │  │
-│  │ settings │ │ /api/maintenance (向量数据库)    │  │
-│  └────┬─────┘ └────┬───────────────────────────┘  │
-│       │            │           │            │       │
-│  ┌────▼────────────▼───────────▼────────────▼────┐  │
-│  │              Prisma ORM                        │  │
-│  └────────────────────┬───────────────────────────┘  │
-│                       │                              │
-│  ┌────────────────────▼───────────────────────────┐  │
-│  │              SQLite / PostgreSQL               │  │
-│  └────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------------+
+|                    Tauri Desktop Shell                     |
+|  +-----------------------------------------------------+  |
+|  |              React Frontend (SPA)                    |  |
+|  |  +-----------+ +--------+ +----------------------+  |  |
+|  |  | HomePage  | |CardView| | Stats / Deck /       |  |  |
+|  |  |           | |        | | Profile / Search     |  |  |
+|  |  +-----+-----+ +---+----+ +----------+-----------+  |  |
+|  |        |            |                |               |  |
+|  |  +-----v------------v----------------v-----------+   |  |
+|  |  |         Repository / API Client              |   |  |
+|  |  +---------------------+------------------------+   |  |
+|  +-------------------------+----------------------------+  |
+|                            |                               |
+|  +-------------------------v----------------------------+  |
+|  |         Native Storage (Rust fs / localStorage)     |  |
+|  +-----------------------------------------------------+  |
++-----------------------------------------------------------+
+                            |
+                            v
++-----------------------------------------------------------+
+|               Backend API (Fastify :3001)                  |
+|  +----------+ +--------+ +----------+ +---------+         |
+|  | /api/    | | /api/  | | /api/    | | /api/   |         |
+|  |  decks   | | cards  | | reviews  | | study   |         |
+|  +----+-----+ +---+----+ +----+-----+ +----+----+         |
+|  +----+-----+ +----+-----------------------------+        |
+|  | /api/    | | /api/search (AI search + plans)  |        |
+|  | settings | | /api/documents (ingest pipeline) |        |
+|  +----+-----+ +----+-----------------------------+        |
+|       |            |            |            |            |
+|  +----v------------v------------v------------v--------+   |
+|  |              Prisma ORM                            |   |
+|  +------------------------+---------------------------+   |
+|                           |                               |
+|  +------------------------v---------------------------+   |
+|  |              SQLite / PostgreSQL                   |   |
+|  +-----------------------------------------------------+  |
++-----------------------------------------------------------+
 ```
 
-## 从源码构建
+## Build from Source
 
 ```bash
 git clone https://github.com/lzzzhh/interview-flashcards.git
 cd interview-flashcards
 npm install
 
-# 启动后端（可选，用于数据库功能）
+# Start backend (optional, for database features)
 cd backend && npm install && npm run dev
 
-# 浏览器开发
+# Browser development
 npm run dev
 
-# 构建桌面安装包
+# Build desktop installer
 npm run build:desktop
 ```
 
 ---
 
-## 许可证
+## License
 
 MIT License
