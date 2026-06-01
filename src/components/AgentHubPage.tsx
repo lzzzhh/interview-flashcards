@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ArrowLeft, Search, FileText, Briefcase, Sparkles, Mic, ListChecks, ChevronRight } from 'lucide-react';
 import { useDocumentQueue } from '../hooks/useDocumentQueue';
 
@@ -10,17 +11,22 @@ const CARD_BORDER = 'var(--card-border)';
 
 const AGENTS = [
   { key: 'search', icon: Search, title: 'AI 智能搜索', desc: '语义搜索所有卡片，快速定位薄弱知识点', color: '#3B82F6' },
-  { key: 'ingest', icon: FileText, title: '资料制卡', desc: '上传 PDF/Word，AI 自动生成面试卡片', color: '#10B981' },
-  { key: 'jobprep', icon: Briefcase, title: '岗位备战', desc: '输入公司/岗位，匹配题库并生成学习计划', color: '#F59E0B' },
+  { key: 'ingest', icon: FileText, title: '资料制卡', desc: '上传 PDF/TXT/MD，AI 自动生成面试卡片', color: '#10B981' },
   { key: 'drafts', icon: Sparkles, title: '草稿审核', desc: '审核 AI 生成的卡片草稿，一键入库', color: '#8B5CF6' },
-  { key: 'mock-interview', icon: Mic, title: '模拟面试', desc: '自答自评模拟真实面试场景', color: '#EC4899' },
-  { key: 'resume-project', icon: ListChecks, title: '简历项目追问', desc: '基于项目描述生成面试追问卡片', color: '#14B8A6' },
+  { key: 'jobprep', icon: Briefcase, title: '岗位备战', desc: '输入公司/岗位，匹配题库并生成学习计划', color: '#F59E0B', disabled: true },
+  { key: 'mock-interview', icon: Mic, title: '模拟面试', desc: '自答自评模拟真实面试场景', color: '#EC4899', disabled: true },
+  { key: 'resume-project', icon: ListChecks, title: '简历项目追问', desc: '基于项目描述生成面试追问卡片', color: '#14B8A6', disabled: true },
 ];
 
 export default function AgentHubPage({ onBack, onNavigate }: Props) {
   const { doneCount, pendingDraftCount } = useDocumentQueue();
+  const [toast, setToast] = useState('');
 
   function handleAgentClick(agent: typeof AGENTS[0]) {
+    if (agent.disabled) {
+      setToast('功能开发中');
+      return;
+    }
     onNavigate(agent.key);
   }
 
@@ -56,7 +62,7 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
                 key={agent.key}
                 type="button"
                 onClick={() => handleAgentClick(agent)}
-                className="group relative flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left backdrop-blur-xl transition-colors hover:bg-white/45 dark:hover:bg-white/12"
+                className={`group relative flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left backdrop-blur-xl ${agent.disabled ? 'opacity-50' : 'hover:bg-white/45 dark:hover:bg-white/12 cursor-pointer'}`}
                 style={{
                   backgroundColor: CARD_BG,
                   borderColor: CARD_BORDER,
@@ -91,6 +97,14 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
             ))}
           </div>
         </div>
+
+        {/* Toast */}
+        {toast && (
+          <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-2xl backdrop-blur-xl border shadow-lg text-[13px] font-medium transition-all"
+            style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER, color: TEXT_MUTED }}>
+            {toast}
+          </div>
+        )}
       </div>
     </div>
   );
