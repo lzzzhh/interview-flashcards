@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { ArrowLeft, Check, X, Merge, Layers, Eye, Loader2, Search, Undo2, ChevronDown, Edit3, Save } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { ArrowLeft, Check, X, Merge, Layers, Eye, Loader2, Search, Undo2, ChevronDown, Edit3, Save, AlertTriangle, CheckCircle2, FileText, ShieldCheck } from 'lucide-react';
 import { getDrafts, batchReview, batchImport, importDryRun, approveDraft, rejectDraft, getDecks, patchDraft } from '../api/documents';
 import { loadCustomDecks } from '../utils/customDecks';
 import { useDocumentQueue } from '../hooks/useDocumentQueue';
@@ -13,6 +13,9 @@ interface Props {
 
 const BLUE = 'var(--blue)';
 const ORANGE = 'var(--orange)';
+const GREEN = '#22C55E';
+const RED = '#EF4444';
+const PURPLE = '#8B5CF6';
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_SECONDARY = 'var(--text-secondary)';
 const TEXT_MUTED = 'var(--text-muted)';
@@ -22,10 +25,10 @@ const CARD_BORDER = 'var(--card-border)';
 const REVIEW_COLORS: Record<string, string> = {
   draft: BLUE,
   needs_review: ORANGE,
-  approved: '#22C55E',
-  rejected: '#EF4444',
-  duplicate: '#8B5CF6',
-  merged: '#8B5CF6',
+  approved: GREEN,
+  rejected: RED,
+  duplicate: PURPLE,
+  merged: PURPLE,
   out_of_scope: TEXT_MUTED,
 };
 
@@ -47,7 +50,24 @@ const OBJ_LABELS: Record<string, string> = {
 
 const PAGE_SIZE = 50;
 
-let undoStack: { id: string; prevStatus: string } | null = null;
+type DryRunResult = Awaited<ReturnType<typeof importDryRun>>;
+type UndoEntry = { id: string; prevStatus: string };
+
+function truncateText(text: string, max = 96) {
+  const compact = text.replace(/\s+/g, ' ').trim();
+  return compact.length > max ? `${compact.slice(0, max)}...` : compact;
+}
+
+function confidenceColor(confidence: number) {
+  if (confidence >= 0.85) return GREEN;
+  if (confidence >= 0.65) return BLUE;
+  if (confidence >= 0.45) return ORANGE;
+  return RED;
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : '请稍后重试';
+}
 
 export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: Props) {
   const [allDrafts, setAllDrafts] = useState<CardDraftDTO[]>([]);
@@ -62,12 +82,15 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
   const [batchProgress, setBatchProgress] = useState('');
   const [tab, setTab] = useState<'all' | 'draft' | 'needs_review' | 'groups'>('draft');
   const [message, setMessage] = useState('');
-  const [dryRunResult, setDryRunResult] = useState<any>(null);
+  const [dryRunResult, setDryRunResult] = useState<DryRunResult | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortByConfidence, setSortByConfidence] = useState(false);
   const [approveResult, setApproveResult] = useState<{ count: number; deckId: string } | null>(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [editingDraft, setEditingDraft] = useState<{ id: string; question: string; answer: string; tags: string } | null>(null);
+  const [undoStack, setUndoStack] = useState<UndoEntry | null>(null);
+  const [deckMenuOpen, setDeckMenuOpen] = useState(false);
+  const deckMenuRef = useRef<HTMLDivElement | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -88,16 +111,30 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
       // Refresh queue draft counts (stale after review actions)
       if (documentId) refreshDraftCountForDoc(documentId);
       else refreshDraftCounts();
-    } catch (e: any) {
+    } catch (e: unknown) {
       setAllDrafts([]);
       setDecks([]);
-      setMessage(`加载失败: ${e?.message || '请稍后重试'}`);
+      setMessage(`加载失败: ${getErrorMessage(e)}`);
     } finally {
       setLoading(false);
     }
   }, [documentId, tab, selectedDeck, refreshDraftCounts, refreshDraftCountForDoc]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [load]);
+
+  useEffect(() => {
+    if (!deckMenuOpen) return;
+    function handlePointerDown(event: PointerEvent) {
+      if (deckMenuRef.current && !deckMenuRef.current.contains(event.target as Node)) {
+        setDeckMenuOpen(false);
+      }
+    }
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [deckMenuOpen]);
 
   // Filter + sort
   const filteredDrafts = useMemo(() => {
@@ -131,7 +168,16 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
     return map;
   }, [allDrafts]);
 
+  const statusCounts = useMemo(() => ({
+    draft: allDrafts.filter(d => d.status === 'draft').length,
+    needs_review: allDrafts.filter(d => d.status === 'needs_review').length,
+    approved: allDrafts.filter(d => d.status === 'approved').length,
+    rejected: allDrafts.filter(d => d.status === 'rejected').length,
+    groups: groups.size,
+  }), [allDrafts, groups]);
+
   const count = allDrafts.length;
+  const selectedDeckName = decks.find(d => d.id === selectedDeck)?.name || '';
 
   async function handleBatch(action: string) {
     if (selected.size === 0) return;
@@ -182,7 +228,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
         setSelected(new Set());
         await load();
       }
-    } catch (e: any) { setMessage(`错误: ${e.message}`); }
+    } catch (e: unknown) { setMessage(`错误: ${getErrorMessage(e)}`); }
     setProcessing(false);
   }
 
@@ -190,7 +236,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
     setProcessing(true);
     try {
       const draft = allDrafts.find(d => d.id === id);
-      undoStack = draft ? { id, prevStatus: draft.status } : null;
+      setUndoStack(draft ? { id, prevStatus: draft.status } : null);
 
       if (action === 'approve') {
         const deck = selectedDeck || draft?.deckId;
@@ -206,7 +252,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
       }
       setMessage('操作完成');
       await load();
-    } catch (e: any) { setMessage(`错误: ${e.message}`); }
+    } catch (e: unknown) { setMessage(`错误: ${getErrorMessage(e)}`); }
     setProcessing(false);
   }
 
@@ -225,28 +271,25 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
       setMessage('已保存并导入');
       setApproveResult({ count: 1, deckId: selectedDeck });
       await load();
-    } catch (e: any) { setMessage(`编辑失败: ${e.message}`); }
+    } catch (e: unknown) { setMessage(`编辑失败: ${getErrorMessage(e)}`); }
     setProcessing(false);
   }
 
-  function handleUndo() {
+  async function handleUndo() {
     if (!undoStack) return;
     setProcessing(true);
     const { id, prevStatus } = undoStack;
-    batchReview([id], 'restore_status', { restoreStatus: prevStatus, note: `Undo to ${prevStatus}` })
-      .then(async () => {
-        undoStack = null;
-        setMessage('已撤销');
-        await load();
-        setProcessing(false);
-      })
-      .catch(async () => {
-        // Reload as fallback
-        undoStack = null;
-        setMessage('撤销失败，已刷新状态');
-        await load();
-        setProcessing(false);
-      });
+    try {
+      await batchReview([id], 'restore_status', { restoreStatus: prevStatus, note: `Undo to ${prevStatus}` });
+      setUndoStack(null);
+      setMessage('已撤销');
+    } catch {
+      setUndoStack(null);
+      setMessage('撤销失败，已刷新状态');
+    } finally {
+      await load();
+      setProcessing(false);
+    }
   }
 
   async function handleGroupResolve(groupId: string, action: string) {
@@ -258,7 +301,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
       await batchReview(group.map(d => d.id), action, { note: `Group ${action}` });
       setMessage(`组操作完成: ${action}`);
       await load();
-    } catch (e: any) { setMessage(`错误: ${e.message}`); }
+    } catch (e: unknown) { setMessage(`错误: ${getErrorMessage(e)}`); }
     setProcessing(false);
   }
 
@@ -272,37 +315,61 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
             <ArrowLeft size={20} style={{ color: TEXT_PRIMARY }} />
           </button>
           <span className="nav-title">卡片草稿审核</span>
-          {count > 0 && <span className="text-[12px] ml-auto" style={{ color: TEXT_MUTED }}>{count} 张</span>}
+          {count > 0 && (
+            <span className="text-[11px] ml-auto px-2 py-1 rounded-full border shrink-0"
+              style={{ color: TEXT_MUTED, borderColor: CARD_BORDER, backgroundColor: 'rgba(255,255,255,0.04)' }}>
+              {count} 张
+            </span>
+          )}
         </div>
 
-        {/* Toolbar card */}
-        <div className="px-5 pt-4 pb-3">
+        <div className="px-5 pt-4 pb-3 space-y-3">
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { label: '待审', value: statusCounts.draft, icon: FileText, color: BLUE },
+              { label: '复查', value: statusCounts.needs_review, icon: AlertTriangle, color: ORANGE },
+              { label: '重复', value: statusCounts.groups, icon: Layers, color: PURPLE },
+              { label: '已过', value: statusCounts.approved, icon: CheckCircle2, color: GREEN },
+            ].map(item => {
+              const Icon = item.icon;
+              return (
+                <div key={item.label} className="rounded-xl border p-2"
+                  style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER, boxShadow: 'var(--card-shadow, 0 1px 3px rgba(0,0,0,0.04))' }}>
+                  <div className="flex items-center gap-1.5">
+                    <Icon size={12} style={{ color: item.color }} />
+                    <span className="text-[10px]" style={{ color: TEXT_MUTED }}>{item.label}</span>
+                  </div>
+                  <div className="mt-1 text-[16px] font-bold leading-none" style={{ color: TEXT_PRIMARY }}>{item.value}</div>
+                </div>
+              );
+            })}
+          </div>
+
           <div className="rounded-2xl border p-3 space-y-3"
             style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER, boxShadow: 'var(--card-shadow, 0 1px 3px rgba(0,0,0,0.04))' }}>
 
-            {/* Tabs */}
-            <div className="flex gap-1">
-              {['draft', 'needs_review', 'groups', 'all'].map(t => (
+            <div className="grid grid-cols-4 gap-1 rounded-xl p-1" style={{ backgroundColor: 'rgba(148,163,184,0.10)' }}>
+              {(['draft', 'needs_review', 'groups', 'all'] as const).map(t => (
                 <button key={t}
-                  onClick={() => { setTab(t as any); setDryRunResult(null); setVisibleCount(PAGE_SIZE); }}
-                  className="px-3 py-1.5 rounded-xl text-[12px] font-semibold transition-colors"
+                  onClick={() => { setTab(t); setDryRunResult(null); setVisibleCount(PAGE_SIZE); }}
+                  className="min-h-9 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors"
                   style={{
-                    backgroundColor: tab === t ? BLUE : 'var(--card-border)',
+                    backgroundColor: tab === t ? BLUE : 'transparent',
                     color: tab === t ? '#fff' : TEXT_MUTED,
                   }}>
-                  {t === 'draft' ? '待审核' : t === 'needs_review' ? '需复查' : t === 'groups' ? '重复组' : '全部'}
+                  {t === 'draft' ? `待审核 ${statusCounts.draft}` : t === 'needs_review' ? `复查 ${statusCounts.needs_review}` : t === 'groups' ? `重复 ${statusCounts.groups}` : '全部'}
                 </button>
               ))}
             </div>
 
-            {/* Search */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-h-10 px-3 rounded-xl border"
+              style={{ borderColor: CARD_BORDER, backgroundColor: 'rgba(148,163,184,0.08)' }}>
               <Search size={14} style={{ color: TEXT_MUTED }} />
               <input
                 value={searchQuery}
                 onChange={e => { setSearchQuery(e.target.value); setVisibleCount(PAGE_SIZE); }}
                 placeholder="搜索问题、概念、标签..."
-                className="flex-1 text-[12px] bg-transparent outline-none"
+                className="flex-1 min-w-0 text-[12px] bg-transparent outline-none"
                 style={{ color: TEXT_PRIMARY }}
               />
               {searchQuery && (
@@ -316,8 +383,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
               </button>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="grid grid-cols-[auto_1fr] gap-2 items-stretch">
               <button
                 onClick={() => {
                   const all = tab === 'groups' ? [] : visibleDrafts.map(d => d.id);
@@ -328,46 +394,99 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
                   }
                 }}
                 disabled={tab === 'groups' || visibleDrafts.length === 0}
-                className="text-[11px] font-medium px-2 py-1 rounded-lg border transition-colors"
+                className="min-h-10 text-[11px] font-medium px-3 rounded-xl border transition-colors"
                 style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY, opacity: tab === 'groups' || visibleDrafts.length === 0 ? 0.4 : 1 }}>
                 {visibleDrafts.length > 0 && visibleDrafts.every(d => selected.has(d.id)) ? '取消' : '全选'} ({selected.size})
               </button>
-              <select value={selectedDeck} onChange={e => setSelectedDeck(e.target.value)}
-                className="flex-1 text-[12px] px-2 py-1.5 rounded-xl border"
-                style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY, backgroundColor: CARD_BG }}>
-                <option value="">选择牌组...</option>
-                {decks.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-              </select>
+              <div ref={deckMenuRef} className="relative min-w-0">
+                <button type="button" onClick={() => setDeckMenuOpen(v => !v)}
+                  className="w-full min-h-12 rounded-xl border px-3 py-2 text-left backdrop-blur-xl transition-colors"
+                  style={{
+                    borderColor: selectedDeck ? CARD_BORDER : 'rgba(234,88,12,0.42)',
+                    backgroundColor: selectedDeck ? 'rgba(148,163,184,0.08)' : 'rgba(234,88,12,0.08)',
+                    color: TEXT_PRIMARY,
+                  }}>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[10px] font-semibold leading-none" style={{ color: selectedDeck ? TEXT_MUTED : ORANGE }}>
+                        目标牌组
+                      </div>
+                      <div className="mt-1 truncate text-[12px] font-semibold">
+                        {selectedDeckName || '先选择牌组'}
+                      </div>
+                      <div className="mt-0.5 truncate text-[10px]" style={{ color: selectedDeck ? TEXT_MUTED : ORANGE }}>
+                        {selectedDeck ? '通过将导入到这里' : '未选择会影响通过 / 导入'}
+                      </div>
+                    </div>
+                    <ChevronDown size={16} className={`shrink-0 transition-transform ${deckMenuOpen ? 'rotate-180' : ''}`} style={{ color: TEXT_MUTED }} />
+                  </div>
+                </button>
+                {deckMenuOpen && (
+                  <div className="absolute right-0 top-full z-30 mt-2 max-h-56 w-full overflow-y-auto rounded-xl border p-1 shadow-xl backdrop-blur-2xl"
+                    style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+                    <button type="button"
+                      onClick={() => { setSelectedDeck(''); setDeckMenuOpen(false); }}
+                      className="w-full rounded-lg px-3 py-2 text-left text-[12px] transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+                      style={{ color: selectedDeck ? TEXT_MUTED : ORANGE }}>
+                      不指定牌组
+                    </button>
+                    {decks.map(d => (
+                      <button type="button" key={d.id}
+                        onClick={() => { setSelectedDeck(d.id); setDeckMenuOpen(false); }}
+                        className="w-full rounded-lg px-3 py-2 text-left text-[12px] transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+                        style={{
+                          color: d.id === selectedDeck ? BLUE : TEXT_PRIMARY,
+                          backgroundColor: d.id === selectedDeck ? 'rgba(64,156,255,0.10)' : 'transparent',
+                        }}>
+                        <span className="block truncate font-medium">{d.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
               <button onClick={() => handleBatch('dry-run')} disabled={processing || selected.size === 0}
-                className="px-2.5 py-1.5 rounded-xl text-[11px] font-medium border transition-colors"
-                style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY, opacity: processing ? 0.4 : 1 }}>
+                className="min-h-10 px-2.5 rounded-xl text-[11px] font-medium border transition-colors"
+                style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY, opacity: processing || selected.size === 0 ? 0.4 : 1 }}>
                 <Eye size={14} className="inline mr-1" />验证
               </button>
               <button onClick={() => handleBatch('approve')} disabled={processing || selected.size === 0}
-                className="px-2.5 py-1.5 rounded-xl text-[11px] font-medium text-white transition-colors"
-                style={{ backgroundColor: BLUE, opacity: processing ? 0.4 : 1 }}>
+                className="min-h-10 px-2.5 rounded-xl text-[11px] font-medium text-white transition-colors"
+                style={{ backgroundColor: BLUE, opacity: processing || selected.size === 0 ? 0.4 : 1 }}>
                 <Check size={14} className="inline mr-1" />通过
               </button>
               <button onClick={() => handleBatch('reject')} disabled={processing || selected.size === 0}
-                className="px-2.5 py-1.5 rounded-xl text-[11px] font-medium text-white transition-colors"
-                style={{ backgroundColor: '#EF4444', opacity: processing ? 0.4 : 1 }}>
+                className="min-h-10 px-2.5 rounded-xl text-[11px] font-medium text-white transition-colors"
+                style={{ backgroundColor: RED, opacity: processing || selected.size === 0 ? 0.4 : 1 }}>
                 <X size={14} className="inline mr-1" />拒绝
               </button>
+            </div>
+
+            {(selected.size > 0 || selectedDeckName || undoStack) && (
+              <div className="flex items-center gap-2 rounded-xl px-3 py-2 text-[11px]"
+                style={{ backgroundColor: 'rgba(64,156,255,0.10)', color: TEXT_MUTED }}>
+                <ShieldCheck size={13} style={{ color: BLUE }} />
+                <span className="flex-1 min-w-0 truncate">
+                  已选 {selected.size} 张{selectedDeckName ? ` · 目标 ${selectedDeckName}` : ''}
+                </span>
               {undoStack && (
                 <button onClick={handleUndo} disabled={processing}
-                  className="px-2 py-1 rounded-lg text-[10px] font-medium border flex items-center gap-1"
+                  className="px-2 py-1 rounded-lg text-[10px] font-medium border flex items-center gap-1 shrink-0"
                   style={{ borderColor: ORANGE, color: ORANGE }}>
                   <Undo2 size={12} />撤销
                 </button>
               )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Batch progress */}
         {batchProgress && (
           <div className="px-5 mb-2">
-            <div className="flex items-center gap-2 p-2 rounded-xl" style={{ backgroundColor: 'var(--card-border)' }}>
+            <div className="flex items-center gap-2 p-2 rounded-xl border" style={{ backgroundColor: 'rgba(64,156,255,0.10)', borderColor: CARD_BORDER }}>
               <Loader2 size={14} className="animate-spin" style={{ color: BLUE }} />
               <span className="text-[12px]" style={{ color: TEXT_PRIMARY }}>{batchProgress}</span>
             </div>
@@ -377,21 +496,34 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
         {/* Dry-run result */}
         {dryRunResult && (
           <div className="px-5 mb-2">
-            <div className="rounded-2xl border p-3 text-[12px]"
-              style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-              <div className="font-semibold mb-2" style={{ color: TEXT_PRIMARY }}>验证结果</div>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1" style={{ color: TEXT_MUTED }}>
-                <span>可导入: {dryRunResult.willCreateCards}</span>
-                <span>被拦截: {dryRunResult.blockedDrafts.length}</span>
-                <span>未处理重复: {dryRunResult.unresolvedDuplicates.length}</span>
-                <span>缺 deckId: {dryRunResult.missingDeckId.length}</span>
-                <span>缺 tags: {dryRunResult.missingTags.length}</span>
-                <span>缺 searchKeywords: {dryRunResult.missingSearchKeywords.length}</span>
+            <div className="rounded-2xl border p-3 text-[12px] space-y-3"
+              style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER, boxShadow: 'var(--card-shadow, 0 1px 3px rgba(0,0,0,0.04))' }}>
+              <div className="flex items-center justify-between">
+                <div className="font-semibold" style={{ color: TEXT_PRIMARY }}>验证结果</div>
+                <span className="text-[10px]" style={{ color: dryRunResult.blockedDrafts.length ? ORANGE : GREEN }}>
+                  {dryRunResult.blockedDrafts.length ? '需要处理' : '可导入'}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  ['可导入', dryRunResult.willCreateCards, GREEN],
+                  ['拦截', dryRunResult.blockedDrafts.length, dryRunResult.blockedDrafts.length ? ORANGE : TEXT_MUTED],
+                  ['重复', dryRunResult.unresolvedDuplicates.length, dryRunResult.unresolvedDuplicates.length ? PURPLE : TEXT_MUTED],
+                  ['缺牌组', dryRunResult.missingDeckId.length, dryRunResult.missingDeckId.length ? ORANGE : TEXT_MUTED],
+                  ['缺标签', dryRunResult.missingTags.length, dryRunResult.missingTags.length ? ORANGE : TEXT_MUTED],
+                  ['缺关键词', dryRunResult.missingSearchKeywords.length, dryRunResult.missingSearchKeywords.length ? ORANGE : TEXT_MUTED],
+                ].map(([label, value, color]) => (
+                  <div key={label as string} className="rounded-xl px-2 py-2 border"
+                    style={{ borderColor: CARD_BORDER, backgroundColor: 'rgba(148,163,184,0.08)' }}>
+                    <div className="text-[10px]" style={{ color: TEXT_MUTED }}>{label}</div>
+                    <div className="text-[15px] font-bold leading-none mt-1" style={{ color: color as string }}>{value}</div>
+                  </div>
+                ))}
               </div>
               {dryRunResult.blockedDrafts.length === 0 && (
                 <button onClick={() => handleBatch('import')} disabled={processing}
-                  className="mt-2 px-3 py-1.5 rounded-xl text-[11px] font-medium text-white"
-                  style={{ backgroundColor: '#22C55E' }}>
+                  className="w-full min-h-10 px-3 rounded-xl text-[12px] font-medium text-white"
+                  style={{ backgroundColor: GREEN }}>
                   <Loader2 size={12} className="inline mr-1" />确认导入 {dryRunResult.willCreateCards} 张
                 </button>
               )}
@@ -403,9 +535,10 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
         {approveResult && (
           <div className="px-5 mb-2">
             <div className="rounded-2xl border p-3 text-[12px]"
-              style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.3)' }}>
+              style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.3)', boxShadow: 'var(--card-shadow, 0 1px 3px rgba(0,0,0,0.04))' }}>
               <div className="flex items-center gap-2 mb-2">
-                <span style={{ color: '#22C55E' }}>✓ 已导入 {approveResult.count} 张卡片到 {decks.find(d => d.id === approveResult.deckId)?.name || approveResult.deckId}</span>
+                <CheckCircle2 size={15} style={{ color: GREEN }} />
+                <span className="flex-1" style={{ color: GREEN }}>已导入 {approveResult.count} 张卡片到 {decks.find(d => d.id === approveResult.deckId)?.name || approveResult.deckId}</span>
                 <button onClick={() => setApproveResult(null)}
                   className="text-[10px]" style={{ color: TEXT_MUTED }}>关闭</button>
               </div>
@@ -526,18 +659,40 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
                   <div key={d.id} className="rounded-2xl border overflow-hidden transition-all hover:-translate-y-0.5"
                     style={{
                       backgroundColor: CARD_BG,
-                      borderColor: CARD_BORDER,
-                      boxShadow: 'var(--card-shadow, 0 1px 3px rgba(0,0,0,0.04))',
+                      borderColor: selected.has(d.id) ? BLUE : CARD_BORDER,
+                      boxShadow: selected.has(d.id) ? '0 14px 34px rgba(64,156,255,0.18)' : 'var(--card-shadow, 0 1px 3px rgba(0,0,0,0.04))',
                     }}>
                     <label className="flex items-start gap-3 p-3 cursor-pointer"
-                      onClick={() => setSelected(s => { const n = new Set(s); n.has(d.id) ? n.delete(d.id) : n.add(d.id); return n; })}>
+                      onClick={() => setSelected(s => {
+                        const n = new Set(s);
+                        if (n.has(d.id)) n.delete(d.id);
+                        else n.add(d.id);
+                        return n;
+                      })}>
                       <input type="checkbox" checked={selected.has(d.id)} onChange={() => {}}
                         className="mt-1 rounded accent-[var(--blue)]" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-[13px] font-bold leading-snug mb-1.5" style={{ color: TEXT_PRIMARY }}>
-                          {d.question}
+                        <div className="flex items-start gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-[13px] font-bold leading-snug" style={{ color: TEXT_PRIMARY }}>
+                              {d.question}
+                            </div>
+                            <div className="mt-1 text-[11px] leading-relaxed line-clamp-2" style={{ color: TEXT_SECONDARY }}>
+                              {truncateText(d.answer)}
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-[10px]" style={{ color: TEXT_MUTED }}>置信度</div>
+                            <div className="text-[14px] font-bold leading-tight" style={{ color: confidenceColor(d.confidence) }}>
+                              {Math.round(d.confidence * 100)}
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(148,163,184,0.18)' }}>
+                          <div className="h-full rounded-full transition-all"
+                            style={{ width: `${Math.max(4, Math.min(100, Math.round(d.confidence * 100)))}%`, backgroundColor: confidenceColor(d.confidence) }} />
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap mt-2">
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border"
                             style={{ color: statusColor, backgroundColor: `${statusColor}18`, borderColor: `${statusColor}30` }}>
                             {STATUS_LABELS[d.status] || d.status}
@@ -554,13 +709,14 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
                               {OBJ_LABELS[d.learningObjective] || d.learningObjective}
                             </span>
                           )}
-                          <span className="text-[10px]" style={{ color: TEXT_MUTED }}>
-                            置信度 {d.confidence.toFixed(2)}
-                          </span>
+                          {d.sourceRefs?.[0]?.pageNumber && (
+                            <span className="text-[10px]" style={{ color: TEXT_MUTED }}>Page {d.sourceRefs[0].pageNumber}</span>
+                          )}
                         </div>
                       </div>
                       <button onClick={e => { e.stopPropagation(); setExpanded(expanded === d.id ? null : d.id); }}
-                        className="p-1 rounded-lg hover:opacity-60">
+                        className="p-1.5 rounded-lg hover:opacity-70 shrink-0"
+                        style={{ backgroundColor: expanded === d.id ? 'rgba(64,156,255,0.12)' : 'transparent' }}>
                         <Eye size={16} style={{ color: TEXT_MUTED }} />
                       </button>
                     </label>
