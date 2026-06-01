@@ -122,7 +122,7 @@ export default function ProcessingBadge({ onViewDrafts }: Props) {
                     </button>
                   )}
                   {item.status === 'processing' && (
-                    <button onClick={() => { cancelOnServer(item.docId); removeFromQueue(item.docId); }} className="p-0.5">
+                    <button onClick={() => { cancelOnServer(item.docId); }} className="p-0.5">
                       <X size={14} style={{ color: '#EF4444' }} />
                     </button>
                   )}
