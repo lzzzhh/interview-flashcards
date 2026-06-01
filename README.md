@@ -17,7 +17,7 @@
 
 <p align="center">
   A desktop flashcard app for interview preparation, powered by Active Recall and SM-2 spaced repetition.<br>
-  <b>AI Semantic Search</b> . <b>Learning Plans</b> . <b>Vector Matching</b><br>
+  <b>AI Semantic Search</b> . <b>Document-to-Flashcards</b> . <b>Learning Plans</b><br>
   Built-in card coverage: Algorithms . Statistics . Machine Learning . Deep Learning . LLM . Agent . Vibe Coding . Industry Jargon . Workplace Communication.
 </p>
 
@@ -33,8 +33,8 @@ Or download from [Releases](https://github.com/lzzzhh/interview-flashcards/relea
 
 | Platform | Package |
 |----------|---------|
-| macOS (Apple Silicon) | `Interview-Flashcards_aarch64.dmg` |
-| macOS (Intel) | `Interview-Flashcards_x86_64.dmg` |
+| macOS (Apple Silicon) | DMG installer |
+| macOS (Intel) | DMG installer |
 | Windows | NSIS `.exe` installer |
 | Linux | `.deb` package |
 
@@ -44,18 +44,18 @@ Or download from [Releases](https://github.com/lzzzhh/interview-flashcards/relea
 
 ### Home Page
 
-Three-column layout: Today's Tasks . Recommended Study . My Decks, with bottom tab bar navigation.
+Mobile-first single-column layout with Today's Tasks, Recommended Study, and a compact My Decks preview. The full deck list is available from the All Decks page.
 
 - **Today's Tasks**: Real-time stats for review / new cards / in-progress, one-click daily study start
 - **Recommended Study**: SM-2 algorithm intelligently recommends cards needing review, supports swipe and tap navigation
-- **My Decks**: 9 built-in modules + custom decks, showing review/new card counts
+- **My Decks**: Preview of the first 6 built-in modules with review/new card counts
 - **Bottom Tab Bar**: Home / All Decks / Stats / Agent / Profile
 
 ### Active Recall + Spaced Repetition
 
 Cards hide answers by default -- recall first, then reveal. Algorithm cards support independent "Approach" and "Code" sections. Q&A cards support Markdown + LaTeX rendering.
 
-- **Enhanced SM-2 Scheduling**: Tracks `new / learning / review / relearning` states
+- **SM-2 Scheduling**: Tracks `new / learning / review / relearning` states; scheduling runs locally first, with backend review logging when available
 - **Five-level Rating System**: Buttons show real-time predicted intervals: `<1d`, `3d`, `2w`, `1m`
 - **Due Review Queue**: Review mode only shows due cards; new card mode has daily limit control
 - **Undo Last Rating**: `Ctrl/Cmd + Z` to rollback
@@ -74,21 +74,28 @@ Cards hide answers by default -- recall first, then reveal. Algorithm cards supp
 | Jargon | Internet slang, industry terminology |
 | Workplace | Upward communication, interview techniques |
 
-### AI Semantic Search (requires backend + Ollama)
+### Document-to-Flashcards
 
-Semantic search based on bge-m3 vector embeddings, supporting Chinese natural language queries with automatic matching of relevant interview cards.
+Upload PDF, TXT, or Markdown files. The app processes documents in a global background queue, extracts concepts via LLM, generates Chinese flashcard drafts, and lets users review, edit, validate, and batch-import cards into selected decks.
 
-- **Multi-channel Recall**: FTS5 full-text search + tag matching + semantic vector retrieval
+- **Background Queue**: Uploads go into a global processing queue with real-time progress tracking. The queue persists across navigation and page refreshes.
+- **Draft Review Page**: Status dashboard (pending / needs-review / duplicate / approved counts), custom deck selector, dry-run validation, confidence-sorted card list
+- **Edit & Approve**: Edit question, answer, and tags inline before importing. Single or batch approve/reject/mark-duplicate/mark-out-of-scope
+- **Batch Import**: Select all drafts, validate via dry run, then import in batches. Supports more than 20 cards at once.
+- **Post-import CTA**: After importing, direct links to start learning new cards or view the target deck
+
+### AI Semantic Search
+
+Semantic search with multi-channel recall and smart ranking, supporting Chinese natural language queries.
+
+- **Multi-channel Recall**: FTS5 full-text search + tag matching + search keyword matching + vector similarity
 - **Smart Ranking**: Field weighting + learning state boost + deck match scoring
+- **Embeddings**: Supports OpenAI-compatible embedding APIs and local Ollama bge-m3. Falls back to local n-gram vectors if no embedding provider is configured.
 - **Semantic Understanding**: Synonyms, mixed Chinese/English, natural language queries
 
 ### AI Learning Plans
 
-After searching, input a learning intent (e.g. "learn decision trees", "master SVM"). AI automatically selects relevant cards and sorts by learning priority to generate a study plan. Plans are saved locally and accessible under Profile > Learning Plans for review and jump-to-study.
-
-### Vector Database
-
-Visual vector store management with multi-module switching, real-time embedded record viewing, and semantic search results.
+After searching, input a learning intent (e.g. "learn decision trees", "master SVM"). AI automatically selects relevant cards and sorts by learning priority to generate a study plan. Plans are saved locally and accessible under Profile > Learning Plans.
 
 ### Study Statistics
 
@@ -99,15 +106,17 @@ Dedicated stats page showing:
 - Mastery rate progress bar, review stage distribution
 - Module distribution progress bars
 - Daily new card limit (collapsible)
-- Data export / import (covers all modules + custom decks)
+
+### Profile & Data Management
+
+- **Data Storage**: JSON / CSV export and import for cards and custom decks
+- **Learning Plans**: View and manage saved study plans
+- **API Settings**: Configure LLM base URL, API key, and model
+- **Tag Management**: Cross-module tag listing, rename, merge, and delete operations
 
 ### Agent Hub
 
-Unified AI Agent management. Currently supports AI Search, document-to-flashcard import, and draft review. Additional agents (Job Preparation, Mock Interview, Resume Project) are planned.
-
-### Tag Management
-
-Cross-module tagging system with custom tag creation, batch assignment, and tag-based card filtering.
+Currently available: AI Search, Document-to-Flashcards, Draft Review. Job Preparation, Mock Interview, and Resume Project are shown as disabled placeholders.
 
 ### Keyboard Shortcuts
 
@@ -130,10 +139,10 @@ Cross-module tagging system with custom tag creation, batch assignment, and tag-
 | Math Rendering | react-markdown + KaTeX |
 | Icons | lucide-react |
 | Desktop Framework | Tauri v2 (Rust) |
-| **Backend API** | **Fastify + Prisma + SQLite** |
-| Vector Embeddings | bge-m3 via Ollama (local deployment) |
+| Backend API | Fastify + Prisma + SQLite |
+| Vector Embeddings | OpenAI-compatible API / Ollama bge-m3 / local n-gram fallback |
 | Full-text Search | SQLite FTS5 + Chinese bigram tokenizer |
-| Spaced Repetition | SM-2 algorithm (backend priority) |
+| Spaced Repetition | SM-2 algorithm (local-first, backend logging when available) |
 | CI/CD | GitHub Actions (macOS / Windows / Linux) |
 
 ## Architecture
@@ -179,7 +188,7 @@ Cross-module tagging system with custom tag creation, batch assignment, and tag-
 |  +------------------------+---------------------------+   |
 |                           |                               |
 |  +------------------------v---------------------------+   |
-|  |              SQLite / PostgreSQL                   |   |
+|  |                     SQLite                         |   |
 |  +-----------------------------------------------------+  |
 +-----------------------------------------------------------+
 ```
@@ -191,14 +200,21 @@ git clone https://github.com/lzzzhh/interview-flashcards.git
 cd interview-flashcards
 npm install
 
-# Start backend (optional, for database features)
-cd backend && npm install && npm run dev
-
-# Browser development
+# ---- Backend ----
+cd backend
+npm install
+cp .env.example .env     # edit .env with your LLM API key before running
+npx prisma generate
+npx prisma db push
 npm run dev
 
-# Build desktop installer
-npm run build:desktop
+# ---- Frontend (open another terminal) ----
+cd interview-flashcards
+npm run dev              # browser development
+
+# ---- Desktop App ----
+npm run dev:desktop      # Tauri dev mode
+npm run build:desktop    # production build
 ```
 
 ---

@@ -118,7 +118,7 @@ export default function ProfilePage({ onBack, onNavigate }: Props) {
                 <div className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ left: state.isDark ? '22px' : '2px' }} />
               </button>
             } />
-            <SettingRow label="版本" right={<span className="text-[13px]" style={{ color: TEXT_MUTED }}>0.5.0</span>} />
+            <SettingRow label="版本" right={<span className="text-[13px]" style={{ color: TEXT_MUTED }}>0.6.0</span>} />
             <SettingRow label="数据存储路径" right={<span className="text-[11px] text-right max-w-[180px] truncate" style={{ color: TEXT_MUTED }}>~/Documents/interview-flashcards/</span>} />
             <button onClick={() => onNavigate('api-settings')} className="flex items-center justify-between w-full py-2.5 border-b last:border-b-0" style={{ borderColor: 'var(--card-border)' }}>
               <div className="flex items-center gap-2">
