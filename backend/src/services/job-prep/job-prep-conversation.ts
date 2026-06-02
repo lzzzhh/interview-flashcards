@@ -8,6 +8,7 @@ import { searchPublicJD } from './tools/public-jd-search-tool';
 import { neo4jBuildKeywordTiers } from '../search/neo4j-graph-search';
 import { fts5Search } from '../search/fts5-search';
 import { ragSearch } from '../rag/rag-search';
+import { indexJobPosting } from '../rag/rag-indexer';
 
 // ── Intent types ──
 
@@ -103,7 +104,7 @@ export async function handleJobPrepMessage(sessionId: string, content: string) {
 // ── Intent Handlers ──
 
 async function handleProvideJD(session: any, content: string) {
-  await prisma.jobPostingSnapshot.create({ data: { sessionId: session.id, sourceType: 'user_pasted', rawText: content, selected: true } });
+  const posting = await prisma.jobPostingSnapshot.create({ data: { sessionId: session.id, sourceType: 'user_pasted', rawText: content, cleanedText: content, company: session.company, role: session.role, selected: true } });
   await prisma.jobPrepSession.update({ where: { id: session.id }, data: { status: 'planning' } });
 
   // Parse requirements
@@ -114,6 +115,9 @@ async function handleProvideJD(session: any, content: string) {
       await prisma.jobRequirement.create({ data: { sessionId: session.id, type: r.type || 'skill', name: r.name, normalizedName: r.normalizedName, importance: r.importance || 'unknown', evidenceText: r.evidenceText } });
     }
   } catch { /* non-critical */ }
+
+  // Index JD into Qdrant for RAG retrieval
+  try { await indexJobPosting(posting.id); } catch { /* Qdrant may be down */ }
 
   return generateAndSavePlan(session);
 }
@@ -137,9 +141,23 @@ async function handleConfirmJD(session: any, content: string) {
   const candidates = await prisma.jobPostingSnapshot.findMany({ where: { sessionId: session.id, sourceType: { in: ['public_web', 'official_site'] } } });
   const idx = parseInt(content) - 1;
   if (idx >= 0 && idx < candidates.length) {
+    const candidate = candidates[idx];
     await prisma.jobPostingSnapshot.updateMany({ where: { sessionId: session.id }, data: { selected: false } });
-    await prisma.jobPostingSnapshot.update({ where: { id: candidates[idx].id }, data: { selected: true } });
+    await prisma.jobPostingSnapshot.update({ where: { id: candidate.id }, data: { selected: true } });
     await prisma.jobPrepSession.update({ where: { id: session.id }, data: { status: 'planning' } });
+
+    // Parse requirements from confirmed JD
+    try {
+      const raw = await llm(JD_PARSE_PROMPT, `Parse this JD:\n${candidate.cleanedText || candidate.rawText}`);
+      const parsed = safeParseJson(raw);
+      if (parsed?.requirements) for (const r of parsed.requirements) {
+        await prisma.jobRequirement.create({ data: { sessionId: session.id, type: r.type || 'skill', name: r.name, normalizedName: r.normalizedName, importance: r.importance || 'unknown', evidenceText: r.evidenceText } });
+      }
+    } catch { /* non-critical */ }
+
+    // Index confirmed JD into Qdrant
+    try { await indexJobPosting(candidate.id); } catch { /* Qdrant may be down */ }
+
     return generateAndSavePlan(session);
   }
   return { assistantMessage: `请输入 1-${candidates.length} 之间的编号。`, nextAction: 'confirm_jd' };
@@ -228,7 +246,9 @@ async function generateAndSavePlan(session: any) {
     const ragQuery = [company, role, ...reqs.map(r => r.name)].filter(Boolean).join(' ');
     const ragResults = await ragSearch({ query: ragQuery, sourceTypes: ['job_posting', 'document', 'project', 'interview_qa'], topK: 15 });
     if (ragResults.length > 0) {
-      ragEvidence = ragResults.map(r => `[${r.sourceType}] ${r.title || ''}: ${r.text.slice(0, 300)}`).join('\n---\n');
+      ragEvidence = ragResults.map(r =>
+        `[${r.sourceType}:${r.sourceId}] ${r.title || ''}: ${r.text.slice(0, 300)}`
+      ).join('\n---\n');
     }
   } catch { /* Qdrant unavailable — skip */ }
 

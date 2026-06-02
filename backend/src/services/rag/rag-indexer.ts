@@ -4,6 +4,7 @@ import prisma from '../../db/prisma';
 import { getQdrantClient, getQdrantCollection } from './qdrant-client';
 import { embedBatch } from './embedding-service';
 import { buildAllCardChunks, type RagChunk } from './chunk-builders/card-chunk-builder';
+import { buildJobPostingChunks, buildAllJobPostingChunks } from './chunk-builders/job-posting-chunk-builder';
 import crypto from 'crypto';
 
 function hashText(text: string): string {
@@ -65,6 +66,12 @@ export async function indexChunks(chunks: RagChunk[]): Promise<{ indexed: number
           text: c.text,
           cardId: c.cardId,
           deckId: c.deckId,
+          jobPostingId: (c as any).jobPostingId,
+          documentId: (c as any).documentId,
+          projectId: (c as any).projectId,
+          interviewQaId: (c as any).interviewQaId,
+          company: (c as any).company,
+          role: (c as any).role,
           tags: c.tags,
           concepts: c.concepts,
           modules: c.modules,
@@ -93,16 +100,14 @@ export async function indexChunks(chunks: RagChunk[]): Promise<{ indexed: number
       await prisma.ragChunkIndex.upsert({
         where: { qdrantPointId: pid },
         create: {
-          qdrantPointId: pid,
-          collectionName: collection,
-          sourceType: c.sourceType,
-          sourceId: c.sourceId,
-          cardId: c.cardId,
-          deckId: c.deckId,
-          chunkIndex: c.chunkIndex,
-          textHash: h,
-          embeddingModel,
-          status: 'active',
+          qdrantPointId: pid, collectionName: collection,
+          sourceType: c.sourceType, sourceId: c.sourceId,
+          cardId: c.cardId, deckId: c.deckId,
+          jobPostingId: (c as any).jobPostingId,
+          documentId: (c as any).documentId,
+          projectId: (c as any).projectId,
+          interviewQaId: (c as any).interviewQaId,
+          chunkIndex: c.chunkIndex, textHash: h, embeddingModel, status: 'active',
         },
         update: { textHash: h, embeddingModel, status: 'active' },
       });
@@ -112,7 +117,23 @@ export async function indexChunks(chunks: RagChunk[]): Promise<{ indexed: number
   return { indexed, skipped, failed };
 }
 
-export async function indexAllCards(force: boolean = false): Promise<{ indexed: number; skipped: number; failed: number }> {
-  const chunks = await buildAllCardChunks();
-  return indexChunks(chunks);
+export async function indexAllCards(force: boolean = false) { return indexChunks(await buildAllCardChunks()); }
+
+export async function indexJobPosting(jobPostingId: string) { return indexChunks(await buildJobPostingChunks(jobPostingId)); }
+
+export async function indexAllJobPostings() { return indexChunks(await buildAllJobPostingChunks()); }
+
+export async function indexAllDocuments() {
+  // Stub — documents chunk builder to be added
+  return { indexed: 0, skipped: 0, failed: 0 };
+}
+
+export async function indexAllProjects() {
+  // Stub — projects chunk builder to be added
+  return { indexed: 0, skipped: 0, failed: 0 };
+}
+
+export async function indexAllInterviewQA() {
+  // Stub — interview QA chunk builder to be added
+  return { indexed: 0, skipped: 0, failed: 0 };
 }

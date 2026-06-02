@@ -3,7 +3,7 @@
 import { FastifyInstance } from 'fastify';
 import { qdrantHealthCheck, qdrantInitCollection, qdrantCheckIndex } from '../services/rag/qdrant-lifecycle';
 import { ragSearch, type RagSearchParams } from '../services/rag/rag-search';
-import { indexAllCards } from '../services/rag/rag-indexer';
+import { indexAllCards, indexAllJobPostings, indexAllDocuments, indexAllProjects, indexAllInterviewQA } from '../services/rag/rag-indexer';
 
 export async function ragRoutes(app: FastifyInstance) {
   // Qdrant health
@@ -27,10 +27,26 @@ export async function ragRoutes(app: FastifyInstance) {
     return indexAllCards(!!force);
   });
 
-  // Index all (currently cards only, extend later)
+  // Index all — cards + job postings + documents + projects + interview QA
   app.post('/api/rag/index/all', async (req) => {
     const { force } = (req.body as any) || {};
-    return indexAllCards(!!force);
+    const [cards, postings, docs, projects, qa] = await Promise.all([
+      indexAllCards(!!force).catch(() => ({ indexed: 0, skipped: 0, failed: 0 })),
+      indexAllJobPostings().catch(() => ({ indexed: 0, skipped: 0, failed: 0 })),
+      indexAllDocuments().catch(() => ({ indexed: 0, skipped: 0, failed: 0 })),
+      indexAllProjects().catch(() => ({ indexed: 0, skipped: 0, failed: 0 })),
+      indexAllInterviewQA().catch(() => ({ indexed: 0, skipped: 0, failed: 0 })),
+    ]);
+    return {
+      cards: cards.indexed, jobPostings: postings.indexed, documents: docs.indexed,
+      projects: projects.indexed, interviewQA: qa.indexed,
+      total: cards.indexed + postings.indexed + docs.indexed + projects.indexed + qa.indexed,
+    };
+  });
+
+  // Index job postings
+  app.post('/api/rag/index/job-postings', async (req) => {
+    return indexAllJobPostings();
   });
 
   // Qdrant start — start Qdrant container on demand
