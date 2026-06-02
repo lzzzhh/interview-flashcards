@@ -21,6 +21,7 @@ import AgentHubPage from './components/AgentHubPage';
 import CardDraftReviewPage from './components/CardDraftReviewPage';
 import ProcessingBadge from './components/ProcessingBadge';
 import JobPrepPage from './components/JobPrepPage';
+import JobPrepBootScreen from './components/JobPrepBootScreen';
 import IngestPage from './components/IngestPage';
 import ApiSettingsPage from './components/ApiSettingsPage';
 import TagManagerPage from './components/TagManagerPage';
@@ -166,7 +167,8 @@ function AppInner() {
     else if (agentPage === 'ingest') content = <IngestPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
     else if (agentPage === 'drafts') content = <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} />;
     else if (agentPage?.startsWith('drafts:')) content = <CardDraftReviewPage onBack={() => setAgentPage(null)} onNavigate={setAgentPage} documentId={agentPage.slice(7)} />;
-    else if (agentPage === 'jobprep') content = <JobPrepPage onBack={() => setAgentPage(null)} />;
+    else if (agentPage === 'jobprep') content = <JobPrepBootScreen onBack={() => setAgentPage(null)} onReady={() => setAgentPage('jobprep-chat')} />;
+    else if (agentPage === 'jobprep-chat') content = <JobPrepPage onBack={() => setAgentPage(null)} />;
     else if (agentPage === 'mock-interview') content = <MockInterviewPage onBack={() => setAgentPage(null)} />;
     else if (agentPage === 'resume-project') content = <ResumeProjectPage onBack={() => setAgentPage(null)} />;
     else content = <AgentHubPage onBack={() => setShowSearch(false)} onNavigate={setAgentPage} />;

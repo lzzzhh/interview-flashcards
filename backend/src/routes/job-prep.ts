@@ -2,6 +2,7 @@
 
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
+import { runWorkflowStep } from '../services/job-prep/job-prep-workflow';
 
 export async function jobPrepRoutes(app: FastifyInstance) {
   // Boot check
@@ -48,14 +49,13 @@ export async function jobPrepRoutes(app: FastifyInstance) {
     const { sessionId } = req.params as any;
     const { content } = req.body as any;
 
-    await prisma.jobPrepMessage.create({
-      data: { sessionId, role: 'user', content: content || '' },
-    });
+    const result = await runWorkflowStep(sessionId, content || '');
 
     return {
       sessionId,
-      assistantMessage: '功能开发中，请稍后。',
-      nextAction: 'collect_target',
+      assistantMessage: result.assistantMessage,
+      state: { currentStep: result.nextAction },
+      nextAction: result.nextAction,
     };
   });
 
