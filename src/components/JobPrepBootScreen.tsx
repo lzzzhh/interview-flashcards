@@ -71,13 +71,21 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
   async function checkQdrant(): Promise<boolean> {
     setStep('qdrant', 'loading');
     try {
-      const res = await fetch(`${API_BASE}/rag/qdrant/health`);
-      const data = await res.json();
+      let res = await fetch(`${API_BASE}/rag/qdrant/health`);
+      let data = await res.json();
       if (data.running) { setStep('qdrant', 'done'); return true; }
-      setStep('qdrant', 'error', 'Qdrant 未运行');
+      // Try to start
+      setStep('qdrant', 'loading', '正在启动 Qdrant...');
+      await fetch(`${API_BASE}/rag/qdrant/start`, { method: 'POST' });
+      // Re-check
+      await new Promise(r => setTimeout(r, 3000));
+      res = await fetch(`${API_BASE}/rag/qdrant/health`);
+      data = await res.json();
+      if (data.running) { setStep('qdrant', 'done'); return true; }
+      setStep('qdrant', 'error', 'Qdrant 启动失败');
       return false;
     } catch {
-      setStep('qdrant', 'error', '无法连接 Qdrant（端口 6335）');
+      setStep('qdrant', 'error', '无法连接 Qdrant');
       return false;
     }
   }

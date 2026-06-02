@@ -33,20 +33,36 @@ export async function ragRoutes(app: FastifyInstance) {
     return indexAllCards(!!force);
   });
 
+  // Qdrant start — start Qdrant container on demand
+  app.post('/api/rag/qdrant/start', async () => {
+    try {
+      const { execSync } = await import('child_process');
+      const composeFile = process.env.QDRANT_COMPOSE_FILE || 'docker-compose.qdrant.yml';
+      execSync(`docker compose -f ${composeFile} up -d`, { timeout: 30000, cwd: process.cwd() });
+      // Wait for ready
+      for (let i = 0; i < 15; i++) {
+        await new Promise(r => setTimeout(r, 2000));
+        try {
+          const check = await fetch(`${process.env.QDRANT_URL || 'http://localhost:6335'}/`);
+          if (check.ok) return { started: true };
+        } catch { /* waiting */ }
+      }
+      return { started: false, error: 'Timed out' };
+    } catch (e: any) {
+      return { started: false, error: e.message };
+    }
+  });
+
   // RAG search
   app.post('/api/rag/search', async (req) => {
     const body = req.body as any;
-    const params: RagSearchParams = {
-      query: body.query || '',
-      sourceTypes: body.sourceTypes,
-      filters: body.filters,
-      topK: body.topK || 50,
-    };
-    const results = await ragSearch(params);
+    const results = await ragSearch({
+      query: body.query || '', sourceTypes: body.sourceTypes, filters: body.filters, topK: body.topK || 50,
+    });
     return { results, total: results.length };
   });
 
-  // Embedding health — check if Ollama is running with bge-m3
+  // Embedding health
   app.get('/api/rag/embedding/health', async () => {
     try {
       const res = await fetch('http://localhost:11434/api/embeddings', {

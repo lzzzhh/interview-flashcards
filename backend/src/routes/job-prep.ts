@@ -3,6 +3,16 @@
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
 import { handleJobPrepMessage } from '../services/job-prep/job-prep-conversation';
+import { getLLMProvider } from '../services/llm-provider';
+
+function safeParseJson(text: string): any {
+  try { return JSON.parse(text); } catch {}
+  const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (m) { try { return JSON.parse(m[1]); } catch {} }
+  const s = text.indexOf('{'), e = text.lastIndexOf('}');
+  if (s >= 0 && e > s) { try { return JSON.parse(text.slice(s, e + 1)); } catch {} }
+  return null;
+}
 
 export async function jobPrepRoutes(app: FastifyInstance) {
   // Boot check
@@ -15,22 +25,28 @@ export async function jobPrepRoutes(app: FastifyInstance) {
     };
   });
 
-  // Create session
+  // Create session — parse company/role with LLM
   app.post('/api/job-prep/sessions', async (req) => {
     const { input } = req.body as any;
-    const session = await prisma.jobPrepSession.create({
-      data: {
-        role: input || 'unknown',
-        status: 'collecting',
-      },
-    });
-    return {
-      sessionId: session.id,
-      company: session.company,
-      role: session.role,
-      status: session.status,
-      nextAction: 'ask_for_jd',
-    };
+    let company: string | null = null;
+    let role = input || 'unknown';
+    let roleFamily: string | null = null;
+    try {
+      const p = getLLMProvider();
+      if (p) {
+        const resp = await p.chat({
+          model: p.defaultModel,
+          messages: [
+            { role: 'system', content: 'Parse job target. Output JSON: {"company":"...","role":"...","roleFamily":"..."}. roleFamily: data-analysis,algorithm,backend,frontend,machine-learning,llm,devops,product,other. Return ONLY JSON.' },
+            { role: 'user', content: input },
+          ], temperature: 0.1, maxTokens: 200,
+        });
+        const parsed = safeParseJson(resp.text);
+        if (parsed?.role) { company = parsed.company || null; role = parsed.role; roleFamily = parsed.roleFamily || null; }
+      }
+    } catch { /* use raw input */ }
+    const session = await prisma.jobPrepSession.create({ data: { company, role, roleFamily, status: 'collecting' } });
+    return { sessionId: session.id, company: session.company, role: session.role, status: session.status, nextAction: 'ask_for_jd' };
   });
 
   // Get session

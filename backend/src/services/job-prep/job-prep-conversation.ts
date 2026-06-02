@@ -7,6 +7,7 @@ import { JD_PARSE_PROMPT, PLAN_GENERATE_PROMPT, PLAN_REVISE_PROMPT } from './job
 import { searchPublicJD } from './tools/public-jd-search-tool';
 import { neo4jBuildKeywordTiers } from '../search/neo4j-graph-search';
 import { fts5Search } from '../search/fts5-search';
+import { ragSearch } from '../rag/rag-search';
 
 // ── Intent types ──
 
@@ -71,6 +72,11 @@ function classifyIntent(content: string, hasPlan: boolean): JobPrepIntent {
 export async function handleJobPrepMessage(sessionId: string, content: string) {
   const session = await loadSession(sessionId);
   if (!session) return { assistantMessage: '会话不存在。', nextAction: 'collect_target' };
+
+  // Fix #2: confirm_jd by session status + digit input
+  if (session.status === 'confirming_jd' && /^\d+$/.test(content.trim())) {
+    return handleConfirmJD(session, content);
+  }
 
   await prisma.jobPrepMessage.create({ data: { sessionId, role: 'user', content } });
 
@@ -216,8 +222,18 @@ async function generateAndSavePlan(session: any) {
   const reqs = await prisma.jobRequirement.findMany({ where: { sessionId: session.id } });
   const reqText = reqs.map(r => `- ${r.type}: ${r.name} (${r.importance})`).join('\n');
 
+  // RAG context — JD/document/project/interview_qa text evidence
+  let ragEvidence = '';
+  try {
+    const ragQuery = [company, role, ...reqs.map(r => r.name)].filter(Boolean).join(' ');
+    const ragResults = await ragSearch({ query: ragQuery, sourceTypes: ['job_posting', 'document', 'project', 'interview_qa'], topK: 15 });
+    if (ragResults.length > 0) {
+      ragEvidence = ragResults.map(r => `[${r.sourceType}] ${r.title || ''}: ${r.text.slice(0, 300)}`).join('\n---\n');
+    }
+  } catch { /* Qdrant unavailable — skip */ }
+
   // LLM generate
-  const prompt = [`Job: ${company} ${role}`, reqText ? `\nRequirements:\n${reqText}` : '', `\nConcepts: ${graphKw.join(', ')}`, `\nCards:\n${cardList}`].join('\n');
+  const prompt = [`Job: ${company} ${role}`, reqText ? `\nRequirements:\n${reqText}` : '', ragEvidence ? `\nRAG Evidence:\n${ragEvidence}` : '', `\nConcepts: ${graphKw.join(', ')}`, `\nCards:\n${cardList}`].join('\n');
 
   try {
     const raw = await llm(PLAN_GENERATE_PROMPT, prompt);
