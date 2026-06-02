@@ -7,17 +7,19 @@ export async function qdrantHealthCheck(): Promise<{ running: boolean; url: stri
   try {
     const client = getQdrantClient();
     const collection = getQdrantCollection();
-    const health = await client.healthCheck();
+    // Use raw fetch for health check — more reliable than JS client
+    const url = process.env.QDRANT_URL || 'http://localhost:6333';
+    const healthRes = await fetch(`${url}/`);
+    const running = healthRes.ok;
+
     let collectionReady = false;
-    try {
-      await client.getCollection(collection);
-      collectionReady = true;
-    } catch { /* collection not found */ }
-    return {
-      running: health?.status === 'ok' || health?.title === 'qdrant - vector search engine',
-      url: process.env.QDRANT_URL || 'http://localhost:6333',
-      collectionReady,
-    };
+    if (running) {
+      try {
+        await client.getCollection(collection);
+        collectionReady = true;
+      } catch { /* collection not found */ }
+    }
+    return { running, url, collectionReady };
   } catch {
     return { running: false, url: process.env.QDRANT_URL || 'http://localhost:6333', collectionReady: false };
   }
