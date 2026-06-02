@@ -16,13 +16,19 @@
     "readiness:fix": "tsx src/ingestion/readiness-cli.ts fix",
     "readiness:fix-all": "tsx src/ingestion/readiness-cli.ts fix-all",
     "readiness:gaps": "tsx src/ingestion/readiness-cli.ts gaps",
-    "readiness:audit": "tsx src/ingestion/readiness-cli.ts audit"
+    "readiness:audit": "tsx src/ingestion/readiness-cli.ts audit",
+    "graph:import-neo4j": "tsx src/scripts/import-concept-graph-neo4j.ts",
+    "evaluate:neo4j-gate": "tsx src/evaluation/neo4j-release-gate.ts",
+    "evaluate:neo4j-best": "tsx src/evaluation/neo4j-release-gate.ts",
+    "evaluate:neo4j-gate-v2": "tsx src/evaluation/neo4j-release-gate-v2.ts",
+    "evaluate:neo4j-gate-v3": "tsx src/evaluation/neo4j-release-gate-v3.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",
     "@fastify/multipart": "^10.0.0",
     "@prisma/client": "^6.0.0",
     "fastify": "^5.0.0",
+    "neo4j-driver": "^5.28.3",
     "pdfjs-dist": "^3.11.174",
     "sqlite-vec": "^0.1.9",
     "zod": "^3.23.0"

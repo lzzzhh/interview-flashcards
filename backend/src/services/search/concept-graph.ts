@@ -936,3 +936,8 @@ export function buildKeywordTiersFromGraphWithLimits(
 export function getAllCanonicalTopics(): string[] {
   return NODES.map(n => n.canonical).filter(Boolean);
 }
+
+/** Return the full concept node list for external consumers (e.g. Neo4j import). */
+export function getConceptNodes(): ConceptNode[] {
+  return NODES;
+}
