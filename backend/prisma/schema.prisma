@@ -226,21 +226,194 @@ model CardDraftReview {
 // Replaced by Document-to-Flashcards CardDraft below
 
 model JobPrepSession {
-  id           String   @id
-  state        String   @default("awaiting_company")
-  company      String?
-  role         String?
-  location     String?
-  targetDays   Int?
-  dailyMinutes Int?
-  jdSource     String?
-  jdText       String?
-  jdSourceUrl  String?
-  jobProfile   String?
-  cardMatches  String?
-  studyPlan    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  userId               String   @default("demo-user")
+
+  company              String?
+  role                 String
+  roleFamily           String?
+
+  status               String   @default("collecting")
+  selectedJobPostingId String?
+  activePlanId         String?
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  messages             JobPrepMessage[]
+  postings             JobPostingSnapshot[]
+  requirements         JobRequirement[]
+  plans                JobPrepPlan[]
+}
+
+model JobPrepMessage {
+  id          String   @id @default(cuid())
+  sessionId   String
+
+  role        String
+  content     String
+
+  toolName    String?
+  toolPayload Json?
+
+  createdAt   DateTime @default(now())
+
+  session     JobPrepSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}
+
+model JobPostingSnapshot {
+  id          String   @id @default(cuid())
+  sessionId   String?
+
+  sourceType  String
+  sourceUrl   String?
+
+  company     String?
+  role        String?
+  title       String?
+
+  rawText     String
+  cleanedText String?
+
+  confidence  Float?
+  selected    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  session      JobPrepSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  requirements JobRequirement[]
+
+  @@index([sessionId])
+}
+
+model JobRequirement {
+  id              String   @id @default(cuid())
+  sessionId       String
+  jobPostingId    String?
+
+  type            String
+  name            String
+  normalizedName  String?
+
+  importance      String   @default("unknown")
+  evidenceText    String?
+
+  createdAt       DateTime @default(now())
+
+  session         JobPrepSession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  jobPosting      JobPostingSnapshot?  @relation(fields: [jobPostingId], references: [id], onDelete: SetNull)
+
+  @@index([sessionId])
+  @@index([normalizedName])
+}
+
+model JobPrepPlan {
+  id             String   @id @default(cuid())
+  sessionId      String
+
+  title          String
+  summary        String?
+
+  totalStages    Int      @default(0)
+  totalCards     Int      @default(0)
+  estimatedDays  Int?
+
+  status         String   @default("draft")
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  session        JobPrepSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  stages         JobPrepStage[]
+  cards          JobPrepPlanCard[]
+
+  @@index([sessionId])
+}
+
+model JobPrepStage {
+  id               String   @id @default(cuid())
+  planId           String
+
+  order            Int
+  name             String
+  goal             String
+
+  estimatedMinutes Int?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  plan             JobPrepPlan      @relation(fields: [planId], references: [id], onDelete: Cascade)
+  cards            JobPrepPlanCard[]
+
+  @@index([planId])
+}
+
+model JobPrepPlanCard {
+  id                  String   @id @default(cuid())
+  planId              String
+  stageId             String
+
+  cardId              String
+  deckId              String
+
+  order               Int
+
+  reason              String
+  matchedRequirements Json
+  matchedConcepts     Json
+
+  source              String
+
+  vectorScore         Float?
+  graphScore          Float?
+  keywordScore        Float?
+  finalScore          Float?
+
+  createdAt           DateTime @default(now())
+
+  plan                JobPrepPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  stage               JobPrepStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
+
+  @@index([planId])
+  @@index([stageId])
+  @@index([cardId])
+}
+
+model RagChunkIndex {
+  id             String   @id @default(cuid())
+
+  qdrantPointId  String   @unique
+  collectionName String
+
+  sourceType     String
+  sourceId       String
+
+  cardId         String?
+  deckId         String?
+  documentId     String?
+  jobPostingId   String?
+  projectId      String?
+  interviewQaId  String?
+
+  chunkIndex     Int
+  textHash       String
+  embeddingModel String
+
+  status         String   @default("active")
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([sourceType, sourceId])
+  @@index([cardId])
+  @@index([jobPostingId])
+  @@index([projectId])
+  @@index([interviewQaId])
+  @@index([status])
 }
 
 model StudyQueue {

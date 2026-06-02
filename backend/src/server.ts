@@ -9,6 +9,8 @@ import { cardRoutes } from './routes/cards';
 import { migrationRoutes } from './routes/migrations';
 import { searchRoutes } from './routes/search';
 import { jobPrepRoutes } from './routes/job-prep';
+import { ragRoutes } from './routes/rag';
+import { graphRoutes } from './routes/graph';
 import { maintenanceRoutes } from './routes/maintenance';
 import { settingsRoutes } from './routes/settings';
 import { statsRoutes } from './routes/stats';
@@ -96,6 +98,8 @@ async function start() {
   await app.register(migrationRoutes);
   await app.register(searchRoutes);
   await app.register(jobPrepRoutes);
+  await app.register(ragRoutes);
+  await app.register(graphRoutes);
   await app.register(maintenanceRoutes);
   await app.register(settingsRoutes);
   await app.register(statsRoutes);

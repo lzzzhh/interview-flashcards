@@ -1,44 +1,173 @@
-// backend/src/routes/job-prep.ts — 岗位备战路由
+// Job Prep Routes — sessions, messages, JD, plans, stages
+
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
-import { handleJobPrepMessage } from '../services/job-prep/orchestrator';
-import { JobPrepSessionSchema, validate } from './schemas';
 
 export async function jobPrepRoutes(app: FastifyInstance) {
-  // 创建/继续会话
-  app.post('/api/job-prep/session', async (req) => {
-    const v = validate(JobPrepSessionSchema, req.body);
-    const body = v.success ? v.data : (req.body as any);
-    const result = await handleJobPrepMessage({
-      sessionId: body.sessionId,
-      message: body.message,
-      jdText: body.jdText,
-    });
-    return result;
-  });
-
-  // 查看会话详情
-  app.get('/api/job-prep/session/:id', async (req) => {
-    const { id } = req.params as { id: string };
-    const session = await prisma.jobPrepSession.findUnique({ where: { id } });
-    if (!session) return { error: 'Not found' };
+  // Boot check
+  app.post('/api/job-prep/boot', async () => {
+    const neo4jEnabled = process.env.GRAPH_NEO4J_ENABLED !== 'false';
     return {
-      id: session.id,
-      state: session.state,
-      company: session.company,
-      role: session.role,
-      jdSource: session.jdSource,
-      studyPlan: session.studyPlan ? JSON.parse(session.studyPlan) : null,
-      cardMatches: session.cardMatches ? JSON.parse(session.cardMatches) : [],
+      qdrant: { running: true, collectionReady: true, indexReady: true },
+      neo4j: { enabled: neo4jEnabled, ready: neo4jEnabled, weightVector: 0.35 },
+      ready: true,
     };
   });
 
-  // 列出所有会话
+  // Create session
+  app.post('/api/job-prep/sessions', async (req) => {
+    const { input } = req.body as any;
+    const session = await prisma.jobPrepSession.create({
+      data: {
+        role: input || 'unknown',
+        status: 'collecting',
+      },
+    });
+    return {
+      sessionId: session.id,
+      company: session.company,
+      role: session.role,
+      status: session.status,
+      nextAction: 'ask_for_jd',
+    };
+  });
+
+  // Get session
+  app.get('/api/job-prep/sessions/:sessionId', async (req) => {
+    const { sessionId } = req.params as any;
+    const session = await prisma.jobPrepSession.findUnique({
+      where: { id: sessionId },
+      include: { messages: true, postings: true, requirements: true, plans: { include: { stages: { include: { cards: true } } } } },
+    });
+    if (!session) return { error: 'Session not found' };
+    return session;
+  });
+
+  // Send message / drive workflow
+  app.post('/api/job-prep/sessions/:sessionId/messages', async (req) => {
+    const { sessionId } = req.params as any;
+    const { content } = req.body as any;
+
+    await prisma.jobPrepMessage.create({
+      data: { sessionId, role: 'user', content: content || '' },
+    });
+
+    return {
+      sessionId,
+      assistantMessage: '功能开发中，请稍后。',
+      nextAction: 'collect_target',
+    };
+  });
+
+  // Save JD
+  app.post('/api/job-prep/sessions/:sessionId/job-postings', async (req) => {
+    const { sessionId } = req.params as any;
+    const { sourceType, rawText, sourceUrl } = req.body as any;
+
+    const posting = await prisma.jobPostingSnapshot.create({
+      data: {
+        sessionId,
+        sourceType: sourceType || 'user_pasted',
+        sourceUrl: sourceUrl || null,
+        rawText: rawText || '',
+        selected: true,
+      },
+    });
+
+    // Unselect other postings
+    await prisma.jobPostingSnapshot.updateMany({
+      where: { sessionId, id: { not: posting.id } },
+      data: { selected: false },
+    });
+
+    return { id: posting.id, sourceType: posting.sourceType };
+  });
+
+  // Save plan
+  app.post('/api/job-prep/sessions/:sessionId/plans', async (req) => {
+    const { sessionId } = req.params as any;
+    const { title, summary, estimatedDays, stages } = req.body as any;
+
+    const plan = await prisma.jobPrepPlan.create({
+      data: {
+        sessionId,
+        title: title || '备战计划',
+        summary: summary || null,
+        estimatedDays,
+        totalStages: (stages || []).length,
+        totalCards: (stages || []).reduce((s: number, st: any) => s + (st.cards || []).length, 0),
+      },
+    });
+
+    for (const [si, stage] of (stages || []).entries()) {
+      const dbStage = await prisma.jobPrepStage.create({
+        data: {
+          planId: plan.id,
+          order: si,
+          name: stage.name || `阶段 ${si + 1}`,
+          goal: stage.goal || '',
+          estimatedMinutes: stage.estimatedMinutes || 180,
+        },
+      });
+
+      for (const [ci, card] of (stage.cards || []).entries()) {
+        await prisma.jobPrepPlanCard.create({
+          data: {
+            planId: plan.id,
+            stageId: dbStage.id,
+            cardId: card.cardId,
+            deckId: card.deckId || '',
+            order: ci,
+            reason: card.reason || '',
+            matchedRequirements: card.matchedRequirements || [],
+            matchedConcepts: card.matchedConcepts || [],
+            source: card.source || 'hybrid',
+            vectorScore: card.vectorScore,
+            graphScore: card.graphScore,
+            keywordScore: card.keywordScore,
+            finalScore: card.finalScore,
+          },
+        });
+      }
+    }
+
+    return { planId: plan.id, title: plan.title, totalStages: plan.totalStages, totalCards: plan.totalCards };
+  });
+
+  // Start stage learning
+  app.post('/api/job-prep/stages/:stageId/start', async (req) => {
+    const { stageId } = req.params as any;
+    const stage = await prisma.jobPrepStage.findUnique({
+      where: { id: stageId },
+      include: { cards: { orderBy: { order: 'asc' } } },
+    });
+    if (!stage) return { error: 'Stage not found' };
+    return {
+      mode: 'job-prep',
+      stageId: stage.id,
+      stageName: stage.name,
+      cardIds: stage.cards.map(c => c.cardId),
+    };
+  });
+
+  // List sessions
   app.get('/api/job-prep/sessions', async () => {
     const sessions = await prisma.jobPrepSession.findMany({
       orderBy: { updatedAt: 'desc' },
       take: 20,
     });
-    return { sessions: sessions.map(s => ({ id: s.id, state: s.state, company: s.company, role: s.role, createdAt: s.createdAt })) };
+    return sessions.map(s => ({
+      id: s.id, company: s.company, role: s.role, status: s.status, createdAt: s.createdAt,
+    }));
+  });
+
+  // List plans for a session
+  app.get('/api/job-prep/sessions/:sessionId/plans', async (req) => {
+    const { sessionId } = req.params as any;
+    return prisma.jobPrepPlan.findMany({
+      where: { sessionId },
+      include: { stages: { orderBy: { order: 'asc' }, include: { cards: { orderBy: { order: 'asc' } } } } },
+      orderBy: { createdAt: 'desc' },
+    });
   });
 }
