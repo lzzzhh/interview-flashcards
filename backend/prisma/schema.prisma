@@ -317,6 +317,9 @@ model JobPrepPlan {
   title          String
   summary        String?
 
+  version        Int      @default(1)
+  parentPlanId   String?
+
   totalStages    Int      @default(0)
   totalCards     Int      @default(0)
   estimatedDays  Int?

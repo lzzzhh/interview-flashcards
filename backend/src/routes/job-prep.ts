@@ -2,7 +2,7 @@
 
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
-import { runWorkflowStep } from '../services/job-prep/job-prep-workflow';
+import { handleJobPrepMessage } from '../services/job-prep/job-prep-conversation';
 
 export async function jobPrepRoutes(app: FastifyInstance) {
   // Boot check
@@ -44,19 +44,11 @@ export async function jobPrepRoutes(app: FastifyInstance) {
     return session;
   });
 
-  // Send message / drive workflow
+  // Send message — unified conversation handler
   app.post('/api/job-prep/sessions/:sessionId/messages', async (req) => {
     const { sessionId } = req.params as any;
     const { content } = req.body as any;
-
-    const result = await runWorkflowStep(sessionId, content || '');
-
-    return {
-      sessionId,
-      assistantMessage: result.assistantMessage,
-      state: { currentStep: result.nextAction },
-      nextAction: result.nextAction,
-    };
+    return handleJobPrepMessage(sessionId, content || '');
   });
 
   // Save JD

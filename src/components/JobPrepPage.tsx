@@ -67,9 +67,8 @@ export default function JobPrepPage({ onBack }: Props) {
       if (data.assistantMessage) {
         setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: data.assistantMessage }]);
       }
-      if (data.nextAction === 'execute_plan' || data.nextAction === 'save_plan') {
-        loadPlans();
-      }
+      // Auto-load plans if plan was generated/updated
+      loadPlans();
     } catch {
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: '请求失败，请重试。' }]);
     }
