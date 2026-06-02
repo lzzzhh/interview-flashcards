@@ -1,7 +1,7 @@
 // Job Prep Page — Agent chat workspace for job interview preparation
 
 import { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Send, FileText, Briefcase, Loader2, ChevronDown, ChevronRight, Play, Trash2 } from 'lucide-react';
+import { ArrowLeft, Send, Briefcase, Loader2, ChevronDown, ChevronRight, Play } from 'lucide-react';
 import { API_BASE } from '../api/client';
 
 interface Props {
@@ -84,7 +84,7 @@ export default function JobPrepPage({ onBack }: Props) {
     } catch {}
   }
 
-  async function handleStartStage(stageId: string, cardIds: string[]) {
+  async function handleStartStage(stageId: string, _cardIds: string[]) {
     try {
       const res = await fetch(`${API_BASE}/job-prep/stages/${stageId}/start`, { method: 'POST' });
       const data = await res.json();

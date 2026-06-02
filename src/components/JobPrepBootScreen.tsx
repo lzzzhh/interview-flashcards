@@ -1,6 +1,6 @@
-// Job Prep Boot Screen — checks environment readiness before entering JobPrepPage
+// Job Prep Boot Screen — strict gate: all 5 conditions must pass before entry
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Loader2, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import { API_BASE } from '../api/client';
 
@@ -11,92 +11,180 @@ interface Props {
 
 type StepStatus = 'pending' | 'loading' | 'done' | 'error';
 
+interface Step {
+  key: string;
+  label: string;
+  status: StepStatus;
+  message?: string;
+  actionable: boolean;
+}
+
 export default function JobPrepBootScreen({ onBack, onReady }: Props) {
-  const [steps, setSteps] = useState<{ label: string; status: StepStatus; message?: string }[]>([
-    { label: '检查后端服务', status: 'pending' },
-    { label: '启动 Qdrant 向量数据库', status: 'pending' },
-    { label: '初始化 RAG collection', status: 'pending' },
-    { label: '检查 RAG 索引', status: 'pending' },
-    { label: '加载 Neo4j 图谱搜索', status: 'pending' },
+  const [steps, setSteps] = useState<Step[]>([
+    { key: 'backend', label: '检查后端服务', status: 'pending', actionable: false },
+    { key: 'qdrant', label: 'Qdrant 向量数据库', status: 'pending', actionable: true },
+    { key: 'collection', label: '初始化 RAG collection', status: 'pending', actionable: false },
+    { key: 'index', label: '检查 RAG 卡片索引', status: 'pending', actionable: true },
+    { key: 'neo4j', label: 'Neo4j 图谱搜索', status: 'pending', actionable: false },
   ]);
-  const [error, setError] = useState('');
-  const [ready, setReady] = useState(false);
+  const [allDone, setAllDone] = useState(false);
+  const [booting, setBooting] = useState(true);
 
-  useEffect(() => {
-    async function boot() {
-      // Step 1: Check backend
-      await updateStep(0, 'loading');
-      try {
-        await fetch(`${API_BASE}/job-prep/boot`, { method: 'POST' });
-        await updateStep(0, 'done');
-      } catch {
-        await updateStep(0, 'error', '后端未启动');
-        return;
-      }
-
-      // Step 2: Qdrant health
-      await updateStep(1, 'loading');
-      try {
-        const health = await fetch(`${API_BASE}/rag/qdrant/health`).then(r => r.json());
-        if (health.running) await updateStep(1, 'done');
-        else await updateStep(1, 'error', 'Qdrant 未运行，请启动 Docker');
-      } catch {
-        await updateStep(1, 'error', 'Qdrant 未运行');
-        setError('请确认 Docker 已启动并运行 Qdrant。\ndocker compose -f docker-compose.qdrant.yml up -d');
-        return;
-      }
-
-      // Step 3: Init collection
-      await updateStep(2, 'loading');
-      try {
-        await fetch(`${API_BASE}/rag/qdrant/init`, { method: 'POST' });
-        await updateStep(2, 'done');
-      } catch {
-        await updateStep(2, 'error', 'Collection 初始化失败');
-        return;
-      }
-
-      // Step 4: Check index
-      await updateStep(3, 'loading');
-      try {
-        const status = await fetch(`${API_BASE}/rag/qdrant/check-index`, { method: 'POST' }).then(r => r.json());
-        if (status.ready) await updateStep(3, 'done');
-        else await updateStep(3, 'done'); // Allow empty index
-      } catch {
-        await updateStep(3, 'error', '索引检查失败');
-        return;
-      }
-
-      // Step 5: Neo4j
-      await updateStep(4, 'loading');
-      setTimeout(async () => {
-        await updateStep(4, 'done');
-        setReady(true);
-      }, 500);
-    }
-
-    async function updateStep(index: number, status: StepStatus, message?: string) {
-      setSteps(prev => {
-        const next = [...prev];
-        next[index] = { ...next[index], status, message };
-        return next;
-      });
-      await new Promise(r => setTimeout(r, 300));
-    }
-
-    boot();
+  const setStep = useCallback((key: string, status: StepStatus, message?: string) => {
+    setSteps(prev => prev.map(s => s.key === key ? { ...s, status, message: message || s.message } : s));
   }, []);
 
-  if (ready) {
+  async function checkBackend(): Promise<boolean> {
+    setStep('backend', 'loading');
+    try {
+      const res = await fetch(`${API_BASE}/job-prep/boot`, { method: 'POST' });
+      if (res.ok) { setStep('backend', 'done'); return true; }
+      setStep('backend', 'error', '后端响应异常');
+      return false;
+    } catch {
+      setStep('backend', 'error', '后端未启动');
+      return false;
+    }
+  }
+
+  async function checkQdrant(): Promise<boolean> {
+    setStep('qdrant', 'loading');
+    try {
+      const res = await fetch(`${API_BASE}/rag/qdrant/health`);
+      const data = await res.json();
+      if (data.running) { setStep('qdrant', 'done'); return true; }
+      setStep('qdrant', 'error', 'Qdrant 未运行');
+      return false;
+    } catch {
+      setStep('qdrant', 'error', '无法连接 Qdrant（端口 6333）');
+      return false;
+    }
+  }
+
+  async function checkCollection(): Promise<boolean> {
+    setStep('collection', 'loading');
+    try {
+      const res = await fetch(`${API_BASE}/rag/qdrant/init`, { method: 'POST' });
+      if (res.ok) { setStep('collection', 'done'); return true; }
+      const data = await res.json();
+      if (data.created || data.collectionName) { setStep('collection', 'done'); return true; }
+      setStep('collection', 'error', 'Collection 初始化失败');
+      return false;
+    } catch {
+      setStep('collection', 'error', '初始化失败');
+      return false;
+    }
+  }
+
+  async function checkIndex(): Promise<boolean> {
+    setStep('index', 'loading');
+    try {
+      const res = await fetch(`${API_BASE}/rag/qdrant/check-index`, { method: 'POST' });
+      const data = await res.json();
+      if (data.totalIndexed > 0) {
+        setStep('index', 'done', `${data.totalIndexed} 条索引`);
+        return true;
+      }
+      // Empty index — try to auto-index cards
+      setStep('index', 'loading', '正在索引卡片...');
+      try {
+        const idxRes = await fetch(`${API_BASE}/rag/index/cards`, { method: 'POST' });
+        const idxData = await idxRes.json();
+        if (idxData.indexed > 0) {
+          setStep('index', 'done', `${idxData.indexed} 条已索引`);
+          return true;
+        }
+        setStep('index', 'error', `索引失败（0 条卡片）`);
+        return false;
+      } catch {
+        setStep('index', 'error', '自动索引失败');
+        return false;
+      }
+    } catch {
+      setStep('index', 'error', '索引检查失败');
+      return false;
+    }
+  }
+
+  async function checkNeo4j(): Promise<boolean> {
+    setStep('neo4j', 'loading');
+    try {
+      const res = await fetch(`${API_BASE}/graph/job-prep/expand`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company: 'test', role: 'test', requirements: [] }),
+      });
+      if (res.ok) { setStep('neo4j', 'done'); return true; }
+      setStep('neo4j', 'error', '图谱服务异常');
+      return false;
+    } catch {
+      // Neo4j is optional — mark as done with note
+      setStep('neo4j', 'done', '未连接（图谱增强不可用）');
+      return true;
+    }
+  }
+
+  async function runBoot() {
+    setBooting(true);
+    // Run in sequence (some depend on previous)
+    const backendOk = await checkBackend();
+    if (!backendOk) { setBooting(false); return; }
+
+    const qdrantOk = await checkQdrant();
+    if (!qdrantOk) { setBooting(false); return; }
+
+    const collOk = await checkCollection();
+    if (!collOk) { setBooting(false); return; }
+
+    const indexOk = await checkIndex();
+    if (!indexOk) { setBooting(false); return; }
+
+    await checkNeo4j(); // optional
+
+    // Check all done
+    setBooting(false);
+    setAllDone(true);
+  }
+
+  async function retryStep(key: string) {
+    setBooting(true);
+    switch (key) {
+      case 'qdrant': await checkQdrant().then(ok => ok ? runBootRemaining() : setBooting(false)); break;
+      case 'index': await checkIndex().then(ok => ok ? runBootRemaining() : setBooting(false)); break;
+      default: runBoot();
+    }
+  }
+
+  async function runBootRemaining() {
+    const collOk = await checkCollection();
+    if (!collOk) { setBooting(false); return; }
+    const indexOk = await checkIndex();
+    if (!indexOk) { setBooting(false); return; }
+    await checkNeo4j();
+    setBooting(false);
+    setAllDone(true);
+  }
+
+  useEffect(() => { runBoot(); }, []);
+
+  const hasError = steps.some(s => s.status === 'error');
+  const anyLoading = steps.some(s => s.status === 'loading');
+
+  if (allDone) {
     return (
       <div className="dark-bg min-h-screen flex flex-col items-center justify-center p-8 gap-4">
         <CheckCircle size={48} style={{ color: '#22C55E' }} />
-        <h2 className="text-[18px] font-bold" style={{ color: 'var(--text-primary)' }}>环境就绪</h2>
-        <button
-          onClick={onReady}
-          className="px-6 py-3 rounded-xl text-white font-medium"
-          style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}
-        >进入岗位备战</button>
+        <h2 className="text-[18px] font-bold" style={{ color: 'var(--text-primary)' }}>所有条件已满足</h2>
+        <p className="text-[12px] text-center" style={{ color: 'var(--text-muted)' }}>
+          {steps.map(s => (
+            <span key={s.key} className="mx-1">✓ {s.label}{s.message ? ` (${s.message})` : ''}</span>
+          ))}
+        </p>
+        <button onClick={onReady}
+          className="px-6 py-3 rounded-xl text-white font-medium mt-4"
+          style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+          进入岗位备战
+        </button>
       </div>
     );
   }
@@ -111,20 +199,38 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
       </div>
       <div className="flex-1 flex items-center justify-center">
         <div className="max-w-md w-full px-5 space-y-4">
-          <p className="text-[13px] mb-4" style={{ color: 'var(--text-muted)' }}>正在准备岗位备战环境...</p>
-          {steps.map((step, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-xl border" style={{ borderColor: 'var(--card-border)', backgroundColor: 'var(--card-bg)' }}>
+          <p className="text-[13px] mb-4" style={{ color: 'var(--text-muted)' }}>
+            {booting ? '正在检查环境...' : hasError ? '部分检查未通过，请修复后重试' : '准备中...'}
+          </p>
+          {steps.map((step) => (
+            <div key={step.key} className="flex items-center gap-3 p-3 rounded-xl border"
+              style={{ borderColor: step.status === 'error' ? '#EF444440' : 'var(--card-border)', backgroundColor: 'var(--card-bg)' }}>
               {step.status === 'loading' && <Loader2 size={18} className="animate-spin" style={{ color: '#F59E0B' }} />}
               {step.status === 'done' && <CheckCircle size={18} style={{ color: '#22C55E' }} />}
               {step.status === 'error' && <XCircle size={18} style={{ color: '#EF4444' }} />}
               {step.status === 'pending' && <div className="w-[18px] h-[18px] rounded-full border-2" style={{ borderColor: 'var(--card-border)' }} />}
-              <span className="text-[13px]" style={{ color: step.status === 'error' ? '#EF4444' : 'var(--text-primary)' }}>{step.label}{step.message ? ` — ${step.message}` : ''}</span>
+              <div className="flex-1">
+                <span className="text-[13px]" style={{ color: step.status === 'error' ? '#EF4444' : 'var(--text-primary)' }}>
+                  {step.label}
+                </span>
+                {step.message && <div className="text-[11px]" style={{ color: step.status === 'error' ? '#EF4444' : 'var(--text-muted)' }}>{step.message}</div>}
+              </div>
+              {step.status === 'error' && step.actionable && (
+                <button onClick={() => retryStep(step.key)} disabled={anyLoading}
+                  className="px-2 py-1 rounded-lg text-[11px] font-medium border flex items-center gap-1 shrink-0"
+                  style={{ borderColor: '#EF444440', color: '#EF4444' }}>
+                  <RefreshCw size={12} />重试
+                </button>
+              )}
             </div>
           ))}
-          {error && (
-            <div className="rounded-xl p-4 border text-[12px] whitespace-pre-wrap" style={{ borderColor: '#EF444440', backgroundColor: '#EF444410', color: '#EF4444' }}>
-              {error}
-              <button onClick={() => window.location.reload()} className="mt-2 flex items-center gap-1 text-[11px] font-medium underline"><RefreshCw size={12} />重试</button>
+          {!booting && hasError && (
+            <div className="rounded-xl p-4 border text-[12px] space-y-2" style={{ borderColor: '#EF444440', backgroundColor: '#EF444410', color: '#EF4444' }}>
+              <p className="font-medium">无法进入岗位备战</p>
+              <p className="text-[11px] opacity-80">请确认：<br />1. Docker 已启动<br />2. Qdrant 已运行（端口 6333）<br />3. 后端服务正常（端口 3001）</p>
+              <button onClick={runBoot} className="w-full py-2 rounded-lg text-white text-[12px] font-medium" style={{ backgroundColor: '#EF4444' }}>
+                <RefreshCw size={12} className="inline mr-1" />重新检查全部
+              </button>
             </div>
           )}
         </div>

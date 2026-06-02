@@ -1940,7 +1940,7 @@ dependencies = [
 
 [[package]]
 name = "interview-flashcards"
-version = "0.1.0"
+version = "0.6.0"
 dependencies = [
  "dirs-next",
  "libc",
