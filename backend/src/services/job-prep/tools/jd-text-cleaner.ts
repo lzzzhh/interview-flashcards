@@ -15,11 +15,17 @@ const JD_KEYWORDS = [
   '加分项', '优先考虑', '我们希望你',
 ];
 
+// Patterns that indicate search result pages, NOT real JDs
+const SEARCH_PAGE_PATTERNS = [
+  '相关搜索', 'related searches', '搜索结果', 'search results',
+  '为您推荐', '大家还在搜', '百度一下', '下一页',
+];
+
 export function cleanHTML(html: string): CleanedJD {
   const $ = cheerio.load(html);
 
   // Remove non-content elements
-  $('script, style, nav, footer, header, aside, iframe, noscript, svg, [role="navigation"]').remove();
+  $('script, style, nav, footer, header, aside, iframe, noscript, svg, [role="navigation"], .search-tips, .related-search').remove();
 
   // Extract main content areas
   const contentSelectors = [
@@ -36,8 +42,10 @@ export function cleanHTML(html: string): CleanedJD {
     }
   }
 
-  // Fallback: take all body text
+  // Fallback: take body text but strip common search page noise
   if (!text.trim()) {
+    // Remove common search page elements first
+    $('.result, .search-item, .g, [class*="result"], [class*="search"]').remove();
     text = $('body').text();
   }
 
@@ -50,13 +58,14 @@ export function cleanHTML(html: string): CleanedJD {
 
   const wordCount = text.length;
 
-  // Check for JD-specific keywords
+  // Check for JD-specific keywords AND absence of search page patterns
   const hasJDKeywords = JD_KEYWORDS.some(kw => text.includes(kw));
+  const isSearchPage = SEARCH_PAGE_PATTERNS.some(p => text.includes(p));
 
-  return { text, wordCount, hasJDKeywords };
+  return { text, wordCount, hasJDKeywords: hasJDKeywords && !isSearchPage };
 }
 
-/** Quick confidence check — does this page look like a JD? */
+/** Quick confidence check — does this page look like a real JD? */
 export function looksLikeJD(cleaned: CleanedJD): boolean {
-  return cleaned.wordCount > 200 && cleaned.hasJDKeywords;
+  return cleaned.wordCount > 300 && cleaned.hasJDKeywords;
 }
