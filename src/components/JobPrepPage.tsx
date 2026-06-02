@@ -225,7 +225,7 @@ export default function JobPrepPage({ onBack }: Props) {
         {/* Quick action buttons */}
         <div className="flex gap-2 mt-2 flex-wrap">
           {['我只有 3 天', '加强 SQL', '加强项目', '减少算法', '增加机器学习', '重新生成计划'].map(label => (
-            <button key={label} onClick={() => { setInput(label); setTimeout(() => sendMessage, 0); }}
+            <button key={label} onClick={() => { setInput(label); setTimeout(() => sendMessage(), 50); }}
               className="px-2.5 py-1 rounded-lg text-[11px] border" style={{ borderColor: CARD_BORDER, color: TEXT_MUTED }}>
               {label}
             </button>

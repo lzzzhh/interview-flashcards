@@ -85,6 +85,19 @@ async function warmupEmbedding(provider: any, model: string) {
 let warmupDone = false;
 
 async function start() {
+  // Auto-sync Prisma schema on startup (safe — only adds missing tables/columns)
+  try {
+    const { execSync } = await import('child_process');
+    execSync('npx prisma db push --accept-data-loss --skip-generate', {
+      cwd: __dirname + '/..',
+      timeout: 30000,
+      stdio: 'pipe',
+    });
+    console.log('[startup] Prisma schema synced');
+  } catch (e: any) {
+    console.warn(`[startup] Prisma schema sync skipped: ${e.message?.slice(0, 100)}`);
+  }
+
   // 依赖注入：LLM + Embedding（先读 .env，再读 DB 覆盖）
   await initLLMProviders();
 
