@@ -24,6 +24,7 @@ interface Step {
 export default function JobPrepBootScreen({ onBack, onReady }: Props) {
   const [steps, setSteps] = useState<Step[]>([
     { key: 'backend', label: '检查后端服务', status: 'pending', actionable: false },
+    { key: 'embedding', label: '启动 Embedding 服务 (Ollama)', status: 'pending', actionable: true },
     { key: 'qdrant', label: 'Qdrant 向量数据库', status: 'pending', actionable: true },
     { key: 'collection', label: '初始化 RAG collection', status: 'pending', actionable: false },
     { key: 'rag', label: '检查 RAG 文本库', status: 'pending', actionable: false },
@@ -45,6 +46,24 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
       return false;
     } catch {
       setStep('backend', 'error', '后端未启动');
+      return false;
+    }
+  }
+
+  async function checkEmbedding(): Promise<boolean> {
+    setStep('embedding', 'loading');
+    try {
+      const res = await fetch(`${API_BASE}/rag/embedding/health`);
+      const data = await res.json();
+      if (data.ready) { setStep('embedding', 'done'); return true; }
+      // Try to start
+      setStep('embedding', 'loading', '正在启动 Ollama...');
+      const startRes = await fetch(`${API_BASE}/rag/embedding/start`, { method: 'POST' });
+      if (startRes.ok) { setStep('embedding', 'done', 'bge-m3 就绪'); return true; }
+      setStep('embedding', 'error', 'Ollama 启动失败');
+      return false;
+    } catch {
+      setStep('embedding', 'error', 'Ollama 未安装');
       return false;
     }
   }
@@ -117,6 +136,8 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
     setBooting(true);
     const backendOk = await checkBackend();
     if (!backendOk) { setBooting(false); return; }
+
+    await checkEmbedding(); // can fail gracefully
 
     const qdrantOk = await checkQdrant();
     if (!qdrantOk) { setBooting(false); return; }
