@@ -1,6 +1,6 @@
 // Card chunk builder — one card = one chunk (up to 800-1200 chars)
 
-import prisma from '../../db/prisma';
+import prisma from '../../../db/prisma';
 
 export interface RagChunk {
   sourceType: 'card';
