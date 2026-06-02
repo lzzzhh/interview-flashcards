@@ -28,10 +28,12 @@
     "@fastify/multipart": "^10.0.0",
     "@prisma/client": "^6.0.0",
     "@qdrant/js-client-rest": "^1.18.0",
+    "cheerio": "^1.2.0",
     "fastify": "^5.0.0",
     "neo4j-driver": "^5.28.3",
     "pdfjs-dist": "^3.11.174",
     "sqlite-vec": "^0.1.9",
+    "undici": "^8.3.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
