@@ -5,6 +5,7 @@ import { getQdrantClient, getQdrantCollection } from './qdrant-client';
 import { embedBatch } from './embedding-service';
 import { buildAllCardChunks, type RagChunk } from './chunk-builders/card-chunk-builder';
 import { buildJobPostingChunks, buildAllJobPostingChunks } from './chunk-builders/job-posting-chunk-builder';
+import { buildAllDocumentChunks } from './chunk-builders/document-chunk-builder';
 import crypto from 'crypto';
 
 function hashText(text: string): string {
@@ -30,19 +31,24 @@ export async function indexChunks(chunks: RagChunk[]): Promise<{ indexed: number
   for (let i = 0; i < chunks.length; i += 32) {
     const batch = chunks.slice(i, i + 32);
 
-    // Check existing records
-    const existingIds = batch.map(c => c.sourceId);
+    // Check existing records by sourceType + sourceId + chunkIndex
     const existing = await prisma.ragChunkIndex.findMany({
-      where: { sourceId: { in: existingIds }, sourceType: batch[0].sourceType, status: 'active' },
-      select: { sourceId: true, textHash: true },
+      where: { sourceType: batch[0].sourceType, sourceId: { in: batch.map(c => c.sourceId) }, status: 'active' },
+      select: { sourceId: true, chunkIndex: true, textHash: true },
     });
-    const existingMap = new Map(existing.map(e => [e.sourceId, e.textHash]));
+    // Map: "sourceId:chunkIndex" -> textHash
+    const existingMap = new Map(existing.map(e => [`${e.sourceId}:${e.chunkIndex}`, e.textHash]));
 
     // Filter out unchanged chunks
     const newChunks = batch.filter(c => {
       const h = hashText(c.text);
-      const oldHash = existingMap.get(c.sourceId);
+      const key = `${c.sourceId}:${c.chunkIndex}`;
+      const oldHash = existingMap.get(key);
       if (oldHash === h) { skipped++; return false; }
+      // Mark stale if hash changed
+      if (oldHash && oldHash !== h) {
+        prisma.ragChunkIndex.updateMany({ where: { sourceType: c.sourceType, sourceId: c.sourceId, chunkIndex: c.chunkIndex }, data: { status: 'stale' } }).catch(() => {});
+      }
       return true;
     });
 
@@ -59,27 +65,14 @@ export async function indexChunks(chunks: RagChunk[]): Promise<{ indexed: number
         id: pointId(c.sourceType, c.sourceId, c.chunkIndex, h),
         vector: embeddings[idx] || new Array(1024).fill(0),
         payload: {
-          sourceType: c.sourceType,
-          sourceId: c.sourceId,
-          chunkIndex: c.chunkIndex,
-          title: c.title,
-          text: c.text,
-          cardId: c.cardId,
-          deckId: c.deckId,
-          jobPostingId: (c as any).jobPostingId,
-          documentId: (c as any).documentId,
-          projectId: (c as any).projectId,
-          interviewQaId: (c as any).interviewQaId,
-          company: (c as any).company,
-          role: (c as any).role,
-          tags: c.tags,
-          concepts: c.concepts,
-          modules: c.modules,
-          language: 'zh',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          embeddingModel,
-          textHash: h,
+          sourceType: c.sourceType, sourceId: c.sourceId, chunkIndex: c.chunkIndex,
+          title: c.title, text: c.text,
+          cardId: c.cardId, deckId: c.deckId,
+          jobPostingId: c.jobPostingId, company: c.company, role: c.role,
+          documentId: c.documentId, projectId: c.projectId, interviewQaId: c.interviewQaId,
+          tags: c.tags, concepts: c.concepts, modules: c.modules,
+          language: 'zh', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+          embeddingModel, textHash: h,
         },
       };
     });
@@ -103,10 +96,7 @@ export async function indexChunks(chunks: RagChunk[]): Promise<{ indexed: number
           qdrantPointId: pid, collectionName: collection,
           sourceType: c.sourceType, sourceId: c.sourceId,
           cardId: c.cardId, deckId: c.deckId,
-          jobPostingId: (c as any).jobPostingId,
-          documentId: (c as any).documentId,
-          projectId: (c as any).projectId,
-          interviewQaId: (c as any).interviewQaId,
+          jobPostingId: c.jobPostingId, documentId: c.documentId, projectId: c.projectId, interviewQaId: c.interviewQaId,
           chunkIndex: c.chunkIndex, textHash: h, embeddingModel, status: 'active',
         },
         update: { textHash: h, embeddingModel, status: 'active' },
@@ -123,10 +113,7 @@ export async function indexJobPosting(jobPostingId: string) { return indexChunks
 
 export async function indexAllJobPostings() { return indexChunks(await buildAllJobPostingChunks()); }
 
-export async function indexAllDocuments() {
-  // Stub — documents chunk builder to be added
-  return { indexed: 0, skipped: 0, failed: 0 };
-}
+export async function indexAllDocuments() { return indexChunks(await buildAllDocumentChunks()); }
 
 export async function indexAllProjects() {
   // Stub — projects chunk builder to be added

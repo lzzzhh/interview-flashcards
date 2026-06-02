@@ -3,13 +3,19 @@
 import prisma from '../../../db/prisma';
 
 export interface RagChunk {
-  sourceType: 'card';
+  sourceType: 'card' | 'job_posting' | 'document' | 'project' | 'interview_qa';
   sourceId: string;
   chunkIndex: number;
   title: string;
   text: string;
-  cardId: string;
-  deckId: string;
+  cardId?: string;
+  deckId?: string;
+  jobPostingId?: string;
+  documentId?: string;
+  projectId?: string;
+  interviewQaId?: string;
+  company?: string;
+  role?: string;
   tags: string[];
   concepts: string[];
   modules: string[];
