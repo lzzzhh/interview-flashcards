@@ -1,4 +1,6 @@
-// Job Prep Boot Screen — strict gate: all 5 conditions must pass before entry
+// Job Prep Boot Screen — checks environment readiness
+// Required: backend, Qdrant, RAG collection, Neo4j
+// NOT required: card chunks in Qdrant (cards come from SQLite/FTS5/Neo4j)
 
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Loader2, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
@@ -24,7 +26,7 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
     { key: 'backend', label: '检查后端服务', status: 'pending', actionable: false },
     { key: 'qdrant', label: 'Qdrant 向量数据库', status: 'pending', actionable: true },
     { key: 'collection', label: '初始化 RAG collection', status: 'pending', actionable: false },
-    { key: 'index', label: '检查 RAG 卡片索引', status: 'pending', actionable: true },
+    { key: 'rag', label: '检查 RAG 文本库', status: 'pending', actionable: false },
     { key: 'neo4j', label: 'Neo4j 图谱搜索', status: 'pending', actionable: false },
   ]);
   const [allDone, setAllDone] = useState(false);
@@ -56,7 +58,7 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
       setStep('qdrant', 'error', 'Qdrant 未运行');
       return false;
     } catch {
-      setStep('qdrant', 'error', '无法连接 Qdrant（端口 6333）');
+      setStep('qdrant', 'error', '无法连接 Qdrant（端口 6335）');
       return false;
     }
   }
@@ -76,33 +78,21 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
     }
   }
 
-  async function checkIndex(): Promise<boolean> {
-    setStep('index', 'loading');
+  async function checkRag(): Promise<boolean> {
+    setStep('rag', 'loading');
     try {
       const res = await fetch(`${API_BASE}/rag/qdrant/check-index`, { method: 'POST' });
       const data = await res.json();
       if (data.totalIndexed > 0) {
-        setStep('index', 'done', `${data.totalIndexed} 条索引`);
-        return true;
+        setStep('rag', 'done', `${data.totalIndexed} 条文本索引`);
+      } else {
+        // Empty is fine — JD/docs will be indexed later
+        setStep('rag', 'done', '暂无岗位文本索引，将在粘贴 JD 后自动建立');
       }
-      // Empty index — try to auto-index cards
-      setStep('index', 'loading', '正在索引卡片...');
-      try {
-        const idxRes = await fetch(`${API_BASE}/rag/index/cards`, { method: 'POST' });
-        const idxData = await idxRes.json();
-        if (idxData.indexed > 0) {
-          setStep('index', 'done', `${idxData.indexed} 条已索引`);
-          return true;
-        }
-        setStep('index', 'error', `索引失败（0 条卡片）`);
-        return false;
-      } catch {
-        setStep('index', 'error', '自动索引失败');
-        return false;
-      }
+      return true; // never fails
     } catch {
-      setStep('index', 'error', '索引检查失败');
-      return false;
+      setStep('rag', 'done', '文本索引检查跳过');
+      return true;
     }
   }
 
@@ -118,7 +108,6 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
       setStep('neo4j', 'error', '图谱服务异常');
       return false;
     } catch {
-      // Neo4j is optional — mark as done with note
       setStep('neo4j', 'done', '未连接（图谱增强不可用）');
       return true;
     }
@@ -126,7 +115,6 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
 
   async function runBoot() {
     setBooting(true);
-    // Run in sequence (some depend on previous)
     const backendOk = await checkBackend();
     if (!backendOk) { setBooting(false); return; }
 
@@ -136,33 +124,21 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
     const collOk = await checkCollection();
     if (!collOk) { setBooting(false); return; }
 
-    const indexOk = await checkIndex();
-    if (!indexOk) { setBooting(false); return; }
+    // RAG check is informational — never blocks
+    await checkRag();
+    await checkNeo4j();
 
-    await checkNeo4j(); // optional
-
-    // Check all done
     setBooting(false);
     setAllDone(true);
   }
 
   async function retryStep(key: string) {
     setBooting(true);
-    switch (key) {
-      case 'qdrant': await checkQdrant().then(ok => ok ? runBootRemaining() : setBooting(false)); break;
-      case 'index': await checkIndex().then(ok => ok ? runBootRemaining() : setBooting(false)); break;
-      default: runBoot();
+    if (key === 'qdrant') {
+      const ok = await checkQdrant();
+      if (ok) { await checkCollection(); await checkRag(); await checkNeo4j(); setAllDone(true); }
     }
-  }
-
-  async function runBootRemaining() {
-    const collOk = await checkCollection();
-    if (!collOk) { setBooting(false); return; }
-    const indexOk = await checkIndex();
-    if (!indexOk) { setBooting(false); return; }
-    await checkNeo4j();
     setBooting(false);
-    setAllDone(true);
   }
 
   useEffect(() => { runBoot(); }, []);
@@ -174,10 +150,10 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
     return (
       <div className="dark-bg min-h-screen flex flex-col items-center justify-center p-8 gap-4">
         <CheckCircle size={48} style={{ color: '#22C55E' }} />
-        <h2 className="text-[18px] font-bold" style={{ color: 'var(--text-primary)' }}>所有条件已满足</h2>
+        <h2 className="text-[18px] font-bold" style={{ color: 'var(--text-primary)' }}>环境就绪</h2>
         <p className="text-[12px] text-center" style={{ color: 'var(--text-muted)' }}>
           {steps.map(s => (
-            <span key={s.key} className="mx-1">✓ {s.label}{s.message ? ` (${s.message})` : ''}</span>
+            <span key={s.key} className="mx-1">{s.status === 'done' ? '✓' : ''} {s.label}{s.message ? ` (${s.message})` : ''}</span>
           ))}
         </p>
         <button onClick={onReady}
@@ -200,7 +176,7 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
       <div className="flex-1 flex items-center justify-center">
         <div className="max-w-md w-full px-5 space-y-4">
           <p className="text-[13px] mb-4" style={{ color: 'var(--text-muted)' }}>
-            {booting ? '正在检查环境...' : hasError ? '部分检查未通过，请修复后重试' : '准备中...'}
+            {booting ? '正在检查环境...' : hasError ? '部分检查未通过' : '准备中...'}
           </p>
           {steps.map((step) => (
             <div key={step.key} className="flex items-center gap-3 p-3 rounded-xl border"
@@ -227,7 +203,7 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
           {!booting && hasError && (
             <div className="rounded-xl p-4 border text-[12px] space-y-2" style={{ borderColor: '#EF444440', backgroundColor: '#EF444410', color: '#EF4444' }}>
               <p className="font-medium">无法进入岗位备战</p>
-              <p className="text-[11px] opacity-80">请确认：<br />1. Docker 已启动<br />2. Qdrant 已运行（端口 6333）<br />3. 后端服务正常（端口 3001）</p>
+              <p className="text-[11px] opacity-80">请确认：<br />1. Docker 已启动<br />2. Qdrant 已运行（端口 6335）<br />3. 后端服务正常（端口 3001）</p>
               <button onClick={runBoot} className="w-full py-2 rounded-lg text-white text-[12px] font-medium" style={{ backgroundColor: '#EF4444' }}>
                 <RefreshCw size={12} className="inline mr-1" />重新检查全部
               </button>

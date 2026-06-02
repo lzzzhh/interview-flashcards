@@ -48,20 +48,32 @@ export async function qdrantCheckIndex(): Promise<{
   staleCount: number;
   ready: boolean;
 }> {
-  const totalIndexed = await prisma.ragChunkIndex.count({ where: { status: 'active' } });
-  const staleCount = await prisma.ragChunkIndex.count({ where: { status: 'stale' } });
-  const rows = await prisma.ragChunkIndex.groupBy({
-    by: ['sourceType'],
-    where: { status: 'active' },
-    _count: { id: true },
-  });
-  const bySourceType: Record<string, number> = {};
-  for (const r of rows) bySourceType[r.sourceType] = r._count.id;
-  return {
-    collectionName: getQdrantCollection(),
-    totalIndexed,
-    bySourceType,
-    staleCount,
-    ready: totalIndexed > 0,
-  };
+  try {
+    const totalIndexed = await prisma.ragChunkIndex.count({ where: { status: 'active' } });
+    const staleCount = await prisma.ragChunkIndex.count({ where: { status: 'stale' } });
+    const rows = await prisma.ragChunkIndex.groupBy({
+      by: ['sourceType'],
+      where: { status: 'active' },
+      _count: { id: true },
+    });
+    const bySourceType: Record<string, number> = {};
+    for (const r of rows) bySourceType[r.sourceType] = r._count.id;
+    return {
+      collectionName: getQdrantCollection(),
+      totalIndexed,
+      bySourceType,
+      staleCount,
+      ready: totalIndexed > 0,
+    };
+  } catch (e: any) {
+    // Table might not exist — schema not yet pushed
+    console.warn(`[rag] RagChunkIndex check failed: ${e.message}`);
+    return {
+      collectionName: getQdrantCollection(),
+      totalIndexed: 0,
+      bySourceType: {},
+      staleCount: 0,
+      ready: false,
+    };
+  }
 }

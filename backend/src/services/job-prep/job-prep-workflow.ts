@@ -6,7 +6,6 @@ import { getLLMProvider } from '../llm-provider';
 import { TARGET_PARSE_PROMPT, JD_PARSE_PROMPT, PLAN_GENERATE_PROMPT, PLAN_REVISE_PROMPT } from './job-prep-prompts';
 import { searchPublicJD } from './tools/public-jd-search-tool';
 import { neo4jBuildKeywordTiers } from '../search/neo4j-graph-search';
-import { ragSearch } from '../rag/rag-search';
 import { fts5Search } from '../search/fts5-search';
 
 function safeParseJson(text: string): any {
@@ -299,27 +298,20 @@ async function generatePlanWithPipeline(
     graphKeywords = [...tiers.coreKeywords, ...tiers.expandedKeywords].slice(0, 20);
   } catch { /* Neo4j unavailable */ }
 
-  // 2. Qdrant RAG retrieval
-  let ragCards: any[] = [];
-  try {
-    const ragResults = await ragSearch({ query: role, sourceTypes: ['card'], topK: 30 });
-    ragCards = ragResults.filter(r => r.cardId).map(r => ({ cardId: r.cardId, reason: `RAG match: ${r.title}` }));
-  } catch { /* Qdrant unavailable */ }
-
-  // 3. FTS5 keyword search
-  let fts5Cards: string[] = [];
+  // 2. FTS5 keyword search (primary card source)
+  let fts5CardIds: string[] = [];
   try {
     const searchQuery = [company, role, ...graphKeywords].filter(Boolean).join(' ');
-    const fts5Results = await fts5Search(searchQuery, 30);
-    fts5Cards = fts5Results.map(r => r.cardId);
+    const fts5Results = await fts5Search(searchQuery, 50);
+    fts5CardIds = fts5Results.map(r => r.cardId);
   } catch { /* FTS5 unavailable */ }
 
-  // 4. Get requirements
+  // 3. Get requirements from JD
   const requirements = await prisma.jobRequirement.findMany({ where: { sessionId } });
   const reqText = requirements.map(r => `- ${r.type}: ${r.name} (${r.importance})`).join('\n');
 
-  // 5. Get available cards
-  const allCardIds = [...new Set([...ragCards.map((c: any) => c.cardId), ...fts5Cards])];
+  // 4. Get cards from SQLite (card candidates from FTS5 + Neo4j, NOT Qdrant)
+  const allCardIds = [...new Set(fts5CardIds)];
   const dbCards = allCardIds.length > 0
     ? await prisma.card.findMany({ where: { id: { in: allCardIds } }, include: { deck: true }, take: 50 })
     : await prisma.card.findMany({ include: { deck: true }, take: 50 });
