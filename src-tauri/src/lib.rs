@@ -98,7 +98,8 @@ fn spawn_backend() -> Option<Child> {
             .env("PATH", &path_env)
             .env("PWD", &home)
             .env("ELECTRON_RUN_AS_NODE", "1")
-            .env("NODE_ENV", "development");
+            .env("NODE_ENV", "development")
+            .env("NODE_OPTIONS", "--max-old-space-size=4096");
         if let Some(file) = stdout {
             command.stdout(file);
         }

@@ -233,13 +233,15 @@ async function generateAndSavePlan(session: any) {
   // Graph expansion — use profile keywords as additional queries
   let graphKw: string[] = [];
   try {
-    for (const kw of [role, company, ...profileKeywords].filter(Boolean).slice(0, 8)) {
+    for (const kw of [role, company, ...profileKeywords].filter(Boolean).slice(0, 4)) {
       try {
         const result = await Promise.race([
           neo4jBuildKeywordTiers(String(kw)),
-          new Promise<any>((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+          new Promise<any>((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
         ]);
-        graphKw.push(...result.tiers.coreKeywords, ...result.tiers.expandedKeywords);
+        if (result?.tiers) {
+          graphKw.push(...result.tiers.coreKeywords, ...result.tiers.expandedKeywords);
+        }
       } catch {}
     }
     graphKw = [...new Set(graphKw)].slice(0, 20);
@@ -255,13 +257,13 @@ async function generateAndSavePlan(session: any) {
     ids = result.map((x: any) => x.cardId);
   } catch {}
 
-  // Fetch cards
+  // Fetch cards — light query (only needed fields)
   const cards = ids.length > 0
-    ? await prisma.card.findMany({ where: { id: { in: ids } }, include: { deck: true }, take: 50 })
+    ? await prisma.card.findMany({ where: { id: { in: ids.slice(0, 50) } }, select: { id: true, deckId: true, question: true, title: true }, take: 50 })
     : [];
   const hasCards = cards.length > 0;
   const cardList = hasCards
-    ? cards.map(c => `- ${c.id}: [${c.deckId}] ${(c as any).deck?.name || ''}: ${c.question || c.title || ''}`).join('\n')
+    ? cards.map(c => `- ${c.id}: [${c.deckId}] ${c.question || c.title || ''}`).join('\n')
     : '(no cards available — generate topic-based plan with empty cards array, use topic fields instead)';
 
   // Requirements from JD
