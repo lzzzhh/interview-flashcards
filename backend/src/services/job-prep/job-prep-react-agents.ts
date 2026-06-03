@@ -174,7 +174,8 @@ const TOOL_DEFINITIONS: Record<JobPrepToolName, ToolDefinition> = {
   },
   search_public_jd: {
     name: 'search_public_jd',
-    description: 'Search public job descriptions when the user asks to search or no JD is available.',
+    description: 'Search public job descriptions. Disabled by default — prefer user-pasted JD for reliability.',
+    enabled: process.env.JOB_PREP_ENABLE_PUBLIC_JD_SEARCH === 'true',
     inputSchema: z.object({ company: z.string().optional(), role: z.string().optional() }),
     outputSchema: z.object({ candidates: z.array(z.any()) }),
     timeoutMs: 8000,
@@ -567,6 +568,9 @@ Available tools: ${Object.values(TOOL_DEFINITIONS).map(t => `${t.name}: ${t.desc
     const action = parsed.data.action as JobPrepToolName;
     if (!TOOL_DEFINITIONS[action]) return fallback;
     if (action === 'save_plan' && !state.guardResult?.passed) return fallback;
+    if (action === 'search_public_jd' && process.env.JOB_PREP_ENABLE_PUBLIC_JD_SEARCH !== 'true') {
+      return { action: 'ask_user', args: { question: '请直接粘贴岗位 JD；如果暂时没有 JD，也可以回复「没有 JD」，我会按岗位画像生成通用计划。' }, rationale: 'Public JD search disabled — prefer user-pasted JD.' };
+    }
     return { action, args: parsed.data.args || {}, rationale: parsed.data.rationale || fallback.rationale };
   } catch {
     return fallback;

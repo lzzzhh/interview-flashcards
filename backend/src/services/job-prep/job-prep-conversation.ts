@@ -475,7 +475,7 @@ export async function handleJobPrepMessage(sessionId: string, content: string) {
           ? ''
           : '\n\n另外也告诉我准备周期：比如「过两天面试」或「长期系统准备」。';
         return {
-          assistantMessage: `目标我先记为「${[session.company, session.role].filter(Boolean).join(' ') || session.role}」。你现在有 JD 吗？可以直接粘贴 JD；如果没有，回复「没有 JD」。${cycleHint}`,
+          assistantMessage: `目标我先记为「${[session.company, session.role].filter(Boolean).join(' ') || session.role}」。请直接粘贴这份岗位 JD，我会从 JD 中提取技能要求并生成备战计划。如果暂时没有 JD，回复「没有 JD」。${cycleHint}`,
           nextAction: 'ask_for_jd',
         };
       }
@@ -625,7 +625,7 @@ async function handleGeneralQuestion(session: any, plan: any, content: string) {
   }
   if (!plan && session.status !== 'planning') {
     // No plan yet — prompt for JD or generate
-    return { assistantMessage: '你现在有 JD 吗？可以粘贴文字，或输入「搜索公开岗位」。', nextAction: 'ask_for_jd' };
+    return { assistantMessage: '请直接粘贴岗位 JD，我会提取技能要求并生成备战计划。如果没有 JD，回复「没有 JD」。', nextAction: 'ask_for_jd' };
   }
   // General conversation with context
   return { assistantMessage: '收到。有什么我可以帮你的？\n\n你可以说「加强 SQL」「只有 3 天」「重新生成计划」来调整计划。', nextAction: 'await_user' };
