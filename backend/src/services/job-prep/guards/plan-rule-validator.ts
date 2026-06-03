@@ -2,7 +2,7 @@
 // Checks cardId existence, coverage gaps, source confusion
 
 import prisma from '../../../db/prisma';
-import type { RoleProfile } from '../role-profiles';
+import type { RoleProfile } from '../role-profiles/types';
 
 export interface GuardError {
   code: string;
@@ -51,6 +51,14 @@ export function ruleValidate(
     });
     repair.push('Set all stages[].cards to empty arrays []. Use topic field instead.');
   }
+  if (context.hasCards && allCards.length === 0) {
+    errors.push({
+      code: 'MISSING_AVAILABLE_CARDS',
+      message: 'Cards are available in the database, but the plan did not include any cardId.',
+      severity: 'error',
+    });
+    repair.push('Use cardId values from the provided available cards list.');
+  }
 
   // 3. MustCoverInPlan coverage
   if (context.profile?.mustCoverInPlan) {
@@ -84,7 +92,7 @@ export function ruleValidate(
     if (overweightCount > 2) {
       errors.push({
         code: 'OVERWEIGHT',
-        message: `${overweightCount} avoid-overweight topics appear in plan. Reduce focus on: ${context.profile.avoidOverweight.filter(t => planText.includes(t.toLowerCase())).join(', ')}`,
+        message: `${overweightCount} avoid-overweight topics appear in plan. Reduce focus on: ${context.profile.avoidOverweight.filter((t: string) => planText.includes(t.toLowerCase())).join(', ')}`,
         severity: 'warning',
       });
       repair.push('Reduce or remove avoid-overweight topics from plan stages.');
@@ -95,7 +103,7 @@ export function ruleValidate(
   if (context.jdReqText && allReasons) {
     const jdSkills = new Set(
       context.jdReqText.match(/\[JD\]\s*\w+:\s*([^\n(]+)/g)
-        ?.map(m => m.replace(/\[JD\]\s*\w+:\s*/, '').trim().toLowerCase()) || []
+        ?.map((m: string) => m.replace(/\[JD\]\s*\w+:\s*/, '').trim().toLowerCase()) || []
     );
     if (jdSkills.size > 0) {
       for (const card of allCards) {
@@ -113,9 +121,9 @@ export function ruleValidate(
 
   // 6. RAG source references
   if (context.ragEvidence && allReasons) {
-    const ragSources = context.ragEvidence.match(/\[(\w+:\w+)\]/g)?.map(m => m.slice(1, -1)) || [];
+    const ragSources = context.ragEvidence.match(/\[(\w+:\w+)\]/g)?.map((m: string) => m.slice(1, -1)) || [];
     const ragSourceSet = new Set(ragSources);
-    const referencedSources = allReasons.match(/\[(\w+:\w+)\]/g)?.map(m => m.slice(1, -1)) || [];
+    const referencedSources = allReasons.match(/\[(\w+:\w+)\]/g)?.map((m: string) => m.slice(1, -1)) || [];
     for (const src of referencedSources) {
       if (!ragSourceSet.has(src)) {
         errors.push({

@@ -29,7 +29,7 @@ export async function jobPrepRoutes(app: FastifyInstance) {
   app.post('/api/job-prep/sessions', async (req) => {
     const { input } = req.body as any;
     let company: string | null = null;
-    let role = input || 'unknown';
+    let role = (input && String(input).length < 80) ? input : 'unknown';
     let roleFamily: string | null = null;
     try {
       const p = getLLMProvider();
@@ -46,7 +46,20 @@ export async function jobPrepRoutes(app: FastifyInstance) {
       }
     } catch { /* use raw input */ }
     const session = await prisma.jobPrepSession.create({ data: { company, role, roleFamily, status: 'collecting' } });
-    return { sessionId: session.id, company: session.company, role: session.role, status: session.status, nextAction: 'ask_for_jd' };
+    if (input && String(input).trim()) {
+      const turn = await handleJobPrepMessage(session.id, String(input));
+      const updated = await prisma.jobPrepSession.findUnique({ where: { id: session.id } });
+      return {
+        sessionId: session.id,
+        company: updated?.company,
+        role: updated?.role,
+        status: updated?.status,
+        nextAction: turn.nextAction,
+        assistantMessage: turn.assistantMessage,
+        data: turn.data,
+      };
+    }
+    return { sessionId: session.id, company: session.company, role: session.role, status: session.status, nextAction: 'collect_target' };
   });
 
   // Get session
@@ -64,7 +77,15 @@ export async function jobPrepRoutes(app: FastifyInstance) {
   app.post('/api/job-prep/sessions/:sessionId/messages', async (req) => {
     const { sessionId } = req.params as any;
     const { content } = req.body as any;
-    return handleJobPrepMessage(sessionId, content || '');
+    try {
+      return await handleJobPrepMessage(sessionId, content || '');
+    } catch (e: any) {
+      app.log.error(e, '[job-prep] message failed');
+      return {
+        assistantMessage: `处理失败：${e?.message || '未知错误'}`,
+        nextAction: 'await_user',
+      };
+    }
   });
 
   // Save JD

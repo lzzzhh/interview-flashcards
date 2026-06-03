@@ -38,22 +38,24 @@ export default function JobPrepPage({ onBack }: Props) {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input: text }),
       });
+      if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       setSessionId(data.sessionId);
       setMessages([{ id: 'sys', role: 'system', content: `准备面试「${data.role || ''}」` }]);
       if (data.assistantMessage) {
         setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: data.assistantMessage }]);
       }
+      if (data.data?.planId) loadPlans(data.sessionId);
     } catch {
       setMessages(prev => [...prev, { id: 'err', role: 'assistant', content: '连接失败，请确认后端已启动。' }]);
     }
     setLoading(false);
   }
 
-  async function sendMessage() {
-    if (!input.trim() || !sessionId) return;
-    const text = input.trim();
-    setInput('');
+  async function sendMessage(textOverride?: string) {
+    const text = (textOverride ?? input).trim();
+    if (!text || !sessionId) return;
+    if (!textOverride) setInput('');
     const userMsg: Message = { id: Date.now().toString(), role: 'user', content: text };
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
@@ -63,6 +65,7 @@ export default function JobPrepPage({ onBack }: Props) {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: text }),
       });
+      if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       if (data.assistantMessage) {
         setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: data.assistantMessage }]);
@@ -75,10 +78,10 @@ export default function JobPrepPage({ onBack }: Props) {
     setLoading(false);
   }
 
-  async function loadPlans() {
-    if (!sessionId) return;
+  async function loadPlans(id = sessionId) {
+    if (!id) return;
     try {
-      const res = await fetch(`${API_BASE}/job-prep/sessions/${sessionId}/plans`);
+      const res = await fetch(`${API_BASE}/job-prep/sessions/${id}/plans`);
       setPlans(await res.json());
     } catch {}
   }
@@ -216,7 +219,7 @@ export default function JobPrepPage({ onBack }: Props) {
             style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}
             disabled={loading}
           />
-          <button onClick={sendMessage} disabled={!input.trim() || loading}
+          <button onClick={() => sendMessage()} disabled={!input.trim() || loading}
             className="px-4 rounded-xl text-white disabled:opacity-30" style={{ backgroundColor: ORANGE }}>
             <Send size={16} />
           </button>
@@ -224,7 +227,7 @@ export default function JobPrepPage({ onBack }: Props) {
         {/* Quick action buttons */}
         <div className="flex gap-2 mt-2 flex-wrap">
           {['我只有 3 天', '加强 SQL', '加强项目', '减少算法', '增加机器学习', '重新生成计划'].map(label => (
-            <button key={label} onClick={() => { setInput(label); setTimeout(() => sendMessage(), 50); }}
+            <button key={label} onClick={() => sendMessage(label)}
               className="px-2.5 py-1 rounded-lg text-[11px] border" style={{ borderColor: CARD_BORDER, color: TEXT_MUTED }}>
               {label}
             </button>
