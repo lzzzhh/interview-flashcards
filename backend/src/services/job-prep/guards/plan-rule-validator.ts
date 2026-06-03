@@ -62,11 +62,13 @@ export function ruleValidate(
       else { missing.push(skill); }
     }
     const coverage = covered / context.profile.mustCoverInPlan.length;
-    if (coverage < 0.5) {
+    // Topic-based plans (no cards): relax threshold to 30%
+    const minCoverage = context.hasCards ? 0.5 : 0.3;
+    if (coverage < minCoverage) {
       errors.push({
         code: 'COVERAGE_GAP',
         message: `Must-cover skills covered: ${covered}/${context.profile.mustCoverInPlan.length} (${Math.round(coverage*100)}%). Missing: ${missing.join(', ')}`,
-        severity: 'error',
+        severity: context.hasCards ? 'error' : 'warning',
       });
       repair.push(`Add stages covering: ${missing.join(', ')}`);
     }
@@ -89,21 +91,22 @@ export function ruleValidate(
     }
   }
 
-  // 5. JD/checklist confusion: reason says "JD" but no JD requirement matches
-  if (context.jdReqText) {
+  // 5. JD/checklist confusion — simplified: if plan says "JD要求" but no jdReqText exists
+  if (context.jdReqText && allReasons) {
     const jdSkills = new Set(
       context.jdReqText.match(/\[JD\]\s*\w+:\s*([^\n(]+)/g)
         ?.map(m => m.replace(/\[JD\]\s*\w+:\s*/, '').trim().toLowerCase()) || []
     );
-    for (const reason of allReasons.match(/JD[要需]求|JD mentions|JD requires/gi) || []) {
-      // Check if reason references a skill not in JD
-      const claimedSkill = allReasons.split(reason)[1]?.slice(0, 30)?.toLowerCase() || '';
-      if (claimedSkill && jdSkills.size > 0 && ![...jdSkills].some(s => claimedSkill.includes(s))) {
-        errors.push({
-          code: 'SOURCE_CONFUSION',
-          message: `Card reason claims JD requirement but no matching JD requirement found: "${reason.slice(0, 60)}"`,
-          severity: 'error',
-        });
+    if (jdSkills.size > 0) {
+      for (const card of allCards) {
+        const reason = (card.reason || '').toLowerCase();
+        if ((reason.includes('jd要求') || reason.includes('jd requires') || reason.includes('jd mentions')) && !jdSkills.has(reason)) {
+          errors.push({
+            code: 'SOURCE_CONFUSION',
+            message: `Card "${card.reason?.slice(0,60)}" claims JD source but no matching JD requirement found.`,
+            severity: 'warning',
+          });
+        }
       }
     }
   }

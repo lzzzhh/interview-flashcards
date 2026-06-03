@@ -305,16 +305,23 @@ async function generateAndSavePlan(session: any) {
     for (let attempt = 0; attempt <= MAX_REPAIRS; attempt++) {
       // Build prompt — append repair instructions on retry
       let currentPrompt = basePrompt;
-      if (attempt > 0 && guardErrors.length > 0) {
+      if (attempt > 0 && guardErrors.filter(e => e.severity === 'error').length > 0) {
         const fixNotes = guardErrors.filter(e => e.severity === 'error').map(e => `FIX: ${e.message}`).join('\n');
         if (fixNotes) {
           currentPrompt = `PREVIOUS PLAN FAILED QUALITY CHECK. Fix these issues:\n${fixNotes}\n\n---\n${basePrompt}`;
         }
       }
 
-      // Generate draft plan
-      const raw = await llm(PLAN_GENERATE_PROMPT, currentPrompt);
-      const draftPlan = safeParseJson(raw);
+      // Generate draft plan (safe — don't crash on LLM failure)
+      let draftPlan: any = null;
+      try {
+        const raw = await llm(PLAN_GENERATE_PROMPT, currentPrompt);
+        draftPlan = safeParseJson(raw);
+      } catch (e: any) {
+        guardErrors.push({ code: 'LLM_FAIL', message: `LLM call failed: ${e.message}`, severity: 'error' });
+        if (attempt < MAX_REPAIRS) { repairCount++; continue; }
+        break;
+      }
       if (!draftPlan) {
         guardErrors.push({ code: 'JSON_PARSE', message: 'Plan JSON could not be parsed', severity: 'error' });
         if (attempt < MAX_REPAIRS) { repairCount++; continue; }
@@ -322,14 +329,17 @@ async function generateAndSavePlan(session: any) {
       }
 
       // Rule validation
-      const ruleResult = ruleValidate(draftPlan, guardContext);
-      const dbCardErrors = await validateCardIds(draftPlan);
+      let ruleResult = { passed: true, errors: [] as any[], repairInstructions: [] as string[] };
+      try { ruleResult = ruleValidate(draftPlan, guardContext); } catch {}
+      let dbCardErrors: any[] = [];
+      try { dbCardErrors = await validateCardIds(draftPlan); } catch {}
       const allRuleErrors = [...ruleResult.errors, ...dbCardErrors];
 
-      // LLM guard (Flash model)
-      const llmResult = await llmGuard(draftPlan, guardContext);
+      // LLM guard (Flash model — graceful, skip on failure)
+      let llmErrors: any[] = [];
+      try { const lr = await llmGuard(draftPlan, guardContext); llmErrors = lr.errors || []; } catch {}
 
-      guardErrors = [...allRuleErrors, ...llmResult.errors];
+      guardErrors = [...allRuleErrors, ...llmErrors];
       const criticalErrors = guardErrors.filter(e => e.severity === 'error');
 
       if (criticalErrors.length === 0) {

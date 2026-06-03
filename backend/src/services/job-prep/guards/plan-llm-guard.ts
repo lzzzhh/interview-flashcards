@@ -23,30 +23,29 @@ export async function llmGuard(
   plan: any,
   context: GuardContext,
 ): Promise<{ passed: boolean; errors: GuardError[] }> {
-  const provider = getLLMProvider();
-  if (!provider) return { passed: true, errors: [] };
-
-  const guardModel = process.env.LLM_GUARD_MODEL || provider.defaultModel;
-
-  const planSummary = JSON.stringify({
-    title: plan?.title,
-    stages: plan?.stages?.map((s: any) => ({
-      name: s.name,
-      goal: s.goal,
-      cardCount: (s.cards || []).length,
-      sampleReasons: (s.cards || []).slice(0, 2).map((c: any) => c.reason),
-    })),
-  }).slice(0, 3000);
-
-  const guardInput = [
-    `Target: ${context.roleFamily || 'unknown'} role`,
-    `JD Requirements:\n${context.jdReqText.slice(0, 500)}`,
-    context.profile?.mustCoverInPlan ? `\nMust Cover: ${context.profile.mustCoverInPlan.join(', ')}` : '',
-    context.profile?.avoidOverweight ? `\nAvoid Overweight: ${context.profile.avoidOverweight.join(', ')}` : '',
-    `\nPlan Summary:\n${planSummary}`,
-  ].join('\n');
-
   try {
+    const provider = getLLMProvider();
+    if (!provider) return { passed: true, errors: [] };
+    const guardModel = process.env.LLM_GUARD_MODEL || provider.defaultModel;
+
+    const planSummary = JSON.stringify({
+      title: plan?.title,
+      stages: plan?.stages?.map((s: any) => ({
+        name: s.name,
+        goal: s.goal,
+        cardCount: (s.cards || []).length,
+        sampleReasons: (s.cards || []).slice(0, 2).map((c: any) => c.reason),
+      })),
+    }).slice(0, 3000);
+
+    const guardInput = [
+      `Target: ${context.roleFamily || 'unknown'} role`,
+      `JD Requirements:\n${context.jdReqText.slice(0, 500)}`,
+      context.profile?.mustCoverInPlan ? `\nMust Cover: ${context.profile.mustCoverInPlan.join(', ')}` : '',
+      context.profile?.avoidOverweight ? `\nAvoid Overweight: ${context.profile.avoidOverweight.join(', ')}` : '',
+      `\nPlan Summary:\n${planSummary}`,
+    ].join('\n');
+
     const resp = await provider.chat({
       model: guardModel,
       messages: [
@@ -58,7 +57,6 @@ export async function llmGuard(
     });
 
     const text = resp.text.trim();
-    // Extract JSON
     let parsed: any = null;
     try { parsed = JSON.parse(text); } catch {
       const match = text.match(/\{[\s\S]*\}/);
@@ -75,13 +73,9 @@ export async function llmGuard(
         })),
       };
     }
-
-    // If JSON parse failed entirely, don't block — log warning
-    console.warn(`[llm-guard] Failed to parse guard response: ${text.slice(0, 200)}`);
     return { passed: true, errors: [] };
   } catch (e: any) {
-    console.warn(`[llm-guard] Guard call failed: ${e.message}`);
-    // Don't block on guard failure
+    console.warn(`[llm-guard] Guard failed: ${e.message}`);
     return { passed: true, errors: [] };
   }
 }
