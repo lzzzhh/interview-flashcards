@@ -80,14 +80,22 @@ function uniqueStrings(values: Array<string | null | undefined>, limit = 100) {
 
 function detectDays(text: string): number | undefined {
   const c = text.toLowerCase();
-  if (/(今天|今晚|明天|后天|大后天|过两天|这两天)/.test(text)) return 2;
+  if (/(今天|今晚|明天)/.test(text)) return 1;
+  if (/(后天|过两天|两天后|这两天)/.test(text)) return 2;
+  if (/(大后天|三天后|3\s*天后)/.test(text)) return 3;
   const dayMatch = c.match(/(\d+)\s*(天|day|days)/);
   if (dayMatch) return Number(dayMatch[1]);
+  const chineseDayMatch = text.match(/([一二两三四五六七八九十])\s*天(?:后|内)?/);
+  if (chineseDayMatch) {
+    const daysByCn: Record<string, number> = { 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
+    return daysByCn[chineseDayMatch[1]];
+  }
   const weekMatch = c.match(/(\d+)\s*(周|星期|week|weeks)/);
   if (weekMatch) return Number(weekMatch[1]) * 7;
   const monthMatch = c.match(/(\d+)\s*(个月|月|month|months)/);
   if (monthMatch) return Number(monthMatch[1]) * 30;
-  if (/(本周|这周|下周)/.test(text)) return 7;
+  if (/(本周|这周)/.test(text)) return 5;
+  if (/(下周|下星期)/.test(text)) return 7;
   return undefined;
 }
 
@@ -95,7 +103,7 @@ function detectPrepIntent(text: string, session: any): PrepIntentProfile {
   const lower = text.toLowerCase();
   const days = detectDays(text);
   const hasShortSignal = /(今天|今晚|明天|后天|大后天|过两天|这两天|马上|很急|临时|突击|冲刺|来不及|短期)/.test(text);
-  const hasLongSignal = /(长期|系统|全面|完整|从零|打基础|全部|所有|刷完|hot\s*100|hot100|leetcode|力扣|一个月|两个月|三个月|半年)/i.test(text);
+  const hasLongSignal = /(长期|系统性|系统\s*(准备|学习|复习|梳理|过一遍)|全面|完整|从零|打基础|全部|所有|全量|刷完|hot\s*100|hot100|leetcode|力扣|一个月|两个月|三个月|半年)/i.test(text);
   const explicit = days !== undefined || hasShortSignal || hasLongSignal;
 
   let horizon: PrepHorizon = 'medium';
@@ -109,7 +117,7 @@ function detectPrepIntent(text: string, session: any): PrepIntentProfile {
     roleFamily === 'algorithm' || /hot\s*100|hot100|leetcode|力扣|刷题|算法/.test(lower)
   );
   const wantsMachineLearning = roleFamily === 'machine-learning'
-    || /((所有|全部|全量|完整).{0,12}(机器学习|machine learning|机器学习卡片))|((机器学习|machine learning|机器学习卡片).{0,12}(所有|全部|全量|完整|卡片))/i.test(text);
+    || /((所有|全部|全量|完整|全都).{0,12}(机器学习|machine learning|机器学习卡片))|((机器学习|machine learning|机器学习卡片).{0,12}(所有|全部|全量|完整|全都|卡片|过一遍|都过|系统过))/i.test(text);
 
   const includeFullDecks = [
     includeHot100 ? 'leetcode' : '',
@@ -463,8 +471,11 @@ export async function handleJobPrepMessage(sessionId: string, content: string) {
         session = await loadSession(sessionId);
       } else {
         await prisma.jobPrepSession.update({ where: { id: session.id }, data: { status: 'collecting_context' } });
+        const cycleHint = prepIntent.explicit
+          ? ''
+          : '\n\n另外也告诉我准备周期：比如「过两天面试」或「长期系统准备」。';
         return {
-          assistantMessage: `目标我先记为「${[session.company, session.role].filter(Boolean).join(' ') || session.role}」。你现在有 JD 吗？可以直接粘贴 JD；如果没有，回复「没有 JD」。\n\n另外也告诉我准备周期：比如「过两天面试」或「长期系统准备」。`,
+          assistantMessage: `目标我先记为「${[session.company, session.role].filter(Boolean).join(' ') || session.role}」。你现在有 JD 吗？可以直接粘贴 JD；如果没有，回复「没有 JD」。${cycleHint}`,
           nextAction: 'ask_for_jd',
         };
       }
@@ -625,12 +636,14 @@ async function handleGeneralQuestion(session: any, plan: any, content: string) {
 async function generateAndSavePlan(session: any) {
   if (process.env.JOB_PREP_AGENT_MODE !== 'single') {
     try {
-      const result = await generateJobPrepPlanWithReActAgents(session);
-      const saved = await savePlanToDB(session.id, result.plan);
+      const result = await generateJobPrepPlanWithReActAgents(session, {
+        savePlan: (plan) => savePlanToDB(session.id, plan),
+      });
+      const savedPlanId = result.savedPlanId;
       return {
         assistantMessage: `计划「${result.plan.title || '备战计划'}」已生成！共 ${result.metrics.stageCount} 个阶段、${result.metrics.selectedCardCount} 张卡片。\n\nReAct 多 Agent 指标：cardId 幻觉率 ${Math.round(result.metrics.hallucinationRate * 100)}%，核心覆盖率 ${Math.round(result.metrics.mustCoverCoverage * 100)}%，规则错误 ${result.metrics.ruleErrorCount} 个。`,
         nextAction: 'await_user',
-        data: { planId: saved.id, metrics: result.metrics, reactTrace: result.trace },
+        data: { planId: savedPlanId, metrics: result.metrics, reactTrace: result.trace },
         _guardDetails: { guardPassed: result.metrics.ruleErrorCount === 0, repairCount: result.metrics.repairCount, errors: result.guardErrors, metrics: result.metrics, reactTrace: result.trace },
       };
     } catch (e: any) {
@@ -829,6 +842,26 @@ async function generateAndSavePlan(session: any) {
 
 async function revisePlanWithFeedback(session: any, plan: any, feedback: string, estimatedDays?: number) {
   if (!plan) return generateAndSavePlan(session);
+
+  if (process.env.JOB_PREP_AGENT_MODE !== 'single') {
+    try {
+      await prisma.jobPrepPlan.update({ where: { id: plan.id }, data: { status: 'archived' } });
+      const result = await generateJobPrepPlanWithReActAgents(session, {
+        currentPlan: plan,
+        revisionFeedback: feedback,
+        estimatedDays,
+        savePlan: (nextPlan) => savePlanToDB(session.id, nextPlan, plan.version + 1, plan.id),
+      });
+      return {
+        assistantMessage: `已根据「${feedback}」调整计划，并通过 ReAct/Guard 校验。`,
+        nextAction: 'await_user',
+        data: { planId: result.savedPlanId, metrics: result.metrics, reactTrace: result.trace },
+        _guardDetails: { guardPassed: result.metrics.ruleErrorCount === 0, repairCount: result.metrics.repairCount, errors: result.guardErrors, metrics: result.metrics, reactTrace: result.trace },
+      };
+    } catch (e: any) {
+      console.warn(`[job-prep] ReAct revision failed, fallback to single revision: ${e.message}`);
+    }
+  }
 
   const company = session.company || '';
   const role = session.role || '';
