@@ -301,20 +301,46 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, apiSource: action.payload };
     case 'LOADED_QUEUE': {
       const cardsById: Record<string, FlashCard> = {};
+      // Merge localStorage SM-2 progress onto API-loaded cards
+      const category = action.payload.cards[0]?.category || state.category;
+      const progress = loadProgressFromLS(category as Category);
       for (const card of action.payload.cards) {
-        cardsById[card.id] = card;
+        const saved = progress.sm2[card.id];
+        cardsById[card.id] = saved
+          ? { ...card, sm2: { ...card.sm2, ...saved }, favorited: progress.favorited.includes(card.id) }
+          : card;
       }
       const nextState = {
         ...state,
         loading: false,
         cardsById,
-        category: action.payload.cards[0]?.category || state.category,
+        category,
         studyMode: action.payload.mode === 'review' ? 'review' as const : 'new' as const,
         showApproach: false,
         showCode: false,
         qaAnswerVisible: false,
       };
       return { ...nextState, visibleCardIds: computeVisibleIds(nextState), currentVisibleIndex: 0 };
+    }
+
+    /** Helper: load progress from localStorage without card data */
+    function loadProgressFromLS(category: Category): { sm2: Record<string, any>; favorited: string[] } {
+      try {
+        const keyMap: Record<string, string> = {
+          leetcode: 'fc-leetcode-progress', statistics: 'fc-stats-progress',
+          'machine-learning': 'fc-ml-progress', 'deep-learning': 'fc-deep-learning-progress',
+          llm: 'fc-llm-progress', agent: 'fc-agent-progress',
+          jargon: 'fc-jargon-progress', workplace: 'fc-workplace-progress',
+          'vibe-coding': 'fc-vibe-coding-progress',
+        };
+        const key = keyMap[category] || `fc-progress-${category}`;
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const p = JSON.parse(raw);
+          return { sm2: p.sm2 || {}, favorited: p.favorited || [] };
+        }
+      } catch {}
+      return { sm2: {}, favorited: [] };
     }
     case 'API_RATE_SUCCESS': {
       const card = state.cardsById[action.payload.cardId];
@@ -345,7 +371,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       const nextState = {
         ...state,
         category: action.payload,
-        cardsById: buildCardsById(action.payload),
+        cardsById: {},  // Cards loaded from API via SubModulePicker / LOADED_QUEUE
         showApproach: false,
         showCode: false,
         qaAnswerVisible: false,
@@ -649,7 +675,7 @@ function createInitialState(): AppState {
 
   return {
     category,
-    cardsById: buildCardsById(category),
+    cardsById: {},  // cards loaded from API on demand
     visibleCardIds: [],
     currentVisibleIndex: 0,
     showApproach: false,
