@@ -9,6 +9,7 @@ import { neo4jBuildKeywordTiers } from '../search/neo4j-graph-search';
 import { fts5Search } from '../search/fts5-search';
 import { ragSearch } from '../rag/rag-search';
 import { indexJobPosting } from '../rag/rag-indexer';
+import { getProfile, type RoleProfile } from './role-profiles';
 
 // ── Intent types ──
 
@@ -220,10 +221,22 @@ async function handleGeneralQuestion(session: any, plan: any, content: string) {
 async function generateAndSavePlan(session: any) {
   const company = session.company || '';
   const role = session.role || '';
+  const profile: RoleProfile | undefined = getProfile(session.roleFamily || '');
 
-  // Graph expansion
+  // Profile keywords for graph expansion — supplement JD requirements
+  const profileKeywords = profile
+    ? [...profile.mustCoverInPlan, ...profile.concepts, ...profile.interviewTopics]
+    : [];
+
+  // Graph expansion — use profile keywords as additional queries
   let graphKw: string[] = [];
-  try { const { tiers } = await neo4jBuildKeywordTiers(`${company} ${role}`); graphKw = [...tiers.coreKeywords, ...tiers.expandedKeywords].slice(0, 15); } catch {}
+  try {
+    for (const kw of [role, company, ...profileKeywords].filter(Boolean).slice(0, 12)) {
+      const { tiers } = await neo4jBuildKeywordTiers(String(kw));
+      graphKw.push(...tiers.coreKeywords, ...tiers.expandedKeywords);
+    }
+    graphKw = [...new Set(graphKw)].slice(0, 20);
+  } catch {}
 
   // FTS5 card search
   let ids: string[] = [];
@@ -238,9 +251,20 @@ async function generateAndSavePlan(session: any) {
     ? cards.map(c => `- ${c.id}: [${c.deckId}] ${(c as any).deck?.name || ''}: ${c.question || c.title || ''}`).join('\n')
     : '(no cards available — generate topic-based plan with empty cards array, use topic fields instead)';
 
-  // Requirements
+  // Requirements from JD
   const reqs = await prisma.jobRequirement.findMany({ where: { sessionId: session.id } });
-  const reqText = reqs.map(r => `- ${r.type}: ${r.name} (${r.importance})`).join('\n');
+  const jdReqText = reqs.length > 0
+    ? reqs.map(r => `- [JD] ${r.type}: ${r.name} (${r.importance})`).join('\n')
+    : '(no JD requirements extracted)';
+
+  // Role checklist requirements — supplement gaps
+  let checklistText = '';
+  if (profile) {
+    checklistText = [
+      '以下为数据科学岗位常见准备项（来自岗位画像，非JD原文）：',
+      ...profile.mustCoverInPlan.map(s => `- [CHECKLIST] skill: ${s} (must_have — role common)`),
+    ].join('\n');
+  }
 
   // RAG context — fire-and-forget, don't block plan generation if slow
   const ragPromise = ragSearch({ query: [company, role, ...reqs.map(r => r.name)].filter(Boolean).join(' '), sourceTypes: ['job_posting', 'document', 'project', 'interview_qa'], topK: 15 })
@@ -251,7 +275,14 @@ async function generateAndSavePlan(session: any) {
   const ragEvidence = await Promise.race([ragPromise, new Promise<string>(r => setTimeout(() => r(''), 5000))]);
 
   // LLM generate
-  const prompt = [`Job: ${company} ${role}`, reqText ? `\nRequirements:\n${reqText}` : '', ragEvidence ? `\nRAG Evidence:\n${ragEvidence}` : '', `\nConcepts: ${graphKw.join(', ')}`, `\nCards:\n${cardList}`].join('\n');
+  const prompt = [
+    `Job: ${company} ${role}${profile ? ` (${profile.displayName})` : ''}`,
+    jdReqText ? `\nJD Requirements (extracted from job posting):\n${jdReqText}` : '',
+    checklistText ? `\nRole Checklist (role-common requirements, supplement gaps):\n${checklistText}` : '',
+    ragEvidence ? `\nRAG Evidence:\n${ragEvidence}` : '',
+    `\nConcepts from knowledge graph: ${graphKw.join(', ')}`,
+    `\nCards:\n${cardList}`,
+  ].join('\n');
 
   try {
     const raw = await llm(PLAN_GENERATE_PROMPT, prompt);
