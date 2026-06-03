@@ -46,6 +46,7 @@ export default function JobPrepPage({ onBack }: Props) {
         setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: data.assistantMessage }]);
       }
       if (data.data?.planId) loadPlans(data.sessionId);
+      setInput(''); // clear input after first message sent
     } catch {
       setMessages(prev => [...prev, { id: 'err', role: 'assistant', content: '连接失败，请确认后端已启动。' }]);
     }
@@ -118,7 +119,7 @@ export default function JobPrepPage({ onBack }: Props) {
               <textarea
                 value={input}
                 onChange={e => setInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); createSession(input); } }}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); const t = input; setInput(''); createSession(t); } }}
                 placeholder="例如：我要面试阿里的数据分析实习..."
                 className="w-full rounded-xl border px-4 py-3 text-[14px] bg-transparent resize-none"
                 style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}
@@ -126,7 +127,7 @@ export default function JobPrepPage({ onBack }: Props) {
                 disabled={loading}
               />
               <button
-                onClick={() => createSession(input)}
+                onClick={() => { const t = input; setInput(''); createSession(t); }}
                 disabled={!input.trim() || loading}
                 className="absolute bottom-3 right-3 p-2 rounded-lg text-white disabled:opacity-30"
                 style={{ backgroundColor: ORANGE }}
