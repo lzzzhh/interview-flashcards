@@ -261,7 +261,7 @@ async function generateAndSavePlan(session: any) {
   let checklistText = '';
   if (profile) {
     checklistText = [
-      '以下为数据科学岗位常见准备项（来自岗位画像，非JD原文）：',
+      `以下为${profile.displayName}岗位常见准备项（来自岗位画像，非JD原文）：`,
       ...profile.mustCoverInPlan.map(s => `- [CHECKLIST] skill: ${s} (must_have — role common)`),
     ].join('\n');
   }
