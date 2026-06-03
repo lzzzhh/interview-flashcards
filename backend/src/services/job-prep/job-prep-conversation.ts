@@ -54,7 +54,7 @@ function classifyIntent(content: string, hasPlan: boolean): JobPrepIntent {
   const ch = content;
 
   // JD-related
-  if (ch.length > 100 && (ch.includes('岗位') || ch.includes('职责') || ch.includes('要求') || ch.includes('任职'))) return 'provide_jd';
+  if (ch.length > 80 && (ch.includes('岗位') || ch.includes('职责') || ch.includes('要求') || ch.includes('任职'))) return 'provide_jd';
   if (ch.includes('搜索') && (ch.includes('JD') || ch.includes('岗位') || ch.includes('公开'))) return 'search_jd_again';
 
   if (!hasPlan) return 'general_question';
