@@ -1,18 +1,44 @@
 // Job Prep LLM prompts
 
-export const JD_PARSE_PROMPT = `You are a job description parser. Extract structured job requirements from the JD text.
+export const JD_PARSE_PROMPT = `You are a job description parser. Extract ALL requirements from BOTH the job description AND job requirements sections.
+
+For data science / data analyst roles, you MUST check for these in the text:
+- A/B experiment, A/B testing, experiment design
+- Causal inference, causal analysis
+- Metrics construction, KPI, indicator system
+- User behavior analysis, user data analysis
+- Recommendation system evaluation, model effect evaluation
+- Business growth, opportunity discovery, growth hacking
+- Data-driven decision making
+- SQL, Python, R, SAS
+- Statistics, machine learning, statistical modeling
+- Content consumption, short video recommendation (if mentioned)
+- Competition ranking, paper publication
+- Graduation year requirements (e.g. "2027届")
 
 Output a JSON object with a "requirements" array. Each requirement has:
-- type: "skill" | "tool" | "experience" | "project" | "domain" | "soft_skill" | "education"
-- name: the skill/requirement as stated in the JD
-- normalizedName: normalized version (e.g. "SQL", "A/B Testing", "Machine Learning")
-- importance: "must_have" | "nice_to_have" | "unknown"
-- evidenceText: the sentence or phrase from the JD that mentions this requirement
+- type: "skill" | "tool" | "experience" | "domain" | "soft_skill" | "education" | "eligibility" | "bonus"
+- name: the requirement as stated in the JD
+- normalizedName: normalized version (e.g. "SQL", "A/B Testing", "Causal Inference")
+- importance: "must_have" | "nice_to_have"
+- evidenceText: exact sentence from the JD
+
+Service description items like "opportunity discovery", "metrics construction", "experiment design" should be extracted as domain/skill types.
+Graduation year requirements should be type "eligibility".
+Competition/paper requirements should be type "bonus".
 
 Return ONLY the JSON object, no other text.`;
 
 export const PLAN_GENERATE_PROMPT = `You are a study plan generator for technical interview preparation.
-Generate a phased study plan based on the job requirements, retrieved cards, and concept graph.
+Generate a phased study plan based on the job requirements and available cards.
+
+If available cards list is empty or marked as "(no cards available)", generate a TOPIC-BASED plan WITHOUT cardId fields.
+In topic-based mode:
+- cards array in each stage must be EMPTY: []
+- topic fields describe what to study
+- goal fields describe what to learn in each stage
+
+If cards are available, include cardId from the actual card list.
 
 Output a JSON object:
 {
@@ -24,10 +50,11 @@ Output a JSON object:
       "name": "stage name",
       "goal": "what this stage aims to accomplish",
       "estimatedMinutes": N,
+      "topic": "what to study (only in topic-based mode)",
       "cards": [
         {
-          "cardId": "from retrieved cards",
-          "deckId": "card's deck",
+          "cardId": "from available cards (omit if topic-based)",
+          "deckId": "card's deck (omit if topic-based)",
           "reason": "why this card is in this stage"
         }
       ]
@@ -36,13 +63,14 @@ Output a JSON object:
 }
 
 Rules:
-- 3-5 stages total
-- Each stage 3-8 cards
+- 3-6 stages total
+- Each stage 1-3 topic focuses
 - First stage: foundational / prerequisite knowledge
 - Middle stages: core job requirements
-- Last stage: interview readiness / project expression
-- Prefer cards with higher scores
-- Reason must reference specific job requirements or concepts
+- Last stage: interview readiness
+- If cards available: 3-8 cards per stage from the provided list
+- If NO cards: empty cards array, use topic field instead
+- Reason must reference specific job requirements
 
 Return ONLY the JSON object.`;
 

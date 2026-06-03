@@ -232,9 +232,11 @@ async function generateAndSavePlan(session: any) {
   // Fetch cards
   const cards = ids.length > 0
     ? await prisma.card.findMany({ where: { id: { in: ids } }, include: { deck: true }, take: 50 })
-    : await prisma.card.findMany({ include: { deck: true }, take: 50 });
-
-  const cardList = cards.map(c => `- ${c.id}: [${c.deckId}] ${(c as any).deck?.name || ''}: ${c.question || c.title || ''}`).join('\n');
+    : [];
+  const hasCards = cards.length > 0;
+  const cardList = hasCards
+    ? cards.map(c => `- ${c.id}: [${c.deckId}] ${(c as any).deck?.name || ''}: ${c.question || c.title || ''}`).join('\n')
+    : '(no cards available — generate topic-based plan with empty cards array, use topic fields instead)';
 
   // Requirements
   const reqs = await prisma.jobRequirement.findMany({ where: { sessionId: session.id } });
@@ -258,7 +260,8 @@ async function generateAndSavePlan(session: any) {
       const saved = await savePlanToDB(session.id, plan);
       const stages = plan.stages?.length || 0;
       const totalCards = plan.stages?.reduce((s: number, st: any) => s + (st.cards?.length || 0), 0) || 0;
-      return { assistantMessage: `计划「${plan.title}」已生成！共 ${stages} 个阶段、${totalCards} 张卡片。\n\n你可以说「加强 SQL」「只有 3 天」「为什么这样安排」来调整计划。`, nextAction: 'await_user', data: { planId: saved.id } };
+      const topicNote = !hasCards ? ' （当前为主题型计划，暂无绑定卡片）' : '';
+      return { assistantMessage: `计划「${plan.title}」已生成！共 ${stages} 个阶段、${totalCards} 张卡片。${topicNote}\n\n你可以说「加强 SQL」「只有 3 天」「为什么这样安排」来调整计划。`, nextAction: 'await_user', data: { planId: saved.id } };
     }
     return { assistantMessage: '计划生成遇到格式问题，请重试。', nextAction: 'await_user' };
   } catch (e: any) {
