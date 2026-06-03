@@ -37,7 +37,7 @@ export async function jobPrepRoutes(app: FastifyInstance) {
         const resp = await p.chat({
           model: p.defaultModel,
           messages: [
-            { role: 'system', content: 'Parse job target. Output JSON: {"company":"...","role":"...","roleFamily":"..."}. roleFamily: data-analysis,algorithm,backend,frontend,machine-learning,llm,devops,product,other. Return ONLY JSON.' },
+            { role: 'system', content: 'Parse job target. Output JSON: {"company":"...","role":"...","roleFamily":"..."}. roleFamily: data-analysis,data-science,algorithm,machine-learning,llm,llm-application,backend,frontend,other. Return ONLY JSON.' },
             { role: 'user', content: input },
           ], temperature: 0.1, maxTokens: 200,
         });

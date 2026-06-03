@@ -90,6 +90,15 @@ Extract company and role. If ambiguous, make your best guess.
 
 Output JSON: { "company": "...", "role": "...", "roleFamily": "..." }
 
-roleFamily should be one of: data-analysis, algorithm, backend, frontend, machine-learning, llm, devops, product, other
+roleFamily must be one of:
+  data-analysis  — SQL/BI/报表/指标体系/A/B测试
+  data-science   — AB实验/因果推断/推荐系统/机器学习/用户分析
+  algorithm      — 数据结构/算法/动态规划/图论
+  machine-learning — 模型训练/特征工程/深度学习/CV/NLP
+  llm            — Transformer/RAG/微调/Agent开发/大模型
+  llm-application — RAG/Agent搭建/向量数据库/LLM API
+  backend        — 系统设计/数据库/分布式/API
+  frontend       — React/Vue/CSS/性能优化/工程化
+  other          — 以上都不匹配
 
 Return ONLY the JSON object.`;
