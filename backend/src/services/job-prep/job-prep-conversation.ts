@@ -10,6 +10,8 @@ import { fts5Search } from '../search/fts5-search';
 import { ragSearch } from '../rag/rag-search';
 import { indexJobPosting } from '../rag/rag-indexer';
 import { getProfile, type RoleProfile } from './role-profiles';
+import { ruleValidate, validateCardIds, type GuardContext } from './guards/plan-rule-validator';
+import { llmGuard } from './guards/plan-llm-guard';
 
 // ── Intent types ──
 
@@ -274,8 +276,8 @@ async function generateAndSavePlan(session: any) {
   // Wait up to 5 seconds for RAG, then proceed
   const ragEvidence = await Promise.race([ragPromise, new Promise<string>(r => setTimeout(() => r(''), 5000))]);
 
-  // LLM generate
-  const prompt = [
+  // Build the base prompt
+  const basePrompt = [
     `Job: ${company} ${role}${profile ? ` (${profile.displayName})` : ''}`,
     jdReqText ? `\nJD Requirements (extracted from job posting):\n${jdReqText}` : '',
     checklistText ? `\nRole Checklist (role-common requirements, supplement gaps):\n${checklistText}` : '',
@@ -284,17 +286,75 @@ async function generateAndSavePlan(session: any) {
     `\nCards:\n${cardList}`,
   ].join('\n');
 
+  const topicNote = !hasCards ? ' （当前为主题型计划，暂无绑定卡片）' : '';
+
+  // Guard context — passed to both validators
+  const guardContext: GuardContext = {
+    hasCards: cards.length > 0,
+    roleFamily: session.roleFamily,
+    profile,
+    jdReqText,
+    ragEvidence,
+  };
+
   try {
-    const raw = await llm(PLAN_GENERATE_PROMPT, prompt);
-    const plan = safeParseJson(raw);
-    if (plan) {
-      const saved = await savePlanToDB(session.id, plan);
-      const stages = plan.stages?.length || 0;
-      const totalCards = plan.stages?.reduce((s: number, st: any) => s + (st.cards?.length || 0), 0) || 0;
-      const topicNote = !hasCards ? ' （当前为主题型计划，暂无绑定卡片）' : '';
-      return { assistantMessage: `计划「${plan.title}」已生成！共 ${stages} 个阶段、${totalCards} 张卡片。${topicNote}\n\n你可以说「加强 SQL」「只有 3 天」「为什么这样安排」来调整计划。`, nextAction: 'await_user', data: { planId: saved.id } };
+    let guardErrors: Array<{ code: string; message: string; severity: 'error' | 'warning' }> = [];
+    let repairCount = 0;
+    const MAX_REPAIRS = 2;
+
+    for (let attempt = 0; attempt <= MAX_REPAIRS; attempt++) {
+      // Build prompt — append repair instructions on retry
+      let currentPrompt = basePrompt;
+      if (attempt > 0 && guardErrors.length > 0) {
+        const fixNotes = guardErrors.filter(e => e.severity === 'error').map(e => `FIX: ${e.message}`).join('\n');
+        if (fixNotes) {
+          currentPrompt = `PREVIOUS PLAN FAILED QUALITY CHECK. Fix these issues:\n${fixNotes}\n\n---\n${basePrompt}`;
+        }
+      }
+
+      // Generate draft plan
+      const raw = await llm(PLAN_GENERATE_PROMPT, currentPrompt);
+      const draftPlan = safeParseJson(raw);
+      if (!draftPlan) {
+        guardErrors.push({ code: 'JSON_PARSE', message: 'Plan JSON could not be parsed', severity: 'error' });
+        if (attempt < MAX_REPAIRS) { repairCount++; continue; }
+        break;
+      }
+
+      // Rule validation
+      const ruleResult = ruleValidate(draftPlan, guardContext);
+      const dbCardErrors = await validateCardIds(draftPlan);
+      const allRuleErrors = [...ruleResult.errors, ...dbCardErrors];
+
+      // LLM guard (Flash model)
+      const llmResult = await llmGuard(draftPlan, guardContext);
+
+      guardErrors = [...allRuleErrors, ...llmResult.errors];
+      const criticalErrors = guardErrors.filter(e => e.severity === 'error');
+
+      if (criticalErrors.length === 0) {
+        // Passed! Save and return
+        const saved = await savePlanToDB(session.id, draftPlan);
+        const stageCount = draftPlan.stages?.length || 0;
+        const cardTotal = draftPlan.stages?.reduce((s: number, st: any) => s + (st.cards?.length || 0), 0) || 0;
+        return {
+          assistantMessage: `计划「${draftPlan.title}」已生成！共 ${stageCount} 个阶段、${cardTotal} 张卡片。${topicNote}\n\n你可以说「加强 SQL」「只有 3 天」「为什么这样安排」来调整计划。`,
+          nextAction: 'await_user',
+          data: { planId: saved.id },
+          _guardDetails: { guardPassed: true, repairCount: attempt, errors: guardErrors },
+        };
+      }
+
+      if (attempt < MAX_REPAIRS) repairCount++;
     }
-    return { assistantMessage: '计划生成遇到格式问题，请重试。', nextAction: 'await_user' };
+
+    // All attempts exhausted — don't save bad plan
+    return {
+      assistantMessage: `计划生成遇到问题，无法通过质量检查。${guardErrors.filter(e => e.severity === 'error').map(e => e.message).join('；')}`,
+      nextAction: 'await_user',
+      data: {},
+      _guardDetails: { guardPassed: false, repairCount, errors: guardErrors },
+    };
   } catch (e: any) {
     return { assistantMessage: `计划生成失败：${e.message}`, nextAction: 'await_user' };
   }
