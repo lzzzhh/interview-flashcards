@@ -233,16 +233,27 @@ async function generateAndSavePlan(session: any) {
   // Graph expansion — use profile keywords as additional queries
   let graphKw: string[] = [];
   try {
-    for (const kw of [role, company, ...profileKeywords].filter(Boolean).slice(0, 12)) {
-      const { tiers } = await neo4jBuildKeywordTiers(String(kw));
-      graphKw.push(...tiers.coreKeywords, ...tiers.expandedKeywords);
+    for (const kw of [role, company, ...profileKeywords].filter(Boolean).slice(0, 8)) {
+      try {
+        const result = await Promise.race([
+          neo4jBuildKeywordTiers(String(kw)),
+          new Promise<any>((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+        ]);
+        graphKw.push(...result.tiers.coreKeywords, ...result.tiers.expandedKeywords);
+      } catch {}
     }
     graphKw = [...new Set(graphKw)].slice(0, 20);
   } catch {}
 
   // FTS5 card search
   let ids: string[] = [];
-  try { const r = await fts5Search([company, role, ...graphKw].filter(Boolean).join(' '), 50); ids = r.map(x => x.cardId); } catch {}
+  try {
+    const result = await Promise.race([
+      fts5Search([company, role, ...graphKw].filter(Boolean).join(' '), 50),
+      new Promise<{ cardId: string }[]>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+    ]);
+    ids = result.map((x: any) => x.cardId);
+  } catch {}
 
   // Fetch cards
   const cards = ids.length > 0
