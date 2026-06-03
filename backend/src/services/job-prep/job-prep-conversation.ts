@@ -116,8 +116,8 @@ async function handleProvideJD(session: any, content: string) {
     }
   } catch { /* non-critical */ }
 
-  // Index JD into Qdrant for RAG retrieval
-  try { await indexJobPosting(posting.id); } catch { /* Qdrant may be down */ }
+  // Index JD into Qdrant for RAG retrieval (fire-and-forget, don't block response)
+  indexJobPosting(posting.id).catch(e => console.warn(`[job-prep] JD index failed: ${e.message}`));
 
   return generateAndSavePlan(session);
 }
@@ -155,8 +155,8 @@ async function handleConfirmJD(session: any, content: string) {
       }
     } catch { /* non-critical */ }
 
-    // Index confirmed JD into Qdrant
-    try { await indexJobPosting(candidate.id); } catch { /* Qdrant may be down */ }
+    // Index confirmed JD into Qdrant (fire-and-forget)
+    indexJobPosting(candidate.id).catch(e => console.warn(`[job-prep] JD index failed: ${e.message}`));
 
     return generateAndSavePlan(session);
   }
@@ -240,17 +240,13 @@ async function generateAndSavePlan(session: any) {
   const reqs = await prisma.jobRequirement.findMany({ where: { sessionId: session.id } });
   const reqText = reqs.map(r => `- ${r.type}: ${r.name} (${r.importance})`).join('\n');
 
-  // RAG context — JD/document/project/interview_qa text evidence
-  let ragEvidence = '';
-  try {
-    const ragQuery = [company, role, ...reqs.map(r => r.name)].filter(Boolean).join(' ');
-    const ragResults = await ragSearch({ query: ragQuery, sourceTypes: ['job_posting', 'document', 'project', 'interview_qa'], topK: 15 });
-    if (ragResults.length > 0) {
-      ragEvidence = ragResults.map(r =>
-        `[${r.sourceType}:${r.sourceId}] ${r.title || ''}: ${r.text.slice(0, 300)}`
-      ).join('\n---\n');
-    }
-  } catch { /* Qdrant unavailable — skip */ }
+  // RAG context — fire-and-forget, don't block plan generation if slow
+  const ragPromise = ragSearch({ query: [company, role, ...reqs.map(r => r.name)].filter(Boolean).join(' '), sourceTypes: ['job_posting', 'document', 'project', 'interview_qa'], topK: 15 })
+    .then(results => results.length > 0 ? results.map(r => `[${r.sourceType}:${r.sourceId}] ${r.title || ''}: ${r.text.slice(0, 300)}`).join('\n---\n') : '')
+    .catch(() => '');
+  
+  // Wait up to 5 seconds for RAG, then proceed
+  const ragEvidence = await Promise.race([ragPromise, new Promise<string>(r => setTimeout(() => r(''), 5000))]);
 
   // LLM generate
   const prompt = [`Job: ${company} ${role}`, reqText ? `\nRequirements:\n${reqText}` : '', ragEvidence ? `\nRAG Evidence:\n${ragEvidence}` : '', `\nConcepts: ${graphKw.join(', ')}`, `\nCards:\n${cardList}`].join('\n');
