@@ -34,23 +34,35 @@ export async function indexChunks(chunks: RagChunk[]): Promise<{ indexed: number
     // Check existing records by sourceType + sourceId + chunkIndex
     const existing = await prisma.ragChunkIndex.findMany({
       where: { sourceType: batch[0].sourceType, sourceId: { in: batch.map(c => c.sourceId) }, status: 'active' },
-      select: { sourceId: true, chunkIndex: true, textHash: true },
+      select: { sourceId: true, chunkIndex: true, textHash: true, qdrantPointId: true },
     });
-    // Map: "sourceId:chunkIndex" -> textHash
-    const existingMap = new Map(existing.map(e => [`${e.sourceId}:${e.chunkIndex}`, e.textHash]));
+    // Map: "sourceId:chunkIndex" -> { textHash, qdrantPointId }
+    const existingMap = new Map(existing.map(e => [`${e.sourceId}:${e.chunkIndex}`, { hash: e.textHash, pointId: e.qdrantPointId }]));
+
+    // Collect stale Qdrant points to delete
+    const stalePointIds: string[] = [];
 
     // Filter out unchanged chunks
     const newChunks = batch.filter(c => {
       const h = hashText(c.text);
       const key = `${c.sourceId}:${c.chunkIndex}`;
-      const oldHash = existingMap.get(key);
-      if (oldHash === h) { skipped++; return false; }
-      // Mark stale if hash changed
-      if (oldHash && oldHash !== h) {
+      const old = existingMap.get(key);
+      if (old?.hash === h) { skipped++; return false; }
+      if (old && old.hash !== h) {
+        stalePointIds.push(old.pointId);
         prisma.ragChunkIndex.updateMany({ where: { sourceType: c.sourceType, sourceId: c.sourceId, chunkIndex: c.chunkIndex }, data: { status: 'stale' } }).catch(() => {});
       }
       return true;
     });
+
+    // Delete stale points from Qdrant
+    if (stalePointIds.length > 0) {
+      try {
+        await client.delete(collection, { points: stalePointIds, wait: true });
+      } catch (e: any) {
+        console.warn(`[rag-indexer] Failed to delete stale points: ${e.message}`);
+      }
+    }
 
     if (newChunks.length === 0) continue;
 
