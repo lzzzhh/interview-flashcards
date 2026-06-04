@@ -11,6 +11,7 @@ import {
   BrainCircuit,
   MessageSquare,
   Briefcase,
+  Coffee,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -30,6 +31,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { key: 'jargon', label: '黑话', icon: MessageSquare },
   { key: 'workplace', label: '职场', icon: Briefcase },
   { key: 'vibe-coding', label: 'Vibe Coding', icon: Bot },
+  { key: 'java', label: 'Java 面试', icon: Coffee },
 ];
 
 export const DIFFICULTY_LABEL: Record<Difficulty, string> = {

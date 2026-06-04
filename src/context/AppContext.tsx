@@ -332,6 +332,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
           llm: 'fc-llm-progress', agent: 'fc-agent-progress',
           jargon: 'fc-jargon-progress', workplace: 'fc-workplace-progress',
           'vibe-coding': 'fc-vibe-coding-progress',
+          java: 'fc-java-progress',
         };
         const key = keyMap[category] || `fc-progress-${category}`;
         const raw = localStorage.getItem(key);
