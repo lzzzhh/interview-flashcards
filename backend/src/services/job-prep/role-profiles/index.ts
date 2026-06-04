@@ -168,13 +168,13 @@ export const PROFILES: RoleProfile[] = [
     displayName: 'LLM应用开发',
     coreSkills: [
       'LLM API调用', 'Prompt工程', 'RAG', 'Agent搭建',
-      'Python', 'API设计', '向量数据库',
+      'Python', 'Java', 'API设计', '向量数据库',
     ],
-    tools: ['Python', 'FastAPI', 'LangChain', 'LlamaIndex', 'Qdrant', 'Chroma'],
+    tools: ['Python', 'Java', 'FastAPI', 'LangChain', 'LlamaIndex', 'Qdrant', 'Chroma', 'LangChain4j', 'Spring AI'],
     concepts: [
       'llm_big_model', 'rag', 'agent', 'prompt_engineering',
       'function_calling', 'tool_use', 'embedding', 'vectordb',
-      'json_mode', 'structured_output',
+      'json_mode', 'structured_output', 'java', 'spring',
     ],
     commonTasks: [
       '搭建RAG应用', '设计Agent workflow', 'Prompt优化',
@@ -182,13 +182,14 @@ export const PROFILES: RoleProfile[] = [
     ],
     interviewTopics: [
       'RAG架构设计', 'Agent ReAct模式', 'Prompt模板',
-      '向量数据库选型', 'LLM API最佳实践',
+      '向量数据库选型', 'LLM API最佳实践', 'Spring AI',
+      'LangChain4j',
     ],
-    projectSignals: ['RAG应用', 'Agent', 'ChatBot', '向量检索'],
+    projectSignals: ['RAG应用', 'Agent', 'ChatBot', '向量检索', 'Spring AI'],
     niceToHave: ['微调经验', '模型部署', '前端集成'],
     mustCoverInPlan: [
       'RAG', 'Prompt工程', 'Agent开发', '向量数据库',
-      'LLM API', 'Python',
+      'LLM API', 'Python', 'Java基础',
     ],
     avoidOverweight: ['算法刷题', '底层模型训练', 'CUDA优化'],
   },
@@ -198,25 +199,27 @@ export const PROFILES: RoleProfile[] = [
     coreSkills: [
       'Java/Go/Python', '数据库设计', '系统设计', 'API设计',
       '并发编程', '分布式系统', '消息队列', '缓存',
+      'Spring Boot', '微服务', 'JVM调优',
     ],
-    tools: ['Java', 'Go', 'Python', 'MySQL', 'Redis', 'Kafka', 'Docker', 'K8s'],
+    tools: ['Java', 'Go', 'Python', 'MySQL', 'Redis', 'Kafka', 'Docker', 'K8s', 'Spring Boot'],
     concepts: [
       'distributed_system', 'cicd', 'sql', 'model_deploy',
-      'cicd_pipeline',
+      'cicd_pipeline', 'java', 'spring',
     ],
     commonTasks: [
       'API设计与开发', '数据库建模', '系统架构设计',
-      '性能优化', '分布式系统设计',
+      '性能优化', '分布式系统设计', '微服务拆分',
     ],
     interviewTopics: [
       '数据库索引优化', '分布式一致性', '消息队列',
       '缓存策略', '微服务架构', '系统设计题',
+      'Java并发编程', 'JVM调优', 'Spring Boot',
     ],
-    projectSignals: ['微服务', '高并发', '分布式', '数据库优化', 'CI/CD'],
-    niceToHave: ['LLM集成', 'ML基础设施', '前端基础'],
+    projectSignals: ['微服务', '高并发', '分布式', '数据库优化', 'CI/CD', 'Spring Boot'],
+    niceToHave: ['LLM集成', 'ML基础设施', '前端基础', 'LangChain4j'],
     mustCoverInPlan: [
       '数据库', '系统设计', 'API设计', '并发编程',
-      '分布式基础', '缓存与消息队列',
+      '分布式基础', '缓存与消息队列', 'Java核心',
     ],
     avoidOverweight: ['深度学习', '算法竞赛', '前端框架'],
   },
