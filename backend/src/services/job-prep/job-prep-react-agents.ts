@@ -146,9 +146,41 @@ interface OrchestratorState {
   options: JobPrepOrchestratorOptions;
 }
 
+const TECHNICAL_ROLE_FAMILIES = new Set([
+  'data-analysis',
+  'data-science',
+  'algorithm',
+  'machine-learning',
+  'llm',
+  'llm-application',
+  'backend',
+  'frontend',
+]);
+
+const CODING_INTERVIEW_TERMS = [
+  'LeetCode',
+  'Hot100',
+  '数据结构',
+  '算法基础',
+  '数组',
+  '哈希表',
+  '链表',
+  '二叉树',
+  '双指针',
+  '滑动窗口',
+  '动态规划',
+];
+
+function codingBasicsLimit(horizon: PrepHorizon) {
+  if (horizon === 'short') return 8;
+  if (horizon === 'medium') return 16;
+  return 0;
+}
+
 interface ToolDefinition {
   name: JobPrepToolName;
   description: string;
+  enabled?: boolean;
   inputSchema: z.ZodTypeAny;
   outputSchema: z.ZodTypeAny;
   timeoutMs: number;
@@ -317,6 +349,17 @@ function uniqueStrings(values: Array<string | null | undefined>, limit = 100) {
   return [...new Set(values.map(v => String(v || '').trim()).filter(Boolean))].slice(0, limit);
 }
 
+function parseSmallChineseNumber(value: string): number | undefined {
+  const digits: Record<string, number> = { 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
+  if (value === '十') return 10;
+  if (value.length === 1) return digits[value];
+  const parts = value.split('十');
+  if (parts.length !== 2) return undefined;
+  const tens = parts[0] ? digits[parts[0]] : 1;
+  const ones = parts[1] ? digits[parts[1]] : 0;
+  return tens === undefined || ones === undefined ? undefined : tens * 10 + ones;
+}
+
 function detectDays(text: string): number | undefined {
   const c = text.toLowerCase();
   if (/(今天|今晚|明天)/.test(text)) return 1;
@@ -324,15 +367,25 @@ function detectDays(text: string): number | undefined {
   if (/(大后天|三天后|3\s*天后)/.test(text)) return 3;
   const dayMatch = c.match(/(\d+)\s*(天|day|days)/);
   if (dayMatch) return Number(dayMatch[1]);
-  const chineseDayMatch = text.match(/([一二两三四五六七八九十])\s*天(?:后|内)?/);
+  const chineseDayMatch = text.match(/([一二两三四五六七八九十]{1,3})\s*天(?:后|内)?/);
   if (chineseDayMatch) {
-    const daysByCn: Record<string, number> = { 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
-    return daysByCn[chineseDayMatch[1]];
+    const days = parseSmallChineseNumber(chineseDayMatch[1]);
+    if (days !== undefined) return days;
   }
   const weekMatch = c.match(/(\d+)\s*(周|星期|week|weeks)/);
   if (weekMatch) return Number(weekMatch[1]) * 7;
+  const chineseWeekMatch = text.match(/([一二两三四五六七八九十]{1,3})\s*(周|星期|礼拜)/);
+  if (chineseWeekMatch) {
+    const weeks = parseSmallChineseNumber(chineseWeekMatch[1]);
+    if (weeks !== undefined) return weeks * 7;
+  }
   const monthMatch = c.match(/(\d+)\s*(个月|月|month|months)/);
   if (monthMatch) return Number(monthMatch[1]) * 30;
+  const chineseMonthMatch = text.match(/([一二两三四五六七八九十]{1,3})\s*(个月|月)/);
+  if (chineseMonthMatch) {
+    const months = parseSmallChineseNumber(chineseMonthMatch[1]);
+    if (months !== undefined) return months * 30;
+  }
   if (/(本周|这周)/.test(text)) return 5;
   if (/(下周|下星期)/.test(text)) return 7;
   return undefined;
@@ -350,13 +403,14 @@ function detectPrepIntent(text: string, roleFamily: string | null | undefined): 
   else if (hasShortSignal) horizon = 'short';
   else if (hasLongSignal) horizon = 'long';
 
-  const includeHot100 = horizon === 'long' && (
-    roleFamily === 'algorithm' || /hot\s*100|hot100|leetcode|力扣|刷题|算法/.test(lower)
-  );
+  const roleFamilyText = String(roleFamily || '');
+  const isTechnicalRole = TECHNICAL_ROLE_FAMILIES.has(roleFamilyText)
+    || /(工程师|开发|技术|算法|数据|前端|后端|测试|运维|安全|架构|程序员|developer|engineer)/i.test(text);
+  const includeHot100 = horizon === 'long' && isTechnicalRole;
   const wantsMachineLearning = roleFamily === 'machine-learning'
     || /((所有|全部|全量|完整|全都).{0,12}(机器学习|machine learning|机器学习卡片))|((机器学习|machine learning|机器学习卡片).{0,12}(所有|全部|全量|完整|全都|卡片|过一遍|都过|系统过))/i.test(text);
   const includeFullDecks = [includeHot100 ? 'leetcode' : '', horizon === 'long' && wantsMachineLearning ? 'machine-learning' : ''].filter(Boolean);
-  const excludeDecks = horizon === 'short' ? ['leetcode'] : [];
+  const excludeDecks: string[] = [];
   const cardLimit = horizon === 'short' ? 24 : horizon === 'long' && includeHot100 && wantsMachineLearning ? 320 : horizon === 'long' ? 220 : 60;
 
   return {
@@ -369,7 +423,7 @@ function detectPrepIntent(text: string, roleFamily: string | null | undefined): 
     cardLimit,
     graphMode: horizon === 'long' ? 'learning-path' : 'search',
     reason: horizon === 'short'
-      ? '识别为短期冲刺，优先 JD 命中点，跳过 Hot100/刷题型长线任务。'
+      ? '识别为短期冲刺，优先 JD 命中点，并保留少量算法基础卡片。'
       : horizon === 'long'
         ? '识别为长期系统准备，允许知识图谱深度扩展并纳入全量核心牌组。'
         : '识别为常规准备，使用 JD + 岗位画像的中等范围计划。',
@@ -645,11 +699,14 @@ async function executeTool(name: JobPrepToolName, args: Record<string, any>, sta
       const existing = await prisma.jobRequirement.findMany({ where: { sessionId: state.session.id } });
       const jdReqs: RequirementObservation[] = existing.map(r => ({ name: r.name, normalizedName: r.normalizedName, type: r.type, importance: r.importance, evidenceText: r.evidenceText, source: 'jd' }));
       const profileReqs: RequirementObservation[] = (state.roleProfile?.mustCoverInPlan || []).map(name => ({ name, normalizedName: name, type: 'skill', importance: 'role_must_cover', source: 'role_profile' }));
+      const codingReqs: RequirementObservation[] = TECHNICAL_ROLE_FAMILIES.has(String(state.session.roleFamily || ''))
+        ? CODING_INTERVIEW_TERMS.map(name => ({ name, normalizedName: name, type: 'skill', importance: state.prepIntent.horizon === 'long' ? 'role_must_cover' : 'technical_basics', source: 'role_profile' }))
+        : [];
       const feedbackReqs: RequirementObservation[] = state.revisionFeedback
         ? uniqueStrings(state.revisionFeedback.split(/[，,、\s]+/).filter(t => t.length >= 2), 8).map(name => ({ name, normalizedName: name, type: 'revision_feedback', importance: 'user_requested', source: 'user_feedback' }))
         : [];
       const merged = new Map<string, RequirementObservation>();
-      for (const req of [...jdReqs, ...profileReqs, ...feedbackReqs]) {
+      for (const req of [...jdReqs, ...profileReqs, ...codingReqs, ...feedbackReqs]) {
         const key = String(req.normalizedName || req.name).toLowerCase();
         if (!merged.has(key)) merged.set(key, req);
       }
@@ -691,8 +748,11 @@ async function executeTool(name: JobPrepToolName, args: Record<string, any>, sta
       const perRequirement = Number(args.perRequirement || (state.prepIntent.horizon === 'short' ? 4 : 8));
       const cards = await retrieveCardsForRequirements(requested, state, perRequirement);
       const fullDeckCards = await findFullDeckCards(state.prepIntent.includeFullDecks);
+      const codingBasicsCards = TECHNICAL_ROLE_FAMILIES.has(String(state.session.roleFamily || '')) && !state.prepIntent.includeFullDecks.includes('leetcode')
+        ? (await findFullDeckCards(['leetcode'])).slice(0, codingBasicsLimit(state.prepIntent.horizon))
+        : [];
       const merged = new Map(state.cardCandidates.map(card => [card.cardId, card]));
-      for (const card of [...fullDeckCards, ...cards]) {
+      for (const card of [...fullDeckCards, ...codingBasicsCards, ...cards]) {
         if (!merged.has(card.cardId)) merged.set(card.cardId, card);
       }
       state.cardCandidates = [...merged.values()].slice(0, state.prepIntent.cardLimit);

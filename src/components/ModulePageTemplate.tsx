@@ -61,18 +61,23 @@ export default function ModulePageTemplate({
         <h1 className="nav-title">{categoryLabel}</h1>
         {(onOpenCardManager || onCreateTopic || onDeleteTopic) && (
           <div className="relative" ref={menuRef}>
-            <button onClick={() => setShowMenu(!showMenu)} className="p-1">
-              <Settings className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="module-page-icon-button"
+              aria-label="模块设置"
+              aria-expanded={showMenu}
+            >
+              <Settings className="w-5 h-5" />
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-10 z-30 min-w-[140px] rounded-xl border py-1.5 shadow-xl" style={{ borderColor: CARD_BORDER, backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(20px)' }}>
+              <div className="module-page-menu absolute right-0 top-10 z-30 min-w-[140px] rounded-xl border py-1.5 shadow-xl">
                 {onOpenCardManager && (
-                  <button onClick={() => { setShowMenu(false); onOpenCardManager(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: TEXT_PRIMARY }}>
+                  <button onClick={() => { setShowMenu(false); onOpenCardManager(); }} className="module-page-menu-item">
                     <FileText className="w-4 h-4" />卡片管理
                   </button>
                 )}
                 {onCreateTopic && (
-                  <button onClick={() => { setShowMenu(false); onCreateTopic(); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left" style={{ color: TEXT_PRIMARY }}>
+                  <button onClick={() => { setShowMenu(false); onCreateTopic(); }} className="module-page-menu-item">
                     <Plus className="w-4 h-4" />新增专题
                   </button>
                 )}

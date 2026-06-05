@@ -22,6 +22,7 @@ import type {
   QACard,
   SM2Record,
   StoredProgress,
+  StudyMode,
 } from '../types';
 import type { CardDTO } from '../api/types';
 import { leetcodeHot100 } from '../data/leetcode-hot100';
@@ -71,6 +72,7 @@ const progressKeyMap: Record<Category, string> = {
   jargon: 'fc-jargon-progress',
   workplace: 'fc-workplace-progress',
   'vibe-coding': 'fc-vibe-coding-progress',
+  java: 'fc-java-progress',
 };
 
 // ---- 合并 progress → cardsById ----
@@ -116,6 +118,27 @@ function isLeetCodeCard(card: FlashCard): card is LeetCodeCard {
   return card.category === 'leetcode';
 }
 
+function getSubModuleTopics(sm: { subTopic?: string; subTopics?: string[] }): string[] {
+  return Array.from(new Set([sm.subTopic, ...(sm.subTopics ?? [])].filter(Boolean) as string[]));
+}
+
+function cardMatchesSubModule(c: FlashCard, sm: { subTopic?: string; subTopics?: string[] }): boolean {
+  if (isLeetCodeCard(c)) return false;
+  const st = 'subTopic' in c ? c.subTopic : undefined;
+  return !!st && getSubModuleTopics(sm).includes(st);
+}
+
+function cardMatchesSubModuleTags(c: FlashCard, sm: { subTopic?: string; subTopics?: string[]; tags?: string[] }): boolean {
+  if (!sm.tags?.length) return false;
+  const tagMatched = (c.tags ?? []).some((t) => sm.tags!.includes(t));
+  if (!tagMatched) return false;
+  if (isLeetCodeCard(c)) return true;
+  const topics = getSubModuleTopics(sm);
+  if (topics.length === 0) return true;
+  const st = 'subTopic' in c ? c.subTopic : undefined;
+  return !!st && topics.includes(st);
+}
+
 // ---- 筛选 visibleCardIds ----
 function computeVisibleIds(state: AppState): string[] {
   // Plan study: only show plan cards, no daily limit
@@ -131,9 +154,6 @@ function computeVisibleIds(state: AppState): string[] {
       const sm2 = state.cardsById[id]?.sm2;
       return !sm2 || sm2.state === 'new';
     });
-    // 每日新卡上限
-    const limit = getModuleDailyLimit(state.category);
-    ids = ids.slice(0, limit);
   } else if (state.studyMode === 'review') {
     // 到期复习卡片（包含 learning、review、relearning 状态）
     ids = ids.filter((id) => {
@@ -148,12 +168,6 @@ function computeVisibleIds(state: AppState): string[] {
       const order: Record<string, number> = { relearning: 0, learning: 1, review: 2 };
       return (order[sa ?? ''] ?? 3) - (order[sb ?? ''] ?? 3);
     });
-
-    // 每日复习上限（优先使用模块级设置）
-    const reviewLimit = getModuleDailyReviewLimit(state.category) || state.dailyReviewLimit;
-    if (reviewLimit > 0) {
-      ids = ids.slice(0, reviewLimit);
-    }
   }
 
   // 难度
@@ -171,23 +185,14 @@ function computeVisibleIds(state: AppState): string[] {
     const sm = subMods.find((s: any) => s.key === state.filterSubTopic);
 
     if (sm?.tags && sm.tags.length > 0) {
-      // LeetCode: 按标签匹配
-      const tagSet = new Set(sm.tags);
-      ids = ids.filter((id) => {
-        const c = state.cardsById[id];
-        if (!isLeetCodeCard(c)) return false;
-        return c.tags.some((t) => tagSet.has(t));
-      });
+      // LeetCode / QA 卡片: 按标签匹配；QA 可叠加 subTopic 约束做二级细分
+      ids = ids.filter((id) => cardMatchesSubModuleTags(state.cardsById[id], sm));
     } else if (sm?.subTopic) {
       // QA 卡片: 按 subTopic 匹配
-      ids = ids.filter((id) => {
-        const c = state.cardsById[id];
-        if (isLeetCodeCard(c)) return false;
-        return 'subTopic' in c && c.subTopic === sm.subTopic;
-      });
+      ids = ids.filter((id) => cardMatchesSubModule(state.cardsById[id], sm));
     } else if (sm) {
       // "其他专题" / 无标签无 subTopic
-      const knownSubTopics = new Set(subMods.filter((s: any) => s.subTopic).map((s: any) => s.subTopic));
+      const knownSubTopics = new Set(subMods.flatMap((s: any) => getSubModuleTopics(s)));
       const knownTags = new Set(subMods.filter((s: any) => s.tags).flatMap((s: any) => s.tags!));
       ids = ids.filter((id) => {
         const c = state.cardsById[id];
@@ -229,6 +234,15 @@ function computeVisibleIds(state: AppState): string[] {
         ((c as any).subTopic ?? '').includes(q)
       );
     });
+  }
+
+  // 每日上限必须在专题/搜索过滤之后截取，否则细分专题会被前 N 张全局卡片误伤。
+  if (state.studyMode === 'new') {
+    const limit = getModuleDailyLimit(state.category);
+    ids = ids.slice(0, limit);
+  } else if (state.studyMode === 'review') {
+    const reviewLimit = getModuleDailyReviewLimit(state.category) || state.dailyReviewLimit;
+    if (reviewLimit > 0) ids = ids.slice(0, reviewLimit);
   }
 
   // 随机
@@ -315,7 +329,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         loading: false,
         cardsById,
         category,
-        studyMode: state.studyMode !== 'choose' ? state.studyMode : 'choose',
+        studyMode: (state.studyMode !== 'choose' ? state.studyMode : 'choose') as StudyMode,
         showApproach: false,
         showCode: false,
         qaAnswerVisible: false,

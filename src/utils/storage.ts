@@ -17,10 +17,11 @@ const progressKeyMap: Record<Category, string> = {
   jargon: STORAGE_KEYS.JARGON_PROGRESS,
   workplace: STORAGE_KEYS.WORKPLACE_PROGRESS,
   'vibe-coding': STORAGE_KEYS.VIBE_CODING_PROGRESS,
+  java: STORAGE_KEYS.JAVA_PROGRESS,
 };
 
 function getProgressKey(category: Category): string {
-  return progressKeyMap[category];
+  return progressKeyMap[category] ?? `fc-${category}-progress`;
 }
 
 export function loadProgress(category: Category): StoredProgress {

@@ -149,6 +149,7 @@ export function exportProgress(): void {
     STORAGE_KEYS.LLM_PROGRESS, STORAGE_KEYS.AGENT_PROGRESS,
     STORAGE_KEYS.JARGON_PROGRESS, STORAGE_KEYS.WORKPLACE_PROGRESS,
     STORAGE_KEYS.VIBE_CODING_PROGRESS,
+    STORAGE_KEYS.JAVA_PROGRESS,
   ];
 
   for (const key of keys) {
@@ -287,6 +288,7 @@ export function exportProgressCSV(): void {
     STORAGE_KEYS.LLM_PROGRESS, STORAGE_KEYS.AGENT_PROGRESS,
     STORAGE_KEYS.JARGON_PROGRESS, STORAGE_KEYS.WORKPLACE_PROGRESS,
     STORAGE_KEYS.VIBE_CODING_PROGRESS,
+    STORAGE_KEYS.JAVA_PROGRESS,
   ];
   for (const key of keys) {
     const cat = key.replace('fc-', '').replace('-progress', '');

@@ -48,6 +48,37 @@ interface CandidateCard {
   score?: number;
 }
 
+const TECHNICAL_ROLE_FAMILIES = new Set([
+  'data-analysis',
+  'data-science',
+  'algorithm',
+  'machine-learning',
+  'llm',
+  'llm-application',
+  'backend',
+  'frontend',
+]);
+
+const CODING_INTERVIEW_TERMS = [
+  'LeetCode',
+  'Hot100',
+  '数据结构',
+  '算法基础',
+  '数组',
+  '哈希表',
+  '链表',
+  '二叉树',
+  '双指针',
+  '滑动窗口',
+  '动态规划',
+];
+
+function codingBasicsLimit(horizon: PrepHorizon) {
+  if (horizon === 'short') return 8;
+  if (horizon === 'medium') return 16;
+  return 0;
+}
+
 // ── Helpers ──
 
 function safeParseJson(text: string): any {
@@ -65,7 +96,7 @@ async function llm(prompt: string, userContent: string): Promise<string> {
   return r.text;
 }
 
-async function loadSession(sessionId: string) {
+async function loadSession(sessionId: string): Promise<any> {
   return prisma.jobPrepSession.findUnique({ where: { id: sessionId } });
 }
 
@@ -78,6 +109,17 @@ function uniqueStrings(values: Array<string | null | undefined>, limit = 100) {
   return [...new Set(values.map(v => String(v || '').trim()).filter(Boolean))].slice(0, limit);
 }
 
+function parseSmallChineseNumber(value: string): number | undefined {
+  const digits: Record<string, number> = { 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
+  if (value === '十') return 10;
+  if (value.length === 1) return digits[value];
+  const parts = value.split('十');
+  if (parts.length !== 2) return undefined;
+  const tens = parts[0] ? digits[parts[0]] : 1;
+  const ones = parts[1] ? digits[parts[1]] : 0;
+  return tens === undefined || ones === undefined ? undefined : tens * 10 + ones;
+}
+
 function detectDays(text: string): number | undefined {
   const c = text.toLowerCase();
   if (/(今天|今晚|明天)/.test(text)) return 1;
@@ -85,15 +127,25 @@ function detectDays(text: string): number | undefined {
   if (/(大后天|三天后|3\s*天后)/.test(text)) return 3;
   const dayMatch = c.match(/(\d+)\s*(天|day|days)/);
   if (dayMatch) return Number(dayMatch[1]);
-  const chineseDayMatch = text.match(/([一二两三四五六七八九十])\s*天(?:后|内)?/);
+  const chineseDayMatch = text.match(/([一二两三四五六七八九十]{1,3})\s*天(?:后|内)?/);
   if (chineseDayMatch) {
-    const daysByCn: Record<string, number> = { 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
-    return daysByCn[chineseDayMatch[1]];
+    const days = parseSmallChineseNumber(chineseDayMatch[1]);
+    if (days !== undefined) return days;
   }
   const weekMatch = c.match(/(\d+)\s*(周|星期|week|weeks)/);
   if (weekMatch) return Number(weekMatch[1]) * 7;
+  const chineseWeekMatch = text.match(/([一二两三四五六七八九十]{1,3})\s*(周|星期|礼拜)/);
+  if (chineseWeekMatch) {
+    const weeks = parseSmallChineseNumber(chineseWeekMatch[1]);
+    if (weeks !== undefined) return weeks * 7;
+  }
   const monthMatch = c.match(/(\d+)\s*(个月|月|month|months)/);
   if (monthMatch) return Number(monthMatch[1]) * 30;
+  const chineseMonthMatch = text.match(/([一二两三四五六七八九十]{1,3})\s*(个月|月)/);
+  if (chineseMonthMatch) {
+    const months = parseSmallChineseNumber(chineseMonthMatch[1]);
+    if (months !== undefined) return months * 30;
+  }
   if (/(本周|这周)/.test(text)) return 5;
   if (/(下周|下星期)/.test(text)) return 7;
   return undefined;
@@ -113,9 +165,9 @@ function detectPrepIntent(text: string, session: any): PrepIntentProfile {
   else if (hasLongSignal) horizon = 'long';
 
   const roleFamily = String(session.roleFamily || '');
-  const includeHot100 = horizon === 'long' && (
-    roleFamily === 'algorithm' || /hot\s*100|hot100|leetcode|力扣|刷题|算法/.test(lower)
-  );
+  const isTechnicalRole = TECHNICAL_ROLE_FAMILIES.has(roleFamily)
+    || /(工程师|开发|技术|算法|数据|前端|后端|测试|运维|安全|架构|程序员|developer|engineer)/i.test(text);
+  const includeHot100 = horizon === 'long' && isTechnicalRole;
   const wantsMachineLearning = roleFamily === 'machine-learning'
     || /((所有|全部|全量|完整|全都).{0,12}(机器学习|machine learning|机器学习卡片))|((机器学习|machine learning|机器学习卡片).{0,12}(所有|全部|全量|完整|全都|卡片|过一遍|都过|系统过))/i.test(text);
 
@@ -124,7 +176,7 @@ function detectPrepIntent(text: string, session: any): PrepIntentProfile {
     horizon === 'long' && wantsMachineLearning ? 'machine-learning' : '',
   ].filter(Boolean);
 
-  const excludeDecks = horizon === 'short' ? ['leetcode'] : [];
+  const excludeDecks: string[] = [];
   const cardLimit = horizon === 'short' ? 24 : horizon === 'long' && includeHot100 && wantsMachineLearning ? 320 : horizon === 'long' ? 220 : 60;
 
   return {
@@ -137,7 +189,7 @@ function detectPrepIntent(text: string, session: any): PrepIntentProfile {
     cardLimit,
     graphMode: horizon === 'long' ? 'learning-path' : 'search',
     reason: horizon === 'short'
-      ? '识别为短期冲刺，优先 JD 命中点，跳过 Hot100/刷题型长线任务。'
+      ? '识别为短期冲刺，优先 JD 命中点，并保留少量算法基础卡片。'
       : horizon === 'long'
         ? '识别为长期系统准备，允许知识图谱深度扩展并纳入全量核心牌组。'
         : '识别为常规准备，使用 JD + 岗位画像的中等范围计划。',
@@ -305,7 +357,7 @@ async function findCandidateCards(terms: string[], limit: number, excludeDecks: 
   }
 
   return [...matches.values()]
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => (b.score || 0) - (a.score || 0))
     .slice(0, limit);
 }
 
@@ -412,9 +464,10 @@ function classifyIntent(content: string, hasPlan: boolean): JobPrepIntent {
 
   // Plan revisions
   if (/\d+\s*天/.test(c) && (c.includes('只有') || c.includes('缩短') || c.includes('压缩'))) return 'shorten_plan';
+  if (c.includes('为什么') || c.includes('解释') || c.includes('安排') || c.includes('推荐') || c.includes('漏掉') || c.includes('覆盖') || /jd.*要求|明确要求/i.test(c)) return 'explain_plan';
+  if (c.includes('不要删') || c.includes('别删') || c.includes('保留') || c.includes('补上') || c.includes('漏了') || /(不要|别).{0,8}(一上来|开始|第一|前面|最初)/.test(c)) return 'revise_plan';
   if (c.includes('加强') || c.includes('增加') || c.includes('更多')) return 'strengthen_skill';
   if (c.includes('减少') || c.includes('去掉') || c.includes('删除') || c.includes('不要')) return 'reduce_topic';
-  if (c.includes('为什么') || c.includes('解释') || c.includes('安排') || c.includes('推荐')) return 'explain_plan';
   if (c.includes('换') || c.includes('替换') || c.includes('不相关') || c.includes('不想学')) return 'replace_cards';
   if (c.includes('重新') && (c.includes('生成') || c.includes('计划'))) return 'regenerate_plan';
   if (c.includes('开始') && (c.includes('学习') || c.includes('学'))) return 'start_learning';
@@ -424,7 +477,7 @@ function classifyIntent(content: string, hasPlan: boolean): JobPrepIntent {
 
 // ── Main Handler ──
 
-export async function handleJobPrepMessage(sessionId: string, content: string) {
+export async function handleJobPrepMessage(sessionId: string, content: string): Promise<any> {
   let session = await loadSession(sessionId);
   if (!session) return { assistantMessage: '会话不存在。', nextAction: 'collect_target' };
 
@@ -506,6 +559,7 @@ export async function handleJobPrepMessage(sessionId: string, content: string) {
     case 'shorten_plan': return handleShortenPlan(session, activePlan, content);
     case 'strengthen_skill': return handleStrengthenSkill(session, activePlan, content);
     case 'reduce_topic': return handleReduceTopic(session, activePlan, content);
+    case 'revise_plan': return revisePlanWithFeedback(session, activePlan, content);
     case 'explain_plan': return handleExplainPlan(activePlan);
     case 'replace_cards': return handleReplaceCards(session, activePlan);
     case 'regenerate_plan': return handleRegeneratePlan(session, activePlan);
@@ -639,6 +693,10 @@ async function generateAndSavePlan(session: any) {
       const result = await generateJobPrepPlanWithReActAgents(session, {
         savePlan: (plan) => savePlanToDB(session.id, plan),
       });
+      if (result.userQuestion && !result.plan) {
+        return { assistantMessage: result.userQuestion, nextAction: 'ask_for_jd', data: { reactTrace: result.trace } };
+      }
+      if (!result.plan) throw new Error('multi-agent returned no plan');
       const savedPlanId = result.savedPlanId;
       return {
         assistantMessage: `计划「${result.plan.title || '备战计划'}」已生成！共 ${result.metrics.stageCount} 个阶段、${result.metrics.selectedCardCount} 张卡片。\n\nReAct 多 Agent 指标：cardId 幻觉率 ${Math.round(result.metrics.hallucinationRate * 100)}%，核心覆盖率 ${Math.round(result.metrics.mustCoverCoverage * 100)}%，规则错误 ${result.metrics.ruleErrorCount} 个。`,
@@ -667,10 +725,11 @@ async function generateAndSavePlan(session: any) {
     [company, role, selectedPosting?.cleanedText || selectedPosting?.rawText || '', ...userMessages.map(m => m.content)].filter(Boolean).join('\n'),
     session,
   );
+  const shouldCoverCodingBasics = TECHNICAL_ROLE_FAMILIES.has(String(session.roleFamily || '')) || prepIntent.includeHot100;
 
   // Profile keywords for graph expansion — supplement JD requirements
   const profileKeywords = profile
-    ? [...profile.mustCoverInPlan, ...profile.concepts, ...profile.interviewTopics]
+    ? [...profile.mustCoverInPlan, ...profile.concepts, ...profile.interviewTopics, ...(shouldCoverCodingBasics ? CODING_INTERVIEW_TERMS : [])]
     : [];
 
   // Requirements from JD
@@ -682,6 +741,7 @@ async function generateAndSavePlan(session: any) {
   const seedTerms = [
     ...(profile?.mustCoverInPlan || []),
     ...(profile?.interviewTopics || []),
+    ...(shouldCoverCodingBasics ? CODING_INTERVIEW_TERMS : []),
     company,
     role,
     ...reqs.flatMap(r => [r.normalizedName || '', r.name || ''].filter(t => t.length <= 40)),
@@ -692,7 +752,10 @@ async function generateAndSavePlan(session: any) {
   const cardSearchTerms = uniqueStrings([...seedTerms, ...graphKw], 120);
   const matchedCards = await findCandidateCards(cardSearchTerms, prepIntent.cardLimit, prepIntent.excludeDecks);
   const fullDeckCards = await findFullDeckCards(prepIntent.includeFullDecks);
-  const cards = mergeCards(fullDeckCards, matchedCards, prepIntent.cardLimit);
+  const codingBasicsCards = shouldCoverCodingBasics && !prepIntent.includeFullDecks.includes('leetcode')
+    ? (await findFullDeckCards(['leetcode'])).slice(0, codingBasicsLimit(prepIntent.horizon))
+    : [];
+  const cards = mergeCards([...fullDeckCards, ...codingBasicsCards], matchedCards, prepIntent.cardLimit);
   const hasCards = cards.length > 0;
   const cardList = hasCards
     ? cards.map(c => `- ${c.id}: [${c.deckId || ''}] ${c.question || c.title || ''}`).join('\n')

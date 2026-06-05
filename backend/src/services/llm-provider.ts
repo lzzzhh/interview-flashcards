@@ -31,7 +31,7 @@ export class OpenAIChatProvider implements LLMProvider {
   private apiKey: string;
 
   constructor(baseUrl: string, apiKey: string, model: string) {
-    this.baseUrl = baseUrl;
+    this.baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/v1$/, '');
     this.apiKey = apiKey;
     this.defaultModel = model;
   }

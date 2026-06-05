@@ -70,6 +70,25 @@ function saveDeletedTopic(category: string, key: string) {
   localStorage.setItem(`fc-deleted-topics-${category}`, JSON.stringify(deleted));
 }
 
+function getSubModuleTopics(sm: Pick<SubModuleMeta, 'subTopic' | 'subTopics'>): string[] {
+  return Array.from(new Set([sm.subTopic, ...(sm.subTopics ?? [])].filter(Boolean) as string[]));
+}
+
+function qaCardMatchesSubModule(card: FlashCard, sm: Pick<SubModuleMeta, 'subTopic' | 'subTopics'>): boolean {
+  if (!('subTopic' in card)) return false;
+  return !!card.subTopic && getSubModuleTopics(sm).includes(card.subTopic);
+}
+
+function cardMatchesSubModuleTags(card: FlashCard, sm: Pick<SubModuleMeta, 'subTopic' | 'subTopics' | 'tags'>): boolean {
+  if (!sm.tags?.length) return false;
+  const tagMatched = (card.tags ?? []).some((t) => sm.tags!.includes(t));
+  if (!tagMatched) return false;
+  if (card.category === 'leetcode') return true;
+  const topics = getSubModuleTopics(sm);
+  if (topics.length === 0) return true;
+  return 'subTopic' in card && !!card.subTopic && topics.includes(card.subTopic);
+}
+
 export default function SubModulePicker({ onBack }: Props) {
   const { state, dispatch, dueCountByCategory } = useAppContext();
   const { category } = state;
@@ -132,11 +151,11 @@ export default function SubModulePicker({ onBack }: Props) {
     return subModules.map((sm) => {
       let mine: FlashCard[];
       if (sm.tags && sm.tags.length > 0) {
-        mine = cards.filter((c) => { if (c.category !== 'leetcode') return false; return sm.tags!.some((t) => c.tags.includes(t)); });
+        mine = cards.filter((c) => cardMatchesSubModuleTags(c, sm));
       } else if (sm.subTopic) {
-        mine = cards.filter((c) => 'subTopic' in c && c.subTopic === sm.subTopic);
+        mine = cards.filter((c) => qaCardMatchesSubModule(c, sm));
       } else {
-        const knownSubTopics = new Set(subModules.filter((s) => s.subTopic).map((s) => s.subTopic));
+        const knownSubTopics = new Set(subModules.flatMap((s) => getSubModuleTopics(s)));
         const knownTags = new Set(subModules.filter((s) => s.tags).flatMap((s) => s.tags!));
         mine = cards.filter((c) => {
           if (c.category === 'leetcode') { if (knownTags.size === 0) return false; return !c.tags.some((t) => knownTags.has(t)); }

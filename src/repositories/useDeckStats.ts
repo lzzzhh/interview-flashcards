@@ -29,8 +29,8 @@ export function deriveGlobalStats(decks: DeckDTO[]) {
 }
 
 const FALLBACK_TOTALS: Record<string, number> = {
-  leetcode: 100, statistics: 202, 'machine-learning': 189, 'deep-learning': 41,
-  llm: 37, agent: 29, jargon: 45, workplace: 82, 'vibe-coding': 23,
+  leetcode: 100, statistics: 202, 'machine-learning': 189, 'deep-learning': 100,
+  llm: 100, agent: 100, jargon: 45, workplace: 82, 'vibe-coding': 23, java: 200,
 };
 
 export function useDecks(): { decks: DeckDTO[]; totals: Record<string, number>; loading: boolean } {
