@@ -315,7 +315,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         loading: false,
         cardsById,
         category,
-        studyMode: action.payload.mode === 'review' ? 'review' as const : 'new' as const,
+        studyMode: state.studyMode !== 'choose' ? state.studyMode : 'choose',
         showApproach: false,
         showCode: false,
         qaAnswerVisible: false,
