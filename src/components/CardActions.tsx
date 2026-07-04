@@ -154,14 +154,16 @@ export default function CardActions() {
         <div className="flex items-center justify-between gap-2 py-2.5 px-3 rounded-xl text-[13px] font-medium"
           style={{ backgroundColor: 'rgba(34,197,94,0.08)', color: '#16A34A' }}>
           <span>{isMastered ? '已掌握' : '今日已完成'} · 本次队列仅可查看</span>
-          {isMastered && (
+          {isMastered ? (
             <button
               type="button"
               onClick={() => dispatch({ type: 'TOGGLE_MASTERED', payload: currentCard.id })}
               className="shrink-0 rounded-lg px-2 py-1 text-[12px] font-semibold hover:bg-green-100 dark:hover:bg-green-900/70"
             >
-              取消
+              取消掌握
             </button>
+          ) : (
+            <span className="shrink-0 text-[12px] opacity-60">已完成</span>
           )}
         </div>
       ) : (
