@@ -6,9 +6,8 @@
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React 19">
   <img src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript" alt="TypeScript">
   <img src="https://img.shields.io/badge/Tauri-v2-FFC131?logo=tauri" alt="Tauri v2">
-  <img src="https://img.shields.io/badge/TailwindCSS-v4-06B6D4?logo=tailwindcss" alt="TailwindCSS v4">
-  <img src="https://img.shields.io/badge/Fastify-5-000000?logo=fastify" alt="Fastify">
-  <img src="https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma" alt="Prisma">
+  <img src="https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite" alt="SQLite">
+  <img src="https://img.shields.io/badge/Neo4j-5-4581C3?logo=neo4j" alt="Neo4j">
 </p>
 
 <p align="center">
@@ -17,8 +16,8 @@
 
 <p align="center">
   A desktop flashcard app for interview preparation, powered by Active Recall and SM-2 spaced repetition.<br>
-  <b>AI Semantic Search</b> . <b>Document-to-Flashcards</b> . <b>Learning Plans</b><br>
-  Built-in card coverage: Algorithms . Statistics . Machine Learning . Deep Learning . LLM . Agent . Vibe Coding . Industry Jargon . Workplace Communication.
+  <b>Job Prep Agent</b> · <b>AI Semantic Search</b> · <b>Document-to-Flashcards</b> · <b>Learning Mode Presets</b><br>
+  Built-in card coverage: Algorithms · Statistics · Machine Learning · Deep Learning · LLM · Agent · Java · Vibe Coding · Industry Jargon · Workplace Communication.
 </p>
 
 ---
@@ -29,94 +28,84 @@
 curl -fsSL https://raw.githubusercontent.com/lzzzhh/interview-flashcards/main/install.sh | bash
 ```
 
-Or download from [Releases](https://github.com/lzzzhh/interview-flashcards/releases):
-
-| Platform | Package |
-|----------|---------|
-| macOS (Apple Silicon) | DMG installer |
-| macOS (Intel) | DMG installer |
-| Windows | NSIS `.exe` installer |
-| Linux | `.deb` package |
+Or download from [Releases](https://github.com/lzzzhh/interview-flashcards/releases).
 
 ---
 
 ## Features
 
-### Home Page
+### Learning Mode Presets
 
-Mobile-first single-column layout with Today's Tasks, Recommended Study, and a compact My Decks preview. The full deck list is available from the All Decks page.
+Configure your study pace with one click. The app calculates daily card quotas and auto-resolves cards once they reach a target interval.
 
-- **Today's Tasks**: Real-time stats for review / new cards / in-progress, one-click daily study start
-- **Recommended Study**: SM-2 algorithm intelligently recommends cards needing review, supports swipe and tap navigation
-- **My Decks**: Preview of the first 6 built-in modules with review/new card counts
-- **Bottom Tab Bar**: Home / All Decks / Stats / Agent / Profile
+- **Sprint** (21 days), **Fast** (45 days), **Normal** (90 days), **Custom** mode
+- Per-deck quota allocation with visual sliders
+- Auto-resolve: cards are automatically marked as mastered when their SM-2 interval reaches the threshold
+- Manual "Mark as Mastered" button on every card — removes it from future review queues
+- Sprint mode compresses SM-2 learning→review from 6 to 4 days
 
-### Active Recall + Spaced Repetition
+### Active Recall + Spaced Repetition (SM-2)
 
-Cards hide answers by default -- recall first, then reveal. Algorithm cards support independent "Approach" and "Code" sections. Q&A cards support Markdown + LaTeX rendering.
+Cards hide answers by default — recall first, then reveal. Tracks `new / learning / review / relearning / mastered` states.
 
-- **SM-2 Scheduling**: Tracks `new / learning / review / relearning` states; scheduling runs locally first, with backend review logging when available
-- **Five-level Rating System**: Buttons show real-time predicted intervals: `<1d`, `3d`, `2w`, `1m`
-- **Due Review Queue**: Review mode only shows due cards; new card mode has daily limit control
+- **Five-level Rating System**: Buttons show real-time predicted intervals
+- **Mastered State**: Cards graduate to a permanent "resolved" state — never appear in review again
 - **Undo Last Rating**: `Ctrl/Cmd + Z` to rollback
+- Scheduling runs locally with backend review logging
 
-### Nine Built-in Modules
+### Job Prep Agent
 
-| Module | Coverage |
-|--------|----------|
-| LeetCode | Hot 100 |
-| Statistics | Descriptive stats, probability, hypothesis testing, Bayesian |
-| Machine Learning | Supervised/unsupervised, ensemble methods, feature engineering |
-| Deep Learning | Neural network training, generative models |
-| LLM | Transformers, RAG, training & fine-tuning |
-| Agent | Agent architecture, tool calling, memory |
-| Vibe Coding | /command, Skill, Agent Team, MCP, Hooks |
-| Jargon | Internet slang, industry terminology |
-| Workplace | Upward communication, interview techniques |
+Paste a job description and get a personalized study plan in minutes.
 
-### Document-to-Flashcards
-
-Upload PDF, TXT, or Markdown files. The app processes documents in a global background queue, extracts concepts via LLM, generates Chinese flashcard drafts, and lets users review, edit, validate, and batch-import cards into selected decks.
-
-- **Background Queue**: Uploads go into a global processing queue with real-time progress tracking. The queue persists across navigation and page refreshes.
-- **Draft Review Page**: Status dashboard (pending / needs-review / duplicate / approved counts), custom deck selector, dry-run validation, confidence-sorted card list
-- **Edit & Approve**: Edit question, answer, and tags inline before importing. Single or batch approve/reject/mark-duplicate/mark-out-of-scope
-- **Batch Import**: Select all drafts, validate via dry run, then import in batches. Supports more than 20 cards at once.
-- **Post-import CTA**: After importing, direct links to start learning new cards or view the target deck
+- **Multi-Agent ReAct Pipeline**: ContextAgent → RequirementAgent → RetrievalAgent → PlannerAgent → CriticAgent
+- **Eight Role Profiles**: Algorithm, LLM, LLM Application, Machine Learning, Data Science, Data Analysis, Backend, Frontend
+- **Guard System**: Rule validator (7 sync rules) + LLM guard, max 2 repair attempts
+- **Resume Tailoring**: Upload PDF/DOCX resume, get JD-optimized rewrite with gap analysis
+- **Neo4j Graph Expansion**: Concept graph + card similarity graph for richer card discovery
 
 ### AI Semantic Search
 
-Semantic search with multi-channel recall and smart ranking, supporting Chinese natural language queries.
+Multi-channel recall with vector similarity, graph expansion, and diversity re-ranking.
 
-- **Multi-channel Recall**: FTS5 full-text search + tag matching + search keyword matching + vector similarity
-- **Smart Ranking**: Field weighting + learning state boost + deck match scoring
-- **Embeddings**: Supports OpenAI-compatible embedding APIs and local Ollama bge-m3. Falls back to local n-gram vectors if no embedding provider is configured.
-- **Semantic Understanding**: Synonyms, mixed Chinese/English, natural language queries
+- **6 Recall Channels**: FTS5 keyword, tag matching, search keywords, bge-m3 vector, Neo4j concept graph, Neo4j card similarity graph
+- **Smart Ranking**: Weighted scoring (vector + keyword + graph + field + learning state)
+- **Learning Plan Search**: Intent-aware query understanding with staged plan output
 
-### AI Learning Plans
+### Document-to-Flashcards
 
-After searching, input a learning intent (e.g. "learn decision trees", "master SVM"). AI automatically selects relevant cards and sorts by learning priority to generate a study plan. Plans are saved locally and accessible under Profile > Learning Plans.
+Upload PDF, TXT, or Markdown files → LLM extracts concepts → generates Chinese flashcard drafts → review, edit, and batch-import.
+
+- Global background queue with real-time progress
+- Draft review dashboard with status filtering
+- Batch import with frontend chunking (20 cards/batch)
+
+### Neo4j Card Similarity Graph
+
+All 1,141 cards have bge-m3 embeddings. Pairwise cosine similarity stored as `SIMILAR_TO` edges in Neo4j — powers cross-deck card discovery and learning path recommendations.
 
 ### Study Statistics
 
-Dedicated stats page showing:
+Pre-computed stats snapshot for instant dashboard rendering.
 
-- Total cards, mastered, pending review
-- Streak days, today's learned
-- Mastery rate progress bar, review stage distribution
-- Module distribution progress bars
-- Daily new card limit (collapsible)
+- Overview: total cards, due, streak, today's correct rate
+- Progress stages: new / learning / review / relearning / mastered
+- Per-deck breakdown with progress bars
+- Daily limits with per-deck allocation
 
-### Profile & Data Management
+### 10 Built-in Decks (1,141 cards)
 
-- **Data Storage**: JSON / CSV export and import for cards and custom decks
-- **Learning Plans**: View and manage saved study plans
-- **API Settings**: Configure LLM base URL, API key, and model
-- **Tag Management**: Cross-module tag listing, rename, merge, and delete operations
-
-### Agent Hub
-
-Currently available: AI Search, Document-to-Flashcards, Draft Review. Job Preparation, Mock Interview, and Resume Project are shown as disabled placeholders.
+| Deck | Cards | Sub-topics |
+|------|-------|------------|
+| LeetCode | 100 | Hot 100 |
+| Statistics | 50 | Descriptive, probability, hypothesis testing, Bayesian |
+| Machine Learning | 100 | Supervised, unsupervised, ensemble, feature engineering |
+| Deep Learning | 100 | Backprop, CNN/RNN, Transformer, GAN/VAE, Diffusion, Deployment |
+| LLM | 100 | Attention, architecture, SFT/PEFT, RLHF, inference, RAG, safety |
+| Agent | 100 | ReAct, tools, memory, RAG, LangGraph, MCP |
+| Java | 200 | Core, collections, concurrency, JVM, Spring, Redis, distributed |
+| Vibe Coding | 50 | Commands, skills, agent teams, MCP, hooks |
+| Jargon | 50 | Internet slang, industry terminology |
+| Workplace | 50 | Communication, project management, interview techniques |
 
 ### Keyboard Shortcuts
 
@@ -135,63 +124,18 @@ Currently available: AI Search, Document-to-Flashcards, Draft Review. Job Prepar
 | Layer | Technology |
 |-------|------------|
 | Frontend | React 19 + TypeScript + Vite 8 |
-| Styling | TailwindCSS v4 + CSS variable theming |
+| Styling | TailwindCSS v4 |
 | Math Rendering | react-markdown + KaTeX |
-| Icons | lucide-react |
 | Desktop Framework | Tauri v2 (Rust) |
 | Backend API | Fastify + Prisma + SQLite |
-| Vector Embeddings | OpenAI-compatible API / Ollama bge-m3 / local n-gram fallback |
-| Full-text Search | SQLite FTS5 + Chinese bigram tokenizer |
-| Spaced Repetition | SM-2 algorithm (local-first, backend logging when available) |
-| CI/CD | GitHub Actions (macOS / Windows / Linux) |
+| Vector Search | bge-m3 (Ollama) + custom SQLite cosine |
+| Full-text Search | SQLite FTS5 |
+| Graph Database | Neo4j 5 (optional) |
+| External Vector DB | Qdrant (optional) |
+| Spaced Repetition | SM-2 (local-first) |
+| CI/CD | GitHub Actions |
 
-## Architecture
-
-<p align="center">
-  <img src="docs/assets/architecture.png" alt="Project architecture diagram" width="920">
-</p>
-
-```
-+-----------------------------------------------------------+
-|                    Tauri Desktop Shell                     |
-|  +-----------------------------------------------------+  |
-|  |              React Frontend (SPA)                    |  |
-|  |  +-----------+ +--------+ +----------------------+  |  |
-|  |  | HomePage  | |CardView| | Stats / Deck /       |  |  |
-|  |  |           | |        | | Profile / Search     |  |  |
-|  |  +-----+-----+ +---+----+ +----------+-----------+  |  |
-|  |        |            |                |               |  |
-|  |  +-----v------------v----------------v-----------+   |  |
-|  |  |         Repository / API Client              |   |  |
-|  |  +---------------------+------------------------+   |  |
-|  +-------------------------+----------------------------+  |
-|                            |                               |
-|  +-------------------------v----------------------------+  |
-|  |         Native Storage (Rust fs / localStorage)     |  |
-|  +-----------------------------------------------------+  |
-+-----------------------------------------------------------+
-                            |
-                            v
-+-----------------------------------------------------------+
-|               Backend API (Fastify :3001)                  |
-|  +----------+ +--------+ +----------+ +---------+         |
-|  | /api/    | | /api/  | | /api/    | | /api/   |         |
-|  |  decks   | | cards  | | reviews  | | study   |         |
-|  +----+-----+ +---+----+ +----+-----+ +----+----+         |
-|  +----+-----+ +----+-----------------------------+        |
-|  | /api/    | | /api/search (AI search + plans)  |        |
-|  | settings | | /api/documents (ingest pipeline) |        |
-|  +----+-----+ +----+-----------------------------+        |
-|       |            |            |            |            |
-|  +----v------------v------------v------------v--------+   |
-|  |              Prisma ORM                            |   |
-|  +------------------------+---------------------------+   |
-|                           |                               |
-|  +------------------------v---------------------------+   |
-|  |                     SQLite                         |   |
-|  +-----------------------------------------------------+  |
-+-----------------------------------------------------------+
-```
+---
 
 ## Build from Source
 
@@ -200,21 +144,21 @@ git clone https://github.com/lzzzhh/interview-flashcards.git
 cd interview-flashcards
 npm install
 
-# ---- Backend ----
+# Backend
 cd backend
 npm install
-cp .env.example .env     # edit .env with your LLM API key before running
+cp .env.example .env     # edit .env with your LLM API key
 npx prisma generate
 npx prisma db push
+npx tsx prisma/seed.ts   # import 1,141 built-in cards
 npm run dev
 
-# ---- Frontend (open another terminal) ----
+# Frontend (another terminal)
 cd interview-flashcards
 npm run dev              # browser development
 
-# ---- Desktop App ----
-npm run dev:desktop      # Tauri dev mode
-npm run build:desktop    # production build
+# Desktop App
+npm run tauri build      # production build
 ```
 
 ---
