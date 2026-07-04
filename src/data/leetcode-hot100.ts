@@ -1390,6 +1390,28 @@ const others: LeetCodeCard[] = [  {
     favorited: fav,
   }];
 
+export const LEETCODE_SUBMODULE_CARD_IDS: Record<string, string[]> = {
+  'lc-array': arrayHash.map((card) => card.id),
+  'lc-twopointer': [...twoPointers, ...slidingWindow].map((card) => card.id),
+  'lc-binary': [...binarySearch, ...sorting].map((card) => card.id),
+  'lc-linkedlist': linkedList.map((card) => card.id),
+  'lc-stack': [...stackQueue, ...design].map((card) => card.id),
+  'lc-tree': binaryTree.map((card) => card.id),
+  'lc-dp': dynamicProgramming.map((card) => card.id),
+  'lc-backtrack': backtracking.map((card) => card.id),
+  'lc-bfs': graph.map((card) => card.id),
+  'lc-greedy': greedy.map((card) => card.id),
+  'lc-heap': heap.map((card) => card.id),
+  'lc-other': others.map((card) => card.id),
+};
+
+export const LEETCODE_PRIMARY_SUBMODULE_BY_ID: Record<string, string> = Object.entries(
+  LEETCODE_SUBMODULE_CARD_IDS,
+).reduce<Record<string, string>>((acc, [subModuleKey, ids]) => {
+  for (const id of ids) acc[id] = subModuleKey;
+  return acc;
+}, {});
+
 export const leetcodeHot100: LeetCodeCard[] = [
   ...arrayHash,
   ...twoPointers,

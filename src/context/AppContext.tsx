@@ -56,6 +56,7 @@ import {
 } from '../utils/customDecks';
 import { getDeletedCardIds, loadDeletedCards, softDeleteCard } from '../utils/cardTrash';
 import { CATEGORIES, SUB_MODULES } from '../constants';
+import { leetCodeCardMatchesSubModule } from '../utils/leetcodeSubModules';
 
 // ---- Undo support ----
 let lastRating: {
@@ -213,9 +214,10 @@ function getEffectiveReviewLimit(category: Category): number {
 
 // ---- 筛选 visibleCardIds ----
 function computeVisibleIds(state: AppState): string[] {
+  const completedIds = new Set(state.studyQueueCompletedIds);
+
   // Plan study: only show plan cards, no daily limit
   if (state.planCardIds) {
-    const completedIds = new Set(state.studyQueueCompletedIds);
     return state.planCardIds.filter(id => {
       const card = state.cardsById[id];
       return !!card && (state.studyQueueIncludesResolved || !isResolvedSm2(card.sm2) || completedIds.has(id));
@@ -228,13 +230,13 @@ function computeVisibleIds(state: AppState): string[] {
   if (state.studyMode === 'new') {
     ids = ids.filter((id) => {
       const sm2 = state.cardsById[id]?.sm2;
-      return !sm2 || sm2.state === 'new';
+      return completedIds.has(id) || !sm2 || sm2.state === 'new';
     });
   } else if (state.studyMode === 'review') {
     // 到期复习卡片（包含 learning、review、relearning 状态）
     ids = ids.filter((id) => {
       const sm2 = state.cardsById[id]?.sm2;
-      return isDueReviewSm2(sm2);
+      return completedIds.has(id) || isDueReviewSm2(sm2);
     });
 
     // 重学队列优先排序：relearning → learning → review
@@ -246,7 +248,7 @@ function computeVisibleIds(state: AppState): string[] {
     });
   }
 
-  ids = ids.filter((id) => !isResolvedSm2(state.cardsById[id]?.sm2));
+  ids = ids.filter((id) => state.studyQueueIncludesResolved || completedIds.has(id) || !isResolvedSm2(state.cardsById[id]?.sm2));
 
   // 难度
   if (state.filterDifficulty !== 'all') {
@@ -264,20 +266,21 @@ function computeVisibleIds(state: AppState): string[] {
 
     if (sm?.tags && sm.tags.length > 0) {
       // LeetCode / QA 卡片: 按标签匹配；QA 可叠加 subTopic 约束做二级细分
-      ids = ids.filter((id) => cardMatchesSubModuleTags(state.cardsById[id], sm));
+      ids = ids.filter((id) => {
+        const card = state.cardsById[id];
+        return isLeetCodeCard(card)
+          ? leetCodeCardMatchesSubModule(card, sm, subMods)
+          : cardMatchesSubModuleTags(card, sm);
+      });
     } else if (sm?.subTopic) {
       // QA 卡片: 按 subTopic 匹配
       ids = ids.filter((id) => cardMatchesSubModule(state.cardsById[id], sm));
     } else if (sm) {
       // "其他专题" / 无标签无 subTopic
       const knownSubTopics = new Set(subMods.flatMap((s: any) => getSubModuleTopics(s)));
-      const knownTags = new Set(subMods.filter((s: any) => s.tags).flatMap((s: any) => s.tags!));
       ids = ids.filter((id) => {
         const c = state.cardsById[id];
-        if (isLeetCodeCard(c)) {
-          if (knownTags.size === 0) return true;
-          return !c.tags.some((t) => knownTags.has(t));
-        }
+        if (isLeetCodeCard(c)) return leetCodeCardMatchesSubModule(c, sm, subMods);
         const st = (c as any).subTopic;
         return !st || !knownSubTopics.has(st);
       });
@@ -661,7 +664,7 @@ function removeAnsweredCardFromStudyQueue(state: AppState, cardId: string): AppS
   }
 
   const completedIds = new Set(state.studyQueueCompletedIds);
-  if (state.planCardIds?.includes(cardId)) completedIds.add(cardId);
+  if (state.studyQueueTotal > 0) completedIds.add(cardId);
   const nextState = {
     ...state,
     studyQueueCompletedIds: Array.from(completedIds),
@@ -854,8 +857,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
       if (!isCurrentlyMastered && countsTowardDaily) appendReviewLog(createManualMasteredLog(card.id, previousSm2, newSm2));
       persistCardProgress(nextCard);
       const completedIds = new Set(state.studyQueueCompletedIds);
-      if (!isCurrentlyMastered && state.planCardIds?.includes(action.payload)) completedIds.add(action.payload);
-      if (isCurrentlyMastered && restoredManualLog && state.planCardIds?.includes(action.payload)) completedIds.delete(action.payload);
+      if (!isCurrentlyMastered && state.studyQueueTotal > 0) completedIds.add(action.payload);
+      if (isCurrentlyMastered && restoredManualLog && state.studyQueueTotal > 0) completedIds.delete(action.payload);
       const nextState = {
         ...state,
         studyQueueCompletedIds: Array.from(completedIds),
@@ -865,7 +868,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         qaAnswerVisible: false,
       };
       const visibleCardIds = computeVisibleIds(nextState);
-      const nextIndex = !isCurrentlyMastered && state.planCardIds?.includes(action.payload)
+      const nextIndex = !isCurrentlyMastered && state.studyQueueTotal > 0
         ? findNextUncompletedIndex(
           visibleCardIds,
           completedIds,

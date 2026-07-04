@@ -82,15 +82,17 @@ export default function CardActions() {
   const isQueueCompleted = state.studyQueueCompletedIds.includes(currentCard.id);
   const isReadOnly = isQueueCompleted || isMastered;
   const isFavorited = favoritedIds.includes(currentCard.id);
+  const statusActionClass = 'flex h-8 w-[72px] shrink-0 items-center justify-center rounded-lg px-2 text-[12px] font-semibold leading-none';
+  const toolButtonClass = 'flex h-9 w-9 items-center justify-center rounded-lg transition-colors';
 
   return (
     <div className="w-full space-y-3">
       {/* Navigation row */}
-      <div className="flex items-center justify-between">
+      <div className="flex h-10 items-center justify-between">
         <button
           onClick={() => dispatch({ type: 'PREV' })}
           disabled={idx === 0}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-white/8 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/12 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="flex h-9 items-center gap-1 rounded-lg bg-gray-100 px-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-30 dark:bg-white/8 dark:text-gray-300 dark:hover:bg-white/12"
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="hidden sm:inline">上一张</span>
@@ -100,7 +102,7 @@ export default function CardActions() {
           <button
             onClick={() => dispatch({ type: 'TOGGLE_MASTERED', payload: currentCard.id })}
             disabled={isQueueCompleted && !isMastered}
-            className={`p-2 rounded-lg transition-colors ${
+            className={`${toolButtonClass} ${
               isMastered
                 ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400'
                 : 'bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12'
@@ -112,7 +114,7 @@ export default function CardActions() {
 
           <button
             onClick={() => dispatch({ type: 'TOGGLE_FAVORITE', payload: currentCard.id })}
-            className={`p-2 rounded-lg transition-colors ${
+            className={`${toolButtonClass} ${
               isFavorited
                 ? 'bg-amber-100 text-amber-500 dark:bg-amber-900 dark:text-amber-400'
                 : 'bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12'
@@ -124,7 +126,7 @@ export default function CardActions() {
 
           <button
             onClick={() => dispatch({ type: 'SHUFFLE' })}
-            className="p-2 rounded-lg bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12 transition-colors"
+            className={`${toolButtonClass} bg-gray-100 text-gray-400 hover:bg-gray-200 dark:bg-white/8 dark:text-gray-400 dark:hover:bg-white/12`}
             title="随机顺序"
           >
             <Shuffle className="w-4 h-4" />
@@ -132,7 +134,7 @@ export default function CardActions() {
 
           <button
             onClick={() => dispatch({ type: 'UNDO_LAST_RATING' })}
-            className="p-2 rounded-lg bg-gray-100 text-gray-400 dark:bg-white/8 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/12 transition-colors"
+            className={`${toolButtonClass} bg-gray-100 text-gray-400 hover:bg-gray-200 dark:bg-white/8 dark:text-gray-400 dark:hover:bg-white/12`}
             title="撤回上次评分 (Ctrl+Z)"
           >
             <Undo2 className="w-4 h-4" />
@@ -142,7 +144,7 @@ export default function CardActions() {
         <button
           onClick={() => dispatch({ type: 'NEXT' })}
           disabled={idx >= total - 1}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-white/8 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/12 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="flex h-9 items-center gap-1 rounded-lg bg-gray-100 px-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-30 dark:bg-white/8 dark:text-gray-300 dark:hover:bg-white/12"
         >
           <span className="hidden sm:inline">下一张</span>
           <ChevronRight className="w-4 h-4" />
@@ -151,19 +153,19 @@ export default function CardActions() {
 
       {/* Rating buttons */}
       {isReadOnly ? (
-        <div className="flex items-center justify-between gap-2 py-2.5 px-3 rounded-xl text-[13px] font-medium"
+        <div className="flex h-12 items-center justify-between gap-2 overflow-hidden rounded-xl px-3 text-[13px] font-medium leading-none"
           style={{ backgroundColor: 'rgba(34,197,94,0.08)', color: '#16A34A' }}>
-          <span>{isMastered ? '已掌握' : '今日已完成'} · 本次队列仅可查看</span>
+          <span className="min-w-0 flex-1 truncate leading-none">{isMastered ? '已掌握' : '今日已完成'} · 本次队列仅可查看</span>
           {isMastered ? (
             <button
               type="button"
               onClick={() => dispatch({ type: 'TOGGLE_MASTERED', payload: currentCard.id })}
-              className="shrink-0 rounded-lg px-2 py-1 text-[12px] font-semibold hover:bg-green-100 dark:hover:bg-green-900/70"
+              className={`${statusActionClass} hover:bg-green-100 dark:hover:bg-green-900/70`}
             >
               取消掌握
             </button>
           ) : (
-            <span className="shrink-0 text-[12px] opacity-60">已完成</span>
+            <span className={`${statusActionClass} opacity-60`}>已完成</span>
           )}
         </div>
       ) : (

@@ -44,7 +44,7 @@ function StudyPage({ onBack, exitOnBack = false, autoCloseOnComplete = false }: 
   const completedVisibleIds = new Set(state.studyQueueCompletedIds);
   const progressTotal = state.studyQueueTotal > 0 ? state.studyQueueTotal : cardCount;
   const completedCount = state.studyQueueTotal > 0
-    ? state.visibleCardIds.filter((id) => completedVisibleIds.has(id)).length
+    ? Math.min(state.studyQueueTotal, completedVisibleIds.size)
     : state.currentVisibleIndex + 1;
   const progressCurrent = Math.min(state.currentVisibleIndex, Math.max(0, progressTotal - 1));
   const progressMastered = state.studyQueueTotal > 0

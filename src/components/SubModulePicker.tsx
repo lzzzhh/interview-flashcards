@@ -4,15 +4,15 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import { dtoToFlashCard, useAppContext } from '../context/AppContext';
 import { SUB_MODULES, CATEGORIES, type SubModuleMeta } from '../constants';
 import ModulePageTemplate, { type ModuleTopicCardModel } from './ModulePageTemplate';
 import CardBrowser from './CardBrowser';
 import CardEditor from './CardEditor';
 import StatsDashboard from './StatsDashboard';
-import type { FlashCard, QACard } from '../types';
+import type { FlashCard } from '../types';
 import { getDeckCards } from '../api/cards';
-import type { CardDTO } from '../api/types';
+import { leetCodeCardMatchesSubModule } from '../utils/leetcodeSubModules';
 
 interface Props {
   onBack: () => void;
@@ -85,7 +85,7 @@ function cardMatchesSubModuleTags(card: FlashCard, sm: Pick<SubModuleMeta, 'subT
   if (!sm.tags?.length) return false;
   const tagMatched = (card.tags ?? []).some((t) => sm.tags!.includes(t));
   if (!tagMatched) return false;
-  if (card.category === 'leetcode') return true;
+  if (card.category === 'leetcode') return false;
   const topics = getSubModuleTopics(sm);
   if (topics.length === 0) return true;
   return 'subTopic' in card && !!card.subTopic && topics.includes(card.subTopic);
@@ -125,18 +125,7 @@ export default function SubModulePicker({ onBack }: Props) {
       try {
         const resp = await getDeckCards(deckId, 500);
         if (cancelled || !resp?.cards?.length) return;
-        const cards: FlashCard[] = resp.cards.map((dto: CardDTO) => ({
-          id: dto.id,
-          category: (dto.deckId as any),
-          question: dto.question || dto.titleCn || dto.title || '',
-          answer: dto.answer || '',
-          tags: dto.tags || [],
-          subTopic: dto.subTopic || undefined,
-          difficulty: (dto.difficulty as 'easy' | 'medium' | 'hard') || 'medium',
-          source: dto.source || undefined,
-          sm2: { state: 'new' as const, easeFactor: 2.5, interval: 0, repetitions: 0, lapses: 0, nextReview: Date.now() },
-          favorited: false,
-        } satisfies QACard));
+        const cards: FlashCard[] = resp.cards.map(dtoToFlashCard);
         dispatch({ type: 'LOADED_QUEUE', payload: { cards, mode: 'new' } });
       } catch (e) {
         console.warn('[SubModulePicker] load cards failed:', e);
@@ -153,14 +142,17 @@ export default function SubModulePicker({ onBack }: Props) {
     return subModules.map((sm) => {
       let mine: FlashCard[];
       if (sm.tags && sm.tags.length > 0) {
-        mine = cards.filter((c) => cardMatchesSubModuleTags(c, sm));
+        mine = cards.filter((c) => (
+          c.category === 'leetcode'
+            ? leetCodeCardMatchesSubModule(c, sm, subModules)
+            : cardMatchesSubModuleTags(c, sm)
+        ));
       } else if (sm.subTopic) {
         mine = cards.filter((c) => qaCardMatchesSubModule(c, sm));
       } else {
         const knownSubTopics = new Set(subModules.flatMap((s) => getSubModuleTopics(s)));
-        const knownTags = new Set(subModules.filter((s) => s.tags).flatMap((s) => s.tags!));
         mine = cards.filter((c) => {
-          if (c.category === 'leetcode') { if (knownTags.size === 0) return false; return !c.tags.some((t) => knownTags.has(t)); }
+          if (c.category === 'leetcode') return leetCodeCardMatchesSubModule(c, sm, subModules);
           const st = 'subTopic' in c ? c.subTopic : undefined;
           return !st || !knownSubTopics.has(st);
         });
