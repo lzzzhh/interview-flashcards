@@ -271,7 +271,7 @@ export async function neo4jHybridSearchV2(input: HybridSearchInput): Promise<Car
       matchedKeywords: c.matchedKeywords,
       queryBigrams,
       learning: prog ? {
-        due: prog.state !== 'new' && prog.nextReview <= new Date(),
+        due: ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date(),
         lapses: prog.lapses,
         easeFactor: prog.easeFactor,
       } : undefined,
@@ -353,7 +353,7 @@ export async function neo4jHybridSearchV2(input: HybridSearchInput): Promise<Car
     let reason = '关键词匹配';
     if (gs && gs.matchType === 'direct') { matchType = 'hybrid'; reason = '图谱直接命中'; }
     else if (gs && gs.matchType === 'oneHop') { matchType = 'hybrid'; reason = '图谱单跳关联'; }
-    if (prog && prog.state !== 'new' && prog.nextReview <= new Date()) {
+    if (prog && ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date()) {
       matchType = 'due'; reason = '到期复习';
     }
 
@@ -369,7 +369,7 @@ export async function neo4jHybridSearchV2(input: HybridSearchInput): Promise<Car
       score: r.finalScore,
       matchType,
       reason,
-      due: prog && prog.state !== 'new' && prog.nextReview <= new Date(),
+      due: prog && ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date(),
       lapses: prog?.lapses ?? undefined,
       snippet,
       scoreBreakdown: {

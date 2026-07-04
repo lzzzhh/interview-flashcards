@@ -1,7 +1,8 @@
 // src/components/ResumeProjectPage.tsx — 简历项目追问卡片生成
 import { useState, useCallback } from 'react';
-import { ArrowLeft, Sparkles, Plus, Upload } from 'lucide-react';
+import { Sparkles, Plus, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import BackButton from './BackButton';
 import type { QACard } from '../types';
 
 interface Props {
@@ -63,9 +64,7 @@ export default function ResumeProjectPage({ onBack }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-        </button>
+        <BackButton onClick={onBack} />
         <Sparkles className="w-5 h-5" style={{ color: ACCENT }} />
         <h1 className="nav-title">简历项目追问</h1>
       </div>

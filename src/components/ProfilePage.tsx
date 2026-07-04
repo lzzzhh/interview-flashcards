@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
-import { ArrowLeft, Moon, Sun, User, Download, Upload, ChevronRight } from 'lucide-react';
+import { Moon, Sun, User, Download, Upload, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { exportProgress, importProgress, exportProgressCSV, importProgressCSV } from '../utils/backup';
+import BackButton from './BackButton';
 
 interface Props {
   onBack: () => void;
@@ -41,9 +42,7 @@ export default function ProfilePage({ onBack, onNavigate }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-        </button>
+        <BackButton onClick={onBack} />
         <h1 className="nav-title">我的</h1>
         <button onClick={() => dispatch({ type: 'TOGGLE_DARK' })} className="p-1">
           {state.isDark ? <Sun className="w-5 h-5" style={{ color: '#FBBF24' }} /> : <Moon className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />}
@@ -84,6 +83,26 @@ export default function ProfilePage({ onBack, onNavigate }: Props) {
             <div className="flex-1 text-left">
               <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>卡片数据库</h3>
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>搜索和管理所有面试卡片</p>
+            </div>
+            <ChevronRight className="w-4 h-4" style={{ color: TEXT_MUTED }} />
+          </button>
+          <button
+            onClick={() => onNavigate('saved-cards')}
+            className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
+          >
+            <div className="flex-1 text-left">
+              <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>已掌握 / 已收藏</h3>
+              <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>查看所有重点卡片</p>
+            </div>
+            <ChevronRight className="w-4 h-4" style={{ color: TEXT_MUTED }} />
+          </button>
+          <button
+            onClick={() => onNavigate('recovery')}
+            className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
+          >
+            <div className="flex-1 text-left">
+              <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>恢复中心</h3>
+              <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>恢复误删的牌组和卡片</p>
             </div>
             <ChevronRight className="w-4 h-4" style={{ color: TEXT_MUTED }} />
           </button>

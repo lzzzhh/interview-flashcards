@@ -16,10 +16,12 @@ import {
   getRecentAccuracy,
   getAverageRating,
   getDifficultCards,
-  isReallyMastered,
+  countTodayNewLearned,
 } from '../utils/reviewLogs';
 import TagRadar from './TagRadar';
 import { loadCustomCards, loadCustomDecks, getModuleDailyLimit, setModuleDailyLimit } from '../utils/customDecks';
+import { getStudyModeNewLimit, loadStudyModeConfig } from '../utils/studyModeConfig';
+import { useStatsSnapshot } from '../repositories/useStatsSnapshot';
 import { leetcodeHot100 } from '../data/leetcode-hot100';
 import { statisticsCards } from '../data/statistics';
 import { machineLearningCards } from '../data/machine-learning';
@@ -31,6 +33,8 @@ import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
 import { loadProgress } from '../utils/storage';
 import type { Category, FlashCard } from '../types';
+
+const REVIEW_STATES = new Set(['learning', 'review', 'relearning']);
 
 /** 从所有数据源加载全部卡片（带进度合并） */
 function loadAllCards(): FlashCard[] {
@@ -147,28 +151,42 @@ function getNewCount(cards: FlashCard[]) {
 
 function getDueCount(cards: FlashCard[]) {
   const now = Date.now();
-  return cards.filter((c) => c.sm2.state && c.sm2.state !== 'new' && c.sm2.nextReview <= now).length;
+  return cards.filter((c) => REVIEW_STATES.has(c.sm2.state) && c.sm2.nextReview <= now).length;
 }
 
 function getTodayNewAllowance(cards: FlashCard[], category?: string) {
-  if (category) return Math.min(getNewCount(cards), getModuleDailyLimit(category));
+  const logs = loadReviewLogs();
+  if (category) {
+    const limit = getStudyModeNewLimit(category, getModuleDailyLimit(category));
+    const learnedToday = countTodayNewLearned(cards.map((card) => card.id), logs);
+    return Math.max(0, Math.min(getNewCount(cards), limit - learnedToday));
+  }
 
-  const byModule = new Map<string, number>();
+  const byModule = new Map<string, { count: number; ids: string[] }>();
   for (const card of cards) {
-    if (card.sm2.state && card.sm2.state !== 'new') continue;
-    byModule.set(card.category, (byModule.get(card.category) || 0) + 1);
+    const entry = byModule.get(card.category) ?? { count: 0, ids: [] };
+    entry.ids.push(card.id);
+    if (!card.sm2.state || card.sm2.state === 'new') entry.count += 1;
+    byModule.set(card.category, entry);
   }
 
   let total = 0;
-  for (const [moduleId, count] of byModule) {
-    total += Math.min(count, getModuleDailyLimit(moduleId));
+  for (const [moduleId, entry] of byModule) {
+    const limit = getStudyModeNewLimit(moduleId, getModuleDailyLimit(moduleId));
+    const learnedToday = countTodayNewLearned(entry.ids, logs);
+    total += Math.max(0, Math.min(entry.count, limit - learnedToday));
   }
   return total;
 }
 
 export default function StatsDashboard({ category }: Props) {
   const { state, dispatch } = useAppContext();
+  const { snapshot, byDeck } = useStatsSnapshot();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const studyModeConfig = loadStudyModeConfig();
+  const studyModeDailyTotal = studyModeConfig
+    ? Object.values(studyModeConfig.dailyQuota).reduce((total, limit) => total + Math.max(0, Number(limit) || 0), 0)
+    : 0;
   const cardVersion = Object.values(state.cardsById)
     .map((card) => `${card.id}:${card.sm2.state}:${card.sm2.interval}:${card.sm2.lapses}:${card.sm2.nextReview}`)
     .join('|');
@@ -182,8 +200,26 @@ export default function StatsDashboard({ category }: Props) {
     void cardVersion;
     const allCards = loadAllCards();
     const filteredCards = category ? allCards.filter((c) => c.category === category) : allCards;
+    const snapshotRow = category ? byDeck[category] : snapshot?.global;
+    if (snapshotRow) {
+      return {
+        total: snapshotRow.totalCards,
+        mastered: snapshotRow.masteredCards,
+        pending: snapshotRow.totalCards - snapshotRow.masteredCards,
+        masteredPercent: Math.round(snapshotRow.masteryRate),
+        newCount: snapshotRow.newCards,
+        dueCount: snapshotRow.dueCards,
+        todayNewAllowance: getTodayNewAllowance(filteredCards, category),
+        todayReviewed: snapshotRow.todayReviewCount,
+        streak: snapshotRow.streak,
+        recentAccuracy: snapshotRow.correctRate ?? 0,
+        avgRating: getAverageRating(getAllLogs()),
+        difficultCount: 0,
+        byDifficulty: {} as Record<string, { total: number; mastered: number }>,
+      };
+    }
     const allLogs = getAllLogs();
-    const mastered = filteredCards.filter((c) => isReallyMastered(c.sm2.interval, c.sm2.lapses)).length;
+    const mastered = filteredCards.filter((c) => c.sm2.state === 'mastered').length;
     const difficultIds = getDifficultCards(loadReviewLogs(), filteredCards.map((c) => c.id));
     const newCount = getNewCount(filteredCards);
     const dueCount = getDueCount(filteredCards);
@@ -202,7 +238,7 @@ export default function StatsDashboard({ category }: Props) {
       difficultCount: difficultIds.length,
       byDifficulty: {} as Record<string, { total: number; mastered: number }>,
     };
-  }, [cardVersion, category]); // re-evaluate when cardsById changes (triggered by any rating)
+  }, [byDeck, cardVersion, category, snapshot]); // re-evaluate when cardsById changes (triggered by any rating)
 
   if (!state.showStats) return null;
 
@@ -315,7 +351,7 @@ export default function StatsDashboard({ category }: Props) {
               <span className="font-medium text-orange-600">{stats.dueCount} 张</span>
             </div>
             <div className="flex justify-between">
-              <span>{category ? `今日新学（上限 ${getModuleDailyLimit(category)}）` : '今日新学（按模块上限）'}</span>
+              <span>{category ? `今日新学（上限 ${getStudyModeNewLimit(category, getModuleDailyLimit(category))}）` : '今日新学（按学习模式）'}</span>
               <span className="font-medium text-blue-600">{stats.todayNewAllowance} / {stats.newCount} 张</span>
             </div>
             <div className="flex justify-between pt-1 border-t border-gray-200 dark:border-gray-600">
@@ -378,26 +414,34 @@ export default function StatsDashboard({ category }: Props) {
               className="flex items-center justify-between w-full text-left"
             >
               <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                每日新卡上限
+                每日新卡来源
               </h3>
               <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${settingsOpen ? 'rotate-180' : ''}`} />
             </button>
             {settingsOpen && (<>
-            {category ? (
-              <ModuleLimitSlider moduleId={category} label={CATEGORIES.find((cat) => cat.key === category)?.label || loadCustomDecks().find((d) => d.id === category)?.name || category} />
+            {studyModeConfig ? (
+              <p className="text-[10px] text-gray-400">
+                当前由学习模式决定，每日新卡总配额 {studyModeDailyTotal} 张；各牌组配额请在学习统计页的“学习模式”里调整。
+              </p>
             ) : (
               <>
-                {CATEGORIES.map((cat) => (
-                  <ModuleLimitSlider key={cat.key} moduleId={cat.key} label={cat.label} />
-                ))}
-                {loadCustomDecks().map((d) => (
-                  <ModuleLimitSlider key={d.id} moduleId={d.id} label={d.name} />
-                ))}
+                {category ? (
+                  <ModuleLimitSlider moduleId={category} label={CATEGORIES.find((cat) => cat.key === category)?.label || loadCustomDecks().find((d) => d.id === category)?.name || category} />
+                ) : (
+                  <>
+                    {CATEGORIES.map((cat) => (
+                      <ModuleLimitSlider key={cat.key} moduleId={cat.key} label={cat.label} />
+                    ))}
+                    {loadCustomDecks().map((d) => (
+                      <ModuleLimitSlider key={d.id} moduleId={d.id} label={d.name} />
+                    ))}
+                  </>
+                )}
+                <p className="text-[10px] text-gray-400">
+                  {category ? '当前模块独立设置，学习新卡时生效' : '没有学习模式配置时，使用这里的兼容上限'}
+                </p>
               </>
             )}
-            <p className="text-[10px] text-gray-400">
-              {category ? '当前模块独立设置，学习新卡时生效' : '首页统计可调整每个模块的新卡上限'}
-            </p>
             </>)}
           </div>
 

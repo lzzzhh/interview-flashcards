@@ -20,13 +20,14 @@ if (!existsSync(UPLOAD_DIR)) mkdirSync(UPLOAD_DIR, { recursive: true });
 
 const allowedMime: Record<string, string> = {
   'application/pdf': 'pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
   'text/markdown': 'markdown',
   'text/plain': 'txt',
   'text/x-markdown': 'markdown',
 };
 
 function extToType(ext: string): string | null {
-  const m: Record<string, string> = { '.pdf': 'pdf', '.md': 'markdown', '.markdown': 'markdown', '.txt': 'txt' };
+  const m: Record<string, string> = { '.pdf': 'pdf', '.docx': 'docx', '.md': 'markdown', '.markdown': 'markdown', '.txt': 'txt' };
   return m[ext.toLowerCase()] || null;
 }
 

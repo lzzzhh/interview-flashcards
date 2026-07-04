@@ -1,6 +1,6 @@
 // src/components/MockInterviewPage.tsx — 模拟面试模式
 import { useState, useMemo, useCallback } from 'react';
-import { ArrowLeft, Play, Eye, RotateCcw, CheckCircle, XCircle } from 'lucide-react';
+import { Play, Eye, RotateCcw, CheckCircle, XCircle } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { statisticsCards } from '../data/statistics';
 import { machineLearningCards } from '../data/machine-learning';
@@ -11,6 +11,7 @@ import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
 import { shuffle } from '../utils/shuffle';
+import BackButton from './BackButton';
 import type { Category, FlashCard, QACard } from '../types';
 
 interface Props {
@@ -97,9 +98,7 @@ export default function MockInterviewPage({ onBack }: Props) {
     return (
       <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
         <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-          <button onClick={onBack} className="p-1 -ml-1">
-            <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-          </button>
+          <BackButton onClick={onBack} />
           <h1 className="nav-title">模拟面试</h1>
         </div>
         <div className="flex-1 flex items-center justify-center px-5">
@@ -148,9 +147,7 @@ export default function MockInterviewPage({ onBack }: Props) {
     return (
       <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
         <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-          <button onClick={onBack} className="p-1 -ml-1">
-            <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-          </button>
+          <BackButton onClick={onBack} />
           <span className="text-[12px]" style={{ color: TEXT_MUTED }}>第 {currentIdx + 1}/{questions.length} 题</span>
         </div>
         <div className="flex-1 flex flex-col px-5 py-4">
@@ -199,9 +196,7 @@ export default function MockInterviewPage({ onBack }: Props) {
     return (
       <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
         <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-          <button onClick={() => setPhase('answering')} className="p-1 -ml-1">
-            <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-          </button>
+          <BackButton onClick={() => setPhase('answering')} />
           <h1 className="nav-title">面试回顾</h1>
         </div>
         <div className="flex-1 flex items-start justify-center px-5 py-4">

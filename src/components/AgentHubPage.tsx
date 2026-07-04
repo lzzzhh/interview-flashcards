@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { ArrowLeft, Search, FileText, Briefcase, Sparkles, Mic, ListChecks, ChevronRight } from 'lucide-react';
+import { Search, FileText, Briefcase, Sparkles, Mic, ListChecks, ChevronRight } from 'lucide-react';
 import { useDocumentQueue } from '../hooks/useDocumentQueue';
+import BackButton from './BackButton';
 
 type Props = { onBack: () => void; onNavigate: (page: string) => void };
 
@@ -13,7 +14,7 @@ const AGENTS = [
   { key: 'search', icon: Search, title: 'AI 智能搜索', desc: '语义搜索所有卡片，快速定位薄弱知识点', color: '#3B82F6' },
   { key: 'ingest', icon: FileText, title: '资料制卡', desc: '上传 PDF/TXT/MD，AI 自动生成面试卡片', color: '#10B981' },
   { key: 'drafts', icon: Sparkles, title: '草稿审核', desc: '审核 AI 生成的卡片草稿，一键入库', color: '#8B5CF6' },
-  { key: 'jobprep', icon: Briefcase, title: '岗位备战', desc: '输入公司/岗位，生成阶段化复习计划', color: '#F59E0B' },
+  { key: 'jobprep', icon: Briefcase, title: '岗位备战', desc: '输入公司/岗位，生成阶段化复习计划', color: '#F59E0B', disabled: true },
   { key: 'mock-interview', icon: Mic, title: '模拟面试', desc: '自答自评模拟真实面试场景', color: '#EC4899', disabled: true },
   { key: 'resume-project', icon: ListChecks, title: '简历项目追问', desc: '基于项目描述生成面试追问卡片', color: '#14B8A6', disabled: true },
 ];
@@ -34,15 +35,7 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
     <div className="dark-bg homepage-glass-stage flex min-h-screen flex-col transition-colors" style={{ color: TEXT_PRIMARY }}>
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-8">
         <div className="flex shrink-0 items-center gap-3 border-b py-4" style={{ borderColor: CARD_BORDER }}>
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors hover:bg-white/45 dark:hover:bg-white/10"
-            style={{ color: TEXT_MUTED }}
-            title="返回"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
+          <BackButton onClick={onBack} />
           <div className="min-w-0 flex-1 text-center">
             <h1 className="text-[18px] font-bold leading-tight" style={{ color: TEXT_PRIMARY }}>
               AI Agent 中心
@@ -79,8 +72,11 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
                   </span>
                 )}
                 <div
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-                  style={{ backgroundColor: `${agent.color}22` }}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border"
+                  style={{
+                    backgroundColor: `${agent.color}22`,
+                    borderColor: 'transparent',
+                  }}
                 >
                   <agent.icon className="h-[22px] w-[22px]" color={agent.color} />
                 </div>
@@ -88,7 +84,7 @@ export default function AgentHubPage({ onBack, onNavigate }: Props) {
                   <h3 className="truncate text-[15px] font-bold leading-tight" style={{ color: TEXT_PRIMARY }}>
                     {agent.title}
                   </h3>
-                  <p className="mt-1 text-[12px] leading-snug" style={{ color: TEXT_MUTED }}>
+                  <p className="mt-1 text-[12px] font-medium leading-snug" style={{ color: TEXT_MUTED }}>
                     {agent.desc}
                   </p>
                 </div>

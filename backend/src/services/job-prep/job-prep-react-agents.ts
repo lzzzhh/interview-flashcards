@@ -9,6 +9,13 @@ import type { RoleProfile } from './role-profiles/types';
 import { llmGuard } from './guards/plan-llm-guard';
 import { ruleValidate, validateCardIds, type GuardContext, type GuardError } from './guards/plan-rule-validator';
 import { searchPublicJD } from './tools/public-jd-search-tool';
+import {
+  AgentActionSchema,
+  JdParseSchema,
+  JobPrepPlanSchema,
+  TargetParseSchema,
+  parseWithSchema,
+} from './job-prep-schemas';
 
 type PrepHorizon = 'short' | 'medium' | 'long';
 
@@ -142,6 +149,7 @@ interface OrchestratorState {
   observations: ReActObservation[];
   repairedCount: number;
   guardFollowupRetrievals: number;
+  jdParseAttempted: boolean;
   startedAt: number;
   options: JobPrepOrchestratorOptions;
 }
@@ -187,12 +195,6 @@ interface ToolDefinition {
   retryable: boolean;
   sideEffect: boolean;
 }
-
-const ActionSchema = z.object({
-  action: z.string(),
-  rationale: z.string().optional(),
-  args: z.record(z.any()).optional(),
-});
 
 const TOOL_DEFINITIONS: Record<JobPrepToolName, ToolDefinition> = {
   parse_target: {
@@ -317,15 +319,6 @@ const TOOL_DEFINITIONS: Record<JobPrepToolName, ToolDefinition> = {
 
 function now() { return Date.now(); }
 
-function safeParseJson(text: string): any {
-  try { return JSON.parse(text); } catch {}
-  const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (m) { try { return JSON.parse(m[1]); } catch {} }
-  const s = text.indexOf('{'), e = text.lastIndexOf('}');
-  if (s >= 0 && e > s) { try { return JSON.parse(text.slice(s, e + 1)); } catch {} }
-  return null;
-}
-
 async function llm(systemPrompt: string, userContent: string, maxTokens = 4096, temperature = 0.2) {
   const p = getLLMProvider();
   if (!p) throw new Error('LLM not configured');
@@ -334,6 +327,7 @@ async function llm(systemPrompt: string, userContent: string, maxTokens = 4096, 
     messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userContent }],
     temperature,
     maxTokens,
+    responseFormat: 'json_object',
   });
   return r.text;
 }
@@ -393,9 +387,11 @@ function detectDays(text: string): number | undefined {
 
 function detectPrepIntent(text: string, roleFamily: string | null | undefined): PrepIntentProfile {
   const lower = text.toLowerCase();
-  const days = detectDays(text);
   const hasShortSignal = /(今天|今晚|明天|后天|大后天|过两天|这两天|马上|很急|临时|突击|冲刺|来不及|短期)/.test(text);
-  const hasLongSignal = /(长期|系统性|系统\s*(准备|学习|复习|梳理|过一遍)|全面|完整|从零|打基础|全部|所有|全量|刷完|hot\s*100|hot100|leetcode|力扣|一个月|两个月|三个月|半年)/i.test(text);
+  const hasLongSignal = /(长期|系统性|系统\s*(准备|学习|复习|梳理|过一遍)|全面|完整|从零|打基础|全部|所有|全量|刷完|hot\s*100|hot100|leetcode|力扣)/i.test(text);
+  const hasPrepDurationContext = /(准备|备战|面试|冲刺|复习|计划|只有|剩|来不及|系统)/.test(text);
+  const rawDays = detectDays(text);
+  const days = (hasPrepDurationContext || hasShortSignal || hasLongSignal) ? rawDays : undefined;
   const explicit = days !== undefined || hasShortSignal || hasLongSignal;
   let horizon: PrepHorizon = 'medium';
   if (days !== undefined && days <= 3) horizon = 'short';
@@ -585,7 +581,7 @@ function summarizeStateForDecision(state: OrchestratorState) {
 function deterministicNextAction(state: OrchestratorState): { action: JobPrepToolName; args: Record<string, any>; rationale: string } {
   if (!state.session.role || state.session.role === 'unknown') return { action: 'parse_target', args: {}, rationale: 'Target is missing.' };
   if (!state.roleProfile) return { action: 'load_role_profile', args: {}, rationale: 'Role profile is needed for coverage.' };
-  if (state.selectedJD?.sourceType !== 'fallback_profile' && state.requirements.filter(r => r.source === 'jd').length === 0) return { action: 'parse_jd', args: {}, rationale: 'Selected JD should be parsed before retrieval.' };
+  if (state.selectedJD?.sourceType !== 'fallback_profile' && !state.jdParseAttempted && state.requirements.filter(r => r.source === 'jd').length === 0) return { action: 'parse_jd', args: {}, rationale: 'Selected JD should be parsed before retrieval.' };
   if (state.requirements.length === 0) return { action: 'extract_requirements', args: {}, rationale: 'Requirements are needed for grouped retrieval.' };
   if (state.graphKeywords.length === 0) return { action: 'graph_expand', args: {}, rationale: 'Graph expansion is needed before retrieval.' };
   if (state.cardCandidates.length === 0) return { action: 'retrieve_cards', args: { perRequirement: state.prepIntent.horizon === 'short' ? 4 : 8 }, rationale: 'No cards have been observed yet.' };
@@ -617,7 +613,7 @@ Do not call save_plan unless validate_plan has passed. If guard reports missing 
 Available tools: ${Object.values(TOOL_DEFINITIONS).map(t => `${t.name}: ${t.description}`).join('\n')}`;
   try {
     const raw = await llm(systemPrompt, JSON.stringify(summarizeStateForDecision(state)).slice(0, 5000), 700, 0);
-    const parsed = ActionSchema.safeParse(safeParseJson(raw));
+    const parsed = AgentActionSchema.safeParse(parseWithSchema(AgentActionSchema, raw));
     if (!parsed.success) return fallback;
     const action = parsed.data.action as JobPrepToolName;
     if (!TOOL_DEFINITIONS[action]) return fallback;
@@ -635,7 +631,7 @@ async function executeTool(name: JobPrepToolName, args: Record<string, any>, sta
   switch (name) {
     case 'parse_target': {
       const raw = await llm(TARGET_PARSE_PROMPT, String(args.text || state.contextText).slice(0, 3000), 500, 0.1);
-      const parsed = safeParseJson(raw) || {};
+      const parsed = parseWithSchema(TargetParseSchema, raw) || {};
       if (parsed.role) {
         state.session = await prisma.jobPrepSession.update({
           where: { id: state.session.id },
@@ -669,9 +665,15 @@ async function executeTool(name: JobPrepToolName, args: Record<string, any>, sta
     }
     case 'parse_jd': {
       if (!state.selectedJD) return { ok: true, summary: 'no selected JD to parse', data: { requirements: [] } };
+      state.jdParseAttempted = true;
       const text = String(args.text || state.selectedJD.cleanedText || state.selectedJD.rawText || '');
-      const raw = await llm(JD_PARSE_PROMPT, `Parse this JD:\n${text.slice(0, 3000)}`, 2000, 0.1);
-      const parsed = safeParseJson(raw) || {};
+      let parsed = { requirements: [] as any[] };
+      try {
+        const raw = await llm(JD_PARSE_PROMPT, `Parse this JD:\n${text.slice(0, 3000)}`, 2000, 0.1);
+        parsed = parseWithSchema(JdParseSchema, raw) || { requirements: [] };
+      } catch (e: any) {
+        return { ok: true, summary: `JD parse unavailable; continuing with role profile requirements (${e.message})`, data: { requirements: [] } };
+      }
       if (Array.isArray(parsed.requirements)) {
         await prisma.jobRequirement.deleteMany({ where: { sessionId: state.session.id } });
         for (const r of parsed.requirements) {
@@ -903,9 +905,13 @@ async function generatePlanFromState(state: OrchestratorState, mode: 'new' | 're
       `Available cards, use only these cardIds:\n${availableCardList(state)}`,
       `Guard policy: return JSON plan only. Keep cardId values exactly as provided.`,
     ].filter(Boolean).join('\n\n');
-    const raw = await llm(PLAN_REVISE_PROMPT, prompt, 4096, 0.2);
-    const parsed = safeParseJson(raw);
-    if (parsed) return parsed;
+    try {
+      const raw = await llm(PLAN_REVISE_PROMPT, prompt, 4096, 0.2);
+      const parsed = parseWithSchema(JobPrepPlanSchema, raw);
+      if (parsed) return parsed;
+    } catch {
+      if (state.cardCandidates.length > 0) return buildDeterministicPlan(state, state.cardCandidates);
+    }
   }
   const prompt = [
     `Job: ${state.session.company || ''} ${state.session.role || ''}${state.roleProfile ? ` (${state.roleProfile.displayName})` : ''}`,
@@ -917,9 +923,24 @@ async function generatePlanFromState(state: OrchestratorState, mode: 'new' | 're
     `Graph concepts: ${state.graphKeywords.slice(0, 60).join(', ')}`,
     state.cardCandidates.length > 0 ? `Cards, use only these cardIds:\n${availableCardList(state)}` : 'No cards available. Generate topic stages with empty cards arrays.',
   ].filter(Boolean).join('\n\n');
-  const raw = await llm(PLAN_GENERATE_PROMPT, prompt, 4096, 0.2);
-  const parsed = safeParseJson(raw);
-  return parsed || buildDeterministicPlan(state, state.cardCandidates);
+  try {
+    const raw = await llm(PLAN_GENERATE_PROMPT, prompt, 4096, 0.2);
+    const parsed = parseWithSchema(JobPrepPlanSchema, raw);
+    return parsed || buildDeterministicPlan(state, state.cardCandidates);
+  } catch {
+    return buildDeterministicPlan(state, state.cardCandidates);
+  }
+}
+
+function validateToolObservation(tool: ToolDefinition, observation: ReActObservation): ReActObservation {
+  if (!observation.ok || observation.data === undefined) return observation;
+  const parsed = tool.outputSchema.safeParse(observation.data);
+  if (parsed.success) return { ...observation, data: parsed.data };
+  return {
+    ok: false,
+    summary: `${tool.name} returned invalid output`,
+    error: parsed.error.issues.map(issue => `${issue.path.join('.') || 'root'}: ${issue.message}`).join('; '),
+  };
 }
 
 async function validatePlan(state: OrchestratorState) {
@@ -1013,6 +1034,7 @@ async function loadInitialState(session: any, options: JobPrepOrchestratorOption
     observations: [],
     repairedCount: 0,
     guardFollowupRetrievals: 0,
+    jdParseAttempted: false,
     startedAt: now(),
     options,
   };
@@ -1035,6 +1057,7 @@ export async function generateJobPrepPlanWithReActAgents(session: any, options: 
     try {
       const parsedArgs = tool.inputSchema.parse(decision.args || {});
       observation = await withTimeout(executeTool(decision.action, parsedArgs, state), tool.timeoutMs, decision.action);
+      observation = validateToolObservation(tool, observation);
       state.observations.push(observation);
     } catch (e: any) {
       observation = { ok: false, summary: `${decision.action} failed`, error: e.message };
@@ -1051,6 +1074,7 @@ export async function generateJobPrepPlanWithReActAgents(session: any, options: 
     });
 
     if (decision.action === 'ask_user' || state.userQuestion) break;
+    if (!observation.ok && !tool.retryable) break;
     if (decision.action === 'save_plan' && observation.ok) break;
   }
 

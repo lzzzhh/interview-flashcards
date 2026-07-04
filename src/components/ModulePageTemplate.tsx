@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
-import { ArrowLeft, Settings, FileText, Plus, Trash2 } from 'lucide-react';
+import { Settings, FileText, Plus, Trash2 } from 'lucide-react';
+import BackButton from './BackButton';
 
 export interface ModuleTopicCardModel {
   key: string;
@@ -55,9 +56,7 @@ export default function ModulePageTemplate({
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-        </button>
+        <BackButton onClick={onBack} />
         <h1 className="nav-title">{categoryLabel}</h1>
         {(onOpenCardManager || onCreateTopic || onDeleteTopic) && (
           <div className="relative" ref={menuRef}>

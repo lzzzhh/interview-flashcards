@@ -1,6 +1,6 @@
 // src/components/TagManagerPage.tsx — 标签管理（批量改名/合并/删除）
 import { useState, useMemo } from 'react';
-import { ArrowLeft, Tag, Pencil, Trash2, GitMerge, Check, X, AlertTriangle } from 'lucide-react';
+import { Tag, Pencil, Trash2, GitMerge, Check, X, AlertTriangle } from 'lucide-react';
 import { loadCustomDecks, loadCustomCards } from '../utils/customDecks';
 import { leetcodeHot100 } from '../data/leetcode-hot100';
 import { statisticsCards } from '../data/statistics';
@@ -11,6 +11,7 @@ import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
+import BackButton from './BackButton';
 import type { Category, FlashCard } from '../types';
 
 interface Props {
@@ -130,9 +131,7 @@ export default function TagManagerPage({ onBack }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-        </button>
+        <BackButton onClick={onBack} />
         <Tag className="w-5 h-5" style={{ color: ACCENT }} />
         <h1 className="nav-title">标签管理</h1>
       </div>

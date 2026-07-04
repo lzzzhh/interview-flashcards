@@ -1,9 +1,10 @@
 // src/components/VectorDatabasePage.tsx — 向量数据库（多模块支持）
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Search, Loader2, Dna, Zap, Database, Layers } from 'lucide-react';
+import { Search, Loader2, Dna, Zap, Database, Layers } from 'lucide-react';
 import { hybridSearch, type SearchResult } from '../api/searchApi';
 import { apiGet, API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
+import BackButton from './BackButton';
 
 interface Props {
   onBack: () => void;
@@ -75,9 +76,7 @@ export default function VectorDatabasePage({ onBack }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-        </button>
+        <BackButton onClick={onBack} />
         <Dna className="w-5 h-5" style={{ color: ACCENT }} />
         <h1 className="nav-title">向量数据库</h1>
       </div>

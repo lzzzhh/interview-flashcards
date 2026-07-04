@@ -1,7 +1,8 @@
 // src/components/DraftReviewPage.tsx — 卡片草稿审核页
 import { useState, useEffect } from 'react';
-import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { apiGet, apiPost } from '../api/client';
+import BackButton from './BackButton';
 
 interface Draft {
   id: string;
@@ -53,9 +54,7 @@ export default function DraftReviewPage({ onBack }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center justify-between">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-        </button>
+        <BackButton onClick={onBack} />
         <h1 className="nav-title">卡片草稿</h1>
         {drafts.length > 0 && (
           <button onClick={approveAll} className="text-[13px] font-bold px-3 py-1 rounded-lg" style={{ backgroundColor: `${GREEN}20`, color: GREEN }}>全部通过</button>

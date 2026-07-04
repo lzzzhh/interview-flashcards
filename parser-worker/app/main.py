@@ -6,7 +6,8 @@ import os
 from .parsers.pdf_parser import parse_pdf
 from .parsers.docx_parser import parse_docx
 from .utils.hash import text_hash
-from .schemas import ParsedDocument, ParsedPage, ParseRequest
+from .resume_renderer import render_tailored_resume
+from .schemas import ParsedDocument, ParsedPage, ParseRequest, ResumeRenderRequest, ResumeRenderResponse
 
 app = FastAPI(title="Flashcards Document Parser Worker")
 
@@ -36,6 +37,26 @@ def parse_document(req: ParseRequest):
     result["source_type"] = file_type
     result["parser"] = "python-worker"
     result["text_hash"] = text_hash(result["full_text"])
+    return result
+
+
+@app.post("/resume/render", response_model=ResumeRenderResponse)
+def render_resume(req: ResumeRenderRequest):
+    if not os.path.exists(req.source_path):
+        raise HTTPException(404, "File not found")
+
+    rewrites = [
+        {"before_text": item.before_text, "after_text": item.after_text}
+        for item in req.rewrites
+    ]
+    result = render_tailored_resume(
+        source_path=req.source_path,
+        source_type=req.source_type,
+        output_dir=req.output_dir,
+        base_name=req.base_name,
+        rewrites=rewrites,
+        fallback_text=req.fallback_text,
+    )
     return result
 
 

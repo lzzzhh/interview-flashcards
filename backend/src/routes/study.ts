@@ -13,7 +13,7 @@ export async function studyRoutes(app: FastifyInstance) {
       const cards = await prisma.card.findMany({
         where: {
           deckId,
-          progress: { some: { userId: USER_ID, state: { not: 'new' }, nextReview: { lte: new Date() } } },
+          progress: { some: { userId: USER_ID, state: { in: ['learning', 'review', 'relearning'] }, nextReview: { lte: new Date() } } },
         },
         include: { progress: { where: { userId: USER_ID } } },
         orderBy: { id: 'asc' },
@@ -25,7 +25,7 @@ export async function studyRoutes(app: FastifyInstance) {
       const limit = await prisma.deckDailyLimit.findUnique({
         where: { userId_deckId: { userId: USER_ID, deckId } },
       });
-      const dailyLimit = limit?.dailyLimit || 20;
+      const dailyLimit = limit?.dailyLimit ?? 20;
 
       const studiedIds = (await prisma.cardProgress.findMany({
         where: { userId: USER_ID, card: { deckId }, state: { not: 'new' } },

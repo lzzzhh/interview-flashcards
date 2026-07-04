@@ -40,7 +40,7 @@ export async function deckRoutes(app: FastifyInstance) {
     const now = new Date();
     const result = decks.map(d => {
       const total = countMap.get(d.id) || 0;
-      const dailyLimit = limitMap.get(d.id) || 20;
+      const dailyLimit = limitMap.get(d.id) ?? 20;
 
       // 注意：allProgress 包含了所有 deck 的数据，这里不做二次过滤
       // 因为 cardProgress query 已通过 card.deckId { in: deckIds } 过滤
@@ -60,6 +60,7 @@ export async function deckRoutes(app: FastifyInstance) {
           learningCount: 0,
           reviewCount: 0,
           relearningCount: 0,
+          masteredCount: 0,
           dueCount: 0,
           favoritedCount: 0,
           dailyLimit,
@@ -74,22 +75,24 @@ export async function deckRoutes(app: FastifyInstance) {
       learningCnt: string;
       reviewCnt: string;
       relearningCnt: string;
+      masteredCnt: string;
       dueCnt: string;
       favCnt: string;
     }[]>(
       `SELECT
         c.deckId as deckId,
-        SUM(CASE WHEN cp.cardId IS NULL THEN 1 ELSE 0 END) as newCnt,
+        SUM(CASE WHEN cp.cardId IS NULL OR cp.state IS NULL OR cp.state = 'new' THEN 1 ELSE 0 END) as newCnt,
         SUM(CASE WHEN cp.state = 'learning' THEN 1 ELSE 0 END) as learningCnt,
         SUM(CASE WHEN cp.state = 'review' THEN 1 ELSE 0 END) as reviewCnt,
         SUM(CASE WHEN cp.state = 'relearning' THEN 1 ELSE 0 END) as relearningCnt,
-        SUM(CASE WHEN cp.state != 'new' AND cp.nextReview <= ? THEN 1 ELSE 0 END) as dueCnt,
+        SUM(CASE WHEN cp.state = 'mastered' THEN 1 ELSE 0 END) as masteredCnt,
+        SUM(CASE WHEN cp.state IN ('learning', 'review', 'relearning') AND cp.nextReview <= ? THEN 1 ELSE 0 END) as dueCnt,
         SUM(CASE WHEN cp.favorited = 1 THEN 1 ELSE 0 END) as favCnt
       FROM Card c
       LEFT JOIN CardProgress cp ON c.id = cp.cardId AND cp.userId = ?
       WHERE c.deckId IN (${deckIds.map(() => '?').join(',')})
       GROUP BY c.deckId`,
-      now.toISOString(), USER_ID, ...deckIds,
+      now.getTime(), USER_ID, ...deckIds,
     );
 
     // 应用统计数据
@@ -103,6 +106,7 @@ export async function deckRoutes(app: FastifyInstance) {
         r.stats.learningCount = Number(s.learningCnt);
         r.stats.reviewCount = Number(s.reviewCnt);
         r.stats.relearningCount = Number(s.relearningCnt);
+        r.stats.masteredCount = Number(s.masteredCnt);
         r.stats.dueCount = Number(s.dueCnt);
         r.stats.favoritedCount = Number(s.favCnt);
       }
@@ -141,23 +145,24 @@ export async function deckRoutes(app: FastifyInstance) {
     const [total, statsRow, limit] = await Promise.all([
       prisma.card.count({ where: { deckId } }),
       prisma.$queryRawUnsafe<{
-        newCnt: string; learningCnt: string; reviewCnt: string; relearningCnt: string; dueCnt: string;
+        newCnt: string; learningCnt: string; reviewCnt: string; relearningCnt: string; masteredCnt: string; dueCnt: string;
       }[]>(
         `SELECT
-          SUM(CASE WHEN cp.cardId IS NULL THEN 1 ELSE 0 END) as newCnt,
+          SUM(CASE WHEN cp.cardId IS NULL OR cp.state IS NULL OR cp.state = 'new' THEN 1 ELSE 0 END) as newCnt,
           SUM(CASE WHEN cp.state = 'learning' THEN 1 ELSE 0 END) as learningCnt,
           SUM(CASE WHEN cp.state = 'review' THEN 1 ELSE 0 END) as reviewCnt,
           SUM(CASE WHEN cp.state = 'relearning' THEN 1 ELSE 0 END) as relearningCnt,
-          SUM(CASE WHEN cp.state != 'new' AND cp.nextReview <= ? THEN 1 ELSE 0 END) as dueCnt
+          SUM(CASE WHEN cp.state = 'mastered' THEN 1 ELSE 0 END) as masteredCnt,
+          SUM(CASE WHEN cp.state IN ('learning', 'review', 'relearning') AND cp.nextReview <= ? THEN 1 ELSE 0 END) as dueCnt
         FROM Card c
         LEFT JOIN CardProgress cp ON c.id = cp.cardId AND cp.userId = ?
         WHERE c.deckId = ?`,
-        new Date().toISOString(), USER_ID, deckId,
+        Date.now(), USER_ID, deckId,
       ),
       prisma.deckDailyLimit.findUnique({ where: { userId_deckId: { userId: USER_ID, deckId } } }),
     ]);
 
-    const s = statsRow[0] || { newCnt: '0', learningCnt: '0', reviewCnt: '0', relearningCnt: '0', dueCnt: '0' };
+    const s = statsRow[0] || { newCnt: '0', learningCnt: '0', reviewCnt: '0', relearningCnt: '0', masteredCnt: '0', dueCnt: '0' };
     return {
       deckId, total,
       newCount: Number(s.newCnt),
@@ -165,6 +170,7 @@ export async function deckRoutes(app: FastifyInstance) {
       learningCount: Number(s.learningCnt),
       reviewCount: Number(s.reviewCnt),
       relearningCount: Number(s.relearningCnt),
+      masteredCount: Number(s.masteredCnt),
       dailyLimit: limit?.dailyLimit || 20,
     };
   });

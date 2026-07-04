@@ -81,7 +81,7 @@ interface CardMatch {
 const USER_ID = 'demo-user';
 const DEFAULT_MIN_SCORE = 0.30;
 const DEFAULT_MAX_RESULTS = 50;
-const DEFAULT_CANDIDATE_LIMIT = 300;
+const DEFAULT_CANDIDATE_LIMIT = 400;
 
 /** Check if top results are dominated by a single concept cluster */
 function getDominantCluster(
@@ -110,7 +110,9 @@ interface RecallCandidate {
   vectorScore: number;
   keywordScore: number;
   matchedKeywords: string[];
-  source: 'fts5' | 'like' | 'tag' | 'searchKeywords' | 'vector';
+  source: 'fts5' | 'like' | 'tag' | 'searchKeywords' | 'vector' | 'graph' | 'similarity';
+  graphScore?: number;
+  similarityScore?: number;
 }
 
 // ---- 主入口 ----
@@ -133,8 +135,8 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     ? [allQueryTextRecall, studyBoostText].join(' ')
     : allQueryTextRecall;
   // For study intent: use lower threshold, higher max results
-  const effectiveMinScore = isStudyIntent ? Math.min(input.minScore ?? 0.20, 0.25) : (input.minScore ?? DEFAULT_MIN_SCORE);
-  const effectiveMaxResults = isStudyIntent ? Math.max(input.maxResults ?? 100, 100) : (input.maxResults ?? DEFAULT_MAX_RESULTS);
+  const effectiveMinScore = isStudyIntent ? Math.min(input.minScore ?? 0.15, 0.18) : (input.minScore ?? DEFAULT_MIN_SCORE);
+  const effectiveMaxResults = isStudyIntent ? Math.max(input.maxResults ?? 200, 200) : (input.maxResults ?? DEFAULT_MAX_RESULTS);
 
   // Debug log
   if (!process.env.EVAL_SUPPRESS_DEBUG) {
@@ -157,12 +159,18 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     tagPool,
     skwPool,
     vecPool,
+    graphPool,
   ] = await Promise.all([
     recallFTS5(finalRecallText, poolSize, input.deckIds),
     recallByTags(finalRecallText, expandedKeywords.slice(0, 12), tagPoolSize),
     recallBySearchKeywords(finalRecallText, expandedKeywords.slice(0, 12), tagPoolSize),
     recallVector(finalRecallText, effectiveCandidateLimit),
+    recallGraph(finalRecallText, effectiveCandidateLimit),
   ]);
+
+  // 2b. Similarity graph expansion — uses top vector seeds AFTER vecPool is ready
+  const topVecSeeds = vecPool.slice(0, 20).map(c => c.cardId);
+  const simPool = await recallSimilarity(topVecSeeds, effectiveCandidateLimit);
 
   // 3. Union + dedup
   const candidateMap = new Map<string, RecallCandidate>();
@@ -196,12 +204,29 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
       candidateMap.set(c.cardId, c);
     }
   }
+  for (const c of graphPool) {
+    const existing = candidateMap.get(c.cardId);
+    if (existing) {
+      existing.graphScore = Math.max(existing.graphScore || 0, c.graphScore || 0);
+      existing.matchedKeywords = [...new Set([...existing.matchedKeywords, ...c.matchedKeywords])];
+    } else {
+      candidateMap.set(c.cardId, c);
+    }
+  }
+  for (const c of simPool) {
+    const existing = candidateMap.get(c.cardId);
+    if (existing) {
+      existing.similarityScore = Math.max(existing.similarityScore || 0, c.similarityScore || 0);
+    } else {
+      candidateMap.set(c.cardId, c);
+    }
+  }
 
   const candidates = [...candidateMap.values()];
   if (candidates.length === 0) return [];
 
   // P4: specificTopicMode — cap candidates for narrow topics
-  const SPECIFIC_TOPIC_THRESHOLD = 200;
+  const SPECIFIC_TOPIC_THRESHOLD = 300;
   if (isStudyIntent || process.env.EVAL_SUPPRESS_DEBUG && candidates.length > SPECIFIC_TOPIC_THRESHOLD) {
     // Prioritize: exact topic match > alias match > tag/kw match > title match > expanded kw
     const topicLower = topic.toLowerCase();
@@ -260,7 +285,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
   if (input.filters?.onlyDue) {
     const dueCardIds = new Set(
       progresses
-        .filter(p => p.state !== 'new' && new Date(p.nextReview) <= new Date())
+        .filter(p => ['learning', 'review', 'relearning'].includes(p.state) && new Date(p.nextReview) <= new Date())
         .map(p => p.cardId)
     );
     cards = cards.filter(c => dueCardIds.has(c.id));
@@ -298,10 +323,12 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
       cardId: c.cardId,
       vectorScore: c.vectorScore,
       keywordScore: c.keywordScore,
+      graphScore: c.graphScore,
+      similarityScore: c.similarityScore,
       matchedKeywords: c.matchedKeywords,
       queryBigrams,
       learning: prog ? {
-        due: prog.state !== 'new' && prog.nextReview <= new Date(),
+        due: ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date(),
         lapses: prog.lapses,
         easeFactor: prog.easeFactor,
       } : undefined,
@@ -482,7 +509,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
     }
 
     const prog = progressMap.get(c.cardId);
-    if (prog && prog.state !== 'new' && prog.nextReview <= new Date()) {
+    if (prog && ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date()) {
       matchType = 'due';
       reason = '到期复习';
     }
@@ -508,7 +535,7 @@ export async function hybridSearch(input: HybridSearchInput): Promise<CardMatch[
       score: rankInfo.finalScore,
       matchType,
       reason,
-      due: prog ? (prog.state !== 'new' && prog.nextReview <= new Date()) : false,
+      due: prog ? (['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date()) : false,
       lapses: prog?.lapses,
       snippet,
       scoreBreakdown: {
@@ -777,6 +804,91 @@ async function recallVector(
   return [];
 }
 
+/** 通道 5: Neo4j 概念图扩展召回 — concept graph → keyword tiers → card search */
+async function recallGraph(
+  query: string,
+  limit: number,
+): Promise<RecallCandidate[]> {
+  try {
+    // Try concept graph lookup on query + expanded keywords
+    const { keywords } = expandQuery(query);
+    const searchTerms = [query, ...keywords.slice(0, 5)];
+
+    let graphNode: ReturnType<typeof conceptGraphLookup> = undefined;
+    for (const term of searchTerms) {
+      graphNode = conceptGraphLookup(term);
+      if (graphNode) break;
+    }
+
+    if (!graphNode) return [];
+
+    // Build keyword tiers from the matched graph node
+    const tiered = buildKeywordTiersFromGraphWithLimits(graphNode.id, 'search');
+
+    // Collect all graph-expanded keywords
+    const graphKW = [
+      ...tiered.coreKeywords,
+      ...tiered.expandedKeywords,
+      ...tiered.prerequisiteKeywords,
+    ].slice(0, 20);
+
+    // Search cards by these graph keywords
+    const seen = new Set<string>();
+    const results: RecallCandidate[] = [];
+
+    for (const kw of graphKW) {
+      if (seen.size >= limit) break;
+      try {
+        const rows = await prisma.$queryRawUnsafe(
+          `SELECT id as cardId FROM Card WHERE searchKeywords LIKE ? AND searchKeywords IS NOT NULL LIMIT ?`,
+          `%${kw}%`, 5,
+        ) as any[];
+        for (const row of (rows || [])) {
+          if (seen.has(row.cardId)) continue;
+          seen.add(row.cardId);
+          results.push({
+            cardId: row.cardId,
+            vectorScore: 0,
+            keywordScore: 0.25,
+            graphScore: 0.30,
+            matchedKeywords: [kw],
+            source: 'graph',
+          });
+        }
+      } catch { /* skip */ }
+    }
+
+    return results;
+  } catch {
+    return [];
+  }
+}
+
+/** 通道 6: Neo4j 卡片相似度图扩展召回 — top vector seeds → similarity neighbors */
+async function recallSimilarity(
+  seedCardIds: string[],
+  limit: number,
+): Promise<RecallCandidate[]> {
+  if (seedCardIds.length === 0) return [];
+  
+  try {
+    const { expandCardIdsViaSimilarity } = await import('../neo4j/card-similarity');
+    const expandPerCard = Math.min(5, Math.ceil(limit / Math.max(1, seedCardIds.length)));
+    const expandedIds = await expandCardIdsViaSimilarity(seedCardIds.slice(0, 20), expandPerCard);
+    
+    return expandedIds.slice(0, limit).map(id => ({
+      cardId: id,
+      vectorScore: 0,
+      keywordScore: 0,
+      similarityScore: 0.30,
+      matchedKeywords: [],
+      source: 'similarity' as const,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 // ---- 辅助 ----
 
 function safeJsonParse(s: string): string[] {
@@ -822,8 +934,8 @@ export async function learningPlanSearch(input: {
   for (const d of expandedDecks) deckBoostSet.add(d);
 
   const relevant = matches.filter(m => {
-    if (m.score >= 0.30) return true;
-    if (m.score >= 0.20 && deckBoostSet.has(m.deckId)) return true;
+    if (m.score >= 0.20) return true;
+    if (m.score >= 0.15 && deckBoostSet.has(m.deckId)) return true;
     return false;
   });
 
@@ -831,7 +943,7 @@ export async function learningPlanSearch(input: {
     return { topic: input.query, stages: {} as any, totalCards: 0, stageBalance: 0 };
   }
 
-  const capped = relevant.slice(0, 100);
+  const capped = relevant.slice(0, 200);
 
   // 3. 获取卡片详情 + 学习状态
   const cardIds = capped.map(c => c.cardId);

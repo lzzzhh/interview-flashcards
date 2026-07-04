@@ -1,9 +1,12 @@
 // src/components/LearningPlanDetailPage.tsx — 学习清单详情
 import { useState, useMemo, useEffect } from 'react';
-import { ArrowLeft, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { getPlan, generateStudyPlan, type LearningPlan } from '../utils/learningPlans';
 import { useAppContext } from '../context/AppContext';
+import BackButton from './BackButton';
 import { CATEGORIES } from '../constants';
+import { loadCardsForCategory } from '../utils/cardLibrary';
+import type { FlashCard } from '../types';
 
 const CARD_BG = 'var(--card-bg)';
 const TEXT_PRIMARY = 'var(--text-primary)';
@@ -15,9 +18,10 @@ interface Props {
   planId: string;
   onBack: () => void;
   onStudyPlan: (cardIds: string[]) => void;
+  onStudyCard?: (card: FlashCard) => void;
 }
 
-export default function LearningPlanDetailPage({ planId, onBack, onStudyPlan }: Props) {
+export default function LearningPlanDetailPage({ planId, onBack, onStudyPlan, onStudyCard }: Props) {
   const { state } = useAppContext();
   const [plan, setPlan] = useState<LearningPlan | undefined>();
   const [generating, setGenerating] = useState(false);
@@ -27,8 +31,14 @@ export default function LearningPlanDetailPage({ planId, onBack, onStudyPlan }: 
   // Track completed cards (read from DB CardProgress via cardsById sm2)
   const enrichedItems = useMemo(() => {
     if (!plan) return [];
+    const deckCache = new Map<string, FlashCard[]>();
+    const findCard = (deckId: string, cardId: string): FlashCard | undefined => {
+      if (state.cardsById[cardId]) return state.cardsById[cardId];
+      if (!deckCache.has(deckId)) deckCache.set(deckId, loadCardsForCategory(deckId));
+      return deckCache.get(deckId)?.find((card) => card.id === cardId);
+    };
     return plan.items.map((item, i) => {
-      const card = state.cardsById[item.cardId];
+      const card = findCard(item.deckId, item.cardId);
       const category = CATEGORIES.find(c => c.key === item.deckId);
       const storedTitle = item.title;
       const cardCn = card ? String((card as any).titleCn || '') : '';
@@ -78,7 +88,7 @@ export default function LearningPlanDetailPage({ planId, onBack, onStudyPlan }: 
     return (
       <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen">
         <div className="nav-bar sticky top-0 z-20 flex items-center">
-          <button onClick={onBack} className="p-1 -ml-1"><ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} /></button>
+          <BackButton onClick={onBack} />
           <h1 className="nav-title">学习清单</h1>
         </div>
         <div className="flex-1 flex items-center justify-center"><p className="text-[13px]" style={{ color: TEXT_MUTED }}>加载中...</p></div>
@@ -89,7 +99,7 @@ export default function LearningPlanDetailPage({ planId, onBack, onStudyPlan }: 
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center">
-        <button onClick={onBack} className="p-1 -ml-1"><ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} /></button>
+        <BackButton onClick={onBack} />
         <h1 className="nav-title">{plan.title}</h1>
         <button onClick={() => onStudyPlan(cardIds)} disabled={cardIds.length === 0} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] font-medium transition-colors" style={{ backgroundColor: `${BLUE}15`, color: BLUE, opacity: cardIds.length > 0 ? 1 : 0.4 }}>
           <Play className="w-3.5 h-3.5" />学习
@@ -123,7 +133,12 @@ export default function LearningPlanDetailPage({ planId, onBack, onStudyPlan }: 
 
           {/* Card list */}
           {enrichedItems.map(item => (
-            <div key={item.cardId} className="w-full text-left rounded-xl p-3 border flex items-start gap-3"
+            <button
+              key={item.cardId}
+              type="button"
+              disabled={!item.card || !onStudyCard}
+              onClick={() => item.card && onStudyCard?.(item.card)}
+              className="w-full text-left rounded-xl p-3 border flex items-start gap-3 disabled:cursor-default cursor-pointer"
               style={{ backgroundColor: item.isCompleted ? 'rgba(16,185,129,0.05)' : CARD_BG, borderColor: item.isCompleted ? GREEN : 'var(--card-border)' }}>
               <span className="text-[12px] font-bold shrink-0 mt-0.5 min-w-[20px]" style={{ color: item.isCompleted ? GREEN : TEXT_MUTED }}>{item.idx + 1}</span>
               <div className="flex-1 min-w-0">
@@ -136,7 +151,7 @@ export default function LearningPlanDetailPage({ planId, onBack, onStudyPlan }: 
                 </div>
                 <p className="text-[10px] mt-1" style={{ color: TEXT_MUTED }}>{item.deckName}</p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

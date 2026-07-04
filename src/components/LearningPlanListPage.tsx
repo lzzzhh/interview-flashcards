@@ -1,7 +1,8 @@
 // src/components/LearningPlanListPage.tsx — 我的学习清单（后端 API 驱动）
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Trash2, ChevronRight, ListChecks, CheckCircle } from 'lucide-react';
+import { Trash2, ChevronRight, ListChecks, CheckCircle } from 'lucide-react';
 import { loadPlans, deletePlan, type LearningPlan } from '../utils/learningPlans';
+import BackButton from './BackButton';
 
 interface Props {
   onBack: () => void;
@@ -33,9 +34,7 @@ export default function LearningPlanListPage({ onBack, onViewPlan }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-        </button>
+        <BackButton onClick={onBack} />
         <h1 className="nav-title">学习清单</h1>
       </div>
 

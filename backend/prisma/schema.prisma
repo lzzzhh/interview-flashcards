@@ -19,6 +19,7 @@ model Deck {
 
   cards  Card[]
   limits DeckDailyLimit[]
+  reviewLimits DeckDailyReviewLimit[]
 }
 
 model Card {
@@ -99,6 +100,47 @@ model DeckDailyLimit {
   deck Deck @relation(fields: [deckId], references: [id])
 
   @@id([userId, deckId])
+}
+
+model DeckDailyReviewLimit {
+  userId           String
+  deckId           String
+  dailyReviewLimit Int    @default(100)
+
+  deck Deck @relation(fields: [deckId], references: [id])
+
+  @@id([userId, deckId])
+}
+
+model StudyStatsSnapshot {
+  userId               String
+  scopeType            String
+  scopeId              String
+  label                String
+  totalCards           Int      @default(0)
+  newCards             Int      @default(0)
+  learningCards        Int      @default(0)
+  reviewCards          Int      @default(0)
+  relearningCards      Int      @default(0)
+  dueCards             Int      @default(0)
+  startedCards         Int      @default(0)
+  masteredCards        Int      @default(0)
+  masteryRate          Float    @default(0)
+  favoritedCards       Int      @default(0)
+  todayNewLimit        Int      @default(0)
+  todayNewRemaining    Int      @default(0)
+  todayReviewLimit     Int      @default(0)
+  todayReviewRemaining Int      @default(0)
+  todayStudiedCards    Int      @default(0)
+  todayReviewCount     Int      @default(0)
+  todayCorrectCount    Int      @default(0)
+  todayWrongCount      Int      @default(0)
+  correctRate          Float?
+  streak               Int      @default(0)
+  updatedAt            DateTime
+
+  @@id([userId, scopeType, scopeId])
+  @@index([userId, scopeType])
 }
 
 // ============ Document-to-Flashcards v1 ============

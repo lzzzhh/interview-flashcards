@@ -18,6 +18,8 @@ interface RecCard {
   overdue: number;
 }
 
+const REVIEW_STATES = new Set(['learning', 'review', 'relearning']);
+
 export default function RecommendBar({ onJumpToCard }: Props) {
   const { state } = useAppContext();
 
@@ -27,7 +29,7 @@ export default function RecommendBar({ onJumpToCard }: Props) {
 
     for (const card of Object.values(state.cardsById)) {
       const sm2 = card.sm2;
-      if (!sm2 || sm2.state === 'new') continue;
+      if (!sm2 || !REVIEW_STATES.has(sm2.state)) continue;
 
       const overdue = (now - sm2.nextReview) / 86400000;
       if (overdue < 0) continue;

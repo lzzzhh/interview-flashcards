@@ -11,6 +11,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
   type ReactNode,
 } from 'react';
 import type {
@@ -20,6 +21,7 @@ import type {
   FlashCard,
   LeetCodeCard,
   QACard,
+  ReviewLog,
   SM2Record,
   StoredProgress,
   StudyMode,
@@ -34,18 +36,37 @@ import { agentCards } from '../data/agent';
 import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
-import { scheduleReview, createDefaultSM2 } from '../utils/sm2';
+import { scheduleReview } from '../utils/sm2';
 import { loadProgress, saveSettings } from '../utils/storage';
 import { loadAppData, saveAppData } from '../utils/nativeStorage';
-import { appendReviewLog } from '../utils/reviewLogs';
+import { getStudyModeNewLimit, getStudyModeReviewLimit, loadStudyModeConfig, isSprintMode, saveStudyModeConfig } from '../utils/studyModeConfig';
+import { syncLocalAppDataToBackend } from '../utils/backendSync';
+import { appendReviewLog, countTodayNewLearned, getTodayStudiedCardIds, loadReviewLogs, saveReviewLogs } from '../utils/reviewLogs';
 import { shuffle } from '../utils/shuffle';
-import { loadCustomCards } from '../utils/customDecks';
-import { getModuleDailyLimit, getModuleDailyReviewLimit } from '../utils/customDecks';
-import { SUB_MODULES } from '../constants';
-import { loadCustomDecks, getAllModuleLimits, getAllModuleReviewLimits, loadAllCustomCards } from '../utils/customDecks';
+import {
+  getAllModuleLimits,
+  getAllModuleReviewLimits,
+  getModuleDailyLimit,
+  getModuleDailyReviewLimit,
+  loadDeletedCustomDecks,
+  loadAllCustomCards,
+  loadCustomCards,
+  loadCustomDecks,
+  updateCardInDeck,
+} from '../utils/customDecks';
+import { getDeletedCardIds, loadDeletedCards, softDeleteCard } from '../utils/cardTrash';
+import { CATEGORIES, SUB_MODULES } from '../constants';
 
 // ---- Undo support ----
-let lastRating: { cardId: string; previousSm2: any } | null = null;
+let lastRating: {
+  cardId: string;
+  previousSm2: SM2Record;
+  previousPlanCardIds: string[] | null;
+  previousVisibleCardIds: string[];
+  previousVisibleIndex: number;
+  previousStudyQueueTotal: number;
+  previousStudyQueueCompletedIds: string[];
+} | null = null;
 export function setLastRating(data: typeof lastRating) { lastRating = data; }
 export function getLastRating() { const r = lastRating; lastRating = null; return r; }
 
@@ -60,6 +81,7 @@ const CARD_DATA: Partial<Record<Category, FlashCard[]>> = {
   jargon: jargonCards as FlashCard[],
   workplace: workplaceCards as FlashCard[],
   'vibe-coding': vibeCodingCards as FlashCard[],
+  java: [],
 };
 
 const progressKeyMap: Record<Category, string> = {
@@ -75,34 +97,51 @@ const progressKeyMap: Record<Category, string> = {
   java: 'fc-java-progress',
 };
 
+const TODAY_STUDY_QUEUE_KEY = 'fc-today-study-queue';
+
+interface TodayStudyQueueSnapshot {
+  date: string;
+  deckKey: string;
+  cardIds: string[];
+}
+
 // ---- 合并 progress → cardsById ----
 function buildCardsById(category: Category): Record<string, FlashCard> {
   const now = Date.now();
+  const deletedIds = getDeletedCardIds();
   // 内置模块
   const rawCards = CARD_DATA[category];
   if (rawCards) {
     const progress = loadProgress(category);
     const result: Record<string, FlashCard> = {};
     for (const card of rawCards) {
-      const sm2 = progress.sm2[card.id]
+      if (deletedIds.has(card.id)) continue;
+      const sm2 = normalizeAutoMasteredSm2(progress.sm2[card.id]
         ? { ...card.sm2, ...progress.sm2[card.id] }
-        : { ...card.sm2, nextReview: now };
+        : { ...card.sm2, nextReview: now });
       result[card.id] = { ...card, sm2, favorited: progress.favorited.includes(card.id) };
     }
     // 合并用户新增到内置模块的卡片
     const userCards = loadUserCards(category);
     for (const [id, card] of Object.entries(userCards)) {
+      if (deletedIds.has(id)) continue;
       const sm2 = progress.sm2[id] ? { ...card.sm2, ...progress.sm2[id] } : card.sm2;
-      result[id] = { ...card, sm2, favorited: progress.favorited.includes(id) };
+      result[id] = { ...card, sm2: normalizeAutoMasteredSm2(sm2), favorited: progress.favorited.includes(id) };
     }
     return result;
   }
   
   // 自定义模块
   const customCards = loadCustomCards(category as string);
+  const progress = loadProgress(category);
   const result: Record<string, FlashCard> = {};
   for (const card of customCards) {
-    result[card.id] = { ...card, sm2: { ...card.sm2, nextReview: card.sm2.nextReview || now } };
+    if (deletedIds.has(card.id)) continue;
+    const saved = progress.sm2[card.id];
+    const sm2 = normalizeAutoMasteredSm2(saved
+      ? { ...card.sm2, ...saved }
+      : { ...card.sm2, nextReview: card.sm2.nextReview || now });
+    result[card.id] = { ...card, sm2, favorited: card.favorited || progress.favorited.includes(card.id) };
   }
   return result;
 }
@@ -139,11 +178,48 @@ function cardMatchesSubModuleTags(c: FlashCard, sm: { subTopic?: string; subTopi
   return !!st && topics.includes(st);
 }
 
+const REVIEW_STATES = new Set(['learning', 'review', 'relearning']);
+
+function getAutoResolveInterval(): number {
+  const value = loadStudyModeConfig()?.autoResolveInterval ?? 90;
+  return Number.isFinite(value) ? Math.max(1, value) : 90;
+}
+
+function normalizeAutoMasteredSm2(sm2: SM2Record): SM2Record {
+  if (sm2.state === 'review' && sm2.interval >= getAutoResolveInterval()) {
+    return { ...sm2, state: 'mastered' };
+  }
+  return sm2;
+}
+
+function isResolvedSm2(sm2?: SM2Record): boolean {
+  if (!sm2) return false;
+  return normalizeAutoMasteredSm2(sm2).state === 'mastered';
+}
+
+function isDueReviewSm2(sm2: SM2Record | undefined, now = Date.now()): boolean {
+  if (!sm2) return false;
+  const normalized = normalizeAutoMasteredSm2(sm2);
+  return REVIEW_STATES.has(normalized.state) && normalized.nextReview <= now;
+}
+
+function getEffectiveNewLimit(category: Category): number {
+  return getStudyModeNewLimit(category, getModuleDailyLimit(category));
+}
+
+function getEffectiveReviewLimit(category: Category): number {
+  return getStudyModeReviewLimit(category, getModuleDailyReviewLimit(category));
+}
+
 // ---- 筛选 visibleCardIds ----
 function computeVisibleIds(state: AppState): string[] {
   // Plan study: only show plan cards, no daily limit
   if (state.planCardIds) {
-    return state.planCardIds.filter(id => id in state.cardsById);
+    const completedIds = new Set(state.studyQueueCompletedIds);
+    return state.planCardIds.filter(id => {
+      const card = state.cardsById[id];
+      return !!card && (state.studyQueueIncludesResolved || !isResolvedSm2(card.sm2) || completedIds.has(id));
+    });
   }
 
   let ids = Object.keys(state.cardsById);
@@ -158,7 +234,7 @@ function computeVisibleIds(state: AppState): string[] {
     // 到期复习卡片（包含 learning、review、relearning 状态）
     ids = ids.filter((id) => {
       const sm2 = state.cardsById[id]?.sm2;
-      return sm2 && sm2.state !== 'new' && sm2.nextReview <= Date.now();
+      return isDueReviewSm2(sm2);
     });
 
     // 重学队列优先排序：relearning → learning → review
@@ -170,6 +246,8 @@ function computeVisibleIds(state: AppState): string[] {
     });
   }
 
+  ids = ids.filter((id) => !isResolvedSm2(state.cardsById[id]?.sm2));
+
   // 难度
   if (state.filterDifficulty !== 'all') {
     ids = ids.filter((id) => {
@@ -179,7 +257,7 @@ function computeVisibleIds(state: AppState): string[] {
     });
   }
 
-  // 子主题 / 标签过滤（必须在每日上限截取之前）
+  // 子主题 / 标签过滤
   if (state.filterSubTopic !== 'all') {
     const subMods = SUB_MODULES[state.category] || [];
     const sm = subMods.find((s: any) => s.key === state.filterSubTopic);
@@ -236,15 +314,6 @@ function computeVisibleIds(state: AppState): string[] {
     });
   }
 
-  // 每日上限必须在专题/搜索过滤之后截取，否则细分专题会被前 N 张全局卡片误伤。
-  if (state.studyMode === 'new') {
-    const limit = getModuleDailyLimit(state.category);
-    ids = ids.slice(0, limit);
-  } else if (state.studyMode === 'review') {
-    const reviewLimit = getModuleDailyReviewLimit(state.category) || state.dailyReviewLimit;
-    if (reviewLimit > 0) ids = ids.slice(0, reviewLimit);
-  }
-
   // 随机
   if (state.shuffled) {
     ids = shuffle(ids);
@@ -253,9 +322,159 @@ function computeVisibleIds(state: AppState): string[] {
   return ids;
 }
 
+function getTodayStudyCategoryKeys(deckIds?: string[]): Category[] {
+  if (deckIds?.length) {
+    return Array.from(new Set(deckIds.filter(Boolean))) as Category[];
+  }
+
+  const keys = new Set<Category>();
+  for (const category of CATEGORIES) keys.add(category.key);
+  for (const deck of loadCustomDecks()) keys.add(deck.id);
+  return Array.from(keys);
+}
+
+function getTodayStudyDeckKey(deckIds?: string[]): string {
+  return getTodayStudyCategoryKeys(deckIds).sort().join('|') || '__empty__';
+}
+
+function loadTodayStudyQueueSnapshot(deckIds?: string[], now = Date.now()): string[] | null {
+  try {
+    const raw = localStorage.getItem(TODAY_STUDY_QUEUE_KEY);
+    if (!raw) return null;
+    const snapshot = JSON.parse(raw) as TodayStudyQueueSnapshot;
+    if (snapshot.date !== localDateKey(now)) return null;
+    if (snapshot.deckKey !== getTodayStudyDeckKey(deckIds)) return null;
+    return Array.isArray(snapshot.cardIds) ? snapshot.cardIds.filter(Boolean) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveTodayStudyQueueSnapshot(deckIds: string[] | undefined, cardIds: string[], now = Date.now()) {
+  try {
+    const snapshot: TodayStudyQueueSnapshot = {
+      date: localDateKey(now),
+      deckKey: getTodayStudyDeckKey(deckIds),
+      cardIds,
+    };
+    localStorage.setItem(TODAY_STUDY_QUEUE_KEY, JSON.stringify(snapshot));
+  } catch {}
+}
+
+function clearTodayStudyQueueSnapshot() {
+  try {
+    localStorage.removeItem(TODAY_STUDY_QUEUE_KEY);
+  } catch {}
+}
+
+function collectCardsForTodayStudy(deckIds?: string[]): Record<string, FlashCard> {
+  const cardsById: Record<string, FlashCard> = {};
+  for (const category of getTodayStudyCategoryKeys(deckIds)) {
+    Object.assign(cardsById, buildCardsById(category));
+  }
+  return cardsById;
+}
+
+function getCompletedQueueIds(cardIds: string[], reviewLogs: Record<string, ReviewLog[]>, now: number): string[] {
+  const studiedIds = getTodayStudiedCardIds(reviewLogs, now);
+  return cardIds.filter((id) => studiedIds.has(id));
+}
+
+function countTodayReviewStudied(
+  cardIds: Iterable<string>,
+  logs: Record<string, ReviewLog[]>,
+  now = Date.now(),
+): number {
+  const today = localDateKey(now);
+  const deckCardIds = new Set(cardIds);
+  const reviewedIds = new Set<string>();
+
+  for (const [cardId, cardLogs] of Object.entries(logs)) {
+    if (!deckCardIds.has(cardId)) continue;
+    if (cardLogs.some((log) => log.stateBefore !== 'new' && localDateKey(log.reviewedAt) === today)) {
+      reviewedIds.add(cardId);
+    }
+  }
+
+  return reviewedIds.size;
+}
+
+function buildTodayStudyQueue(deckIds?: string[]): { cardsById: Record<string, FlashCard>; cardIds: string[]; completedIds: string[] } {
+  const now = Date.now();
+  const reviewLogs = loadReviewLogs();
+  const savedCardIds = loadTodayStudyQueueSnapshot(deckIds, now);
+  if (savedCardIds) {
+    const allCardsById = collectCardsForTodayStudy(deckIds);
+    const cardsById: Record<string, FlashCard> = {};
+    const cardIds: string[] = [];
+
+    for (const id of savedCardIds) {
+      const card = allCardsById[id];
+      if (!card || cardsById[id]) continue;
+      cardsById[id] = card;
+      cardIds.push(id);
+    }
+
+    return { cardsById, cardIds, completedIds: getCompletedQueueIds(cardIds, reviewLogs, now) };
+  }
+
+  const cardsById: Record<string, FlashCard> = {};
+  const cardIds: string[] = [];
+  const studiedIds = getTodayStudiedCardIds(reviewLogs, now);
+
+  for (const category of getTodayStudyCategoryKeys(deckIds)) {
+    const categoryCards = buildCardsById(category);
+    const cards = Object.values(categoryCards);
+    const cardDeckIds = cards.map((card) => card.id);
+    const completedCards = cards.filter((card) => studiedIds.has(card.id));
+    const todayNewLearned = countTodayNewLearned(cardDeckIds, reviewLogs, now);
+    const todayReviewStudied = countTodayReviewStudied(cardDeckIds, reviewLogs, now);
+    const remainingNewLimit = Math.max(0, getEffectiveNewLimit(category) - todayNewLearned);
+    const remainingReviewLimit = Math.max(0, getEffectiveReviewLimit(category) - todayReviewStudied);
+    const dueCards = cards
+      .filter((card) => !studiedIds.has(card.id) && isDueReviewSm2(card.sm2, now))
+      .slice(0, remainingReviewLimit);
+    const newCards = cards
+      .filter((card) => !studiedIds.has(card.id) && (!card.sm2.state || card.sm2.state === 'new'))
+      .slice(0, remainingNewLimit);
+
+    for (const card of [...completedCards, ...dueCards, ...newCards]) {
+      if (cardsById[card.id]) continue;
+      cardsById[card.id] = card;
+      cardIds.push(card.id);
+    }
+  }
+
+  saveTodayStudyQueueSnapshot(deckIds, cardIds, now);
+  return { cardsById, cardIds, completedIds: getCompletedQueueIds(cardIds, reviewLogs, now) };
+}
+
+function buildStudyQueueFromCards(cards: FlashCard[]): { cardsById: Record<string, FlashCard>; cardIds: string[]; completedIds: string[] } {
+  const cardsById: Record<string, FlashCard> = {};
+  const cardIds: string[] = [];
+
+  for (const card of cards) {
+    if (cardsById[card.id]) continue;
+    if (isResolvedSm2(card.sm2)) continue;
+    cardsById[card.id] = card;
+    cardIds.push(card.id);
+  }
+
+  return { cardsById, cardIds, completedIds: [] };
+}
+
 /** 从 API CardDTO 转换为 FlashCard */
 function dtoToFlashCard(dto: CardDTO): FlashCard {
   if (dto.type === 'leetcode') {
+    const sm2 = normalizeAutoMasteredSm2({
+      state: (dto.progress?.state as any) || 'new',
+      easeFactor: dto.progress?.easeFactor ?? 2.5,
+      interval: dto.progress?.intervalDays ?? 0,
+      repetitions: dto.progress?.repetitions ?? 0,
+      lapses: dto.progress?.lapses ?? 0,
+      nextReview: dto.progress?.nextReview ? new Date(dto.progress.nextReview).getTime() : Date.now(),
+      stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
+    });
     return {
       id: dto.id,
       category: 'leetcode' as const,
@@ -267,19 +486,20 @@ function dtoToFlashCard(dto: CardDTO): FlashCard {
       difficulty: (dto.difficulty || 'medium') as 'easy' | 'medium' | 'hard',
       tags: dto.tags,
       codes: dto.codes || undefined,
-      sm2: {
-        state: (dto.progress?.state as any) || 'new',
-        easeFactor: dto.progress?.easeFactor ?? 2.5,
-        interval: dto.progress?.intervalDays ?? 0,
-        repetitions: dto.progress?.repetitions ?? 0,
-        lapses: dto.progress?.lapses ?? 0,
-        nextReview: dto.progress?.nextReview ? new Date(dto.progress.nextReview).getTime() : Date.now(),
-        stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
-      },
+      sm2,
       favorited: dto.progress?.favorited ?? false,
       userNotes: dto.progress?.userNotes ?? undefined,
     };
   }
+  const sm2 = normalizeAutoMasteredSm2({
+    state: (dto.progress?.state as any) || 'new',
+    easeFactor: dto.progress?.easeFactor ?? 2.5,
+    interval: dto.progress?.intervalDays ?? 0,
+    repetitions: dto.progress?.repetitions ?? 0,
+    lapses: dto.progress?.lapses ?? 0,
+    nextReview: dto.progress?.nextReview ? new Date(dto.progress.nextReview).getTime() : Date.now(),
+    stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
+  });
   return {
     id: dto.id,
     category: dto.deckId as QACard['category'],
@@ -289,15 +509,7 @@ function dtoToFlashCard(dto: CardDTO): FlashCard {
     subTopic: dto.subTopic || undefined,
     difficulty: (dto.difficulty || 'medium') as 'easy' | 'medium' | 'hard',
     source: dto.source || undefined,
-    sm2: {
-      state: (dto.progress?.state as any) || 'new',
-      easeFactor: dto.progress?.easeFactor ?? 2.5,
-      interval: dto.progress?.intervalDays ?? 0,
-      repetitions: dto.progress?.repetitions ?? 0,
-      lapses: dto.progress?.lapses ?? 0,
-      nextReview: dto.progress?.nextReview ? new Date(dto.progress.nextReview).getTime() : Date.now(),
-      stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
-    },
+    sm2,
     favorited: dto.progress?.favorited ?? false,
     userNotes: dto.progress?.userNotes ?? undefined,
   };
@@ -305,6 +517,167 @@ function dtoToFlashCard(dto: CardDTO): FlashCard {
 
 // 为了 Step 3/4 导出
 export { dtoToFlashCard };
+
+function toTimestamp(value: unknown, fallback = Date.now()): number {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' || value instanceof Date) {
+    const time = new Date(value).getTime();
+    if (Number.isFinite(time)) return time;
+  }
+  return fallback;
+}
+
+function apiLogToReviewLog(log: any): ReviewLog | null {
+  if (!log?.cardId || log.rating == null) return null;
+  return {
+    id: log.id || `log-${Date.now()}`,
+    cardId: log.cardId,
+    reviewedAt: toTimestamp(log.reviewedAt),
+    rating: log.rating,
+    stateBefore: log.stateBefore || 'new',
+    stateAfter: log.stateAfter || 'new',
+    intervalBefore: log.intervalBefore ?? 0,
+    intervalAfter: log.intervalAfter ?? 0,
+    easeBefore: log.easeBefore ?? 2.5,
+    easeAfter: log.easeAfter ?? 2.5,
+    elapsedDays: log.elapsedDays ?? 0,
+    scheduledDays: log.scheduledDays ?? log.intervalAfter ?? 0,
+  };
+}
+
+function localDateKey(timestamp: number): string {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function hashText(value: string): string {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = Math.imul(31, hash) + value.charCodeAt(i) | 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+function createManualMasteredLog(cardId: string, previousSm2: SM2Record, nextSm2: SM2Record): ReviewLog {
+  const now = Date.now();
+  const elapsedDays = previousSm2.lastReviewedAt ? Math.max(0, (now - previousSm2.lastReviewedAt) / 86400000) : 0;
+  return {
+    id: `manual-mastered-${localDateKey(now)}-${hashText(cardId)}`,
+    cardId,
+    reviewedAt: now,
+    rating: 5,
+    stateBefore: previousSm2.state,
+    stateAfter: nextSm2.state,
+    intervalBefore: previousSm2.interval,
+    intervalAfter: nextSm2.interval,
+    easeBefore: previousSm2.easeFactor,
+    easeAfter: nextSm2.easeFactor,
+    elapsedDays: Math.round(elapsedDays * 100) / 100,
+    scheduledDays: nextSm2.interval,
+  };
+}
+
+function removeTodayManualMasteredLog(cardId: string, now = Date.now()): ReviewLog | null {
+  const logs = loadReviewLogs();
+  const cardLogs = logs[cardId] ?? [];
+  const today = localDateKey(now);
+  const index = cardLogs.findLastIndex((log) =>
+    log.id.startsWith('manual-mastered-') &&
+    log.stateAfter === 'mastered' &&
+    localDateKey(log.reviewedAt) === today
+  );
+  if (index < 0) return null;
+
+  const [removed] = cardLogs.splice(index, 1);
+  if (cardLogs.length > 0) logs[cardId] = cardLogs;
+  else delete logs[cardId];
+  saveReviewLogs(logs);
+  return removed;
+}
+
+function restoreSm2BeforeManualMastered(card: FlashCard, log: ReviewLog, now = Date.now()): SM2Record {
+  const restored: SM2Record = {
+    ...card.sm2,
+    state: log.stateBefore,
+    interval: log.intervalBefore,
+    easeFactor: log.easeBefore,
+    repetitions: Math.max(0, card.sm2.repetitions - 1),
+    nextReview: now,
+    scheduledDays: log.intervalBefore,
+  };
+
+  if (log.stateBefore === 'new') {
+    restored.interval = 0;
+    restored.nextReview = now;
+    restored.scheduledDays = 0;
+    delete restored.lastReviewedAt;
+  }
+
+  return restored;
+}
+
+function createLastRatingSnapshot(state: AppState, cardId: string, previousSm2: SM2Record): typeof lastRating {
+  return {
+    cardId,
+    previousSm2: { ...previousSm2 },
+    previousPlanCardIds: state.planCardIds ? [...state.planCardIds] : null,
+    previousVisibleCardIds: [...state.visibleCardIds],
+    previousVisibleIndex: state.currentVisibleIndex,
+    previousStudyQueueTotal: state.studyQueueTotal,
+    previousStudyQueueCompletedIds: [...state.studyQueueCompletedIds],
+  };
+}
+
+function clampVisibleIndex(index: number, total: number): number {
+  if (total <= 0) return 0;
+  return Math.max(0, Math.min(index, total - 1));
+}
+
+function findNextUncompletedIndex(visibleCardIds: string[], completedIds: Set<string>, fromIndex: number): number {
+  if (visibleCardIds.length === 0) return 0;
+
+  for (let i = fromIndex; i < visibleCardIds.length; i += 1) {
+    if (!completedIds.has(visibleCardIds[i])) return i;
+  }
+
+  for (let i = 0; i < fromIndex; i += 1) {
+    if (!completedIds.has(visibleCardIds[i])) return i;
+  }
+
+  return clampVisibleIndex(fromIndex, visibleCardIds.length);
+}
+
+function removeAnsweredCardFromStudyQueue(state: AppState, cardId: string): AppState {
+  if (state.studyMode === 'choose' && !state.planCardIds) {
+    const visibleCardIds = computeVisibleIds(state);
+    return {
+      ...state,
+      visibleCardIds,
+      currentVisibleIndex: clampVisibleIndex(state.currentVisibleIndex, visibleCardIds.length),
+    };
+  }
+
+  const completedIds = new Set(state.studyQueueCompletedIds);
+  if (state.planCardIds?.includes(cardId)) completedIds.add(cardId);
+  const nextState = {
+    ...state,
+    studyQueueCompletedIds: Array.from(completedIds),
+  };
+  const visibleCardIds = computeVisibleIds(nextState);
+
+  return {
+    ...nextState,
+    visibleCardIds,
+    currentVisibleIndex: findNextUncompletedIndex(
+      visibleCardIds,
+      completedIds,
+      clampVisibleIndex(state.currentVisibleIndex + 1, visibleCardIds.length),
+    ),
+  };
+}
 
 // ---- Reducer ----
 function appReducer(state: AppState, action: AppAction): AppState {
@@ -321,7 +694,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       for (const card of action.payload.cards) {
         const saved = progress.sm2[card.id];
         cardsById[card.id] = saved
-          ? { ...card, sm2: { ...card.sm2, ...saved }, favorited: progress.favorited.includes(card.id) }
+          ? { ...card, sm2: normalizeAutoMasteredSm2({ ...card.sm2, ...saved }), favorited: progress.favorited.includes(card.id) }
           : card;
       }
       const nextState = {
@@ -333,8 +706,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
         showApproach: false,
         showCode: false,
         qaAnswerVisible: false,
+        studyQueueCountsTowardDaily: true,
+        studyQueueIncludesResolved: false,
       };
-      return { ...nextState, visibleCardIds: computeVisibleIds(nextState), currentVisibleIndex: 0 };
+      const visibleCardIds = computeVisibleIds(nextState);
+      return {
+        ...nextState,
+        visibleCardIds,
+        currentVisibleIndex: 0,
+        studyQueueTotal: nextState.studyMode === 'choose' ? 0 : visibleCardIds.length,
+        studyQueueCompletedIds: [],
+      };
     }
 
     /** Helper: load progress from localStorage without card data */
@@ -360,14 +742,21 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'API_RATE_SUCCESS': {
       const card = state.cardsById[action.payload.cardId];
       if (!card) return state;
-      const newSm2: SM2Record = {
-        state: action.payload.progress?.state || 'new',
-        easeFactor: action.payload.progress?.easeFactor ?? 2.5,
-        interval: action.payload.progress?.intervalDays ?? 0,
-        repetitions: action.payload.progress?.repetitions ?? 0,
-        lapses: action.payload.progress?.lapses ?? 0,
-        nextReview: action.payload.progress?.nextReview ? new Date(action.payload.progress.nextReview).getTime() : Date.now(),
-      };
+      if (state.studyQueueCompletedIds.includes(action.payload.cardId)) return state;
+      setLastRating(createLastRatingSnapshot(state, action.payload.cardId, card.sm2));
+      const progress = action.payload.progress ?? {};
+      const newSm2: SM2Record = normalizeAutoMasteredSm2({
+        ...card.sm2,
+        state: progress.state || 'new',
+        easeFactor: progress.easeFactor ?? 2.5,
+        interval: progress.intervalDays ?? progress.interval ?? 0,
+        repetitions: progress.repetitions ?? 0,
+        lapses: progress.lapses ?? 0,
+        nextReview: toTimestamp(progress.nextReview),
+        lastReviewedAt: progress.lastReviewedAt ? toTimestamp(progress.lastReviewedAt) : Date.now(),
+      });
+      const apiLog = apiLogToReviewLog(action.payload.log);
+      if (apiLog && state.studyQueueCountsTowardDaily !== false) appendReviewLog(apiLog);
       const updated = {
         ...state,
         cardsById: { ...state.cardsById, [action.payload.cardId]: { ...card, sm2: newSm2 } },
@@ -375,12 +764,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         showCode: false,
         qaAnswerVisible: false,
       };
-      if (state.studyMode === 'review') {
-        const visibleIds = computeVisibleIds(updated);
-        const curIdx = Math.min(state.currentVisibleIndex + 1, visibleIds.length - 1);
-        return { ...updated, visibleCardIds: visibleIds, currentVisibleIndex: Math.max(0, curIdx) };
-      }
-      return updated;
+      return removeAnsweredCardFromStudyQueue(updated, action.payload.cardId);
     }
     case 'SET_CATEGORY': {
       const nextState = {
@@ -396,6 +780,11 @@ function appReducer(state: AppState, action: AppAction): AppState {
         shuffled: false,
         reviewMode: false,
         studyMode: 'choose' as const,
+        planCardIds: null,
+        studyQueueTotal: 0,
+        studyQueueCompletedIds: [],
+        studyQueueCountsTowardDaily: true,
+        studyQueueIncludesResolved: false,
       };
       return { ...nextState, visibleCardIds: computeVisibleIds(nextState), currentVisibleIndex: 0 };
     }
@@ -439,12 +828,54 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'TOGGLE_MASTERED': {
       const card = state.cardsById[action.payload];
       if (!card) return state;
-      const newSm2: SM2Record = card.sm2.state === 'new'
-        ? { ...card.sm2, state: 'learning' as const, interval: 6, repetitions: 3, nextReview: Date.now() + 6 * 86400000 }
-        : createDefaultSM2();
-      return {
+      const isCurrentlyMastered = card.sm2?.state === 'mastered';
+      const isQueueCompleted = state.studyQueueCompletedIds.includes(action.payload);
+      if (isQueueCompleted && !isCurrentlyMastered) return state;
+      const countsTowardDaily = state.studyQueueCountsTowardDaily !== false;
+      const previousSm2 = { ...card.sm2 };
+      const now = Date.now();
+      const restoredManualLog = isCurrentlyMastered && countsTowardDaily
+        ? removeTodayManualMasteredLog(action.payload, now)
+        : null;
+      const newSm2: SM2Record = isCurrentlyMastered
+        ? restoredManualLog
+          ? restoreSm2BeforeManualMastered(card, restoredManualLog, now)
+          : { ...card.sm2, state: 'review' as const, interval: 1, nextReview: now + 86400000 }
+        : {
+          ...card.sm2,
+          state: 'mastered' as const,
+          interval: 999,
+          repetitions: card.sm2.repetitions + 1,
+          nextReview: now + 999 * 86400000,
+          lastReviewedAt: now,
+          scheduledDays: 999,
+        };
+      const nextCard = { ...card, sm2: newSm2 };
+      if (!isCurrentlyMastered && countsTowardDaily) appendReviewLog(createManualMasteredLog(card.id, previousSm2, newSm2));
+      persistCardProgress(nextCard);
+      const completedIds = new Set(state.studyQueueCompletedIds);
+      if (!isCurrentlyMastered && state.planCardIds?.includes(action.payload)) completedIds.add(action.payload);
+      if (isCurrentlyMastered && restoredManualLog && state.planCardIds?.includes(action.payload)) completedIds.delete(action.payload);
+      const nextState = {
         ...state,
-        cardsById: { ...state.cardsById, [action.payload]: { ...card, sm2: newSm2 } },
+        studyQueueCompletedIds: Array.from(completedIds),
+        cardsById: { ...state.cardsById, [action.payload]: nextCard },
+        showApproach: false,
+        showCode: false,
+        qaAnswerVisible: false,
+      };
+      const visibleCardIds = computeVisibleIds(nextState);
+      const nextIndex = !isCurrentlyMastered && state.planCardIds?.includes(action.payload)
+        ? findNextUncompletedIndex(
+          visibleCardIds,
+          completedIds,
+          clampVisibleIndex(state.currentVisibleIndex + 1, visibleCardIds.length),
+        )
+        : clampVisibleIndex(state.currentVisibleIndex, visibleCardIds.length);
+      return {
+        ...nextState,
+        visibleCardIds,
+        currentVisibleIndex: nextIndex,
       };
     }
 
@@ -461,23 +892,41 @@ function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case 'RATE_CARD': {
-      const { cardId, rating } = action.payload;
+      const { cardId, rating, clientReviewId } = action.payload;
       const card = state.cardsById[cardId];
       if (!card) return state;
+      if (state.studyQueueCompletedIds.includes(cardId)) return state;
+      if (isResolvedSm2(card.sm2)) return state;
       // 保存原始状态用于撤回
-      setLastRating({ cardId, previousSm2: { ...card.sm2 } });
-      const result = scheduleReview(cardId, card.sm2, rating);
-      appendReviewLog(result.log);
+      setLastRating(createLastRatingSnapshot(state, cardId, card.sm2));
+      const modeConfig = loadStudyModeConfig();
+      const countsTowardDaily = state.studyQueueCountsTowardDaily !== false;
+      const result = scheduleReview(cardId, card.sm2, rating, {
+        sprint: isSprintMode(),
+        autoResolveInterval: modeConfig?.autoResolveInterval ?? 90,
+      });
+      if (countsTowardDaily) appendReviewLog(result.log);
       // 持久化评分进度到 localStorage
-      const key = progressKeyMap[card.category] ?? `fc-progress-${card.category}`;
+      const key = progressKeyMap[card.category] ?? `fc-${card.category}-progress`;
       try {
         const raw = localStorage.getItem(key);
         const prev: StoredProgress = raw ? JSON.parse(raw) : { sm2: {}, mastered: [], favorited: [] };
         prev.sm2[cardId] = result.sm2;
         localStorage.setItem(key, JSON.stringify(prev));
       } catch {}
-      // Fire-and-forget POST to backend API
-      fetch('http://localhost:3001/api/reviews', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cardId, rating }) }).catch(() => {});
+      if (countsTowardDaily) {
+        fetch('http://localhost:3001/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cardId,
+            rating,
+            clientReviewId,
+            sprint: isSprintMode(),
+            autoResolveInterval: modeConfig?.autoResolveInterval ?? 90,
+          }),
+        }).catch(() => {});
+      }
       const updated = {
         ...state,
         cardsById: {
@@ -488,13 +937,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         showCode: false,
         qaAnswerVisible: false,
       };
-      // 复习模式下重算可见卡片并前进
-      if (state.studyMode === 'review') {
-        const visibleIds = computeVisibleIds(updated);
-        const curIdx = Math.min(state.currentVisibleIndex + 1, visibleIds.length - 1);
-        return { ...updated, visibleCardIds: visibleIds, currentVisibleIndex: Math.max(0, curIdx) };
-      }
-      return updated;
+      return removeAnsweredCardFromStudyQueue(updated, cardId);
     }
 
     case 'SET_FILTER_DIFFICULTY': {
@@ -546,6 +989,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
         const existing = loadUserCards(card.category);
         existing[card.id] = card;
         try { localStorage.setItem(key, JSON.stringify(existing)); } catch {}
+      } else if (loadCustomDecks().some((deck) => deck.id === card.category)) {
+        updateCardInDeck(card.category, card as QACard);
       }
       return {
         ...state,
@@ -561,6 +1006,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
         const existing = loadUserCards(card.category);
         existing[card.id] = card;
         try { localStorage.setItem(key, JSON.stringify(existing)); } catch {}
+      } else if (loadCustomDecks().some((deck) => deck.id === card.category)) {
+        updateCardInDeck(card.category, card as QACard);
       }
       return {
         ...state,
@@ -572,13 +1019,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       const newCards = { ...state.cardsById };
       const removed = newCards[action.payload];
       if (removed) {
-        const isBuiltIn = Object.keys(CARD_DATA).includes(removed.category);
-        if (isBuiltIn) {
-          const key = `fc-user-cards-${removed.category}`;
-          const existing = loadUserCards(removed.category);
-          delete existing[action.payload];
-          try { localStorage.setItem(key, JSON.stringify(existing)); } catch {}
-        }
+        softDeleteCard(removed);
         delete newCards[action.payload];
       }
       return {
@@ -597,22 +1038,39 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...state, 
         studyMode: action.payload,
         filterSubTopic: action.payload === 'choose' ? 'all' : state.filterSubTopic,
+        planCardIds: action.payload === 'choose' ? null : state.planCardIds,
+        studyQueueCompletedIds: action.payload === 'choose' ? [] : state.studyQueueCompletedIds,
+        studyQueueCountsTowardDaily: action.payload === 'choose' ? true : state.studyQueueCountsTowardDaily,
+        studyQueueIncludesResolved: action.payload === 'choose' ? false : state.studyQueueIncludesResolved,
         showApproach: false,
         showCode: false,
         qaAnswerVisible: false,
       };
-      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+      const visibleCardIds = computeVisibleIds(next);
+      return {
+        ...next,
+        visibleCardIds,
+        currentVisibleIndex: 0,
+        studyQueueTotal: action.payload === 'choose' ? 0 : visibleCardIds.length,
+      };
     }
 
     case 'UNDO_LAST_RATING': {
       const last = getLastRating();
       if (!last || !state.cardsById[last.cardId]) return state;
+      const cardsById = {
+        ...state.cardsById,
+        [last.cardId]: { ...state.cardsById[last.cardId], sm2: last.previousSm2 },
+      };
+      const visibleCardIds = last.previousVisibleCardIds.filter((id) => id in cardsById);
       return {
         ...state,
-        cardsById: { 
-          ...state.cardsById, 
-          [last.cardId]: { ...state.cardsById[last.cardId], sm2: last.previousSm2 } 
-        },
+        cardsById,
+        planCardIds: last.previousPlanCardIds,
+        visibleCardIds,
+        currentVisibleIndex: clampVisibleIndex(last.previousVisibleIndex, visibleCardIds.length),
+        studyQueueTotal: last.previousStudyQueueTotal,
+        studyQueueCompletedIds: last.previousStudyQueueCompletedIds,
         qaAnswerVisible: false,
         showApproach: false,
         showCode: false,
@@ -635,6 +1093,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
         shuffled: false,
         reviewMode: false,
         studyMode: 'review' as const,
+        planCardIds: null,
+        studyQueueCompletedIds: [],
+        studyQueueCountsTowardDaily: true,
+        studyQueueIncludesResolved: false,
       };
       const visibleIds = computeVisibleIds(nextState);
       const idx = visibleIds.indexOf(cardId);
@@ -642,6 +1104,40 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...nextState,
         visibleCardIds: visibleIds,
         currentVisibleIndex: idx >= 0 ? idx : 0,
+        studyQueueTotal: visibleIds.length,
+      };
+    }
+
+    case 'START_TODAY_STUDY': {
+      const existingCards = state.planCardIds
+        ? state.planCardIds.map((id) => state.cardsById[id]).filter(Boolean) as FlashCard[]
+        : [];
+      const { cardsById, cardIds, completedIds } = action.payload?.cards?.length
+        ? buildStudyQueueFromCards([...existingCards, ...action.payload.cards])
+        : buildTodayStudyQueue(action.payload?.deckIds);
+      const next = {
+        ...state,
+        cardsById,
+        planCardIds: cardIds,
+        studyQueueCompletedIds: completedIds,
+        studyQueueCountsTowardDaily: true,
+        studyQueueIncludesResolved: false,
+        studyMode: 'new' as const,
+        shuffled: false,
+        showApproach: false,
+        showCode: false,
+        qaAnswerVisible: false,
+        filterDifficulty: 'all' as const,
+        filterSubTopic: 'all' as const,
+        searchQuery: '',
+        studyQueueTotal: cardIds.length,
+      };
+      const visibleCardIds = computeVisibleIds(next);
+      return {
+        ...next,
+        visibleCardIds,
+        currentVisibleIndex: findNextUncompletedIndex(visibleCardIds, new Set(completedIds), 0),
+        studyQueueTotal: cardIds.length,
       };
     }
 
@@ -656,12 +1152,69 @@ function appReducer(state: AppState, action: AppAction): AppState {
       for (const deck of neededDecks) {
         Object.assign(allCardsById, buildCardsById(deck as Category));
       }
-      const next = { ...state, cardsById: allCardsById, planCardIds: action.payload.cardIds, studyMode: 'new' as const, shuffled: false };
-      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+      const next = {
+        ...state,
+        cardsById: allCardsById,
+        planCardIds: action.payload.cardIds,
+        studyMode: 'new' as const,
+        shuffled: false,
+        studyQueueTotal: action.payload.cardIds.length,
+        studyQueueCompletedIds: [],
+        studyQueueCountsTowardDaily: true,
+        studyQueueIncludesResolved: false,
+      };
+      const visibleCardIds = computeVisibleIds(next);
+      return { ...next, visibleCardIds, currentVisibleIndex: 0, studyQueueTotal: visibleCardIds.length };
+    }
+    case 'START_SINGLE_CARD_STUDY': {
+      const card = {
+        ...action.payload.card,
+        sm2: normalizeAutoMasteredSm2(action.payload.card.sm2),
+      } as FlashCard;
+      const next = {
+        ...state,
+        category: card.category,
+        cardsById: { ...state.cardsById, [card.id]: card },
+        planCardIds: [card.id],
+        studyQueueCompletedIds: [],
+        studyQueueCountsTowardDaily: action.payload.countTowardsDaily !== false,
+        studyQueueIncludesResolved: true,
+        studyMode: 'new' as const,
+        shuffled: false,
+        showApproach: false,
+        showCode: false,
+        qaAnswerVisible: false,
+        filterDifficulty: 'all' as const,
+        filterSubTopic: 'all' as const,
+        searchQuery: '',
+        studyQueueTotal: 1,
+      };
+      const visibleCardIds = computeVisibleIds(next);
+      return {
+        ...next,
+        visibleCardIds,
+        currentVisibleIndex: 0,
+        studyQueueTotal: visibleCardIds.length || 1,
+      };
     }
     case 'STOP_PLAN_STUDY': {
-      const next = { ...state, planCardIds: null, studyMode: 'choose' as const };
+      const next = {
+        ...state,
+        planCardIds: null,
+        studyMode: 'choose' as const,
+        studyQueueTotal: 0,
+        studyQueueCompletedIds: [],
+        studyQueueCountsTowardDaily: true,
+        studyQueueIncludesResolved: false,
+      };
       return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: 0 };
+    }
+
+    case 'SET_STUDY_MODE_CONFIG': {
+      saveStudyModeConfig(action.payload);
+      clearTodayStudyQueueSnapshot();
+      const next = { ...state };
+      return { ...next, visibleCardIds: computeVisibleIds(next), currentVisibleIndex: clampVisibleIndex(state.currentVisibleIndex, computeVisibleIds(next).length) };
     }
 
     default:
@@ -672,7 +1225,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 // ---- Helpers ----
 export function getMasteredIds(cardsById: Record<string, FlashCard>): string[] {
   return Object.values(cardsById)
-    .filter((c) => c.sm2.state !== 'new')
+    .filter((c) => c.sm2.state === 'mastered')
     .map((c) => c.id);
 }
 
@@ -693,6 +1246,10 @@ function createInitialState(): AppState {
     cardsById: {},  // cards loaded from API on demand
     visibleCardIds: [],
     currentVisibleIndex: 0,
+    studyQueueTotal: 0,
+    studyQueueCompletedIds: [],
+    studyQueueCountsTowardDaily: true,
+    studyQueueIncludesResolved: false,
     showApproach: false,
     showCode: false,
     qaAnswerVisible: false,
@@ -723,20 +1280,23 @@ interface AppContextValue {
   dueCountByCategory: Record<Category, number>;
   totalDue: number;
   totalNew: number;
+  dataReady: boolean;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, undefined, createInitialState);
+  const [dataReady, setDataReady] = useState(false);
 
   // 启动时从 data.json 恢复进度到 localStorage
   const hasLoadedData = useRef(false);
   useEffect(() => {
-    loadAppData().then(() => {
+    loadAppData().then((data) => {
       hasLoadedData.current = true;
+      setDataReady(true);
       // 重建 cardsById，使用刚从文件恢复的进度
-      dispatch({ type: 'SET_CATEGORY', payload: state.category });
+      dispatch({ type: 'SET_CATEGORY', payload: data.settings?.lastCategory ?? state.category });
     });
   }, []);
 
@@ -754,15 +1314,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hasLoadedData.current) return;
 
-    const progress: StoredProgress = {
-      sm2: {},
-      mastered: getMasteredIds(state.cardsById),
-      favorited: getFavoritedIds(state.cardsById),
-    };
-    for (const card of Object.values(state.cardsById)) {
-      progress.sm2[card.id] = card.sm2;
-    }
-    saveProgressToLS(state.category, progress);
+    saveProgressByCardCategory(Object.values(state.cardsById));
 
     // Tauri 文件存储（v2 schema）
     const allData = loadAllProgress();
@@ -771,14 +1323,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     saveAppData({
       schemaVersion: 2,
       progress: allData,
-      reviewLogs: {},
       settings: { isDark: state.isDark, lastCategory: state.category },
       stats: { sessions: [] },
-      customDecks: loadCustomDecks().map((d: any) => ({ id: d.id, name: d.name, description: d.description || '' })),
+      customDecks: loadCustomDecks().map((d: any) => ({ id: d.id, name: d.name, icon: d.icon, description: d.description || '' })),
       customCards: loadAllCustomCards(),
       moduleDailyLimits: allLimits,
       moduleDailyReviewLimits: allReviewLimits,
-    } as any);
+      studyModeConfig: loadStudyModeConfig(),
+      reviewLogs: loadReviewLogs(),
+      deletedCustomDecks: loadDeletedCustomDecks(),
+      deletedCards: loadDeletedCards(),
+    } as any).then(() => syncLocalAppDataToBackend()).catch(() => {});
   }, [state.cardsById, state.category, state.isDark]);
 
   const currentCard = state.visibleCardIds.length > 0
@@ -800,11 +1355,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const progress = loadProgress(cat);
       counts[cat] = allCards.filter((c) => {
         const sm2 = progress.sm2[c.id] ?? c.sm2;
-        // 新卡片不计入到期数，只有复习过的卡片到期才算
-        // 防御：state 可以是 learning / review / relearning，缺失或不认识的视为 new
-        const knownStates = new Set(['learning', 'review', 'relearning']);
-        if (!knownStates.has(sm2.state)) return false;
-        return sm2.nextReview <= Date.now();
+        return isDueReviewSm2(sm2);
+      }).length;
+    }
+    for (const deck of loadCustomDecks()) {
+      const progress = loadProgress(deck.id);
+      counts[deck.id] = loadCustomCards(deck.id).filter((card) => {
+        const sm2 = progress.sm2[card.id] ?? card.sm2;
+        return isDueReviewSm2(sm2);
       }).length;
     }
     return counts as Record<Category, number>;
@@ -822,6 +1380,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return !sm2 || sm2.state === 'new';
       }).length;
     }
+    for (const deck of loadCustomDecks()) {
+      const progress = loadProgress(deck.id);
+      count += loadCustomCards(deck.id).filter((card) => {
+        const sm2 = progress.sm2[card.id] ?? card.sm2;
+        return !sm2.state || sm2.state === 'new';
+      }).length;
+    }
     return count;
   }, [state.cardsById]);
 
@@ -835,6 +1400,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     dueCountByCategory,
     totalDue,
     totalNew,
+    dataReady,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -849,9 +1415,61 @@ export function useAppContext(): AppContextValue {
 // ---- helpers ----
 function saveProgressToLS(category: Category, progress: StoredProgress) {
   try {
-    const key = progressKeyMap[category] ?? `fc-progress-${category}`;
+    const key = progressKeyMap[category] ?? `fc-${category}-progress`;
     localStorage.setItem(key, JSON.stringify(progress));
   } catch {}
+}
+
+function persistCardProgress(card: FlashCard) {
+  const previous = loadProgress(card.category);
+  const mastered = new Set(previous.mastered ?? []);
+  const favorited = new Set(previous.favorited ?? []);
+  const nextProgress: StoredProgress = {
+    sm2: { ...previous.sm2, [card.id]: card.sm2 },
+    mastered: [],
+    favorited: [],
+  };
+
+  if (card.sm2.state === 'mastered') mastered.add(card.id);
+  else mastered.delete(card.id);
+
+  if (card.favorited) favorited.add(card.id);
+  else favorited.delete(card.id);
+
+  nextProgress.mastered = Array.from(mastered);
+  nextProgress.favorited = Array.from(favorited);
+  saveProgressToLS(card.category, nextProgress);
+}
+
+function saveProgressByCardCategory(cards: FlashCard[]) {
+  const grouped = new Map<Category, FlashCard[]>();
+  for (const card of cards) {
+    const group = grouped.get(card.category) ?? [];
+    group.push(card);
+    grouped.set(card.category, group);
+  }
+
+  for (const [category, categoryCards] of grouped) {
+    const previous = loadProgress(category);
+    const touchedIds = new Set(categoryCards.map((card) => card.id));
+    const mastered = new Set((previous.mastered ?? []).filter((id) => !touchedIds.has(id)));
+    const favorited = new Set((previous.favorited ?? []).filter((id) => !touchedIds.has(id)));
+    const nextProgress: StoredProgress = {
+      sm2: { ...previous.sm2 },
+      mastered: [],
+      favorited: [],
+    };
+
+    for (const card of categoryCards) {
+      nextProgress.sm2[card.id] = card.sm2;
+      if (card.sm2.state === 'mastered') mastered.add(card.id);
+      if (card.favorited) favorited.add(card.id);
+    }
+
+    nextProgress.mastered = Array.from(mastered);
+    nextProgress.favorited = Array.from(favorited);
+    saveProgressToLS(category, nextProgress);
+  }
 }
 
 function loadAllProgress(): Record<string, StoredProgress> {

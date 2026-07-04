@@ -206,7 +206,7 @@ export async function neo4jHybridSearchV3(input: HybridSearchInput): Promise<Car
       keywordScore: c.keywordScore,
       matchedKeywords: c.matchedKeywords,
       queryBigrams,
-      learning: prog ? { due: prog.state !== 'new' && prog.nextReview <= new Date(), lapses: prog.lapses, easeFactor: prog.easeFactor } : undefined,
+      learning: prog ? { due: ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date(), lapses: prog.lapses, easeFactor: prog.easeFactor } : undefined,
     });
   }
   const profile = detectProfile(input.query, topic, mergedExpandedKeywords.slice(0, 5), input.deckIds || []);
@@ -247,7 +247,7 @@ export async function neo4jHybridSearchV3(input: HybridSearchInput): Promise<Car
     let matchType: CardMatch['matchType'] = 'keyword';
     let reason = '关键词匹配';
     if (gs && gs.score > 0.15) { matchType = 'hybrid'; reason = '图谱增强匹配'; }
-    if (prog && prog.state !== 'new' && prog.nextReview <= new Date()) { matchType = 'due'; reason = '到期复习'; }
+    if (prog && ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date()) { matchType = 'due'; reason = '到期复习'; }
 
     const content = card.question || card.answer || card.description || '';
     results.push({
@@ -255,7 +255,7 @@ export async function neo4jHybridSearchV3(input: HybridSearchInput): Promise<Car
       title: card.title || card.titleCn || card.question || '',
       deckId: card.deckId, deckName: (card as any).deck?.name,
       tags: safeJsonParse(card.tags) || [], score: r.finalScore, matchType, reason,
-      due: prog && prog.state !== 'new' && prog.nextReview <= new Date(),
+      due: prog && ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date(),
       lapses: prog?.lapses ?? undefined,
       snippet: content.slice(0, 120) + (content.length > 120 ? '...' : ''),
       scoreBreakdown: {

@@ -3,8 +3,9 @@
 // NOT required: card chunks in Qdrant (cards come from SQLite/FTS5/Neo4j)
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Loader2, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import { API_BASE } from '../api/client';
+import BackButton from './BackButton';
 
 interface Props {
   onBack: () => void;
@@ -197,9 +198,7 @@ export default function JobPrepBootScreen({ onBack, onReady }: Props) {
   return (
     <div className="dark-bg min-h-screen flex flex-col">
       <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-        </button>
+        <BackButton onClick={onBack} />
         <h1 className="nav-title">岗位备战</h1>
       </div>
       <div className="flex-1 flex items-center justify-center">

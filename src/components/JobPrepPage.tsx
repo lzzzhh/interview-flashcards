@@ -1,8 +1,9 @@
 // Job Prep Page — Agent chat workspace for job interview preparation
 
 import { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Send, Briefcase, Loader2, ChevronDown, ChevronRight, Play } from 'lucide-react';
+import { Send, Briefcase, Loader2, ChevronDown, ChevronRight, Play, FileText, Wand2, Download } from 'lucide-react';
 import { API_BASE } from '../api/client';
+import BackButton from './BackButton';
 
 interface Props {
   onBack: () => void;
@@ -27,6 +28,11 @@ export default function JobPrepPage({ onBack }: Props) {
   const [loading, setLoading] = useState(false);
   const [plans, setPlans] = useState<any[]>([]);
   const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
+  const [resumeText, setResumeText] = useState('');
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [resumeFilePath, setResumeFilePath] = useState('');
+  const [resumeLoading, setResumeLoading] = useState(false);
+  const [resumeTailoring, setResumeTailoring] = useState<any | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
@@ -96,12 +102,91 @@ export default function JobPrepPage({ onBack }: Props) {
     } catch {}
   }
 
+  async function tailorResume() {
+    if (!sessionId || resumeText.trim().length < 40) return;
+    setResumeLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/job-prep/sessions/${sessionId}/resume-tailoring`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumeText }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setResumeTailoring(data);
+    } catch {
+      setResumeTailoring({
+        summary: '简历优化失败，请确认后端已启动，并稍后重试。',
+        matchedEvidence: [],
+        gaps: [],
+        rewrites: [],
+        riskFlags: [{ severity: 'warning', text: '请求失败', reason: '后端暂时没有返回可用结果。' }],
+      });
+    }
+    setResumeLoading(false);
+  }
+
+  async function uploadResume() {
+    if (!sessionId || (!resumeFile && !resumeFilePath)) return;
+    setResumeLoading(true);
+    try {
+      const res = resumeFilePath
+        ? await fetch(`${API_BASE}/job-prep/sessions/${sessionId}/resume/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filePath: resumeFilePath }),
+        })
+        : await fetch(`${API_BASE}/job-prep/sessions/${sessionId}/resume/upload`, {
+          method: 'POST',
+          body: (() => {
+            const formData = new FormData();
+            if (resumeFile) formData.append('file', resumeFile);
+            return formData;
+          })(),
+        });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setResumeTailoring(data);
+    } catch {
+      setResumeTailoring({
+        summary: '简历文件优化失败，请确认 parser-worker 和后端都已启动。',
+        matchedEvidence: [],
+        gaps: [],
+        rewrites: [],
+        riskFlags: [{ severity: 'warning', text: '请求失败', reason: '文件解析或生成失败。' }],
+      });
+    }
+    setResumeLoading(false);
+  }
+
+  async function chooseResumeFile() {
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      const path = await invoke<string | null>('choose_document_file');
+      if (!path) return;
+      if (!/\.(pdf|docx)$/i.test(path)) {
+        setResumeTailoring({
+          summary: '请选择 PDF 或 DOCX 简历文件。',
+          matchedEvidence: [],
+          gaps: [],
+          rewrites: [],
+          riskFlags: [{ severity: 'warning', text: path, reason: '当前简历优化只支持 PDF / DOCX。' }],
+        });
+        return;
+      }
+      setResumeFile(null);
+      setResumeFilePath(path);
+    } catch {
+      document.getElementById('resume-file-input')?.click();
+    }
+  }
+
   // Initial state: ask for job target
   if (!sessionId) {
     return (
       <div className="dark-bg min-h-screen flex flex-col">
         <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-          <button onClick={onBack} className="p-1 -ml-1"><ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} /></button>
+          <BackButton onClick={onBack} />
           <h1 className="nav-title">岗位备战</h1>
         </div>
         <div className="flex-1 flex items-center justify-center p-5">
@@ -144,7 +229,7 @@ export default function JobPrepPage({ onBack }: Props) {
   return (
     <div className="dark-bg min-h-screen flex flex-col">
       <div className="nav-bar sticky top-0 z-20 flex items-center gap-3 shrink-0">
-        <button onClick={onBack} className="p-1 -ml-1"><ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} /></button>
+        <BackButton onClick={onBack} />
         <h1 className="nav-title">岗位备战</h1>
       </div>
 
@@ -183,6 +268,126 @@ export default function JobPrepPage({ onBack }: Props) {
             ))}
           </div>
         )}
+
+        <div className="rounded-2xl border p-4 space-y-3" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <div className="flex items-center gap-2">
+            <FileText size={16} style={{ color: ORANGE }} />
+            <h3 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>简历优化</h3>
+          </div>
+          <div className="rounded-xl border px-3 py-3 space-y-2" style={{ borderColor: CARD_BORDER }}>
+            <input
+              id="resume-file-input"
+              type="file"
+              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              onChange={e => { setResumeFile(e.target.files?.[0] || null); setResumeFilePath(''); }}
+              className="hidden"
+              style={{ color: TEXT_MUTED }}
+              disabled={resumeLoading}
+            />
+            <button
+              onClick={chooseResumeFile}
+              disabled={resumeLoading}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] font-medium border"
+              style={{ color: TEXT_PRIMARY, borderColor: CARD_BORDER }}
+            >
+              <FileText size={14} />
+              选择 PDF / DOCX
+            </button>
+            {(resumeFilePath || resumeFile) && (
+              <div className="text-[11px] truncate" style={{ color: TEXT_MUTED }}>
+                {resumeFilePath || resumeFile?.name}
+              </div>
+            )}
+            <button
+              onClick={uploadResume}
+              disabled={(!resumeFile && !resumeFilePath) || resumeLoading}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] font-medium text-white disabled:opacity-30"
+              style={{ backgroundColor: ORANGE }}
+            >
+              {resumeLoading ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
+              上传并生成 Word / PDF
+            </button>
+          </div>
+          <textarea
+            value={resumeText}
+            onChange={e => setResumeText(e.target.value)}
+            placeholder="也可以先粘贴简历内容做快速分析..."
+            className="w-full rounded-xl border px-3 py-2.5 text-[13px] bg-transparent resize-none"
+            style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}
+            rows={5}
+            disabled={resumeLoading}
+          />
+          <button
+            onClick={tailorResume}
+            disabled={resumeText.trim().length < 40 || resumeLoading}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] font-medium text-white disabled:opacity-30"
+            style={{ backgroundColor: ORANGE }}
+          >
+            {resumeLoading ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
+            针对 JD 优化简历
+          </button>
+
+          {resumeTailoring && (
+            <div className="space-y-3 pt-2">
+              <p className="text-[12px] leading-relaxed" style={{ color: TEXT_MUTED }}>{resumeTailoring.summary}</p>
+              {resumeTailoring.downloadUrls && (
+                <div className="flex flex-wrap gap-2">
+                  <a
+                    href={`${API_BASE.replace(/\/api$/, '')}${resumeTailoring.downloadUrls.docx}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium border"
+                    style={{ color: TEXT_PRIMARY, borderColor: CARD_BORDER }}
+                  >
+                    <Download size={13} /> 下载 Word
+                  </a>
+                  <a
+                    href={`${API_BASE.replace(/\/api$/, '')}${resumeTailoring.downloadUrls.pdf}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium border"
+                    style={{ color: TEXT_PRIMARY, borderColor: CARD_BORDER }}
+                  >
+                    <Download size={13} /> 下载 PDF
+                  </a>
+                </div>
+              )}
+              {typeof resumeTailoring.appliedRewriteCount === 'number' && (
+                <div className="text-[11px]" style={{ color: TEXT_MUTED }}>
+                  已应用 {resumeTailoring.appliedRewriteCount} 处低风险改写
+                </div>
+              )}
+              {resumeTailoring.rewrites?.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-[12px] font-semibold" style={{ color: TEXT_PRIMARY }}>改写建议</div>
+                  {resumeTailoring.rewrites.slice(0, 5).map((item: any, index: number) => (
+                    <div key={`${item.beforeText}-${index}`} className="rounded-xl border p-3 space-y-1" style={{ borderColor: CARD_BORDER }}>
+                      <div className="text-[11px]" style={{ color: TEXT_MUTED }}>原文：{item.beforeText}</div>
+                      <div className="text-[12px] font-medium" style={{ color: TEXT_PRIMARY }}>建议：{item.afterText}</div>
+                      <div className="text-[11px]" style={{ color: TEXT_MUTED }}>{item.rationale}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {resumeTailoring.gaps?.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-[12px] font-semibold" style={{ color: TEXT_PRIMARY }}>JD 缺口</div>
+                  {resumeTailoring.gaps.slice(0, 5).map((gap: any) => (
+                    <div key={gap.requirement} className="text-[11px] rounded-lg border px-3 py-2" style={{ borderColor: CARD_BORDER, color: TEXT_MUTED }}>
+                      <span className="font-medium" style={{ color: TEXT_PRIMARY }}>{gap.requirement}</span>：{gap.suggestion}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {resumeTailoring.riskFlags?.length > 0 && (
+                <div className="space-y-1">
+                  <div className="text-[12px] font-semibold" style={{ color: TEXT_PRIMARY }}>风险提示</div>
+                  {resumeTailoring.riskFlags.slice(0, 4).map((flag: any, index: number) => (
+                    <div key={`${flag.text}-${index}`} className="text-[11px]" style={{ color: flag.severity === 'blocker' ? '#EF4444' : TEXT_MUTED }}>
+                      {flag.reason}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Chat messages */}
         {messages.filter(m => m.role !== 'system').map(msg => (

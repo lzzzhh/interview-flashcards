@@ -1,5 +1,4 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
-import { ArrowLeft, X } from 'lucide-react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useKeyboard } from './hooks/useKeyboard';
 import HomePage from './components/HomePage';
@@ -8,14 +7,14 @@ import CardActions from './components/CardActions';
 import ProgressBar from './components/ProgressBar';
 import DarkModeToggle from './components/DarkModeToggle';
 import EmptyState from './components/EmptyState';
-import CardBrowser from './components/CardBrowser';
-import CardEditor from './components/CardEditor';
 import CardDatabasePage from './components/CardDatabasePage';
 import VectorDatabasePage from './components/VectorDatabasePage';
 import SubModulePicker from './components/SubModulePicker';
 import DeckPage from './components/DeckPage';
 import StatsPage from './components/StatsPage';
 import ProfilePage from './components/ProfilePage';
+import SavedCardsPage from './components/SavedCardsPage';
+import RecoveryPage from './components/RecoveryPage';
 import AISearchPage from './components/AISearchPage';
 import AgentHubPage from './components/AgentHubPage';
 import CardDraftReviewPage from './components/CardDraftReviewPage';
@@ -29,19 +28,28 @@ import MockInterviewPage from './components/MockInterviewPage';
 import ResumeProjectPage from './components/ResumeProjectPage';
 import LearningPlanListPage from './components/LearningPlanListPage';
 import LearningPlanDetailPage from './components/LearningPlanDetailPage';
+import BackButton from './components/BackButton';
+import FirstRunStudyModePage from './components/FirstRunStudyModePage';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import type { FlashCard } from './types';
-
-function StudyPage({ onBack, exitOnBack = false }: { onBack: () => void; exitOnBack?: boolean }) {
+import { loadStudyModeConfig } from './utils/studyModeConfig';
+import type { FlashCard, StudyModeConfig } from './types';
+function StudyPage({ onBack, exitOnBack = false, autoCloseOnComplete = false }: { onBack: () => void; exitOnBack?: boolean; autoCloseOnComplete?: boolean }) {
   const { state, dispatch, currentCard, totalNew, dueCountByCategory } = useAppContext();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [showBrowser, setShowBrowser] = useState(false);
-  const [editingCard, setEditingCard] = useState<FlashCard | null>(null);
 
   const getCurrentCardId = useCallback(() => currentCard?.id ?? null, [currentCard]);
   useKeyboard({ dispatch, searchInputRef, getCurrentCardId });
 
   const cardCount = state.visibleCardIds.length;
+  const completedVisibleIds = new Set(state.studyQueueCompletedIds);
+  const progressTotal = state.studyQueueTotal > 0 ? state.studyQueueTotal : cardCount;
+  const completedCount = state.studyQueueTotal > 0
+    ? state.visibleCardIds.filter((id) => completedVisibleIds.has(id)).length
+    : state.currentVisibleIndex + 1;
+  const progressCurrent = Math.min(state.currentVisibleIndex, Math.max(0, progressTotal - 1));
+  const progressMastered = state.studyQueueTotal > 0
+    ? completedCount
+    : state.currentVisibleIndex + 1;
 
   // 复习完毕自动返回首页
   useEffect(() => {
@@ -49,6 +57,13 @@ function StudyPage({ onBack, exitOnBack = false }: { onBack: () => void; exitOnB
       onBack();
     }
   }, [state.studyMode, state.category, dueCountByCategory, onBack]);
+
+  useEffect(() => {
+    if (!autoCloseOnComplete || state.studyQueueTotal <= 0) return;
+    if (state.studyQueueCompletedIds.length >= state.studyQueueTotal) {
+      onBack();
+    }
+  }, [autoCloseOnComplete, state.studyQueueCompletedIds.length, state.studyQueueTotal, onBack]);
 
   if (state.studyMode === 'choose') {
     return <SubModulePicker onBack={onBack} />;
@@ -60,19 +75,12 @@ function StudyPage({ onBack, exitOnBack = false }: { onBack: () => void; exitOnB
 
         {/* Top bar — fixed height */}
         <div className="sticky top-0 z-20 shrink-0 py-3 flex items-center justify-between backdrop-blur-lg dark:bg-transparent -mx-3 sm:-mx-4 px-3 sm:px-4">
-          <button onClick={() => exitOnBack ? onBack() : dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm">
-            <ArrowLeft className="w-4 h-4" /> 返回
-          </button>
-          <div className="flex items-center gap-0.5">
-            <button onClick={() => setShowBrowser(true)} className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700" title="卡片管理">
-              <X className="w-4 h-4 rotate-45 text-gray-500 dark:text-gray-400" />
-            </button>
-            <DarkModeToggle />
-          </div>
+          <BackButton onClick={() => exitOnBack ? onBack() : dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} />
+          <DarkModeToggle />
         </div>
 
         {/* Status messages */}
-        {state.studyMode === 'new' && totalNew === 0 && (
+        {state.studyMode === 'new' && !state.planCardIds && totalNew === 0 && (
           <div className="shrink-0 text-center py-8 text-gray-400">🎉 所有卡片都已学过！<button onClick={() => exitOnBack ? onBack() : dispatch({ type: 'SET_STUDY_MODE', payload: 'choose' })} className="ml-2 text-primary underline">返回</button></div>
         )}
 
@@ -95,13 +103,10 @@ function StudyPage({ onBack, exitOnBack = false }: { onBack: () => void; exitOnB
         {/* Progress bar — fixed at bottom */}
         {cardCount > 0 && (
           <div className="shrink-0 pt-1 pb-6">
-            <ProgressBar current={Math.min(state.currentVisibleIndex, cardCount - 1)} total={cardCount} mastered={state.currentVisibleIndex + 1} />
+            <ProgressBar current={progressCurrent} total={progressTotal} mastered={progressMastered} />
           </div>
         )}
       </div>
-
-      {showBrowser && <CardBrowser onEdit={(card) => { if (!card.id) setEditingCard(null); else setEditingCard(card); }} onClose={() => setShowBrowser(false)} />}
-      {editingCard !== null && <CardEditor card={editingCard} onSave={() => { setEditingCard(null); dispatch({ type: 'SET_CATEGORY', payload: state.category }); }} onClose={() => setEditingCard(null)} />}
     </div>
   );
 }
@@ -116,14 +121,55 @@ function AppInner() {
   const [showSearch, setShowSearch] = useState(false);
   const [agentPage, setAgentPage] = useState<string | null>(null);
   const [studyExitOnBack, setStudyExitOnBack] = useState(false);
-  const { dispatch } = useAppContext();
+  const [studyAutoCloseOnComplete, setStudyAutoCloseOnComplete] = useState(false);
+  const [modeGate, setModeGate] = useState<'checking' | 'required' | 'ready'>('checking');
+  const todayStudyRequestRef = useRef(0);
+  const { dispatch, dataReady } = useAppContext();
+
+  useEffect(() => {
+    if (!dataReady) return;
+    setModeGate(loadStudyModeConfig() ? 'ready' : 'required');
+  }, [dataReady]);
+
+  const handleInitialModeComplete = useCallback((config: StudyModeConfig) => {
+    dispatch({ type: 'SET_STUDY_MODE_CONFIG', payload: config });
+    if (config.selectedDecks[0]) {
+      dispatch({ type: 'SET_CATEGORY', payload: config.selectedDecks[0] });
+    }
+    setModeGate('ready');
+  }, [dispatch]);
+
   const handleEnterStudy = useCallback(async (category: string, cardId?: string, options?: { exitOnBack?: boolean }) => {
+    todayStudyRequestRef.current += 1;
     setStudyCategory(category); setShowDecks(false); setShowSearch(false); setShowProfile(false); setShowStats(false);
     setAgentPage(null);
     setStudyExitOnBack(Boolean(options?.exitOnBack));
+    setStudyAutoCloseOnComplete(false);
     dispatch({ type: 'SET_CATEGORY', payload: category });
     dispatch({ type: 'SET_API_SOURCE', payload: false });
     if (cardId) dispatch({ type: 'JUMP_TO_CARD', payload: { category, cardId } });
+  }, [dispatch]);
+
+  const handleStartTodayStudy = useCallback((deckIds: string[]) => {
+    todayStudyRequestRef.current += 1;
+    setStudyCategory('__today__');
+    setShowDecks(false);
+    setShowSearch(false);
+    setShowProfile(false);
+    setShowStats(false);
+    setAgentPage(null);
+    setStudyExitOnBack(true);
+    setStudyAutoCloseOnComplete(false);
+    dispatch({ type: 'START_TODAY_STUDY', payload: { deckIds } });
+  }, [dispatch]);
+
+  const handleStudyCardFromProfile = useCallback((card: FlashCard) => {
+    todayStudyRequestRef.current += 1;
+    setStudyCategory(`__single__:${card.id}`);
+    setStudyExitOnBack(true);
+    setStudyAutoCloseOnComplete(true);
+    setAgentPage(null);
+    dispatch({ type: 'START_SINGLE_CARD_STUDY', payload: { card, countTowardsDaily: false } });
   }, [dispatch]);
 
   // Handle deck:xxx and deck:xxx:new navigation as side effect
@@ -141,6 +187,14 @@ function AppInner() {
     }
   }, [agentPage, handleEnterStudy, dispatch]);
 
+  if (!dataReady || modeGate === 'checking') {
+    return <AppLoadingScreen message="正在加载本地数据..." />;
+  }
+
+  if (modeGate === 'required') {
+    return <FirstRunStudyModePage onComplete={handleInitialModeComplete} />;
+  }
+
   // Compute content — avoid early returns so ProcessingBadge renders globally
   let content: React.ReactNode = null;
 
@@ -149,15 +203,19 @@ function AppInner() {
   } else if (showStats) {
     content = <StatsPage onBack={() => setShowStats(false)} />;
   } else if (showProfile) {
-    if (profileSubPage === 'card-database') content = <CardDatabasePage onBack={() => setProfileSubPage(null)} />;
+    if (profileSubPage === 'card-database') content = <CardDatabasePage onBack={() => setProfileSubPage(null)} onStudyCard={handleStudyCardFromProfile} />;
+    else if (profileSubPage === 'saved-cards') content = <SavedCardsPage onBack={() => setProfileSubPage(null)} onStudyCard={handleStudyCardFromProfile} />;
+    else if (profileSubPage === 'recovery') content = <RecoveryPage onBack={() => setProfileSubPage(null)} onStudyCard={handleStudyCardFromProfile} />;
     else if (profileSubPage === 'vector-database') content = <VectorDatabasePage onBack={() => setProfileSubPage(null)} />;
     else if (profileSubPage === 'tag-manager') content = <TagManagerPage onBack={() => setProfileSubPage(null)} />;
     else if (profileSubPage === 'api-settings') content = <ApiSettingsPage onBack={() => setProfileSubPage(null)} />;
-    else if (profileSubPage === 'learning-plans' && learningPlanId) content = <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} onStudyPlan={(cardIds: string[]) => {
+    else if (profileSubPage === 'learning-plans' && learningPlanId) content = <LearningPlanDetailPage planId={learningPlanId} onBack={() => setLearningPlanId(null)} onStudyCard={handleStudyCardFromProfile} onStudyPlan={(cardIds: string[]) => {
       dispatch({ type: 'START_PLAN_STUDY', payload: { cardIds } });
       setShowProfile(false);
       setLearningPlanId(null);
       setProfileSubPage(null);
+      setStudyExitOnBack(true);
+      setStudyAutoCloseOnComplete(false);
       setStudyCategory('leetcode');
     }} />;
     else if (profileSubPage === 'learning-plans') content = <LearningPlanListPage onBack={() => setProfileSubPage(null)} onViewPlan={(id: string) => setLearningPlanId(id)} />;
@@ -176,7 +234,16 @@ function AppInner() {
       content = (
         <>
           <div className={studyCategory ? 'hidden' : ''}>
-            <HomePage onEnterStudy={handleEnterStudy} onShowDecks={() => setShowDecks(true)} onShowStats={() => setShowStats(true)} onShowProfile={() => setShowProfile(true)} onShowSearch={() => setShowSearch(true)} />
+            <div className="transition duration-200">
+              <HomePage
+                onEnterStudy={handleEnterStudy}
+                onStartToday={handleStartTodayStudy}
+                onShowDecks={() => setShowDecks(true)}
+                onShowStats={() => setShowStats(true)}
+                onShowProfile={() => setShowProfile(true)}
+                onShowSearch={() => setShowSearch(true)}
+              />
+            </div>
           </div>
         </>
       );
@@ -187,7 +254,7 @@ function AppInner() {
       {content}
       {studyCategory && (
         <div className="fixed inset-0 z-50 page-enter" key={studyCategory}>
-          <StudyPage exitOnBack={studyExitOnBack} onBack={() => { dispatch({ type: 'STOP_PLAN_STUDY' }); setStudyCategory(null); setStudyExitOnBack(false); }} />
+          <StudyPage exitOnBack={studyExitOnBack} autoCloseOnComplete={studyAutoCloseOnComplete} onBack={() => { todayStudyRequestRef.current += 1; dispatch({ type: 'STOP_PLAN_STUDY' }); setStudyCategory(null); setStudyExitOnBack(false); setStudyAutoCloseOnComplete(false); }} />
         </div>
       )}
       <ProcessingBadge onViewDrafts={(docId: string) => {
@@ -195,6 +262,14 @@ function AppInner() {
         setAgentPage(`drafts:${docId}`);
       }} />
     </>
+  );
+}
+
+function AppLoadingScreen({ message }: { message: string }) {
+  return (
+    <div className="dark-bg homepage-glass-stage min-h-screen flex items-center justify-center px-5">
+      <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>{message}</p>
+    </div>
   );
 }
 

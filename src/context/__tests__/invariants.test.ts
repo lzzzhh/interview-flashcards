@@ -99,9 +99,10 @@ describe('Reducer logic invariants', () => {
     };
 
     // Review mode: only due cards
+    const reviewStates = new Set(['learning', 'review', 'relearning']);
     const dueIds = Object.keys(cardsById).filter((id) => {
       const sm2 = cardsById[id].sm2;
-      return sm2.state !== 'new' && sm2.nextReview <= now;
+      return reviewStates.has(sm2.state) && sm2.nextReview <= now;
     });
 
     expect(dueIds).toHaveLength(1);

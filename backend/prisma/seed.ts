@@ -16,6 +16,7 @@ const BUILTIN_DECKS = [
   { id: 'jargon', name: '黑话', sortOrder: 7 },
   { id: 'workplace', name: '职场', sortOrder: 8 },
   { id: 'vibe-coding', name: 'Vibe Coding', sortOrder: 9 },
+  { id: 'java', name: 'Java 面试', sortOrder: 10 },
 ];
 
 // 直接从前端数据文件构建的卡片数据
@@ -57,6 +58,7 @@ const CARD_MAP: Record<string, CardInput[]> = {
   jargon: jargonCards.jargonCards || [],
   workplace: workplaceCards.workplaceCards || [],
   'vibe-coding': vibeCards.vibeCodingCards || [],
+  java: [],
 };
 
 async function main() {
@@ -76,6 +78,16 @@ async function main() {
   let totalCards = 0;
   for (const [deckId, cards] of Object.entries(CARD_MAP)) {
     if (!Array.isArray(cards)) continue;
+    const incomingIds = new Set(cards.map((card) => card.id).filter(Boolean));
+    const existingCards = await prisma.card.findMany({ where: { deckId }, select: { id: true } });
+    const deletedIds = existingCards.map((card) => card.id).filter((id) => !incomingIds.has(id));
+    if (deletedIds.length > 0) {
+      await prisma.reviewLog.deleteMany({ where: { cardId: { in: deletedIds } } });
+      await prisma.cardProgress.deleteMany({ where: { cardId: { in: deletedIds } } });
+      await prisma.card.deleteMany({ where: { id: { in: deletedIds } } });
+      console.log(`  Removed ${deletedIds.length} stale cards from ${deckId}`);
+    }
+
     for (const card of cards) {
       await prisma.card.upsert({
         where: { id: card.id },

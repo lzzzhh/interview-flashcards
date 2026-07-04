@@ -2,14 +2,16 @@
 // src/components/HomePage.tsx — 首页重设计
 // ============================================================
 
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { ChevronRight, Home, Layers, BarChart3, User, ChevronLeft, Bot } from 'lucide-react';
 import appIcon from '../../icon.png';
 import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
-import { getStreak, loadReviewLogs } from '../utils/reviewLogs';
-import { getModuleDailyLimit } from '../utils/customDecks';
+import { countTodayNewLearned, getStreak, loadReviewLogs } from '../utils/reviewLogs';
+import { getModuleDailyLimit, getModuleDailyReviewLimit, loadCustomCards } from '../utils/customDecks';
+import { getStudyModeDeckIds, getStudyModeNewLimit, getStudyModeReviewLimit, loadStudyModeConfig } from '../utils/studyModeConfig';
 import { useDecks, deriveGlobalStats } from '../repositories/useDeckStats';
+import { useStatsSnapshot } from '../repositories/useStatsSnapshot';
 import { loadProgress } from '../utils/storage';
 import type { Category } from '../types';
 import { leetcodeHot100 } from '../data/leetcode-hot100';
@@ -22,21 +24,24 @@ import { jargonCards } from '../data/jargon';
 import { workplaceCards } from '../data/workplace';
 import { vibeCodingCards } from '../data/vibe-coding';
 
+const CARD_MODULES: [string, any[]][] = [
+  ['leetcode', leetcodeHot100],
+  ['statistics', statisticsCards],
+  ['machine-learning', machineLearningCards],
+  ['deep-learning', deepLearningCards],
+  ['llm', llmCards],
+  ['agent', agentCards],
+  ['jargon', jargonCards],
+  ['workplace', workplaceCards],
+  ['vibe-coding', vibeCodingCards],
+];
+
+const REVIEW_STATES = new Set(['learning', 'review', 'relearning']);
+
 // 跨分类卡片名称查找表（解决 cardsById 只含当前分类的问题）
 const CARD_LABELS: Record<string, string> = (() => {
   const map: Record<string, string> = {};
-  const modules: [string, any[]][] = [
-    ['leetcode', leetcodeHot100],
-    ['statistics', statisticsCards],
-    ['machine-learning', machineLearningCards],
-    ['deep-learning', deepLearningCards],
-    ['llm', llmCards],
-    ['agent', agentCards],
-    ['jargon', jargonCards],
-    ['workplace', workplaceCards],
-    ['vibe-coding', vibeCodingCards],
-  ];
-  for (const [, cards] of modules) {
+  for (const [, cards] of CARD_MODULES) {
     for (const card of (cards as any[])) {
       const label = card.category === 'leetcode'
         ? `#${card.number} ${card.titleCn || card.title}`
@@ -47,8 +52,29 @@ const CARD_LABELS: Record<string, string> = (() => {
   return map;
 })();
 
+function getDeckCardIds(deckId: string): string[] {
+  const builtin = CARD_MODULES.find(([id]) => id === deckId);
+  if (builtin) return builtin[1].map((card) => card.id);
+  return loadCustomCards(deckId).map((card) => card.id);
+}
+
+function getDeckNewCount(deckId: string): number {
+  const progress = loadProgress(deckId);
+  return getDeckCardIds(deckId).filter((cardId) => {
+    const sm2 = progress.sm2[cardId];
+    return !sm2 || sm2.state === 'new';
+  }).length;
+}
+
+function getRemainingNewLimit(deckId: string, logs: ReturnType<typeof loadReviewLogs>, newCards?: number): number {
+  const limit = getStudyModeNewLimit(deckId, getModuleDailyLimit(deckId));
+  const learnedToday = countTodayNewLearned(getDeckCardIds(deckId), logs);
+  return Math.max(0, Math.min(newCards ?? getDeckNewCount(deckId), limit - learnedToday));
+}
+
 interface Props {
   onEnterStudy: (category: Category) => void;
+  onStartToday: (deckIds: string[]) => void;
   onShowDecks: () => void;
   onShowStats: () => void;
   onShowProfile: () => void;
@@ -74,31 +100,44 @@ const TABS = [
   { label: '我的', icon: User, action: 'profile' as const },
 ];
 
-export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onShowProfile, onShowSearch }: Props) {
+export default function HomePage({ onEnterStudy, onStartToday, onShowDecks, onShowStats, onShowProfile, onShowSearch }: Props) {
   const { state, dueCountByCategory, dispatch } = useAppContext();
   const { decks } = useDecks();
+  const { snapshot, byDeck } = useStatsSnapshot();
 
   const globalStats = useMemo(() => deriveGlobalStats(decks), [decks]);
+  const studyDeckIds = useMemo(
+    () => {
+      const ids = decks.length > 0 ? decks.map((deck) => deck.id) : CATEGORIES.map((category) => category.key);
+      if (loadStudyModeConfig()) return getStudyModeDeckIds(ids);
+      return ids.filter((id) => getModuleDailyLimit(id) > 0 || getModuleDailyReviewLimit(id) > 0);
+    },
+    [decks],
+  );
 
-  const streak = useMemo(() => {
-    const logs = loadReviewLogs();
-    return getStreak(Object.values(logs).flat());
-  }, []);
+  const reviewLogs = useMemo(() => loadReviewLogs(), [state.cardsById]);
+  const streak = useMemo(
+    () => snapshot?.global.streak ?? getStreak(Object.values(reviewLogs).flat()),
+    [reviewLogs, snapshot],
+  );
 
   const todayDue = useMemo(() => {
-    let total = 0;
-    for (const cat of CATEGORIES) total += dueCountByCategory[cat.key] ?? 0;
-    return total;
-  }, [dueCountByCategory]);
+    return studyDeckIds.reduce((total, deckId) => {
+      const reviewLimit = getStudyModeReviewLimit(deckId, getModuleDailyReviewLimit(deckId));
+      const dueCards = byDeck[deckId]?.dueCards ?? dueCountByCategory[deckId] ?? 0;
+      return total + Math.min(dueCards, reviewLimit);
+    }, 0);
+  }, [byDeck, dueCountByCategory, studyDeckIds]);
 
   const todayNewAllowance = useMemo(() => {
-    let total = 0;
-    for (const cat of CATEGORIES) total += getModuleDailyLimit(cat.key);
-    return total;
-  }, []);
+    return studyDeckIds.reduce((total, deckId) => {
+      const newCards = byDeck[deckId]?.newCards;
+      return total + getRemainingNewLimit(deckId, reviewLogs, newCards);
+    }, 0);
+  }, [byDeck, studyDeckIds, reviewLogs]);
 
   // 学习中卡片数从 API decks 统计
-  const learningCount = globalStats.learningCount;
+  const learningCount = snapshot?.global.learningCards ?? globalStats.learningCount;
 
   // 推荐
   const [recIndex, setRecIndex] = useState(0);
@@ -111,7 +150,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
     for (const cat of CATEGORIES) {
       const progress = loadProgress(cat.key);
       for (const [cardId, sm2] of Object.entries(progress.sm2)) {
-        if (!sm2 || sm2.state === 'new') continue;
+        if (!sm2 || !REVIEW_STATES.has(sm2.state)) continue;
         const overdue = (now - sm2.nextReview) / 86400000;
         if (overdue < 0) continue;
         const R = Math.pow(2, -overdue / Math.max(sm2.interval, 1));
@@ -129,11 +168,6 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
     const rec = recommendations[idx];
     return { ...rec, index: idx, total: recommendations.length, moduleName: CATEGORIES.find(c => c.key === rec.category)?.label || rec.category };
   }, [recommendations, recIndex]);
-
-  const handleStartToday = useCallback(() => {
-    const firstDue = CATEGORIES.find((c) => (dueCountByCategory[c.key] ?? 0) > 0);
-    if (firstDue) onEnterStudy(firstDue.key);
-  }, [dueCountByCategory, onEnterStudy]);
 
   return (
     <div className="dark-bg homepage-glass-stage flex min-h-screen items-center justify-center transition-colors">
@@ -162,7 +196,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
             <StatBlock label="学习中" value={learningCount} color="#CBD5E1" />
           </div>
           <button
-            onClick={handleStartToday}
+            onClick={() => onStartToday(studyDeckIds)}
             className="w-full py-1 rounded-xl text-[14px] font-bold text-white"
             style={{ background: `linear-gradient(135deg, ${BLUE}, #2f6bed)` }}
           >
@@ -232,8 +266,13 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
           </div>
           <div className="space-y-2">
             {CATEGORIES.slice(0, 6).map((cat) => {
-              const newCount = getModuleDailyLimit(cat.key);
-              const dueCount = dueCountByCategory[cat.key] ?? 0;
+              const row = byDeck[cat.key];
+              const newCount = getRemainingNewLimit(cat.key, reviewLogs, row?.newCards);
+              const dueCount = Math.min(
+                row?.todayReviewRemaining ?? dueCountByCategory[cat.key] ?? 0,
+                getStudyModeReviewLimit(cat.key, getModuleDailyReviewLimit(cat.key)),
+              );
+              const totalCount = row?.totalCards ?? globalStats.moduleTotals[cat.key] ?? '--';
               return (
                 <button
                   key={cat.key}
@@ -243,7 +282,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[13px] font-bold truncate" style={{ color: TEXT_PRIMARY }}>{cat.label}</h3>
-                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {globalStats.moduleTotals[cat.key] ?? '--'} 张卡片</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: TEXT_MUTED }}>共 {totalCount} 张卡片</p>
                   </div>
                   <div className="flex gap-4 text-right">
                     <div>
@@ -259,9 +298,7 @@ export default function HomePage({ onEnterStudy, onShowDecks, onShowStats, onSho
                 </button>
               );
             })}
-          </div>
-        </div>
-
+          </div> </div>
         {/* Tab Bar */}
         <div className="fixed bottom-0 left-0 right-0 flex justify-around py-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)' }}>
           {TABS.map((tab) => (

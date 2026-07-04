@@ -11,6 +11,7 @@
     "evaluate:validate": "tsx src/evaluation/validate.ts",
     "evaluate:v8-ablation": "tsx src/evaluation/v8-ablation-runner.ts",
     "evaluate:gate": "tsx src/evaluation/release-gate.ts",
+    "evaluate:job-prep-multiturn": "tsx src/evaluation/job-prep-multiturn-md-runner.ts",
     "evaluate:smoke-new-cards": "tsx src/evaluation/smoke-new-cards.ts",
     "readiness:check": "tsx src/ingestion/readiness-cli.ts check",
     "readiness:fix": "tsx src/ingestion/readiness-cli.ts fix",

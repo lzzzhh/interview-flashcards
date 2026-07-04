@@ -32,3 +32,24 @@ class ParsedDocument(BaseModel):
     pages: List[ParsedPage] = []
     warnings: List[str] = []
     text_hash: str = ""
+
+
+class ResumeRewrite(BaseModel):
+    before_text: str
+    after_text: str
+
+
+class ResumeRenderRequest(BaseModel):
+    source_path: str
+    source_type: str
+    output_dir: str
+    base_name: str
+    rewrites: List[ResumeRewrite] = []
+    fallback_text: str = ""
+
+
+class ResumeRenderResponse(BaseModel):
+    docx_path: str
+    pdf_path: str
+    applied_count: int = 0
+    warnings: List[str] = []

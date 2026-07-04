@@ -1,27 +1,21 @@
 // src/components/CardDatabasePage.tsx — 卡片数据库（全局搜索 + 管理 + 导出导入）
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { ArrowLeft, Search, Trash2, Database, Download, Upload, ChevronDown, FileJson, FileSpreadsheet, FileInput, BrainCircuit } from 'lucide-react';
+import { Search, Trash2, Database, Download, Upload, ChevronDown, FileJson, FileSpreadsheet, FileInput, BrainCircuit, RotateCcw } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { getDeckCards } from '../api/cards';
 import { CATEGORIES } from '../constants';
-import { loadProgress } from '../utils/storage';
-import { loadCustomDecks, loadCustomCards } from '../utils/customDecks';
-import { leetcodeHot100 } from '../data/leetcode-hot100';
-import { statisticsCards } from '../data/statistics';
-import { machineLearningCards } from '../data/machine-learning';
-import { deepLearningCards } from '../data/deep-learning';
-import { llmCards } from '../data/llm';
-import { agentCards } from '../data/agent';
-import { jargonCards } from '../data/jargon';
-import { workplaceCards } from '../data/workplace';
-import { vibeCodingCards } from '../data/vibe-coding';
+import { loadCustomDecks, UNASSIGNED_DECK_ID, UNASSIGNED_DECK_NAME } from '../utils/customDecks';
+import { loadDeletedCards, restoreDeletedCard, softDeleteCard } from '../utils/cardTrash';
+import { loadAllCardsFromStorage } from '../utils/cardLibrary';
 import { createDefaultSM2 } from '../utils/sm2';
 import { validateExportCards } from '../utils/backup';
 import { parseMarkdownCards } from '../utils/markdownImporter';
+import BackButton from './BackButton';
 import type { Category, FlashCard, QACard, LeetCodeCard } from '../types';
 
 interface Props {
   onBack: () => void;
+  onStudyCard?: (card: FlashCard) => void;
 }
 
 const TEXT_PRIMARY = 'var(--text-primary)';
@@ -49,35 +43,12 @@ function getCardDisplayLabel(card: FlashCard): string {
 }
 
 function getCategoryLabel(category: string): string {
-  return CATEGORIES.find(c => c.key === category)?.label || category;
+  if (category === UNASSIGNED_DECK_ID) return UNASSIGNED_DECK_NAME;
+  return CATEGORIES.find(c => c.key === category)?.label || loadCustomDecks().find(d => d.id === category)?.name || category;
 }
 
 function loadAllCards(): FlashCard[] {
-  const sources: [Category, FlashCard[]][] = [
-    ['leetcode', leetcodeHot100 as FlashCard[]],
-    ['statistics', statisticsCards as FlashCard[]],
-    ['machine-learning', machineLearningCards as FlashCard[]],
-    ['deep-learning', deepLearningCards as FlashCard[]],
-    ['llm', llmCards as FlashCard[]],
-    ['agent', agentCards as FlashCard[]],
-    ['jargon', jargonCards as FlashCard[]],
-    ['workplace', workplaceCards as FlashCard[]],
-    ['vibe-coding', vibeCodingCards as FlashCard[]],
-  ];
-  const result: FlashCard[] = [];
-  for (const [cat, cards] of sources) {
-    const progress = loadProgress(cat);
-    for (const card of cards) {
-      const sm2 = progress.sm2[card.id] ? { ...card.sm2, ...progress.sm2[card.id] } : card.sm2;
-      result.push({ ...card, sm2 });
-    }
-  }
-  for (const deck of loadCustomDecks()) {
-    for (const card of loadCustomCards(deck.id)) {
-      result.push(card);
-    }
-  }
-  return result;
+  return loadAllCardsFromStorage();
 }
 
 // ---- 导出/导入类型 ----
@@ -177,13 +148,15 @@ function parseCSVLine(line: string): string[] {
 }
 
 // ---- 主组件 ----
-export default function CardDatabasePage({ onBack }: Props) {
+export default function CardDatabasePage({ onBack, onStudyCard }: Props) {
   const { state, dispatch } = useAppContext();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showRestore, setShowRestore] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
+  const [refreshTick, setRefreshTick] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
 
@@ -235,7 +208,8 @@ export default function CardDatabasePage({ onBack }: Props) {
     return () => document.removeEventListener('mousedown', handler);
   }, [showExportMenu]);
 
-  const allCards = useMemo(() => loadAllCards(), [state.cardsById]);
+  const allCards = useMemo(() => loadAllCards(), [state.cardsById, refreshTick]);
+  const deletedCards = useMemo(() => loadDeletedCards(), [refreshTick, showRestore]);
 
   const filtered = useMemo(() => {
     let result = allCards;
@@ -253,9 +227,17 @@ export default function CardDatabasePage({ onBack }: Props) {
     return counts;
   }, [allCards]);
 
-  const handleDelete = (id: string) => {
-    dispatch({ type: 'DELETE_CARD', payload: id });
+  const handleDelete = (card: FlashCard) => {
+    if (state.cardsById[card.id]) dispatch({ type: 'DELETE_CARD', payload: card.id });
+    else softDeleteCard(card);
     setConfirmDelete(null);
+    setRefreshTick((tick) => tick + 1);
+  };
+
+  const handleRestoreCard = (cardId: string) => {
+    const restored = restoreDeletedCard(cardId);
+    if (restored) setImportMsg('卡片已恢复');
+    setRefreshTick((tick) => tick + 1);
   };
 
   // ---- 导出 ----
@@ -406,9 +388,7 @@ export default function CardDatabasePage({ onBack }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-        </button>
+        <BackButton onClick={onBack} />
         <Database className="w-5 h-5" style={{ color: ACCENT }} />
         <h1 className="nav-title">卡片数据库</h1>
       </div>
@@ -470,15 +450,22 @@ export default function CardDatabasePage({ onBack }: Props) {
                 )}
               </div>
               {/* 导入按钮 */}
-              <button
-                onClick={() => fileRef.current?.click()}
-                className="flex-1 py-2.5 rounded-xl text-[13px] font-medium flex items-center justify-center gap-1.5 transition-colors"
-                style={{ backgroundColor: `${PURPLE}15`, color: PURPLE }}
-              >
-                <Upload className="w-4 h-4" />导入
-              </button>
-              <input ref={fileRef} type="file" accept=".csv,.json,.md" onChange={handleImport} className="hidden" />
-            </div>
+	              <button
+	                onClick={() => fileRef.current?.click()}
+	                className="flex-1 py-2.5 rounded-xl text-[13px] font-medium flex items-center justify-center gap-1.5 transition-colors"
+	                style={{ backgroundColor: `${PURPLE}15`, color: PURPLE }}
+	              >
+	                <Upload className="w-4 h-4" />导入
+	              </button>
+	              <button
+	                onClick={() => setShowRestore(true)}
+	                className="flex-1 py-2.5 rounded-xl text-[13px] font-medium flex items-center justify-center gap-1.5 transition-colors"
+	                style={{ backgroundColor: 'rgba(16,185,129,0.14)', color: GREEN }}
+	              >
+	                <RotateCcw className="w-4 h-4" />恢复
+	              </button>
+	              <input ref={fileRef} type="file" accept=".csv,.json,.md" onChange={handleImport} className="hidden" />
+	            </div>
             {/* 导入说明 */}
             <p className="text-[10px] leading-relaxed" style={{ color: TEXT_MUTED }}>
               支持 CSV / JSON 格式。导入时自动识别卡片所属模块，已有卡片更新进度，新卡片新增进库。
@@ -499,7 +486,13 @@ export default function CardDatabasePage({ onBack }: Props) {
             {CATEGORIES.map(cat => (
               <FilterBtn key={cat.key} label={`${cat.label} (${categoryCounts[cat.key] || 0})`} active={categoryFilter === cat.key} onClick={() => setCategoryFilter(cat.key)} />
             ))}
-          </div>
+	            {loadCustomDecks().map(deck => (
+	              <FilterBtn key={deck.id} label={`${deck.name} (${categoryCounts[deck.id] || 0})`} active={categoryFilter === deck.id} onClick={() => setCategoryFilter(deck.id)} />
+	            ))}
+	            {(categoryCounts[UNASSIGNED_DECK_ID] || 0) > 0 && (
+	              <FilterBtn label={`${UNASSIGNED_DECK_NAME} (${categoryCounts[UNASSIGNED_DECK_ID] || 0})`} active={categoryFilter === UNASSIGNED_DECK_ID} onClick={() => setCategoryFilter(UNASSIGNED_DECK_ID)} />
+	            )}
+	          </div>
 
           {/* 卡片列表 */}
           {filtered.length === 0 ? (
@@ -510,7 +503,20 @@ export default function CardDatabasePage({ onBack }: Props) {
           ) : (
             <div className="space-y-1.5">
               {filtered.map(card => (
-                <div key={card.id} className="rounded-xl p-3 border flex items-start gap-3" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+                <div
+                  key={card.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onStudyCard?.(card)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      onStudyCard?.(card);
+                    }
+                  }}
+                  className="rounded-xl p-3 border flex items-start gap-3 cursor-pointer transition-colors hover:border-blue-300"
+                  style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}
+                >
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-medium leading-snug line-clamp-2" style={{ color: TEXT_PRIMARY }}>{getCardDisplayLabel(card)}</p>
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -525,10 +531,10 @@ export default function CardDatabasePage({ onBack }: Props) {
                       {(card.tags || []).slice(0, 2).map(tag => <span key={tag} className="text-[10px]" style={{ color: TEXT_MUTED }}>#{tag}</span>)}
                     </div>
                   </div>
-                  {confirmDelete === card.id ? (
-                    <button onClick={() => handleDelete(card.id)} className="shrink-0 px-2 py-1 rounded-lg text-[11px] font-bold text-white" style={{ backgroundColor: '#EF4444' }}>确认删除</button>
-                  ) : (
-                    <button onClick={() => setConfirmDelete(card.id)} className="shrink-0 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
+	                  {confirmDelete === card.id ? (
+	                    <button onClick={(event) => { event.stopPropagation(); handleDelete(card); }} className="shrink-0 px-2 py-1 rounded-lg text-[11px] font-bold text-white" style={{ backgroundColor: '#EF4444' }}>确认删除</button>
+	                  ) : (
+                    <button onClick={(event) => { event.stopPropagation(); setConfirmDelete(card.id); }} className="shrink-0 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
                       <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
                     </button>
                   )}
@@ -536,10 +542,48 @@ export default function CardDatabasePage({ onBack }: Props) {
               ))}
             </div>
           )}
-        </div>
-      </div>
-    </div>
-  );
+	          {showRestore && (
+	            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4">
+	              <div className="w-full max-w-sm rounded-2xl border p-4 shadow-xl" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+	                <div className="flex items-center justify-between mb-3">
+	                  <h3 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>恢复已删除卡片</h3>
+	                  <button onClick={() => setShowRestore(false)} className="text-[12px]" style={{ color: TEXT_MUTED }}>关闭</button>
+	                </div>
+	                {deletedCards.length === 0 ? (
+	                  <p className="py-8 text-center text-[13px]" style={{ color: TEXT_MUTED }}>暂无可恢复卡片</p>
+	                ) : (
+	                  <div className="max-h-[60vh] overflow-y-auto space-y-2">
+	                    {deletedCards.map((item) => (
+	                      <div
+                          key={item.card.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => onStudyCard?.(item.card)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              onStudyCard?.(item.card);
+                            }
+                          }}
+                          className="rounded-xl border p-3 cursor-pointer"
+                          style={{ borderColor: CARD_BORDER, backgroundColor: 'rgba(255,255,255,0.03)' }}
+                        >
+	                        <p className="line-clamp-2 text-[13px] font-medium" style={{ color: TEXT_PRIMARY }}>{getCardDisplayLabel(item.card)}</p>
+	                        <p className="mt-1 text-[11px]" style={{ color: TEXT_MUTED }}>原牌组：{getCategoryLabel(item.originCategory)}</p>
+	                        <button onClick={(event) => { event.stopPropagation(); handleRestoreCard(item.card.id); }} className="mt-2 w-full rounded-lg py-2 text-[12px] font-bold" style={{ backgroundColor: 'rgba(16,185,129,0.14)', color: GREEN }}>
+	                          恢复
+	                        </button>
+	                      </div>
+	                    ))}
+	                  </div>
+	                )}
+	              </div>
+	            </div>
+	          )}
+	        </div>
+	      </div>
+	    </div>
+	  );
 }
 
 function StatMini({ label, value, color }: { label: string; value: number; color: string }) {

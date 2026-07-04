@@ -79,7 +79,7 @@ const ADMIN_PATTERNS = [
 export async function uploadDocument(
   docId: string,
   filename: string,
-  fileType: 'pdf' | 'markdown' | 'txt',
+  fileType: 'pdf' | 'markdown' | 'txt' | 'docx',
   fileSize: number,
   filePath: string,
 ): Promise<string> {
@@ -409,7 +409,7 @@ export async function generateDraftsFromDocument(documentId: string): Promise<vo
 export async function runFullPipeline(
   docId: string,
   filename: string,
-  fileType: 'pdf' | 'markdown' | 'txt',
+  fileType: 'pdf' | 'markdown' | 'txt' | 'docx',
   fileSize: number,
   filePath: string,
 ): Promise<string> {

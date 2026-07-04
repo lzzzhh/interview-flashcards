@@ -3,6 +3,9 @@ import prisma from '../db/prisma';
 import { syncCardEmbedding, deleteCardEmbedding } from '../services/vector/embedding-sync';
 import { CreateCardSchema, UpdateCardSchema, validate } from './schemas';
 import { generateSearchKeywords } from '../services/ingestion/search-readiness';
+import { rebuildStatsSnapshot } from '../services/stats-snapshot';
+
+const USER_ID = 'demo-user';
 
 export async function cardRoutes(app: FastifyInstance) {
   // POST /api/cards — 新增卡片
@@ -42,6 +45,8 @@ export async function cardRoutes(app: FastifyInstance) {
     syncCardEmbedding(card.id).catch((e) => {
       console.error(`[cards] embedding sync failed for ${card.id}:`, e?.message?.slice(0, 100));
     });
+
+    await rebuildStatsSnapshot(USER_ID);
 
     return card;
   });
@@ -88,6 +93,8 @@ export async function cardRoutes(app: FastifyInstance) {
       console.error(`[cards] embedding sync failed for ${cardId}:`, e?.message?.slice(0, 100));
     });
 
+    await rebuildStatsSnapshot(USER_ID);
+
     return updated;
   });
 
@@ -102,6 +109,7 @@ export async function cardRoutes(app: FastifyInstance) {
     await prisma.card.delete({ where: { id: cardId } });
 
     deleteCardEmbedding(cardId).catch(() => {});
+    await rebuildStatsSnapshot(USER_ID);
 
     return { deleted: true };
   });

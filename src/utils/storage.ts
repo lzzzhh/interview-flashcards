@@ -26,7 +26,7 @@ function getProgressKey(category: Category): string {
 
 export function loadProgress(category: Category): StoredProgress {
   try {
-    const raw = localStorage.getItem(getProgressKey(category));
+    const raw = localStorage.getItem(getProgressKey(category)) || localStorage.getItem(`fc-progress-${category}`);
     if (raw) return JSON.parse(raw) as StoredProgress;
   } catch {
     // corrupted data — reset

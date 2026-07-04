@@ -16,6 +16,8 @@ export interface RerankProfile {
   wKeyword: number;
   wField: number;
   wLearning: number;
+  wGraph: number;
+  wSimilarity: number;
   deckBoost: number;
   /** 是否启用统计学 lexical booster */
   statsLexicalBoost: boolean;
@@ -24,9 +26,11 @@ export interface RerankProfile {
 export const DEFAULT_PROFILE: RerankProfile = {
   name: 'default',
   wVector: 0.10,
-  wKeyword: 0.60,
-  wField: 0.20,
+  wKeyword: 0.50,
+  wField: 0.15,
   wLearning: 0.10,
+  wGraph: 0.10,
+  wSimilarity: 0.05,
   deckBoost: 0.25,
   statsLexicalBoost: false,
 };
@@ -34,9 +38,11 @@ export const DEFAULT_PROFILE: RerankProfile = {
 export const STATS_PROFILE: RerankProfile = {
   name: 'statistics',
   wVector: 0.20,
-  wKeyword: 0.30,
-  wField: 0.40,
+  wKeyword: 0.25,
+  wField: 0.35,
   wLearning: 0.10,
+  wGraph: 0.05,
+  wSimilarity: 0.05,
   deckBoost: 0.25,
   statsLexicalBoost: true,
 };
@@ -44,9 +50,11 @@ export const STATS_PROFILE: RerankProfile = {
 export const LONG_STATS_PROFILE: RerankProfile = {
   name: 'long-statistics',
   wVector: 0.15,
-  wKeyword: 0.35,
-  wField: 0.40,
+  wKeyword: 0.30,
+  wField: 0.35,
   wLearning: 0.10,
+  wGraph: 0.05,
+  wSimilarity: 0.05,
   deckBoost: 0.25,
   statsLexicalBoost: true,
 };
@@ -54,10 +62,12 @@ export const LONG_STATS_PROFILE: RerankProfile = {
 /** 全局 keyword-heavy profile (ablation 用) */
 export const KEYWORD_HEAVY_PROFILE: RerankProfile = {
   name: 'keyword-heavy',
-  wVector: 0.25,
-  wKeyword: 0.30,
-  wField: 0.35,
+  wVector: 0.20,
+  wKeyword: 0.25,
+  wField: 0.30,
   wLearning: 0.10,
+  wGraph: 0.10,
+  wSimilarity: 0.05,
   deckBoost: 0.25,
   statsLexicalBoost: false,
 };
@@ -225,6 +235,10 @@ export interface RerankCandidate {
   vectorScore: number;
   /** 关键词/FTS5 匹配分数 [0, 1] */
   keywordScore: number;
+  /** Neo4j 概念图扩展分数 [0, 1] */
+  graphScore?: number;
+  /** Neo4j 卡片相似度扩展分数 [0, 1] */
+  similarityScore?: number;
   /** 命中的关键词列表（用于字段 boost 计算） */
   matchedKeywords: string[];
   /** 查询 bigram token 列表 */
@@ -353,10 +367,12 @@ export function computeFinalScore(
   const learningBoost = computeLearningBoost(candidate.learning);
 
   return (
-    profile.wVector   * candidate.vectorScore +
-    profile.wKeyword  * candidate.keywordScore +
-    profile.wField    * fieldBoost +
-    profile.wLearning * learningBoost +
+    profile.wVector     * candidate.vectorScore +
+    profile.wKeyword    * candidate.keywordScore +
+    profile.wField      * fieldBoost +
+    profile.wLearning   * learningBoost +
+    profile.wGraph      * (candidate.graphScore || 0) +
+    profile.wSimilarity * (candidate.similarityScore || 0) +
     extraBoost
   );
 }
@@ -380,10 +396,12 @@ export function rerank(
     const learningBoost = computeLearningBoost(cand.learning);
     const extra = extraBoosts.get(cand.cardId) || 0;
     const finalScore = (
-      profile.wVector   * cand.vectorScore +
-      profile.wKeyword  * cand.keywordScore +
-      profile.wField    * fieldBoost +
-      profile.wLearning * learningBoost +
+      profile.wVector     * cand.vectorScore +
+      profile.wKeyword    * cand.keywordScore +
+      profile.wField      * fieldBoost +
+      profile.wLearning   * learningBoost +
+      profile.wGraph      * (cand.graphScore || 0) +
+      profile.wSimilarity * (cand.similarityScore || 0) +
       extra
     );
 

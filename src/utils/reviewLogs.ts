@@ -29,6 +29,7 @@ export function saveReviewLogs(logs: Record<string, ReviewLog[]>): void {
 export function appendReviewLog(log: ReviewLog): void {
   const logs = loadReviewLogs();
   if (!logs[log.cardId]) logs[log.cardId] = [];
+  if (logs[log.cardId].some((existing) => existing.id === log.id)) return;
   logs[log.cardId].push(log);
   saveReviewLogs(logs);
 }
@@ -46,6 +47,78 @@ export function getTodayReviewed(allLogs: ReviewLog[]): number {
     const d = new Date(l.reviewedAt).toISOString().slice(0, 10);
     return d === today;
   }).length;
+}
+
+function getLocalDateKey(timestamp: number): string {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/** 今日从 new 首次学过的卡片 ID */
+export function getTodayNewLearnedCardIds(
+  logs: Record<string, ReviewLog[]> = loadReviewLogs(),
+  now = Date.now(),
+): Set<string> {
+  const today = getLocalDateKey(now);
+  const learnedIds = new Set<string>();
+
+  for (const [cardId, cardLogs] of Object.entries(logs)) {
+    if (cardLogs.some((log) => log.stateBefore === 'new' && getLocalDateKey(log.reviewedAt) === today)) {
+      learnedIds.add(cardId);
+    }
+  }
+
+  return learnedIds;
+}
+
+/** 今日有过任意复习记录的卡片 ID（去重） */
+export function getTodayStudiedCardIds(
+  logs: Record<string, ReviewLog[]> = loadReviewLogs(),
+  now = Date.now(),
+): Set<string> {
+  const today = getLocalDateKey(now);
+  const studiedIds = new Set<string>();
+
+  for (const [cardId, cardLogs] of Object.entries(logs)) {
+    if (cardLogs.some((log) => getLocalDateKey(log.reviewedAt) === today)) {
+      studiedIds.add(cardId);
+    }
+  }
+
+  return studiedIds;
+}
+
+/** 指定卡片集合里，今天已经消耗的新卡额度 */
+export function countTodayNewLearned(
+  cardIds: Iterable<string>,
+  logs: Record<string, ReviewLog[]> = loadReviewLogs(),
+  now = Date.now(),
+): number {
+  const deckCardIds = new Set(cardIds);
+  const learnedIds = getTodayNewLearnedCardIds(logs, now);
+  let count = 0;
+  for (const cardId of learnedIds) {
+    if (deckCardIds.has(cardId)) count += 1;
+  }
+  return count;
+}
+
+/** 指定卡片集合里，今天已经完成过学习/复习的唯一卡片数 */
+export function countTodayStudied(
+  cardIds: Iterable<string>,
+  logs: Record<string, ReviewLog[]> = loadReviewLogs(),
+  now = Date.now(),
+): number {
+  const deckCardIds = new Set(cardIds);
+  const studiedIds = getTodayStudiedCardIds(logs, now);
+  let count = 0;
+  for (const cardId of studiedIds) {
+    if (deckCardIds.has(cardId)) count += 1;
+  }
+  return count;
 }
 
 /** 连续学习天数 */

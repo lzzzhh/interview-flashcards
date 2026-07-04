@@ -1,14 +1,19 @@
-import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Search, Loader2, ChevronDown, ChevronUp, CheckCircle2, Check, ZoomIn } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Search, Loader2, ChevronDown, ChevronUp, CheckCircle2, Check, ZoomIn, X, Eye, EyeOff } from 'lucide-react';
 import { hybridSearch, fetchLearningPlan, type LearningPlanCard, type SearchResult } from '../api/searchApi';
-import { useAppContext } from '../context/AppContext';
+import { getDeckCards } from '../api/cards';
 import { API_BASE } from '../api/client';
+import type { CardDTO } from '../api/types';
+import { CATEGORIES } from '../constants';
 import { savePlan, type LearningPlanItem } from '../utils/learningPlans';
+import MathText from './MathText';
+import BackButton from './BackButton';
 import type { Category } from '../types';
 
 interface Props {
   onBack: () => void;
   onEnterStudy: (category: Category) => void;
+  variant?: 'page' | 'overlay';
 }
 
 // Local display type with full card details; stripped to LearningPlanItem when saving
@@ -23,6 +28,13 @@ interface PlanItemDisplay {
   snippet?: string;
 }
 
+interface CardPreviewState {
+  result: SearchResult;
+  card?: CardDTO;
+  loading: boolean;
+  error?: string;
+}
+
 const TEXT_PRIMARY = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
 const BLUE = 'var(--blue)';
@@ -30,6 +42,21 @@ const CARD_BG = 'var(--card-bg)';
 const CARD_BORDER = 'var(--card-border)';
 const GREEN = '#10B981';
 const AMBER = '#D97706';
+
+const STATE_LABELS: Record<string, string> = {
+  new: '新卡',
+  learning: '学习中',
+  review: '复习中',
+  relearning: '重学中',
+};
+
+const DIFFICULTY_LABELS: Record<string, string> = {
+  easy: '简单',
+  medium: '中等',
+  hard: '困难',
+};
+
+const CATEGORY_LABEL_BY_KEY = Object.fromEntries(CATEGORIES.map(category => [category.key, category.label]));
 
 // Intent keywords that suggest the user wants a learning plan
 const PLAN_INTENT_PATTERNS = [
@@ -41,8 +68,17 @@ function hasPlanIntent(query: string): boolean {
   return PLAN_INTENT_PATTERNS.some(p => p.test(query));
 }
 
-export default function AISearchPage({ onBack, onEnterStudy }: Props) {
-  const { dispatch } = useAppContext();
+function displayDeckName(deckId?: string, deckName?: string): string {
+  if (deckId && CATEGORY_LABEL_BY_KEY[deckId]) return CATEGORY_LABEL_BY_KEY[deckId];
+  if (deckName) {
+    const normalized = deckName.trim().toLowerCase().replace(/_/g, '-').replace(/\s+/g, '-');
+    if (CATEGORY_LABEL_BY_KEY[normalized]) return CATEGORY_LABEL_BY_KEY[normalized];
+    return deckName;
+  }
+  return deckId || '未知牌组';
+}
+
+export default function AISearchPage({ onBack, onEnterStudy: _onEnterStudy, variant = 'page' }: Props) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,6 +91,9 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
   const [planLoading, setPlanLoading] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const [preview, setPreview] = useState<CardPreviewState | null>(null);
+  const [answerVisible, setAnswerVisible] = useState(false);
+  const deckCardCache = useRef<Record<string, CardDTO[]>>({});
 
   useEffect(() => {
     fetch(`${API_BASE}/health/warmup`, { method: 'POST' })
@@ -144,37 +183,68 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
     setPlanExpanded(false);
   };
 
-  const handleCardClick = (cardId: string, deckId: string) => {
-    dispatch({ type: 'JUMP_TO_CARD', payload: { category: deckId as Category, cardId } });
-    onEnterStudy(deckId as Category);
+  const handleCardClick = async (result: SearchResult) => {
+    setAnswerVisible(false);
+    setPreview({ result, loading: true });
+    try {
+      if (!deckCardCache.current[result.deckId]) {
+        const resp = await getDeckCards(result.deckId, 2000, 0);
+        deckCardCache.current[result.deckId] = resp.cards;
+      }
+      const card = deckCardCache.current[result.deckId].find(c => c.id === result.cardId);
+      setPreview({
+        result,
+        card,
+        loading: false,
+        error: card ? undefined : '未找到卡片详情',
+      });
+    } catch (e: any) {
+      setPreview({
+        result,
+        loading: false,
+        error: e?.message || '加载卡片详情失败',
+      });
+    }
   };
 
   const selectedCount = planItems.filter(p => p.selected).length;
+  const isOverlay = variant === 'overlay';
 
   return (
-    <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
-      <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-        </button>
-        <div className="flex-1 flex items-center gap-2">
+    <div className={`${isOverlay ? 'fixed inset-0 z-50 bg-white/78 backdrop-blur-md dark:bg-slate-950/78' : 'dark-bg homepage-glass-stage min-h-screen'} flex flex-col transition-colors`}>
+      <div className={`${isOverlay ? 'mx-auto mt-4 w-[calc(100%-2rem)] max-w-md' : 'nav-bar sticky top-0'} z-20 flex items-center gap-3`}>
+        <BackButton onClick={onBack} />
+        <div
+          className={`${isOverlay ? 'h-12 rounded-2xl border bg-white/90 px-3 shadow-lg backdrop-blur-xl dark:bg-slate-900/90' : ''} flex flex-1 items-center gap-2`}
+          style={isOverlay ? { borderColor: CARD_BORDER } : undefined}
+        >
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="搜索卡片，如「哈希表」「梯度下降」..."
-            className="flex-1 px-3 py-1.5 rounded-lg text-[13px] border-0 outline-none"
-            style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: TEXT_PRIMARY }}
+            className={`${isOverlay ? 'h-full bg-transparent px-1 text-[14px]' : 'rounded-lg px-3 py-1.5 text-[13px]'} flex-1 border-0 outline-none`}
+            style={{
+              backgroundColor: isOverlay ? 'transparent' : 'rgba(255,255,255,0.08)',
+              color: TEXT_PRIMARY,
+              outline: 'none',
+              boxShadow: 'none',
+            }}
             autoFocus
           />
-          <button onClick={() => handleSearch()} disabled={loading} className="p-1.5 rounded-lg" style={{ backgroundColor: 'rgba(64,156,255,0.15)' }}>
+          <button
+            onClick={() => handleSearch()}
+            disabled={loading}
+            className={`${isOverlay ? 'h-9 w-9' : 'p-1.5'} flex shrink-0 items-center justify-center rounded-xl`}
+            style={{ backgroundColor: 'rgba(64,156,255,0.15)' }}
+          >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" style={{ color: BLUE }} /> : <Search className="w-4 h-4" style={{ color: BLUE }} />}
           </button>
         </div>
       </div>
 
       <div className="flex-1 flex items-start justify-center">
-        <div className="relative z-10 w-full max-w-md px-5 py-6 pb-24">
+        <div className={`relative z-10 w-full max-w-md px-5 ${isOverlay ? 'py-4 pb-8' : 'py-6 pb-24'}`}>
           {!searched ? (
             warmingUp ? (
               <div className="text-center mt-8">
@@ -228,7 +298,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
                             <div className="flex-1 min-w-0">
                               <p className="text-[12px] font-medium truncate" style={{ color: TEXT_PRIMARY }}>{item.title}</p>
                               <p className="text-[10px] truncate" style={{ color: TEXT_MUTED }}>
-                                {item.deckName} {item.state !== 'new' ? `· 间隔${item.interval}天` : '· 新卡'}
+                                {displayDeckName(item.deckId, item.deckName)} {item.state !== 'new' ? `· 间隔${item.interval}天` : '· 新卡'}
                               </p>
                             </div>
                           </button>
@@ -276,7 +346,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
                 </button>
               )}
               {results.map((r) => (
-                <button key={r.cardId} onClick={() => handleCardClick(r.cardId, r.deckId)}
+                <button key={r.cardId} onClick={() => handleCardClick(r)}
                   className="w-full text-left rounded-xl p-3 border transition-colors"
                   style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}
                 >
@@ -293,7 +363,7 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
                     <p className="text-[11px] mt-1 leading-relaxed truncate-2" style={{ color: TEXT_MUTED }}>{r.snippet}</p>
                   )}
                   <div className="flex items-center gap-2 mt-1">
-                    {r.deckName && <span className="text-[10px]" style={{ color: TEXT_MUTED }}>{r.deckName}</span>}
+                    <span className="text-[10px]" style={{ color: TEXT_MUTED }}>{displayDeckName(r.deckId, r.deckName)}</span>
                     <span className="text-[10px]" style={{ color: TEXT_MUTED }}>{r.reason}</span>
                   </div>
                 </button>
@@ -303,6 +373,154 @@ export default function AISearchPage({ onBack, onEnterStudy }: Props) {
           </>)}
         </div>
       </div>
+      {preview && (
+        <CardPreviewSheet
+          preview={preview}
+          answerVisible={answerVisible}
+          onToggleAnswer={() => setAnswerVisible(v => !v)}
+          onClose={() => setPreview(null)}
+        />
+      )}
     </div>
+  );
+}
+
+function getQuestionText(preview: CardPreviewState): string {
+  const card = preview.card;
+  if (!card) return preview.result.title;
+  if (card.type === 'leetcode') {
+    const title = card.titleCn || card.title || preview.result.title;
+    return card.number ? `#${card.number} ${title}` : title;
+  }
+  return card.question || preview.result.title;
+}
+
+function getAnswerText(preview: CardPreviewState): string {
+  const card = preview.card;
+  if (!card) return preview.result.snippet || '暂无答案详情';
+  if (card.type === 'leetcode') return card.approach || card.description || '暂无答案详情';
+  return card.answer || '暂无答案详情';
+}
+
+function getBodyText(preview: CardPreviewState): string | null {
+  const card = preview.card;
+  if (!card) return preview.result.snippet || null;
+  if (card.type === 'leetcode') return card.description || null;
+  return null;
+}
+
+function CardPreviewSheet({
+  preview,
+  answerVisible,
+  onToggleAnswer,
+  onClose,
+}: {
+  preview: CardPreviewState;
+  answerVisible: boolean;
+  onToggleAnswer: () => void;
+  onClose: () => void;
+}) {
+  const card = preview.card;
+  const progress = card?.progress;
+  const state = progress?.state || (preview.result.due ? 'review' : 'new');
+  const tags = card?.tags?.length ? card.tags : preview.result.tags;
+  const question = getQuestionText(preview);
+  const answer = getAnswerText(preview);
+  const body = getBodyText(preview);
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-slate-950/25 px-3 pb-3 backdrop-blur-[2px]">
+      <div
+        className="max-h-[72vh] w-full max-w-md overflow-hidden rounded-t-3xl border bg-white shadow-2xl dark:bg-slate-950"
+        style={{ borderColor: CARD_BORDER, color: TEXT_PRIMARY }}
+      >
+        <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: CARD_BORDER }}>
+          <div className="min-w-0">
+            <p className="text-[12px] font-medium" style={{ color: TEXT_MUTED }}>
+              {displayDeckName(preview.result.deckId, preview.result.deckName)} · {STATE_LABELS[state] || state}
+            </p>
+            <h3 className="mt-0.5 truncate text-[15px] font-bold">卡片详情</h3>
+          </div>
+          <button type="button" onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-xl">
+            <X className="h-4 w-4" style={{ color: TEXT_MUTED }} />
+          </button>
+        </div>
+
+        <div className="max-h-[calc(72vh-56px)] overflow-y-auto px-4 py-4">
+          {preview.loading ? (
+            <div className="flex items-center justify-center gap-2 py-10 text-[13px]" style={{ color: TEXT_MUTED }}>
+              <Loader2 className="h-4 w-4 animate-spin" style={{ color: BLUE }} />
+              正在加载卡片详情...
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {preview.error && (
+                <div className="rounded-xl border px-3 py-2 text-[12px]" style={{ borderColor: 'rgba(239,68,68,0.24)', color: '#EF4444' }}>
+                  {preview.error}
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                <MetaPill label={STATE_LABELS[state] || state} />
+                {card?.difficulty && <MetaPill label={DIFFICULTY_LABELS[card.difficulty] || card.difficulty} />}
+                <MetaPill label={preview.result.matchType === 'due' ? '到期' : preview.result.matchType === 'keyword' ? '关键词' : preview.result.matchType === 'vector' || preview.result.matchType === 'semantic' ? '语义' : '混合'} />
+                {progress && progress.intervalDays > 0 && <MetaPill label={`间隔 ${progress.intervalDays} 天`} />}
+              </div>
+
+              <section>
+                <h4 className="mb-2 text-[12px] font-bold" style={{ color: TEXT_MUTED }}>题目</h4>
+                <div className="rounded-2xl border px-3 py-3 text-[14px] font-semibold leading-relaxed" style={{ borderColor: CARD_BORDER }}>
+                  <MathText text={question} />
+                </div>
+              </section>
+
+              {body && (
+                <section>
+                  <h4 className="mb-2 text-[12px] font-bold" style={{ color: TEXT_MUTED }}>描述</h4>
+                  <div className="rounded-2xl border px-3 py-3 text-[13px] leading-relaxed whitespace-pre-wrap" style={{ borderColor: CARD_BORDER, color: TEXT_MUTED }}>
+                    <MathText text={body} />
+                  </div>
+                </section>
+              )}
+
+              <section>
+                <div className="mb-2 flex items-center justify-between">
+                  <h4 className="text-[12px] font-bold" style={{ color: TEXT_MUTED }}>答案</h4>
+                  <button
+                    type="button"
+                    onClick={onToggleAnswer}
+                    className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-bold"
+                    style={{ backgroundColor: 'rgba(64,156,255,0.15)', color: BLUE }}
+                  >
+                    {answerVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    {answerVisible ? '隐藏答案' : '显示答案'}
+                  </button>
+                </div>
+                <div className="min-h-24 rounded-2xl border px-3 py-3 text-[13px] leading-relaxed whitespace-pre-wrap" style={{ borderColor: CARD_BORDER }}>
+                  {answerVisible ? <MathText text={answer} /> : <span style={{ color: TEXT_MUTED }}>答案已隐藏</span>}
+                </div>
+              </section>
+
+              {tags.length > 0 && (
+                <section>
+                  <h4 className="mb-2 text-[12px] font-bold" style={{ color: TEXT_MUTED }}>标签</h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {tags.map(tag => <MetaPill key={tag} label={tag} />)}
+                  </div>
+                </section>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MetaPill({ label }: { label: string }) {
+  return (
+    <span className="rounded-full px-2.5 py-1 text-[11px] font-medium" style={{ backgroundColor: 'rgba(100,116,139,0.12)', color: TEXT_MUTED }}>
+      {label}
+    </span>
   );
 }

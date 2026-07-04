@@ -1,10 +1,26 @@
 // backend/src/services/vector/embedding-sync.ts — 卡片 Embedding 自动同步
 // 优先使用外部 Embedding API，失败时降级到本地 n-gram 向量
+// 同步完成后自动触发 Neo4j 卡片相似度更新
 
 import prisma from '../../db/prisma';
 import { getEmbeddingProvider } from '../embedding-provider';
 import { getVectorStore } from './vector-store';
 import { localSyncCardEmbedding, localSyncCardEmbeddings } from './local-embedding';
+
+/** Fire-and-forget Neo4j similarity update after embedding sync */
+function triggerSimilarityUpdate(cardId: string) {
+  setImmediate(async () => {
+    try {
+      const { upsertCardSimilarity } = await import('../neo4j/card-similarity');
+      await upsertCardSimilarity(cardId);
+    } catch (e: any) {
+      // Silently skip — similarity is best-effort
+      if (!e.message?.includes('Neo4j')) {
+        console.warn(`[embedding-sync] Similarity update failed for ${cardId}: ${e.message}`);
+      }
+    }
+  });
+}
 
 /** 构建卡片索引文本（用于 embedding） */
 export function buildCardIndexText(card: { question?: string | null; answer?: string | null; title?: string | null; titleCn?: string | null; tags?: string | null; description?: string | null }): string {
@@ -40,6 +56,7 @@ export async function syncCardEmbedding(cardId: string): Promise<void> {
       const res = await provider.embed({ model: model || 'bge-m3', texts: [text] });
       if (res.embeddings.length > 0) {
         await store.upsert(cardId, 'card', res.embeddings[0]);
+        triggerSimilarityUpdate(cardId);
         return;
       }
     } catch (e: any) {
@@ -49,6 +66,7 @@ export async function syncCardEmbedding(cardId: string): Promise<void> {
 
   // 降级：本地 n-gram 向量
   await localSyncCardEmbedding(cardId);
+  triggerSimilarityUpdate(cardId);
 }
 
 /** 为多张卡片批量生成并写入 embedding */
@@ -79,6 +97,7 @@ export async function syncCardEmbeddings(cardIds: string[]): Promise<number> {
       }
       if (items.length > 0) {
         await store.upsertBatch(items);
+        for (const item of items) triggerSimilarityUpdate(item.objectId);
         return items.length;
       }
     } catch {
@@ -87,7 +106,9 @@ export async function syncCardEmbeddings(cardIds: string[]): Promise<number> {
   }
 
   // 降级：本地 n-gram 向量
-  return await localSyncCardEmbeddings(cardIds);
+  const result = await localSyncCardEmbeddings(cardIds);
+  for (const id of cardIds) triggerSimilarityUpdate(id);
+  return result;
 }
 
 /** 删除卡片的 embedding */

@@ -1,6 +1,6 @@
 export type ParsedBlockType = 'heading' | 'paragraph' | 'list' | 'table' | 'formula' | 'image_text' | 'ocr' | 'code' | 'caption';
 
-export type ParsedBlockSource = 'pdf_text' | 'ocr' | 'table_parser' | 'formula_parser' | 'markdown' | 'txt';
+export type ParsedBlockSource = 'pdf_text' | 'ocr' | 'table_parser' | 'formula_parser' | 'markdown' | 'txt' | 'docx';
 
 export interface ParsedBlock {
   id: string;
@@ -18,7 +18,7 @@ export interface ParsedBlock {
 export interface ParsedDocument {
   id: string;
   filename: string;
-  fileType: 'pdf' | 'markdown' | 'txt';
+  fileType: 'pdf' | 'markdown' | 'txt' | 'docx';
   markdown: string;
   blocks: ParsedBlock[];
   numPages?: number;

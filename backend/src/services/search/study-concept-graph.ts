@@ -30,8 +30,8 @@ const STAGE_RULES: StageRule[] = [
       /入门|基础|概述|介绍|什么是|定义|概念|初学|新手|简介|理解|认识|了解/i,
       /fundamental|introduction|basics|overview|beginner|getting.?started/i,
     ],
-    minCards: 3,
-    maxCards: 5,
+    minCards: 5,
+    maxCards: 10,
   },
   {
     stage: '核心方法',
@@ -39,8 +39,8 @@ const STAGE_RULES: StageRule[] = [
       /核心|主要|关键|算法|方法|原理|机制|实现|技术|模型|架构|流程|推导|公式|计算/i,
       /core|algorithm|method|principle|mechanism|implementation|technique|architecture/i,
     ],
-    minCards: 3,
-    maxCards: 5,
+    minCards: 5,
+    maxCards: 12,
   },
   {
     stage: '对比选择',
@@ -48,8 +48,8 @@ const STAGE_RULES: StageRule[] = [
       /对比|区别|比较|vs|选择|优劣|适用|场景|差异|不同|优缺点|对比分析|对比总结|选型/i,
       /comparison|difference|vs|trade.?off|pros.?cons|advantage|disadvantage|choose|selection/i,
     ],
-    minCards: 2,
-    maxCards: 5,
+    minCards: 3,
+    maxCards: 8,
   },
   {
     stage: '面试考点',
@@ -57,8 +57,8 @@ const STAGE_RULES: StageRule[] = [
       /面试|常见|考点|总结|必考|经典|重点|考察|要点|高频|常考|核心概念|面试题/i,
       /interview|common|summary|frequent|key.?point|essential|classic/i,
     ],
-    minCards: 2,
-    maxCards: 5,
+    minCards: 3,
+    maxCards: 10,
   },
   {
     stage: '复习练习',
@@ -66,8 +66,8 @@ const STAGE_RULES: StageRule[] = [
       /复习|回顾|刷题|练习|巩固|整理|清单|总结|备忘|速查|手册|题目|习题/i,
       /review|practice|exercise|problem|quiz|cheat.?sheet|checklist|recap/i,
     ],
-    minCards: 2,
-    maxCards: 5,
+    minCards: 3,
+    maxCards: 10,
   },
 ];
 
@@ -159,8 +159,8 @@ export function buildStagedPlan(
 
     let priority: number;
     if (state === 'new') priority = 0;
-    else if (state !== 'new' && nextReview <= now) priority = 1;
-    else if (state !== 'new' && nextReview <= now + 3 * 86400000) priority = 2;
+    else if (['learning', 'review', 'relearning'].includes(state) && nextReview <= now) priority = 1;
+    else if (['learning', 'review', 'relearning'].includes(state) && nextReview <= now + 3 * 86400000) priority = 2;
     else priority = 3;
 
     stages[stage].push({

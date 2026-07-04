@@ -120,8 +120,56 @@ fn spawn_backend() -> Option<Child> {
     None
 }
 
+/// 尝试启动 Python 文档解析 Worker，供资料制卡和简历优化共用
+fn spawn_parser_worker() -> Option<Child> {
+    let home = dirs_next::home_dir().unwrap_or_else(|| PathBuf::from("."));
+    let candidates: Vec<PathBuf> = vec![
+        home.join("Library").join("Application Support").join("interview-flashcards").join("parser-worker"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).parent()?.join("parser-worker"),
+        home.join("Desktop").join("interview-flashcards").join("parser-worker"),
+    ];
+    let worker_dir = candidates.into_iter().find(|p| p.join("start.sh").exists())?;
+    log::info!("启动解析 Worker: {}", worker_dir.display());
+
+    let log_dir = home.join("Library").join("Logs").join("interview-flashcards");
+    let _ = fs::create_dir_all(&log_dir);
+    let log_path = log_dir.join("parser-worker.log");
+    let stdout = fs::OpenOptions::new().create(true).append(true).open(&log_path).ok();
+    let stderr = fs::OpenOptions::new().create(true).append(true).open(&log_path).ok();
+    let path_env = format!(
+        "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:{}",
+        home.join(".local/bin").display()
+    );
+
+    let mut command = Command::new("/bin/bash");
+    command
+        .arg(worker_dir.join("start.sh"))
+        .arg("8000")
+        .current_dir(&worker_dir)
+        .env("PATH", &path_env)
+        .env("PWD", &worker_dir);
+    if let Some(file) = stdout {
+        command.stdout(file);
+    }
+    if let Some(file) = stderr {
+        command.stderr(file);
+    }
+
+    match command.spawn() {
+        Ok(child) => {
+            log::info!("解析 Worker 已启动 (pid: {})", child.id());
+            Some(child)
+        }
+        Err(e) => {
+            log::warn!("解析 Worker 启动失败: {}", e);
+            None
+        }
+    }
+}
+
 // 保持后端进程存活
 static BACKEND_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
+static PARSER_WORKER_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
 
 #[tauri::command]
 fn read_data() -> Result<String, String> {
@@ -221,6 +269,9 @@ pub fn run() {
     if let Some(child) = spawn_backend() {
         *BACKEND_PROCESS.lock().unwrap() = Some(child);
     }
+    if let Some(child) = spawn_parser_worker() {
+        *PARSER_WORKER_PROCESS.lock().unwrap() = Some(child);
+    }
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -231,6 +282,9 @@ pub fn run() {
 
     // 退出时清理后端进程
     if let Some(mut child) = BACKEND_PROCESS.lock().unwrap().take() {
+        let _ = child.kill();
+    }
+    if let Some(mut child) = PARSER_WORKER_PROCESS.lock().unwrap().take() {
         let _ = child.kill();
     }
 }

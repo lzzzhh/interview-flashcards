@@ -186,7 +186,9 @@ export function exportProgress(): void {
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
     if (k?.startsWith('fc-limit-')) {
-      moduleDailyLimits[k.replace('fc-limit-', '')] = Number(localStorage.getItem(k)) || 20;
+      const raw = localStorage.getItem(k);
+      const value = raw === null ? 20 : Number(raw);
+      moduleDailyLimits[k.replace('fc-limit-', '')] = Number.isFinite(value) ? value : 20;
     }
   }
 

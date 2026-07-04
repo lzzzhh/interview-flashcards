@@ -54,6 +54,7 @@ export async function llmGuard(
       ],
       temperature: 0,
       maxTokens: 1024,
+      responseFormat: 'json_object',
     });
 
     const text = resp.text.trim();

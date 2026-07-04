@@ -113,6 +113,18 @@ describe('previewSchedule', () => {
       expect(result.repetitions).toBe(4);
     });
 
+    it('should shorten learning intervals in sprint mode', () => {
+      const result = previewSchedule(learningRecord, 4, { sprint: true });
+      expect(result.state).toBe('review');
+      expect(result.interval).toBe(4);
+    });
+
+    it('should mark review cards mastered when interval reaches auto resolve threshold', () => {
+      const result = previewSchedule(reviewRecord, 4, { autoResolveInterval: 20 });
+      expect(result.state).toBe('mastered');
+      expect(result.interval).toBe(23);
+    });
+
     it('should use multiplier 1.0 for rating 3', () => {
       const result = previewSchedule(reviewRecord, 3);
       expect(result.interval).toBe(Math.round(7 * 2.5 * 1.0));

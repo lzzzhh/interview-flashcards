@@ -16,13 +16,14 @@ import { settingsRoutes } from './routes/settings';
 import { statsRoutes } from './routes/stats';
 import { learningPlanRoutes } from './routes/learning-plans';
 import { documentRoutes, ingestRedirectRoutes } from './routes/documents';
+import { agentRoutes } from './routes/agent';
 import { initFTS5 } from './services/search/fts5-search';
 import { setLLMProvider, OpenAIChatProvider } from './services/llm-provider';
 import { setEmbeddingProvider, OpenAIEmbeddingProvider, getEmbeddingProvider } from './services/embedding-provider';
 import { getVectorStore, SqliteVecVectorStore, setVectorStore, initVectorStore } from './services/vector/vector-store';
 import prisma from './db/prisma';
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: true, bodyLimit: 20 * 1024 * 1024 });
 const PORT = parseInt(process.env.PORT || '3001', 10);
 
 /** 从 DB 或环境变量读取配置值 */
@@ -119,6 +120,7 @@ async function start() {
   await app.register(learningPlanRoutes);
   await app.register(ingestRedirectRoutes);
   await app.register(documentRoutes);
+  await app.register(agentRoutes);
 
   // 初始化 FTS5 索引
   initFTS5().catch(() => {});

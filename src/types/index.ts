@@ -4,8 +4,27 @@
 
 export type Category = 'leetcode' | 'statistics' | 'machine-learning' | 'deep-learning' | 'llm' | 'agent' | 'jargon' | 'workplace' | 'vibe-coding' | 'java' | string;
 export type Difficulty = 'easy' | 'medium' | 'hard';
-export type CardState = 'new' | 'learning' | 'review' | 'relearning';
+export type CardState = 'new' | 'learning' | 'review' | 'relearning' | 'mastered';
 export type StudyMode = 'choose' | 'new' | 'review';
+
+/** 学习模式预设 */
+export type StudyPaceMode = 'sprint' | 'fast' | 'normal' | 'custom';
+
+/** 学习模式配置 */
+export interface StudyModeConfig {
+  /** 模式预设 */
+  mode: StudyPaceMode;
+  /** 目标天数 */
+  targetDays: number;
+  /** 自动解决阈值（interval 超过此天数自动标记 mastered） */
+  autoResolveInterval: number;
+  /** 选中的牌组 ID */
+  selectedDecks: string[];
+  /** 每日新卡配额 { deckId: nCards }，总和不等于总上限时用默认比例 */
+  dailyQuota: Record<string, number>;
+  /** 每日复习上限倍数（新卡数 × multiplier） */
+  dailyReviewMultiplier: number;
+}
 
 /** SM-2 复习状态（增强版） */
 export interface SM2Record {
@@ -129,6 +148,14 @@ export interface AppState {
 
   /** 当前在 visibleCardIds 中的下标 */
   currentVisibleIndex: number;
+  /** 本次学习队列的初始总数，用于进度条保持总量稳定 */
+  studyQueueTotal: number;
+  /** 本次队列中已完成但仍保留可查看的卡片 ID，例如手动标记已掌握 */
+  studyQueueCompletedIds: string[];
+  /** 当前学习队列是否计入今日学习日志/每日限额 */
+  studyQueueCountsTowardDaily: boolean;
+  /** 当前学习队列是否允许展示已掌握卡片 */
+  studyQueueIncludesResolved: boolean;
 
   showApproach: boolean;
   showCode: boolean;
@@ -164,7 +191,7 @@ export type AppAction =
   | { type: 'TOGGLE_QA_ANSWER' }
   | { type: 'TOGGLE_MASTERED'; payload: string }
   | { type: 'TOGGLE_FAVORITE'; payload: string }
-  | { type: 'RATE_CARD'; payload: { cardId: string; rating: number } }
+  | { type: 'RATE_CARD'; payload: { cardId: string; rating: number; clientReviewId?: string } }
   | { type: 'SET_FILTER_DIFFICULTY'; payload: Difficulty | 'all' }
   | { type: 'SET_FILTER_SUBTOPIC'; payload: string | 'all' }
   | { type: 'SET_SEARCH'; payload: string }
@@ -183,10 +210,13 @@ export type AppAction =
   | { type: 'UNDO_LAST_RATING' }
   | { type: 'LOADED_QUEUE'; payload: { cards: FlashCard[]; mode: 'new' | 'review' } }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'API_RATE_SUCCESS'; payload: { cardId: string; progress: any } }
+  | { type: 'API_RATE_SUCCESS'; payload: { cardId: string; progress: any; log?: any } }
   | { type: 'SET_API_SOURCE'; payload: boolean }
+  | { type: 'START_TODAY_STUDY'; payload?: { cards?: FlashCard[]; deckIds?: string[] } }
   | { type: 'START_PLAN_STUDY'; payload: { cardIds: string[] } }
-  | { type: 'STOP_PLAN_STUDY' };
+  | { type: 'START_SINGLE_CARD_STUDY'; payload: { card: FlashCard; countTowardsDaily?: boolean } }
+  | { type: 'STOP_PLAN_STUDY' }
+  | { type: 'SET_STUDY_MODE_CONFIG'; payload: StudyModeConfig };
 
 // ============================================================
 // localStorage 持久化（兼容旧格式）

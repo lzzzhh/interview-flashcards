@@ -9,16 +9,18 @@ interface ProgressBarProps {
 }
 
 export default function ProgressBar({ current, total, mastered }: ProgressBarProps) {
-  const pct = total > 0 ? Math.round((mastered / total) * 100) : 0;
+  const completed = total > 0 ? Math.min(total, Math.max(0, mastered)) : 0;
+  const currentPosition = total > 0 ? Math.min(total, Math.max(1, current + 1)) : 0;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
     <div className="w-full">
       {/* Text */}
       <div className="flex justify-between items-center mb-1 text-xs text-gray-700 dark:text-gray-400">
         <span>
-          第 {current + 1} / 共 {total} 张
+          第 {currentPosition} / 共 {total} 张
         </span>
-        <span>{pct}%</span>
+        <span>已完成 {completed}/{total} · {pct}%</span>
       </div>
 
       {/* Bar */}

@@ -1,9 +1,16 @@
 // Job Prep Routes — sessions, messages, JD, plans, stages
 
 import { FastifyInstance } from 'fastify';
+import { createReadStream, createWriteStream, existsSync, mkdirSync, statSync } from 'fs';
+import { join, resolve } from 'path';
+import { pipeline } from 'stream/promises';
 import prisma from '../db/prisma';
 import { handleJobPrepMessage } from '../services/job-prep/job-prep-conversation';
 import { getLLMProvider } from '../services/llm-provider';
+import { tailorResumeDocumentForJobPrep, tailorResumeForJobPrep } from '../services/job-prep/resume-tailoring-skill';
+
+const RESUME_ARTIFACT_DIR = join(process.cwd(), 'data', 'job-prep-resumes');
+if (!existsSync(RESUME_ARTIFACT_DIR)) mkdirSync(RESUME_ARTIFACT_DIR, { recursive: true });
 
 function safeParseJson(text: string): any {
   try { return JSON.parse(text); } catch {}
@@ -12,6 +19,27 @@ function safeParseJson(text: string): any {
   const s = text.indexOf('{'), e = text.lastIndexOf('}');
   if (s >= 0 && e > s) { try { return JSON.parse(text.slice(s, e + 1)); } catch {} }
   return null;
+}
+
+function multipartFieldValue(field: unknown): string | undefined {
+  const value = (field as any)?.value;
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
+function resumeFileType(filename: string, mimetype?: string): 'pdf' | 'docx' | null {
+  const lower = filename.toLowerCase();
+  if (lower.endsWith('.pdf') || mimetype === 'application/pdf') return 'pdf';
+  if (lower.endsWith('.docx') || mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return 'docx';
+  return null;
+}
+
+function artifactPath(sessionId: string, artifactId: string, ext: 'docx' | 'pdf') {
+  const safeSession = sessionId.replace(/[^a-zA-Z0-9_-]/g, '');
+  const safeArtifact = artifactId.replace(/[^a-zA-Z0-9_-]/g, '');
+  const base = resolve(RESUME_ARTIFACT_DIR, safeSession, safeArtifact);
+  const filePath = resolve(base, `${safeArtifact}.${ext}`);
+  if (!filePath.startsWith(resolve(RESUME_ARTIFACT_DIR))) throw new Error('Invalid artifact path');
+  return filePath;
 }
 
 export async function jobPrepRoutes(app: FastifyInstance) {
@@ -86,6 +114,116 @@ export async function jobPrepRoutes(app: FastifyInstance) {
         nextAction: 'await_user',
       };
     }
+  });
+
+  // Tailor resume against the current JD / role requirements.
+  app.post('/api/job-prep/sessions/:sessionId/resume-tailoring', async (req) => {
+    const { sessionId } = req.params as any;
+    const { resumeText, jdText } = req.body as any;
+    const text = String(resumeText || '').trim();
+    if (text.length < 40) {
+      return {
+        error: 'resumeText is too short',
+        assistantMessage: '请粘贴更完整的简历内容，至少包含一段项目或经历。',
+      };
+    }
+    try {
+      const result = await tailorResumeForJobPrep(sessionId, text, jdText ? String(jdText) : undefined);
+      await prisma.jobPrepMessage.create({
+        data: {
+          sessionId,
+          role: 'tool',
+          content: 'resume_tailoring_completed',
+          toolName: 'resume_tailoring_completed',
+          toolPayload: {
+            summary: result.summary,
+            matchedEvidenceCount: result.matchedEvidence.length,
+            gapCount: result.gaps.length,
+            rewriteCount: result.rewrites.length,
+            blockerCount: result.riskFlags.filter(flag => flag.severity === 'blocker').length,
+          },
+        },
+      }).catch(() => {});
+      return result;
+    } catch (e: any) {
+      app.log.error(e, '[job-prep] resume tailoring failed');
+      return { error: e?.message || 'resume tailoring failed' };
+    }
+  });
+
+  app.post('/api/job-prep/sessions/:sessionId/resume/upload', async (req, reply) => {
+    const { sessionId } = req.params as any;
+    const isMultipart = req.headers['content-type']?.includes('multipart/form-data');
+    const data = isMultipart ? await req.file().catch(() => null) : null;
+    const body = (!isMultipart ? req.body : {}) as any;
+    const localPath = typeof body?.filePath === 'string' ? body.filePath.trim() : '';
+    const filename = data?.filename || localPath.split('/').pop() || '';
+    const mimetype = data?.mimetype;
+    if (!data && !localPath) return reply.status(400).send({ error: 'No file uploaded' });
+
+    const fileType = resumeFileType(filename, mimetype);
+    if (!fileType) return reply.status(400).send({ error: 'Only PDF and DOCX resumes are supported' });
+    if (localPath && !existsSync(localPath)) return reply.status(400).send({ error: 'Selected file does not exist' });
+
+    const session = await prisma.jobPrepSession.findUnique({ where: { id: sessionId } });
+    if (!session) return reply.status(404).send({ error: 'Session not found' });
+
+    const artifactId = `resume_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const outputDir = join(RESUME_ARTIFACT_DIR, sessionId, artifactId);
+    mkdirSync(outputDir, { recursive: true });
+
+    const sourcePath = join(outputDir, `source.${fileType}`);
+    if (data) {
+      await pipeline(data.file, createWriteStream(sourcePath));
+    } else {
+      await pipeline(createReadStream(localPath), createWriteStream(sourcePath));
+    }
+    const size = statSync(sourcePath).size;
+    const jdText = data ? multipartFieldValue((data as any).fields?.jdText) : (typeof body?.jdText === 'string' ? body.jdText : undefined);
+
+    try {
+      const result = await tailorResumeDocumentForJobPrep({
+        sessionId,
+        sourcePath,
+        sourceType: fileType,
+        outputDir,
+        artifactId,
+        jdText,
+      });
+      await prisma.jobPrepMessage.create({
+        data: {
+          sessionId,
+          role: 'tool',
+          content: 'resume_document_tailoring_completed',
+          toolName: 'resume_document_tailoring_completed',
+          toolPayload: {
+            artifactId,
+            fileName: filename,
+            fileType,
+            fileSize: size,
+            parsedTextLength: result.parsedTextLength,
+            appliedRewriteCount: result.appliedRewriteCount,
+            rewriteCount: result.rewrites.length,
+            gapCount: result.gaps.length,
+            downloadUrls: result.downloadUrls,
+          },
+        },
+      }).catch(() => {});
+      return result;
+    } catch (e: any) {
+      app.log.error(e, '[job-prep] resume document tailoring failed');
+      return reply.status(500).send({ error: e?.message || 'resume document tailoring failed' });
+    }
+  });
+
+  app.get('/api/job-prep/sessions/:sessionId/resume-artifacts/:artifactId/download/:format', async (req, reply) => {
+    const { sessionId, artifactId, format } = req.params as any;
+    if (format !== 'docx' && format !== 'pdf') return reply.status(400).send({ error: 'Unsupported format' });
+    const filePath = artifactPath(sessionId, artifactId, format);
+    if (!existsSync(filePath)) return reply.status(404).send({ error: 'Artifact not found' });
+    reply.header('Content-Disposition', `attachment; filename="tailored_resume.${format}"`);
+    reply.type(format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    return reply.send(createReadStream(filePath));
   });
 
   // Save JD

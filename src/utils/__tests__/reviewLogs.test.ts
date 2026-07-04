@@ -9,6 +9,10 @@ import {
   getAverageRating,
   getDifficultCards,
   isReallyMastered,
+  countTodayNewLearned,
+  countTodayStudied,
+  getTodayNewLearnedCardIds,
+  getTodayStudiedCardIds,
 } from '../reviewLogs';
 import type { ReviewLog } from '../../types';
 
@@ -61,6 +65,15 @@ describe('reviewLogs storage', () => {
     expect(logs['card-1']).toHaveLength(3);
   });
 
+  it('should ignore duplicate log ids for the same card', () => {
+    const log = makeLog({ cardId: 'card-1', rating: 4 });
+    appendReviewLog(log);
+    appendReviewLog(log);
+
+    const logs = loadReviewLogs();
+    expect(logs['card-1']).toHaveLength(1);
+  });
+
   it('should flatten all logs correctly', () => {
     appendReviewLog(makeLog({ cardId: 'a', rating: 3 }));
     appendReviewLog(makeLog({ cardId: 'b', rating: 4 }));
@@ -93,6 +106,41 @@ describe('getTodayReviewed', () => {
 
   it('should return 0 when no logs exist', () => {
     expect(getTodayReviewed([])).toBe(0);
+  });
+});
+
+describe('today new-card allowance usage', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.useFakeTimers();
+    vi.setSystemTime(MOCK_NOW);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should count unique cards learned from new today within a deck', () => {
+    appendReviewLog(makeLog({ cardId: 'stats-1', rating: 4, stateBefore: 'new', reviewedAt: MOCK_NOW }));
+    appendReviewLog(makeLog({ cardId: 'stats-1', rating: 5, stateBefore: 'learning', reviewedAt: MOCK_NOW }));
+    appendReviewLog(makeLog({ cardId: 'ml-1', rating: 4, stateBefore: 'new', reviewedAt: MOCK_NOW }));
+    appendReviewLog(makeLog({ cardId: 'stats-old', rating: 4, stateBefore: 'new', reviewedAt: MOCK_NOW - DAY }));
+
+    const logs = loadReviewLogs();
+    expect(getTodayNewLearnedCardIds(logs, MOCK_NOW)).toEqual(new Set(['stats-1', 'ml-1']));
+    expect(countTodayNewLearned(['stats-1', 'stats-2'], logs, MOCK_NOW)).toBe(1);
+    expect(countTodayNewLearned(['ml-1'], logs, MOCK_NOW)).toBe(1);
+  });
+
+  it('should count unique studied cards today within a deck regardless of stateBefore', () => {
+    appendReviewLog(makeLog({ cardId: 'stats-1', rating: 4, stateBefore: 'new', reviewedAt: MOCK_NOW }));
+    appendReviewLog(makeLog({ cardId: 'stats-1', rating: 5, stateBefore: 'learning', reviewedAt: MOCK_NOW }));
+    appendReviewLog(makeLog({ cardId: 'stats-2', rating: 3, stateBefore: 'review', reviewedAt: MOCK_NOW }));
+    appendReviewLog(makeLog({ cardId: 'stats-old', rating: 4, stateBefore: 'review', reviewedAt: MOCK_NOW - DAY }));
+
+    const logs = loadReviewLogs();
+    expect(getTodayStudiedCardIds(logs, MOCK_NOW)).toEqual(new Set(['stats-1', 'stats-2']));
+    expect(countTodayStudied(['stats-1', 'stats-2', 'stats-3'], logs, MOCK_NOW)).toBe(2);
   });
 });
 

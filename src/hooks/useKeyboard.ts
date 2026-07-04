@@ -99,5 +99,5 @@ export function useKeyboard({ dispatch, searchInputRef, getCurrentCardId }: Keyb
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [dispatch, searchInputRef]);
+  }, [dispatch, getCurrentCardId, searchInputRef]);
 }

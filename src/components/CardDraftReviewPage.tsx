@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { ArrowLeft, Check, X, Merge, Layers, Eye, Loader2, Search, Undo2, ChevronDown, Edit3, Save, AlertTriangle, CheckCircle2, FileText, ShieldCheck } from 'lucide-react';
+import { Check, X, Merge, Layers, Eye, Loader2, Search, Undo2, ChevronDown, Edit3, Save, AlertTriangle, CheckCircle2, FileText, ShieldCheck } from 'lucide-react';
 import { getDrafts, batchReview, batchImport, importDryRun, approveDraft, rejectDraft, getDecks, patchDraft } from '../api/documents';
 import { loadCustomDecks } from '../utils/customDecks';
 import { useDocumentQueue } from '../hooks/useDocumentQueue';
+import BackButton from './BackButton';
 import type { CardDraftDTO } from '../api/documents';
 
 interface Props {
@@ -311,9 +312,7 @@ export default function CardDraftReviewPage({ onBack, onNavigate, documentId }: 
 
         {/* Nav bar */}
         <div className="nav-bar sticky top-0 z-20 flex items-center gap-3 shrink-0">
-          <button onClick={onBack} className="p-1.5 rounded-xl hover:opacity-70">
-            <ArrowLeft size={20} style={{ color: TEXT_PRIMARY }} />
-          </button>
+          <BackButton onClick={onBack} />
           <span className="nav-title">卡片草稿审核</span>
           {count > 0 && (
             <span className="text-[11px] ml-auto px-2 py-1 rounded-full border shrink-0"

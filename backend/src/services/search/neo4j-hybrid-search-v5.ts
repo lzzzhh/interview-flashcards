@@ -230,7 +230,7 @@ export async function neo4jHybridSearchV5(input: HybridSearchInput): Promise<Car
   ]);
 
   if (input.filters?.onlyDue) {
-    const dueCardIds = new Set(progresses.filter(p => p.state !== 'new' && new Date(p.nextReview) <= new Date()).map(p => p.cardId));
+    const dueCardIds = new Set(progresses.filter(p => ['learning', 'review', 'relearning'].includes(p.state) && new Date(p.nextReview) <= new Date()).map(p => p.cardId));
     cards = cards.filter(c => dueCardIds.has(c.id));
   }
 
@@ -293,7 +293,7 @@ export async function neo4jHybridSearchV5(input: HybridSearchInput): Promise<Car
       matchedKeywords: c.matchedKeywords,
       queryBigrams,
       learning: prog ? {
-        due: prog.state !== 'new' && prog.nextReview <= new Date(),
+        due: ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date(),
         lapses: prog.lapses,
         easeFactor: prog.easeFactor,
       } : undefined,
@@ -392,7 +392,7 @@ export async function neo4jHybridSearchV5(input: HybridSearchInput): Promise<Car
     let matchType = 'keyword' as CardMatch['matchType'];
     let reason = '关键词匹配';
     if (graphResult.score > 0.3) { matchType = 'hybrid'; reason = '图谱增强混合匹配'; }
-    if (prog && prog.state !== 'new' && prog.nextReview <= new Date()) {
+    if (prog && ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date()) {
       matchType = 'due';
       reason = '到期复习';
     }
@@ -409,7 +409,7 @@ export async function neo4jHybridSearchV5(input: HybridSearchInput): Promise<Car
       score: r.finalScore,
       matchType,
       reason,
-      due: prog && prog.state !== 'new' && prog.nextReview <= new Date(),
+      due: prog && ['learning', 'review', 'relearning'].includes(prog.state) && prog.nextReview <= new Date(),
       lapses: prog?.lapses ?? undefined,
       snippet,
       scoreBreakdown: {

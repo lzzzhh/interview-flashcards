@@ -1,8 +1,9 @@
 // src/components/ApiSettingsPage.tsx — API Key 配置页面
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, CheckCircle, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { apiGet, apiPost } from '../api/client';
+import BackButton from './BackButton';
 
 interface Settings {
   baseUrl: string;
@@ -55,9 +56,7 @@ export default function ApiSettingsPage({ onBack }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-        </button>
+        <BackButton onClick={onBack} />
         <h1 className="nav-title">API 配置</h1>
       </div>
 

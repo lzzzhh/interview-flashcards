@@ -26,6 +26,8 @@ type SubModuleWithStats = SubModuleMeta & {
 
 type ModuleTone = { bg: string; fg: string; bar: string; label: string; glow: string; };
 
+const REVIEW_STATES = new Set(['learning', 'review', 'relearning']);
+
 const COLOR_TONES: Record<string, Omit<ModuleTone, 'label'>> = {
   'bg-blue-500': { bg: 'from-[#2F86FF] to-[#1267EE]', fg: '#2378f4', bar: '#2378f4', glow: 'rgba(35,120,244,0.28)' },
   'bg-green-500': { bg: 'from-[#20D452] to-[#0EB442]', fg: '#14b83f', bar: '#14b83f', glow: 'rgba(20,184,63,0.26)' },
@@ -163,7 +165,7 @@ export default function SubModulePicker({ onBack }: Props) {
           return !st || !knownSubTopics.has(st);
         });
       }
-      return { ...sm, newCount: mine.filter((c) => !c.sm2.state || c.sm2.state === 'new').length, dueCount: mine.filter((c) => { const s = c.sm2.state; return s && s !== 'new' && c.sm2.nextReview <= Date.now(); }).length, total: mine.length };
+      return { ...sm, newCount: mine.filter((c) => !c.sm2.state || c.sm2.state === 'new').length, dueCount: mine.filter((c) => REVIEW_STATES.has(c.sm2.state) && c.sm2.nextReview <= Date.now()).length, total: mine.length };
     });
   }, [state.cardsById, subModules]);
 

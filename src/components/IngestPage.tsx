@@ -1,11 +1,12 @@
 // src/components/IngestPage.tsx — 资料制卡（文档上传）
 import { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle, Loader2, ChevronRight, UploadCloud, ChevronDown } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ChevronRight, UploadCloud, ChevronDown } from 'lucide-react';
 import { API_BASE } from '../api/client';
 import { CATEGORIES } from '../constants';
 import { loadCustomDecks } from '../utils/customDecks';
 import { getDecks } from '../api/documents';
 import { useDocumentQueue } from '../hooks/useDocumentQueue';
+import BackButton from './BackButton';
 
 interface IngestResult {
   sourceId: string;
@@ -136,9 +137,7 @@ export default function IngestPage({ onBack, onNavigate }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center gap-3">
-        <button onClick={onBack} className="p-1 -ml-1">
-          <ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} />
-        </button>
+        <BackButton onClick={onBack} />
         <FileText className="w-5 h-5" style={{ color: ACCENT }} />
         <h1 className="nav-title">资料制卡</h1>
       </div>

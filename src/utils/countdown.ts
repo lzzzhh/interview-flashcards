@@ -12,6 +12,8 @@ export interface CountdownPlan {
   urgentModules: { deck: string; due: number; new: number }[];
 }
 
+const REVIEW_STATES = new Set(['learning', 'review', 'relearning']);
+
 /**
  * 计算倒计时学习计划
  * @param targetDate 目标日期 (YYYY-MM-DD)
@@ -42,7 +44,7 @@ export function calculateCountdownPlan(
     if (!sm2 || sm2.state === 'new') {
       newCardsLeft++;
       moduleStats[deck].new++;
-    } else {
+    } else if (REVIEW_STATES.has(sm2.state)) {
       if (sm2.nextReview && sm2.nextReview <= now) {
         dueCards++;
         moduleStats[deck].due++;

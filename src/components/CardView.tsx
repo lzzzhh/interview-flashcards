@@ -347,9 +347,9 @@ function QAView({ card }: { card: QACard }) {
   };
 
   return (
-    <div className="space-y-2">
-      {/* Sticky header: Meta + Question + Tags */}
-      <div className="sticky top-0 z-10 -mx-4 border-b border-black/5 bg-transparent px-4 pb-3 pt-1 dark:border-white/10 dark:bg-transparent sm:-mx-6 sm:px-6">
+    <div className="flex h-full min-h-0 flex-col">
+      {/* Header: Meta + Question + Tags */}
+      <div className="shrink-0 -mx-4 border-b border-black/5 bg-transparent px-4 pb-3 pt-1 dark:border-white/10 dark:bg-transparent sm:-mx-6 sm:px-6">
         <div className="mb-2 flex items-center justify-between gap-3 border-b border-black/5 pb-2 dark:border-white/10">
           <div className="min-w-0 flex-1">
             <ReviewMeta sm2={card.sm2} inline />
@@ -378,12 +378,10 @@ function QAView({ card }: { card: QACard }) {
       </div>
 
       {/* Scrollable answer area */}
-      <div>
-      {/* Reveal / Hide Answer Toggle */}
-      <div className="pt-1">
+      <div className="flex min-h-0 flex-1 flex-col pt-2">
         <button
           onClick={handleToggleAnswer}
-          className={`flex items-center gap-1.5 text-sm font-medium transition-colors w-full justify-center py-2 rounded-lg
+          className={`flex shrink-0 items-center gap-1.5 text-sm font-medium transition-colors w-full justify-center py-2 rounded-lg
             ${showAnswer
               ? 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
               : 'text-primary hover:text-primary-hover bg-primary/5 hover:bg-primary/10'}`}
@@ -401,11 +399,11 @@ function QAView({ card }: { card: QACard }) {
           )}
         </button>
 
-        {/* Answer — collapsible with smooth transition */}
+        {/* Answer — constrained to the answer workspace */}
         <div
-          className={`transition-all duration-400 ease-out ${
+          className={`min-h-0 flex-1 transition-all duration-400 ease-out ${
             showAnswer
-              ? 'max-h-[2000px] opacity-100 mt-3 overflow-visible'
+              ? 'opacity-100 mt-3 overflow-y-auto'
               : 'max-h-0 opacity-0 overflow-hidden'
           }`}
         >
@@ -421,7 +419,6 @@ function QAView({ card }: { card: QACard }) {
           参考: {card.source}
         </p>
       )}
-      </div>
     </div>
   );
 }
@@ -443,7 +440,7 @@ export default function CardView({ card, showApproach, showCode }: CardViewProps
   // QA cards with flip animation
   return (
     <div className={shellClass}>
-      <div className="overflow-y-auto flex-1 pr-1 -mr-1">
+      <div className="min-h-0 flex-1 pr-1 -mr-1">
         <QAView card={card} />
       </div>
     </div>

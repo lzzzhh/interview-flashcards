@@ -1,19 +1,59 @@
 // backend/src/routes/reviews.ts — 评分 + 学习统计 API
 import { FastifyInstance } from 'fastify';
 import prisma from '../db/prisma';
+import { rebuildStatsSnapshot } from '../services/stats-snapshot';
 
 const USER_ID = 'demo-user';
 
 export async function reviewRoutes(app: FastifyInstance) {
   // POST /api/reviews — 评分（atomic: review log + progress update）
   app.post('/api/reviews', async (req, reply) => {
-    const { cardId, rating } = req.body as { cardId: string; rating: number };
+    const { cardId, rating, clientReviewId, sprint, autoResolveInterval } = req.body as {
+      cardId: string;
+      rating: number;
+      clientReviewId?: string;
+      sprint?: boolean;
+      autoResolveInterval?: number;
+    };
     if (!cardId || rating == null) {
       return reply.status(400).send({ error: 'cardId and rating required' });
     }
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      return reply.status(400).send({ error: 'rating must be an integer from 1 to 5' });
+    }
 
     const now = new Date();
-    await prisma.$transaction(async (tx) => {
+    const today = getDateInTZ(now, 'Australia/Sydney');
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const stableLogId = normalizeClientReviewId(clientReviewId);
+
+    const result = await prisma.$transaction(async (tx) => {
+      if (stableLogId) {
+        const existingLog = await tx.reviewLog.findUnique({ where: { id: stableLogId } });
+        if (existingLog) {
+          const progress = await tx.cardProgress.findUnique({
+            where: { userId_cardId: { userId: USER_ID, cardId } },
+          });
+          return { progress, log: existingLog, duplicate: true };
+        }
+      }
+
+      const existingTodayLog = await tx.reviewLog.findFirst({
+        where: {
+          userId: USER_ID,
+          cardId,
+          reviewedAt: { gte: today, lt: tomorrow },
+        },
+        orderBy: { reviewedAt: 'desc' },
+      });
+      if (existingTodayLog) {
+        const progress = await tx.cardProgress.findUnique({
+          where: { userId_cardId: { userId: USER_ID, cardId } },
+        });
+        return { progress, log: existingTodayLog, duplicate: true };
+      }
+
       const old = await tx.cardProgress.findUnique({
         where: { userId_cardId: { userId: USER_ID, cardId } },
       });
@@ -23,12 +63,15 @@ export async function reviewRoutes(app: FastifyInstance) {
         state: 'new', easeFactor: 2.5, intervalDays: 0,
         repetitions: 0, lapses: 0, nextReview: now,
       };
-      const newSm2 = calculateSM2(oldState, rating);
+      const newSm2 = calculateSM2(oldState, rating, {
+        sprint: sprint === true,
+        autoResolveInterval,
+      });
 
       // Write review log
-      await tx.reviewLog.create({
+      const log = await tx.reviewLog.create({
         data: {
-          id: `rl-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          id: stableLogId || `rl-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           userId: USER_ID,
           cardId,
           rating,
@@ -53,7 +96,7 @@ export async function reviewRoutes(app: FastifyInstance) {
       });
 
       // Upsert progress
-      await tx.cardProgress.upsert({
+      const progress = await tx.cardProgress.upsert({
         where: { userId_cardId: { userId: USER_ID, cardId } },
         update: {
           state: newSm2.state,
@@ -76,9 +119,18 @@ export async function reviewRoutes(app: FastifyInstance) {
           lastReviewedAt: now,
         },
       });
+
+      return { progress, log };
     });
 
-    return { ok: true };
+    if (!result.duplicate) await rebuildStatsSnapshot(USER_ID);
+
+    return {
+      cardId,
+      progress: result.progress,
+      log: result.log,
+      duplicate: result.duplicate ?? false,
+    };
   });
 
   // GET /api/stats/today?timezone=Australia/Sydney
@@ -156,25 +208,49 @@ export async function reviewRoutes(app: FastifyInstance) {
 
 // ── SM2 calculation ──
 
-function calculateSM2(old: any, rating: number) {
+function calculateSM2(old: any, rating: number, options: { sprint?: boolean; autoResolveInterval?: number } = {}) {
+  const sprint = options.sprint === true;
+  const autoResolveInterval = Number.isFinite(options.autoResolveInterval)
+    ? Math.max(1, Number(options.autoResolveInterval))
+    : Infinity;
   let { easeFactor, intervalDays, repetitions, lapses, state } = old;
   if (rating < 3) {
     lapses = (lapses || 0) + 1;
-    repetitions = 0;
-    intervalDays = 1;
+    repetitions = (repetitions || 0) + 1;
+    intervalDays = rating === 1 ? 1 : Math.max(1, Math.round((intervalDays || 0) * 0.5));
     easeFactor = Math.max(1.3, (easeFactor || 2.5) - 0.2);
     state = 'relearning';
   } else {
     repetitions = (repetitions || 0) + 1;
     easeFactor = (easeFactor || 2.5) + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02));
     easeFactor = Math.max(1.3, easeFactor);
-    if (repetitions === 1) intervalDays = 1;
-    else if (repetitions === 2) intervalDays = 6;
-    else intervalDays = Math.round(intervalDays * easeFactor);
-    state = repetitions === 1 ? 'learning' : 'review';
+    if (state === 'new' || repetitions === 1) {
+      intervalDays = 1;
+      state = 'learning';
+    } else if (state === 'learning') {
+      intervalDays = sprint ? (rating >= 4 ? 4 : 2) : (rating >= 4 ? 6 : 3);
+      state = 'review';
+    } else if (state === 'relearning') {
+      intervalDays = sprint ? (rating >= 4 ? 4 : 3) : (rating >= 4 ? 7 : 4);
+      state = 'review';
+    } else {
+      const m = rating === 3 ? 1.0 : rating === 4 ? 1.3 : 1.6;
+      intervalDays = Math.round((intervalDays || 1) * easeFactor * m);
+      state = 'review';
+    }
+    if (state === 'review' && intervalDays >= autoResolveInterval) {
+      state = 'mastered';
+    }
   }
   const nextReview = new Date(Date.now() + intervalDays * 86400000);
   return { state, easeFactor, intervalDays, repetitions, lapses, nextReview };
+}
+
+function normalizeClientReviewId(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!/^[A-Za-z0-9:_-]{8,120}$/.test(trimmed)) return null;
+  return trimmed;
 }
 
 function getDateInTZ(date: Date, tz: string): Date {

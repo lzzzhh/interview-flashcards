@@ -13,14 +13,12 @@ import type { RoleProfile } from './role-profiles/types';
 import { ruleValidate, validateCardIds, type GuardContext } from './guards/plan-rule-validator';
 import { llmGuard } from './guards/plan-llm-guard';
 import { generateJobPrepPlanWithReActAgents } from './job-prep-react-agents';
+import { classifyJobPrepIntent, isJobDescriptionText, type JobPrepIntent, type JobPrepIntentResult } from './job-prep-intent';
+import { JdParseSchema, JobPrepPlanSchema, TargetParseSchema, parseWithSchema } from './job-prep-schemas';
 
 // ── Intent types ──
 
-export type JobPrepIntent =
-  | 'provide_jd' | 'confirm_jd' | 'search_jd_again'
-  | 'revise_plan' | 'shorten_plan' | 'strengthen_skill' | 'reduce_topic'
-  | 'replace_cards' | 'explain_plan' | 'regenerate_plan'
-  | 'start_learning' | 'general_question';
+export type { JobPrepIntent };
 
 type PrepHorizon = 'short' | 'medium' | 'long';
 
@@ -81,18 +79,15 @@ function codingBasicsLimit(horizon: PrepHorizon) {
 
 // ── Helpers ──
 
-function safeParseJson(text: string): any {
-  try { return JSON.parse(text); } catch {}
-  const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (m) { try { return JSON.parse(m[1]); } catch {} }
-  const s = text.indexOf('{'), e = text.lastIndexOf('}');
-  if (s >= 0 && e > s) { try { return JSON.parse(text.slice(s, e + 1)); } catch {} }
-  return null;
-}
-
 async function llm(prompt: string, userContent: string): Promise<string> {
   const p = getLLMProvider(); if (!p) throw new Error('LLM not configured');
-  const r = await p.chat({ model: p.defaultModel, messages: [{ role: 'system', content: prompt }, { role: 'user', content: userContent }], temperature: 0.3, maxTokens: 4096 });
+  const r = await p.chat({
+    model: p.defaultModel,
+    messages: [{ role: 'system', content: prompt }, { role: 'user', content: userContent }],
+    temperature: 0.3,
+    maxTokens: 4096,
+    responseFormat: 'json_object',
+  });
   return r.text;
 }
 
@@ -153,9 +148,11 @@ function detectDays(text: string): number | undefined {
 
 function detectPrepIntent(text: string, session: any): PrepIntentProfile {
   const lower = text.toLowerCase();
-  const days = detectDays(text);
   const hasShortSignal = /(今天|今晚|明天|后天|大后天|过两天|这两天|马上|很急|临时|突击|冲刺|来不及|短期)/.test(text);
-  const hasLongSignal = /(长期|系统性|系统\s*(准备|学习|复习|梳理|过一遍)|全面|完整|从零|打基础|全部|所有|全量|刷完|hot\s*100|hot100|leetcode|力扣|一个月|两个月|三个月|半年)/i.test(text);
+  const hasLongSignal = /(长期|系统性|系统\s*(准备|学习|复习|梳理|过一遍)|全面|完整|从零|打基础|全部|所有|全量|刷完|hot\s*100|hot100|leetcode|力扣)/i.test(text);
+  const hasPrepDurationContext = /(准备|备战|面试|冲刺|复习|计划|只有|剩|来不及|系统)/.test(text);
+  const rawDays = detectDays(text);
+  const days = (hasPrepDurationContext || hasShortSignal || hasLongSignal) ? rawDays : undefined;
   const explicit = days !== undefined || hasShortSignal || hasLongSignal;
 
   let horizon: PrepHorizon = 'medium';
@@ -196,25 +193,83 @@ function detectPrepIntent(text: string, session: any): PrepIntentProfile {
   };
 }
 
-function isJobDescriptionText(content: string) {
-  const c = content.trim();
-  return c.length > 80 && (
-    c.includes('岗位') || c.includes('职位描述') || c.includes('职位要求') ||
-    c.includes('职责') || c.includes('要求') || c.includes('任职') || c.includes('负责') ||
-    /responsibilities|requirements|job description/i.test(c)
-  );
-}
-
 function hasUsableTarget(session: any) {
   const role = String(session.role || '').trim();
-  return !!role && role !== 'unknown' && role.length < 80;
+  return !!role
+    && role !== 'unknown'
+    && role.length < 40
+    && !/(准备|面试|JD|jd|岗位描述|职位描述|暂时没有|没有)/.test(role);
+}
+
+function inferRoleFamily(text: string) {
+  const combined = text.toLowerCase();
+  if (/数据分析|bi|tableau|埋点|数仓|取数|sql/.test(combined)) return 'data-analysis';
+  if (/数据科学|因果|a\/b|ab实验|机器学习/.test(combined)) return 'data-science';
+  if (/后端|java|go|spring|分布式/.test(combined)) return 'backend';
+  if (/前端|react|vue|typescript|javascript/.test(combined)) return 'frontend';
+  if (/大模型|llm|rag|agent|prompt/.test(combined)) return 'llm-application';
+  if (/算法|leetcode|hot100|动态规划/.test(combined)) return 'algorithm';
+  return 'other';
+}
+
+function inferTargetFromPlainText(content: string) {
+  const cleaned = content.replace(/\s+/g, ' ').trim();
+  const knownCompanies = ['字节跳动', '腾讯微信', '腾讯', '阿里', '蚂蚁', '美团', '百度', '快手', '京东', '小红书', '抖音', '飞书'];
+  const company = knownCompanies.find(name => cleaned.includes(name)) || null;
+  const knownRoleMatch = cleaned.match(/(AI\s*应用开发工程师|大模型算法工程师|机器学习工程师|数据科学实习生|数据分析实习生|数据分析师|算法工程师|后端开发工程师|前端开发工程师|Java\s*开发工程师)/i);
+  const fallbackRoleMatch = cleaned.match(/(?:岗位|职位)?[:：]?\s*([\u4e00-\u9fa5A-Za-z0-9 +#/.-]{2,24}(?:工程师|开发|实习生|分析师|科学家|算法岗|开发岗|产品岗|运营岗))/i);
+  const roleMatch = knownRoleMatch || fallbackRoleMatch;
+  const role = (roleMatch?.[1] || '')
+    .replace(company || '', '')
+    .replace(/^(我想|我要|希望|计划|打算|准备|面试|应聘|投递|按通用|通用|的|岗位：?|职位：?)+/, '')
+    .replace(/岗位$/, '')
+    .trim();
+  return {
+    company,
+    role: role && role.length < 40 ? role.replace(/岗位$/, '') : 'unknown',
+    roleFamily: inferRoleFamily(cleaned),
+  };
+}
+
+function inferTargetFromJD(content: string) {
+  const firstLine = content.split(/\n/).map(line => line.trim()).find(Boolean) || '';
+  const titleMatch = firstLine.match(/^(.+?)[-—–](.+)$/);
+  const role = (titleMatch?.[1] || firstLine).trim();
+  const company = titleMatch?.[2]?.trim() || null;
+  return {
+    company,
+    role: role || 'unknown',
+    roleFamily: inferRoleFamily(`${content}\n${role}`),
+  };
 }
 
 async function parseTargetIntoSession(session: any, content: string) {
+  if (isJobDescriptionText(content)) {
+    const inferred = inferTargetFromJD(content);
+    return prisma.jobPrepSession.update({
+      where: { id: session.id },
+      data: {
+        company: inferred.company || session.company || null,
+        role: inferred.role || session.role || 'unknown',
+        roleFamily: inferred.roleFamily || session.roleFamily || null,
+      },
+    });
+  }
   try {
     const raw = await llm(TARGET_PARSE_PROMPT, content.slice(0, 3000));
-    const parsed = safeParseJson(raw);
-    if (!parsed?.role) return session;
+    const parsed = parseWithSchema(TargetParseSchema, raw);
+    if (!parsed?.role) {
+      const inferred = inferTargetFromPlainText(content);
+      if (!inferred.role || inferred.role === 'unknown') return session;
+      return prisma.jobPrepSession.update({
+        where: { id: session.id },
+        data: {
+          company: inferred.company || session.company || null,
+          role: inferred.role,
+          roleFamily: inferred.roleFamily || session.roleFamily || null,
+        },
+      });
+    }
     return prisma.jobPrepSession.update({
       where: { id: session.id },
       data: {
@@ -224,7 +279,16 @@ async function parseTargetIntoSession(session: any, content: string) {
       },
     });
   } catch {
-    return session;
+    const inferred = inferTargetFromPlainText(content);
+    if (!inferred.role || inferred.role === 'unknown') return session;
+    return prisma.jobPrepSession.update({
+      where: { id: session.id },
+      data: {
+        company: inferred.company || session.company || null,
+        role: inferred.role,
+        roleFamily: inferred.roleFamily || session.roleFamily || null,
+      },
+    });
   }
 }
 
@@ -249,7 +313,7 @@ async function getSessionContext(session: any) {
   return { selectedPosting, contextText, prepIntent: detectPrepIntent(contextText, session) };
 }
 
-async function savePastedJD(session: any, content: string) {
+async function savePastedJD(session: any, content: string, parseRequirements = true) {
   const posting = await prisma.jobPostingSnapshot.create({
     data: {
       sessionId: session.id,
@@ -266,9 +330,9 @@ async function savePastedJD(session: any, content: string) {
     data: { selected: false },
   });
 
-  try {
+  if (parseRequirements) try {
     const raw = await llm(JD_PARSE_PROMPT, `Parse this JD:\n${content.slice(0, 3000)}`);
-    const parsed = safeParseJson(raw);
+    const parsed = parseWithSchema(JdParseSchema, raw);
     if (parsed?.requirements) {
       await prisma.jobRequirement.deleteMany({ where: { sessionId: session.id } });
       for (const r of parsed.requirements) {
@@ -452,27 +516,20 @@ function buildDeterministicPlan(
 
 // ── Intent Classifier ──
 
-function classifyIntent(content: string, hasPlan: boolean): JobPrepIntent {
-  const c = content.toLowerCase();
-  const ch = content;
+function classifyIntent(content: string, hasPlan: boolean): JobPrepIntentResult {
+  return classifyJobPrepIntent(content, hasPlan);
+}
 
-  // JD-related — must have content > 80 chars AND contain JD signal words
-  if (isJobDescriptionText(ch)) return 'provide_jd';
-  if (ch.includes('搜索') && (ch.includes('JD') || ch.includes('岗位') || ch.includes('公开'))) return 'search_jd_again';
-
-  if (!hasPlan) return 'general_question';
-
-  // Plan revisions
-  if (/\d+\s*天/.test(c) && (c.includes('只有') || c.includes('缩短') || c.includes('压缩'))) return 'shorten_plan';
-  if (c.includes('为什么') || c.includes('解释') || c.includes('安排') || c.includes('推荐') || c.includes('漏掉') || c.includes('覆盖') || /jd.*要求|明确要求/i.test(c)) return 'explain_plan';
-  if (c.includes('不要删') || c.includes('别删') || c.includes('保留') || c.includes('补上') || c.includes('漏了') || /(不要|别).{0,8}(一上来|开始|第一|前面|最初)/.test(c)) return 'revise_plan';
-  if (c.includes('加强') || c.includes('增加') || c.includes('更多')) return 'strengthen_skill';
-  if (c.includes('减少') || c.includes('去掉') || c.includes('删除') || c.includes('不要')) return 'reduce_topic';
-  if (c.includes('换') || c.includes('替换') || c.includes('不相关') || c.includes('不想学')) return 'replace_cards';
-  if (c.includes('重新') && (c.includes('生成') || c.includes('计划'))) return 'regenerate_plan';
-  if (c.includes('开始') && (c.includes('学习') || c.includes('学'))) return 'start_learning';
-
-  return 'general_question';
+async function logAgentTrace(sessionId: string, event: string, payload: Record<string, any>) {
+  await prisma.jobPrepMessage.create({
+    data: {
+      sessionId,
+      role: 'tool',
+      content: event,
+      toolName: event,
+      toolPayload: payload,
+    },
+  }).catch(() => {});
 }
 
 // ── Main Handler ──
@@ -490,13 +547,22 @@ export async function handleJobPrepMessage(sessionId: string, content: string): 
 
   const activePlan = await loadActivePlan(session.activePlanId);
   const hasPlan = !!session.activePlanId;
+  const intentResult = classifyIntent(content, hasPlan);
+  await logAgentTrace(sessionId, 'intent_classified', {
+    intent: intentResult.intent,
+    confidence: intentResult.confidence,
+    reason: intentResult.reason,
+    hasPlan,
+    status: session.status,
+  });
 
-  if (!hasPlan && (isJobDescriptionText(content) || !hasUsableTarget(session))) {
+  if (!hasPlan && (isJobDescriptionText(content) || !hasUsableTarget(session) || !session.roleFamily)) {
     session = await parseTargetIntoSession(session, content);
   }
 
   if (!hasPlan && isJobDescriptionText(content)) {
-    await savePastedJD(session, content);
+    const prepIntentFromMessage = detectPrepIntent(content, session);
+    await savePastedJD(session, content, prepIntentFromMessage.explicit);
     session = await loadSession(sessionId);
     if (!session) return { assistantMessage: '会话不存在。', nextAction: 'collect_target' };
   }
@@ -549,10 +615,8 @@ export async function handleJobPrepMessage(sessionId: string, content: string): 
     return generateAndSavePlan(session);
   }
 
-  const intent = classifyIntent(content, hasPlan);
-
   // ── Route by intent ──
-  switch (intent) {
+  switch (intentResult.intent) {
     case 'provide_jd': return handleProvideJD(session, content);
     case 'search_jd_again': return handleSearchJD(session);
     case 'confirm_jd': return handleConfirmJD(session, content);
@@ -577,7 +641,7 @@ async function handleProvideJD(session: any, content: string) {
   // Parse requirements
   try {
     const raw = await llm(JD_PARSE_PROMPT, `Parse this JD:\n${content.slice(0, 3000)}`);
-    const parsed = safeParseJson(raw);
+    const parsed = parseWithSchema(JdParseSchema, raw);
     if (parsed?.requirements) for (const r of parsed.requirements) {
       await prisma.jobRequirement.create({ data: { sessionId: session.id, type: r.type || 'skill', name: r.name, normalizedName: r.normalizedName, importance: r.importance || 'unknown', evidenceText: r.evidenceText } });
     }
@@ -592,6 +656,12 @@ async function handleProvideJD(session: any, content: string) {
 }
 
 async function handleSearchJD(session: any) {
+  if (process.env.JOB_PREP_ENABLE_PUBLIC_JD_SEARCH !== 'true') {
+    return {
+      assistantMessage: '为了保证岗位信息可靠，请直接粘贴岗位 JD；如果暂时没有 JD，回复「没有 JD」，我会按岗位画像生成通用计划。',
+      nextAction: 'ask_for_jd',
+    };
+  }
   const result = await searchPublicJD(session.company || '', session.role || '');
   if (result.candidates.length > 0) {
     for (const c of result.candidates) {
@@ -618,7 +688,7 @@ async function handleConfirmJD(session: any, content: string) {
     // Parse requirements from confirmed JD
     try {
       const raw = await llm(JD_PARSE_PROMPT, `Parse this JD:\n${candidate.cleanedText || candidate.rawText}`);
-      const parsed = safeParseJson(raw);
+      const parsed = parseWithSchema(JdParseSchema, raw);
       if (parsed?.requirements) for (const r of parsed.requirements) {
         await prisma.jobRequirement.create({ data: { sessionId: session.id, type: r.type || 'skill', name: r.name, normalizedName: r.normalizedName, importance: r.importance || 'unknown', evidenceText: r.evidenceText } });
       }
@@ -687,16 +757,44 @@ async function handleGeneralQuestion(session: any, plan: any, content: string) {
 
 // ── Plan Generation & Revision ──
 
+async function shouldUseFastPlan(session: any) {
+  const [selectedPosting, userMessages] = await Promise.all([
+    prisma.jobPostingSnapshot.findFirst({
+      where: { sessionId: session.id, selected: true },
+      orderBy: { updatedAt: 'desc' },
+    }),
+    prisma.jobPrepMessage.findMany({
+      where: { sessionId: session.id, role: 'user' },
+      orderBy: { createdAt: 'asc' },
+      take: 20,
+    }),
+  ]);
+  const prepIntent = detectPrepIntent(
+    [session.company || '', session.role || '', selectedPosting?.cleanedText || selectedPosting?.rawText || '', ...userMessages.map(m => m.content)].filter(Boolean).join('\n'),
+    session,
+  );
+  return prepIntent.horizon === 'short';
+}
+
 async function generateAndSavePlan(session: any) {
-  if (process.env.JOB_PREP_AGENT_MODE !== 'single') {
+  const useFastPlan = await shouldUseFastPlan(session);
+  if (!useFastPlan && process.env.JOB_PREP_AGENT_MODE !== 'single') {
     try {
       const result = await generateJobPrepPlanWithReActAgents(session, {
         savePlan: (plan) => savePlanToDB(session.id, plan),
+      });
+      await logAgentTrace(session.id, 'react_run_completed', {
+        mode: result.mode,
+        savedPlanId: result.savedPlanId,
+        metrics: result.metrics,
+        guardErrors: result.guardErrors,
+        trace: result.trace,
       });
       if (result.userQuestion && !result.plan) {
         return { assistantMessage: result.userQuestion, nextAction: 'ask_for_jd', data: { reactTrace: result.trace } };
       }
       if (!result.plan) throw new Error('multi-agent returned no plan');
+      if (!result.savedPlanId) throw new Error('multi-agent returned an unsaved plan');
       const savedPlanId = result.savedPlanId;
       return {
         assistantMessage: `计划「${result.plan.title || '备战计划'}」已生成！共 ${result.metrics.stageCount} 个阶段、${result.metrics.selectedCardCount} 张卡片。\n\nReAct 多 Agent 指标：cardId 幻觉率 ${Math.round(result.metrics.hallucinationRate * 100)}%，核心覆盖率 ${Math.round(result.metrics.mustCoverCoverage * 100)}%，规则错误 ${result.metrics.ruleErrorCount} 个。`,
@@ -761,11 +859,36 @@ async function generateAndSavePlan(session: any) {
     ? cards.map(c => `- ${c.id}: [${c.deckId || ''}] ${c.question || c.title || ''}`).join('\n')
     : '(no cards available — generate topic-based plan with empty cards array, use topic fields instead)';
 
+  if (prepIntent.horizon === 'short' && hasCards) {
+    const draftPlan = buildDeterministicPlan(session, cards, prepIntent, profile);
+    const saved = await savePlanToDB(session.id, draftPlan);
+    await logAgentTrace(session.id, 'fast_plan_saved', {
+      reason: 'short_horizon',
+      planId: saved.id,
+      horizon: prepIntent.horizon,
+      cardCount: cards.length,
+      stageCount: draftPlan.stages?.length || 0,
+    });
+    return {
+      assistantMessage: `计划「${draftPlan.title}」已生成！${prepIntent.reason} 共 ${draftPlan.stages.length} 个阶段、${cards.length} 张卡片。`,
+      nextAction: 'await_user',
+      data: { planId: saved.id },
+      _guardDetails: { guardPassed: true, repairCount: 0, errors: [] },
+    };
+  }
+
   if (prepIntent.includeFullDecks.length > 0 && fullDeckCards.length > 0) {
     const fullDeckIds = new Set(prepIntent.includeFullDecks);
     const comprehensiveCards = cards.filter(card => card.deckId && fullDeckIds.has(card.deckId));
     const draftPlan = buildDeterministicPlan(session, comprehensiveCards, prepIntent, profile);
     const saved = await savePlanToDB(session.id, draftPlan);
+    await logAgentTrace(session.id, 'fast_plan_saved', {
+      reason: 'full_deck',
+      planId: saved.id,
+      includeFullDecks: prepIntent.includeFullDecks,
+      cardCount: comprehensiveCards.length,
+      stageCount: draftPlan.stages?.length || 0,
+    });
     return {
       assistantMessage: `计划「${draftPlan.title}」已生成！${prepIntent.reason} 共 ${draftPlan.stages.length} 个阶段、${comprehensiveCards.length} 张卡片。`,
       nextAction: 'await_user',
@@ -834,7 +957,7 @@ async function generateAndSavePlan(session: any) {
       let draftPlan: any = null;
       try {
         const raw = await llm(PLAN_GENERATE_PROMPT, currentPrompt);
-        draftPlan = safeParseJson(raw);
+        draftPlan = parseWithSchema(JobPrepPlanSchema, raw);
       } catch (e: any) {
         guardErrors.push({ code: 'LLM_FAIL', message: `LLM call failed: ${e.message}`, severity: 'error' });
         if (attempt < MAX_REPAIRS) { repairCount++; continue; }
@@ -883,6 +1006,14 @@ async function generateAndSavePlan(session: any) {
       const saved = await savePlanToDB(session.id, draftPlan);
       const stageCount = draftPlan.stages?.length || 0;
       const cardTotal = draftPlan.stages?.reduce((s: number, st: any) => s + (st.cards?.length || 0), 0) || 0;
+      await logAgentTrace(session.id, 'fallback_plan_saved', {
+        reason: 'deterministic_cards',
+        planId: saved.id,
+        guardErrors,
+        repairCount,
+        cardCount: cardTotal,
+        stageCount,
+      });
       return {
         assistantMessage: `计划「${draftPlan.title}」已生成！${prepIntent.reason} 共 ${stageCount} 个阶段、${cardTotal} 张卡片。`,
         nextAction: 'await_user',
@@ -908,12 +1039,22 @@ async function revisePlanWithFeedback(session: any, plan: any, feedback: string,
 
   if (process.env.JOB_PREP_AGENT_MODE !== 'single') {
     try {
-      await prisma.jobPrepPlan.update({ where: { id: plan.id }, data: { status: 'archived' } });
       const result = await generateJobPrepPlanWithReActAgents(session, {
         currentPlan: plan,
         revisionFeedback: feedback,
         estimatedDays,
         savePlan: (nextPlan) => savePlanToDB(session.id, nextPlan, plan.version + 1, plan.id),
+      });
+      if (!result.savedPlanId) throw new Error('multi-agent revision returned no saved plan');
+      await prisma.jobPrepPlan.update({ where: { id: plan.id }, data: { status: 'archived' } });
+      await logAgentTrace(session.id, 'react_revision_completed', {
+        previousPlanId: plan.id,
+        savedPlanId: result.savedPlanId,
+        feedback,
+        estimatedDays,
+        metrics: result.metrics,
+        guardErrors: result.guardErrors,
+        trace: result.trace,
       });
       return {
         assistantMessage: `已根据「${feedback}」调整计划，并通过 ReAct/Guard 校验。`,
@@ -938,11 +1079,17 @@ async function revisePlanWithFeedback(session: any, plan: any, feedback: string,
 
   try {
     const raw = await llm(PLAN_REVISE_PROMPT, prompt);
-    const revised = safeParseJson(raw);
+    const revised = parseWithSchema(JobPrepPlanSchema, raw);
     if (revised) {
       // Archive old plan, save new
       await prisma.jobPrepPlan.update({ where: { id: plan.id }, data: { status: 'archived' } });
       const saved = await savePlanToDB(session.id, revised, plan.version + 1, plan.id);
+      await logAgentTrace(session.id, 'fallback_revision_saved', {
+        previousPlanId: plan.id,
+        planId: saved.id,
+        feedback,
+        estimatedDays,
+      });
       return { assistantMessage: `已根据「${feedback}」调整计划。`, nextAction: 'await_user', data: { planId: saved.id } };
     }
     return { assistantMessage: '调整遇到问题，请重试。', nextAction: 'await_user' };
@@ -952,20 +1099,46 @@ async function revisePlanWithFeedback(session: any, plan: any, feedback: string,
 }
 
 async function savePlanToDB(sessionId: string, plan: any, version = 1, parentPlanId?: string) {
+  const normalizedPlan = JobPrepPlanSchema.parse(plan || {});
+  const validPlanCards: Array<{ stageIndex: number; cardIndex: number; card: any; existingDeckId: string | null }> = [];
+  const requestedCards = (normalizedPlan.stages || []).flatMap((stage, stageIndex) =>
+    (stage.cards || []).map((card, cardIndex) => ({ stageIndex, cardIndex, card }))
+  ).filter(item => item.card.cardId);
+  if (requestedCards.length > 0) {
+    const existing = await prisma.card.findMany({
+      where: { id: { in: requestedCards.map(item => item.card.cardId as string) } },
+      select: { id: true, deckId: true },
+    });
+    const existingById = new Map(existing.map(card => [card.id, card.deckId]));
+    for (const item of requestedCards) {
+      const existingDeckId = existingById.get(item.card.cardId as string);
+      if (existingDeckId !== undefined) validPlanCards.push({ ...item, existingDeckId });
+    }
+  }
   const p = await prisma.jobPrepPlan.create({
     data: {
-      sessionId, title: plan.title || '备战计划', summary: plan.summary, estimatedDays: plan.estimatedDays,
+      sessionId, title: normalizedPlan.title || '备战计划', summary: normalizedPlan.summary, estimatedDays: normalizedPlan.estimatedDays,
       version, parentPlanId: parentPlanId || null,
-      totalStages: (plan.stages || []).length, totalCards: (plan.stages || []).reduce((s: number, st: any) => s + (st.cards || []).length, 0),
+      totalStages: normalizedPlan.stages.length, totalCards: validPlanCards.length,
     },
   });
-  for (const [si, stage] of (plan.stages || []).entries()) {
+  for (const [si, stage] of normalizedPlan.stages.entries()) {
     const st = await prisma.jobPrepStage.create({ data: { planId: p.id, order: si, name: stage.name || `Stage ${si + 1}`, goal: stage.goal || '', estimatedMinutes: stage.estimatedMinutes || 180 } });
-    for (const [ci, card] of (stage.cards || []).entries()) {
-      const exists = await prisma.card.findUnique({ where: { id: card.cardId } });
-      if (exists) {
-        await prisma.jobPrepPlanCard.create({ data: { planId: p.id, stageId: st.id, cardId: card.cardId, deckId: card.deckId || exists.deckId, order: ci, reason: card.reason || '', matchedRequirements: [], matchedConcepts: [], source: 'hybrid' } });
-      }
+    for (const item of validPlanCards.filter(card => card.stageIndex === si)) {
+      const card = item.card;
+      await prisma.jobPrepPlanCard.create({
+        data: {
+          planId: p.id,
+          stageId: st.id,
+          cardId: card.cardId as string,
+          deckId: card.deckId || item.existingDeckId,
+          order: item.cardIndex,
+          reason: card.reason || '',
+          matchedRequirements: card.matchedRequirements || [],
+          matchedConcepts: card.matchedConcepts || [],
+          source: card.source || 'hybrid',
+        },
+      });
     }
   }
   await prisma.jobPrepSession.update({ where: { id: sessionId }, data: { status: 'active', activePlanId: p.id } });

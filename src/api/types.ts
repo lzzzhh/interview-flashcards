@@ -40,6 +40,7 @@ export interface StudyQueueResponse {
 
 export interface ReviewResponse {
   cardId: string;
+  duplicate?: boolean;
   progress: CardProgressDTO | null;
   log: {
     id: string;
@@ -69,6 +70,7 @@ export interface DeckDTO {
     learningCount: number;
     reviewCount: number;
     relearningCount: number;
+    masteredCount: number;
     dueCount: number;
     favoritedCount: number;
     dailyLimit: number;
@@ -84,4 +86,38 @@ export interface DeckCardsResponse {
 
 export interface DecksResponse {
   decks: DeckDTO[];
+}
+
+export interface StatsSnapshotRowDTO {
+  userId: string;
+  scopeType: 'global' | 'deck';
+  scopeId: string;
+  label: string;
+  totalCards: number;
+  newCards: number;
+  learningCards: number;
+  reviewCards: number;
+  relearningCards: number;
+  dueCards: number;
+  startedCards: number;
+  masteredCards: number;
+  masteryRate: number;
+  favoritedCards: number;
+  todayNewLimit: number;
+  todayNewRemaining: number;
+  todayReviewLimit: number;
+  todayReviewRemaining: number;
+  todayStudiedCards: number;
+  todayReviewCount: number;
+  todayCorrectCount: number;
+  todayWrongCount: number;
+  correctRate: number | null;
+  streak: number;
+  updatedAt: string;
+}
+
+export interface StatsSnapshotResponse {
+  global: StatsSnapshotRowDTO;
+  decks: StatsSnapshotRowDTO[];
+  updatedAt: string;
 }

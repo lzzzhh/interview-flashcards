@@ -1,8 +1,12 @@
-// src/components/StatsPage.tsx — 学习统计（纯后端 API 驱动）
-import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, Clock, ChevronDown } from 'lucide-react';
-import { CATEGORIES } from '../constants';
-import { getModuleDailyLimit, setModuleDailyLimit, getModuleDailyReviewLimit, setModuleDailyReviewLimit, loadCustomDecks } from '../utils/customDecks';
+// src/components/StatsPage.tsx — 学习统计（统计投影表驱动）
+import { useState } from 'react';
+import { BookOpen, CheckCircle, Clock, Zap, Settings } from 'lucide-react';
+import { loadStudyModeConfig, PACE_LABELS } from '../utils/studyModeConfig';
+import { applyStudyModeConfig } from '../utils/applyStudyModeConfig';
+import type { StatsSnapshotResponse } from '../api/types';
+import { useStatsSnapshot } from '../repositories/useStatsSnapshot';
+import BackButton from './BackButton';
+import StudyModeSelector from './StudyModeSelector';
 
 const BLUE = 'var(--blue)';
 const GREEN = '#22C55E';
@@ -33,23 +37,50 @@ interface Props {
   onBack: () => void;
 }
 
+function snapshotToOverview(snapshot: StatsSnapshotResponse): OverviewData {
+  const global = snapshot.global;
+  return {
+    totalCards: global.totalCards,
+    dueCards: global.dueCards,
+    streak: global.streak,
+    stageCounts: {
+      new: global.newCards,
+      learning: global.learningCards,
+      review: global.reviewCards,
+      relearning: global.relearningCards,
+    },
+    masteredCards: global.masteredCards,
+    masteryRate: global.masteryRate,
+    today: {
+      reviewCount: global.todayReviewCount,
+      uniqueCardCount: global.todayStudiedCards,
+      correctCount: global.todayCorrectCount,
+      wrongCount: global.todayWrongCount,
+      correctRate: global.correctRate,
+    },
+    moduleStats: snapshot.decks.map((deck) => ({
+      key: deck.scopeId,
+      label: deck.label,
+      total: deck.totalCards,
+      started: deck.startedCards,
+    })),
+  };
+}
+
 export default function StatsPage({ onBack }: Props) {
-  const [data, setData] = useState<OverviewData | null>(null);
-  const [limitsOpen, setLimitsOpen] = useState(false);
-  const [reviewLimitsOpen, setReviewLimitsOpen] = useState(false);
+  const { snapshot, loading, refresh } = useStatsSnapshot();
+  const [modeModalOpen, setModeModalOpen] = useState(false);
+  const data = snapshot ? snapshotToOverview(snapshot) : null;
 
-  useEffect(() => {
-    fetch(`http://localhost:3001/api/stats/overview?timezone=Australia/Sydney`)
-      .then(r => r.json())
-      .then(setData)
-      .catch(() => {});
-  }, []);
+  const savedConfig = loadStudyModeConfig();
+  const activeMode = savedConfig?.mode ?? 'normal';
+  const activeLabel = PACE_LABELS[activeMode] || '正常';
 
-  if (!data) {
+  if (!data || loading) {
     return (
       <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen">
         <div className="nav-bar sticky top-0 z-20 flex items-center">
-          <button onClick={onBack} className="p-1 -ml-1"><ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} /></button>
+          <BackButton onClick={onBack} />
           <h1 className="nav-title">学习统计</h1>
         </div>
         <div className="flex-1 flex items-center justify-center"><p style={{ color: TEXT_MUTED }}>加载中...</p></div>
@@ -62,7 +93,7 @@ export default function StatsPage({ onBack }: Props) {
   return (
     <div className="dark-bg homepage-glass-stage flex flex-col min-h-screen transition-colors">
       <div className="nav-bar sticky top-0 z-20 flex items-center">
-        <button onClick={onBack} className="p-1 -ml-1"><ArrowLeft className="w-5 h-5" style={{ color: TEXT_PRIMARY }} /></button>
+        <BackButton onClick={onBack} />
         <h1 className="nav-title">学习统计</h1>
       </div>
       <div className="flex-1 flex items-center justify-center">
@@ -102,11 +133,41 @@ export default function StatsPage({ onBack }: Props) {
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
           <h2 className="text-[14px] font-bold mb-3" style={{ color: TEXT_PRIMARY }}>今日表现</h2>
           <div className="grid grid-cols-3 gap-3">
-            <StatBoxSmall label="复习次数" value={data.today.reviewCount} color={BLUE} />
+            <StatBoxSmall label="今日已学" value={data.today.reviewCount} color={BLUE} />
             <StatBoxSmall label="正确率" value={correctRateText} color={GREEN} />
             <StatBoxSmall label="错误" value={data.today.wrongCount} color="#EF4444" />
           </div>
         </div>
+
+        {/* 学习模式 */}
+        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
+          <button onClick={() => setModeModalOpen(true)} className="flex items-center justify-between w-full text-left">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4" style={{ color: ORANGE }} />
+              <h2 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>学习模式 · {activeLabel}</h2>
+            </div>
+            <Settings className="w-4 h-4" style={{ color: TEXT_MUTED }} />
+          </button>
+          {savedConfig && (
+            <div className="mt-2 text-[11px]" style={{ color: TEXT_MUTED }}>
+              {savedConfig.selectedDecks.length} 个牌组 · {savedConfig.targetDays} 天 · 自动解决≥{savedConfig.autoResolveInterval}天
+            </div>
+          )}
+        </div>
+
+        {/* Mode Selector Modal */}
+        {modeModalOpen && (
+          <StudyModeSelector
+            snapshot={snapshot}
+            variant="modal"
+            onCancel={() => setModeModalOpen(false)}
+            onApply={async (config) => {
+              await applyStudyModeConfig(config, snapshot);
+              setModeModalOpen(false);
+              refresh();
+            }}
+          />
+        )}
 
         {/* 4. 模块分布 */}
         <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
@@ -127,33 +188,6 @@ export default function StatsPage({ onBack }: Props) {
               );
             })}
           </div>
-        </div>
-
-        {/* 每日上限 */}
-        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-          <button onClick={() => setLimitsOpen(!limitsOpen)} className="flex items-center justify-between w-full text-left">
-            <h2 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>每日新卡上限</h2>
-            <ChevronDown className="w-4 h-4 transition-transform" style={{ color: TEXT_MUTED, transform: limitsOpen ? 'rotate(180deg)' : '' }} />
-          </button>
-          {limitsOpen && (
-            <div className="space-y-2 mt-3">
-              {CATEGORIES.map(cat => <ModuleLimitRow key={cat.key} id={cat.key} label={cat.label} type="new" />)}
-              {loadCustomDecks().map(d => <ModuleLimitRow key={d.id} id={d.id} label={d.name} type="new" />)}
-            </div>
-          )}
-        </div>
-
-        <div className="rounded-2xl p-4 mb-4 border" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER }}>
-          <button onClick={() => setReviewLimitsOpen(!reviewLimitsOpen)} className="flex items-center justify-between w-full text-left">
-            <h2 className="text-[14px] font-bold" style={{ color: TEXT_PRIMARY }}>每日复习上限</h2>
-            <ChevronDown className="w-4 h-4 transition-transform" style={{ color: TEXT_MUTED, transform: reviewLimitsOpen ? 'rotate(180deg)' : '' }} />
-          </button>
-          {reviewLimitsOpen && (
-            <div className="space-y-2 mt-3">
-              {CATEGORIES.map(cat => <ModuleLimitRow key={cat.key} id={cat.key} label={cat.label} type="review" />)}
-              {loadCustomDecks().map(d => <ModuleLimitRow key={d.id} id={d.id} label={d.name} type="review" />)}
-            </div>
-          )}
         </div>
 
         </div>
@@ -186,30 +220,6 @@ function StageBadge({ label, count, color }: { label: string; count: number; col
     <div>
       <div className="text-[20px] font-bold" style={{ color }}>{count}</div>
       <div className="text-[11px]" style={{ color: TEXT_MUTED }}>{label}</div>
-    </div>
-  );
-}
-
-function ModuleLimitRow({ id, label, type }: { id: string; label: string; type: 'new' | 'review' }) {
-  const getter = type === 'new' ? getModuleDailyLimit : getModuleDailyReviewLimit;
-  const setter = type === 'new' ? setModuleDailyLimit : setModuleDailyReviewLimit;
-  const [limit, setLimit] = useState(() => getter(id));
-
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-[13px]" style={{ color: TEXT_PRIMARY }}>{label}</span>
-      <div className="flex items-center gap-2">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={limit}
-          onChange={e => { const v = Number(e.target.value); setLimit(v); setter(id, v); }}
-          className="w-24 h-1.5 rounded-full appearance-none cursor-pointer"
-          style={{ accentColor: 'var(--blue)' }}
-        />
-        <span className="text-[13px] font-medium min-w-[24px] text-right" style={{ color: TEXT_PRIMARY }}>{limit}</span>
-      </div>
     </div>
   );
 }
