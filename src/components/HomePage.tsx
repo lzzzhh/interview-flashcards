@@ -9,7 +9,7 @@ import { useAppContext } from '../context/AppContext';
 import { CATEGORIES } from '../constants';
 import { countTodayNewLearned, getStreak, loadReviewLogs } from '../utils/reviewLogs';
 import { getModuleDailyLimit, getModuleDailyReviewLimit, loadCustomCards } from '../utils/customDecks';
-import { getStudyModeDeckIds, getStudyModeNewLimit, getStudyModeReviewLimit, loadStudyModeConfig } from '../utils/studyModeConfig';
+import { filterDailyLimitDeckIds, getStudyModeDeckIds, getStudyModeNewLimit, getStudyModeReviewLimit, loadStudyModeConfig } from '../utils/studyModeConfig';
 import { useDecks, deriveGlobalStats } from '../repositories/useDeckStats';
 import { useStatsSnapshot } from '../repositories/useStatsSnapshot';
 import { loadProgress } from '../utils/storage';
@@ -108,7 +108,7 @@ export default function HomePage({ onEnterStudy, onStartToday, onShowDecks, onSh
   const globalStats = useMemo(() => deriveGlobalStats(decks), [decks]);
   const studyDeckIds = useMemo(
     () => {
-      const ids = decks.length > 0 ? decks.map((deck) => deck.id) : CATEGORIES.map((category) => category.key);
+      const ids = filterDailyLimitDeckIds(decks.length > 0 ? decks.map((deck) => deck.id) : CATEGORIES.map((category) => category.key));
       if (loadStudyModeConfig()) return getStudyModeDeckIds(ids);
       return ids.filter((id) => getModuleDailyLimit(id) > 0 || getModuleDailyReviewLimit(id) > 0);
     },
@@ -208,7 +208,6 @@ export default function HomePage({ onEnterStudy, onStartToday, onShowDecks, onSh
         <div className="rounded-2xl p-4 mb-3 border flex flex-col" style={{ backgroundColor: CARD_BG, borderColor: CARD_BORDER, height: '120px' }}>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-[15px] font-bold" style={{ color: TEXT_PRIMARY }}>推荐学习</h2>
-            <span className="text-[12px] px-2 py-0.5 rounded-full" style={{ color: 'var(--text-secondary)', backgroundColor: 'rgba(255,255,255,0.08)' }}>基于推荐算法</span>
           </div>
           {recModule === null ? (
             <p className="text-[13px]" style={{ color: TEXT_MUTED }}>暂无待复习卡片</p>
